@@ -6,15 +6,18 @@ import Apps from './ApiToken';
 import Meta from './Meta';
 import NcBase from '../../types/NcBase';
 import NcPageParams from '../../types/common/NcPageParams';
+import NcListResponse from '../../types/common/NcListResponse';
 
 export default class Base {
   public static create(base: NcBase): Promise<NcBase> {
     return Promise.resolve(null);
   }
-  public static list(pageParams: NcPageParams): Promise<NcBase[]> {
+  public static list(
+    pageParams: NcPageParams
+  ): Promise<NcListResponse<NcBase>> {
     return Promise.resolve(null);
   }
-  public static update(id: string, base: NcBase): Promise<NcBase[]> {
+  public static update(id: string, base: NcBase): Promise<NcBase> {
     return Promise.resolve(null);
   }
   public static restart(): Promise<void> {

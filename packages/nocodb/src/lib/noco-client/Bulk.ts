@@ -1,5 +1,5 @@
 export default class Bulk {
-  public static create() {}
-  public static update() {}
-  public static delete() {}
+  public static create(data: any[]) {}
+  public static update(data: any[]) {}
+  public static delete(data: any[]) {}
 }
