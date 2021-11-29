@@ -2,7 +2,7 @@ import NcTimestamps from './common/NcTimestamps';
 import NcOrder from './common/NcOrder';
 import NcSoftDelete from './common/NcSoftDelete';
 
-export default interface NcFormViewColumn
+export default interface NcGridView
   extends NcTimestamps,
     NcOrder,
     NcSoftDelete {
@@ -10,12 +10,11 @@ export default interface NcFormViewColumn
   project_id: string;
   db_alias: string;
   uuid: string;
+  public: string;
+  password: string;
+  show_all_fields: string;
   tn: string;
   _tn: string;
   cn: string;
   _cn: string;
-  label: string;
-  help?: string;
-  required: string;
-  condition?: any;
 }
