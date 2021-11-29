@@ -1,4 +1,4 @@
-import UITypes from '../../lib/sqlUi/UITypes';
+import UITypes from '../lib/sqlUi/UITypes';
 import NcTimestamps from './common/NcTimestamps';
 import NcOrder from './common/NcOrder';
 import NcSoftDelete from './common/NcSoftDelete';
