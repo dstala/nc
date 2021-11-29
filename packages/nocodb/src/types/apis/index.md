@@ -1,6 +1,4 @@
 ## APIs
-
-
 - nc.base.create()
 - nc.base.list()
 - nc.base.update()
@@ -118,12 +116,29 @@
 - nc.auth.token.refresh()
 - nc.auth.token.verify()
 
+- nc.base.apiToken.list()
+- nc.base.apiToken.create()
+- nc.base.apiToken.update()
+- nc.base.apiToken.delete()
+
+- nc.base.audit.list()
 
 
 
 
-
-
+- nc.base.data.list()
+- nc.base.data.create()
+- nc.base.data.update()
+- nc.base.data.read()
+- nc.base.data.exists()
+- nc.base.data.delete()
+- nc.base.data.count()
+- nc.base.data.bulk.create()
+- nc.base.data.bulk.update()
+- nc.base.data.bulk.delete()
+- nc.base.data.distinct()
+- nc.base.data.aggregate()
+- nc.base.data.distribution()
 
 
 
@@ -138,10 +153,14 @@
 
 - nc.team.create()
 - nc.team.user.list()
+- nc.team.user.listOne()
 - nc.team.user.add()
 - nc.team.user.invite()
 - nc.team.user.update()
 - nc.team.user.delete()
+- nc.team.invitation.list()
+- nc.team.invitation.accept()
+- nc.team.invitation.reject()
 - nc.team.update()
 - nc.team.rename()
 - nc.team.delete()
