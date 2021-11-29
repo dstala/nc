@@ -117,3 +117,31 @@
 - nc.auth.password.change()
 - nc.auth.token.refresh()
 - nc.auth.token.verify()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- nc.org.create()
+- nc.org.update()
+- nc.org.rename()
+- nc.org.delete()
+
+- nc.team.create()
+- nc.team.user.list()
+- nc.team.user.add()
+- nc.team.user.invite()
+- nc.team.user.update()
+- nc.team.user.delete()
+- nc.team.update()
+- nc.team.rename()
+- nc.team.delete()
