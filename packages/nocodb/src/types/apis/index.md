@@ -172,3 +172,12 @@
 - nc.team.update()
 - nc.team.rename()
 - nc.team.delete()
+
+- nc.base.apps.list()
+- nc.base.apps.install()
+- nc.base.apps.test()
+- nc.base.apps.uninstall()
+- nc.base.apps.read()
+
+- nc.base.meta.isSync()
+- nc.base.meta.sync()
