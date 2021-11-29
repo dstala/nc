@@ -104,6 +104,15 @@
 - nc.base.table.calendarView.sort.update()
 - nc.base.table.calendarView.sort.delete()
 
+
+- nc.base.table.webhook.create()
+- nc.base.table.webhook.update()
+- nc.base.table.webhook.test()
+- nc.base.table.webhook.delete()
+- nc.base.table.webhook.log()
+- nc.base.log()
+
+
 - nc.auth.signup()
 - nc.auth.signin()
 - nc.auth.signout()
@@ -141,9 +150,8 @@
 - nc.base.data.distribution()
 
 
-
-
-
+- nc.base.table.import()
+- nc.base.table.export()
 
 
 - nc.org.create()
