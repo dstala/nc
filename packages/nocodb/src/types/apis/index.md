@@ -23,6 +23,7 @@
 - nc.base.table.filter.create()
 - nc.base.table.filter.update()
 - nc.base.table.filter.delete()
+
 - nc.base.table.sort.create()
 - nc.base.table.sort.update()
 - nc.base.table.sort.delete()
@@ -39,6 +40,9 @@
 - nc.base.table.gridView.sort.create()
 - nc.base.table.gridView.sort.update()
 - nc.base.table.gridView.sort.delete()
+- nc.base.table.gridView.share.create()
+- nc.base.table.gridView.share.update()
+- nc.base.table.gridView.share.delete()
 - 
 - nc.base.table.formView.list()
 - nc.base.table.formView.create()

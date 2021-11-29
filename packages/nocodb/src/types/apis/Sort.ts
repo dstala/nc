@@ -1,6 +1,7 @@
 import NcTimestamps from './common/NcTimestamps';
+import NcOrder from './common/NcOrder';
 
-export default interface NcSort extends NcTimestamps {
+export default interface NcFilterExp extends NcTimestamps, NcOrder {
   id: string;
   project_id: string;
   db_alias: string;
@@ -8,5 +9,11 @@ export default interface NcSort extends NcTimestamps {
   _tn: string;
   cn: string;
   _cn: string;
-  sort_order: number;
+  comparison_op: string;
+  value: string;
+  start?: string;
+  stop?: string;
+  op: 'AND' | 'OR' | string;
+  grp_idx?: number;
+  grp_op: 'AND' | 'OR' | string;
 }
