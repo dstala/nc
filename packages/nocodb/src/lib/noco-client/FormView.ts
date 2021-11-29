@@ -1,10 +1,10 @@
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 import NcListResponse from '../../types/common/NcListResponse';
 import NcFormView from '../../types/NcFormView';
 
 export default class FormView {
   public static list(
-    pageParams: NcPageParams
+    pageInfo: NcPageInfo
   ): Promise<NcListResponse<NcFormView>> {
     return Promise.resolve(null);
   }

@@ -1,9 +1,9 @@
 import Bulk from './Bulk';
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 import NcListResponse from '../../types/common/NcListResponse';
 
 export default class Data {
-  public static list(pageParams: NcPageParams): Promise<NcListResponse<any>> {
+  public static list(pageInfo: NcPageInfo): Promise<NcListResponse<any>> {
     return Promise.resolve(null);
   }
   public static create(data: any): Promise<NcListResponse<any>> {

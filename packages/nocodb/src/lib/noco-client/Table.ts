@@ -3,13 +3,13 @@ import Sort from './Sort';
 import Filter from './Filter';
 import GridView from './GridView';
 import Webhook from './Webhook';
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 import NcModel from '../../types/NcModel';
 import NcListResponse from '../../types/common/NcListResponse';
 
 export default class Table {
   public static list(
-    pageParams: NcPageParams
+    pageInfo: NcPageInfo
   ): Promise<NcListResponse<NcModel>> {
     return Promise.resolve(null);
   }

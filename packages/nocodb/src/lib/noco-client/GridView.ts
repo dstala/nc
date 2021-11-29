@@ -1,13 +1,13 @@
 import Filter from './Filter';
 import Sort from './Sort';
 import Share from './Share';
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 import NcListResponse from '../../types/common/NcListResponse';
 import NcGridView from '../../types/NcGridView';
 
 export default class GridView {
   public static list(
-    pageParams: NcPageParams
+    pageInfo: NcPageInfo
   ): Promise<NcListResponse<NcGridView>> {
     return Promise.resolve(null);
   }

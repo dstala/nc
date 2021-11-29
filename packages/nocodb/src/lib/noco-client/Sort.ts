@@ -1,10 +1,10 @@
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 import NcListResponse from '../../types/common/NcListResponse';
 import NcSort from '../../types/NcSort';
 
 export default class Sort {
   public static list(
-    pageParams: NcPageParams
+    pageInfo: NcPageInfo
   ): Promise<NcListResponse<NcSort>> {
     return Promise.resolve(null);
   }

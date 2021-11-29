@@ -1,9 +1,9 @@
 import NcListResponse from '../../types/common/NcListResponse';
 import NcBase from '../../types/NcBase';
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 
 export default class Audit {
   public static list(
-    pageParams: NcPageParams
+    pageInfo: NcPageInfo
   ): Promise<NcListResponse<NcBase>> {}
 }

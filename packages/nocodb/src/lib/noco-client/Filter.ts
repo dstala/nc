@@ -1,10 +1,10 @@
 import NcListResponse from '../../types/common/NcListResponse';
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 import NcFilterExp from '../../types/NcFilterExp';
 
 export default class Filter {
   public static list(
-    pageParams: NcPageParams
+    pageInfo: NcPageInfo
   ): Promise<NcListResponse<NcFilterExp>> {
     return Promise.resolve(null);
   }

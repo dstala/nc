@@ -1,8 +1,8 @@
 import NcListResponse from '../../types/common/NcListResponse';
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 
 export default class Apps {
-  public static list(ageParams: NcPageParams): Promise<NcListResponse<any>> {
+  public static list(ageParams: NcPageInfo): Promise<NcListResponse<any>> {
     return Promise.resolve(null);
   }
   public static create(data: any) {}

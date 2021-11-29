@@ -1,10 +1,10 @@
-import NcPageParams from '../../types/common/NcPageParams';
+import NcPageInfo from '../../types/common/NcPageInfo';
 import NcListResponse from '../../types/common/NcListResponse';
 import NcRelation from '../../types/apis/Relation';
 
 export default class Relation {
   public static list(
-    pageParams: NcPageParams
+    pageInfo: NcPageInfo
   ): Promise<NcListResponse<NcRelation>> {
     return Promise.resolve(null);
   }
