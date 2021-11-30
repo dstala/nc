@@ -4,6 +4,7 @@ import NcOrder from './common/NcOrder';
 import NcSoftDelete from './common/NcSoftDelete';
 
 interface NcColumn extends NcTimestamps, NcOrder, NcSoftDelete {
+  id: string;
   project_id: string;
   model_id: string;
   db_alias: 'db' | string;

@@ -9,6 +9,7 @@ import XcMigrationSource from '../common/XcMigrationSource';
 import NcMetaIO, { META_TABLES } from './NcMetaIO';
 import NcConnectionMgr from '../common/NcConnectionMgr';
 
+import { v4 as uuidv4 } from 'uuid';
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
 
 export default class NcMetaIOImpl extends NcMetaIO {
@@ -190,9 +191,27 @@ export default class NcMetaIOImpl extends NcMetaIO {
     });
   }
 
+  public async metaInsert2(
+    base_id: string,
+    db_alias: string,
+    target: string,
+    data: any
+  ): Promise<any> {
+    const id = uuidv4();
+    await this.knexConnection(target).insert({
+      id,
+      db_alias,
+      base_id,
+      created_at: this.knexConnection?.fn?.now(),
+      updated_at: this.knexConnection?.fn?.now(),
+      ...data
+    });
+    return { id };
+  }
+
   public async metaList(
     project_id: string,
-    dbAlias: string,
+    _dbAlias: string,
     target: string,
     args?: {
       condition?: { [p: string]: any };
@@ -207,6 +226,47 @@ export default class NcMetaIOImpl extends NcMetaIO {
 
     if (project_id !== null && project_id !== undefined) {
       query.where('project_id', project_id);
+    }
+    /*    if (dbAlias !== null && dbAlias !== undefined) {
+      query.where('db_alias', dbAlias);
+    }*/
+
+    if (args?.condition) {
+      query.where(args.condition);
+    }
+    if (args?.limit) {
+      query.limit(args.limit);
+    }
+    if (args?.offset) {
+      query.offset(args.offset);
+    }
+    if (args?.xcCondition) {
+      (query as any).condition(args.xcCondition);
+    }
+
+    if (args?.fields?.length) {
+      query.select(...args.fields);
+    }
+
+    return query;
+  }
+
+  public async metaList2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    args?: {
+      condition?: { [p: string]: any };
+      limit?: number;
+      offset?: number;
+      xcCondition?;
+      fields?: string[];
+    }
+  ): Promise<any[]> {
+    const query = this.knexConnection(target);
+
+    if (base_id !== null && base_id !== undefined) {
+      query.where('base_id', base_id);
     }
     if (dbAlias !== null && dbAlias !== undefined) {
       query.where('db_alias', dbAlias);
@@ -373,6 +433,12 @@ export default class NcMetaIOImpl extends NcMetaIO {
         ...project,
         created_at: this.knexConnection?.fn?.now(),
         updated_at: this.knexConnection?.fn?.now()
+      });
+
+      // todo
+      await this.knexConnection('nc_bases').insert({
+        id,
+        title: projectName
       });
 
       project.prefix = config.prefix;

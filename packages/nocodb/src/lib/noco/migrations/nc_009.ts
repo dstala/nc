@@ -19,6 +19,7 @@ const up = async knex => {
 
     // todo: foreign key
     // table.string('base_id', 128);
+    // table.string('base_id', 128)
     // table.foreign('base_id').references('nc_bases.id');
 
     table.string('alias');
@@ -38,7 +39,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_models', table => {
+  await knex.schema.createTable('nc_models_2', table => {
     table
       .uuid('id')
       .primary()
@@ -47,6 +48,7 @@ const up = async knex => {
     // // todo: foreign
     // table.string('base_id');
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
     // table.foreign('data_src_id').references('nc_data_src.id');
 
@@ -86,9 +88,12 @@ const up = async knex => {
     // table.string('base_id');
     // table.string('db_alias').defaultTo('db');
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
+    // table.string('base_id', 128)
     // table.foreign('base_id').references('nc_bases.id');
+    table.uuid('model_id');
     table.foreign('model_id').references('nc_models.id');
 
     // table.string('tn');
@@ -98,7 +103,6 @@ const up = async knex => {
     table.string('_cn');
 
     // todo: decide type
-    table.string('_cn');
     table.string('uidt');
     table.string('dt');
     table.string('np');
@@ -127,12 +131,13 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_relations', table => {
+  await knex.schema.createTable('nc_relations_2', table => {
     table
       .uuid('id')
       .primary()
       .notNullable();
 
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
     table.string('db_alias').defaultTo('db');
 
@@ -151,11 +156,15 @@ const up = async knex => {
     table.string('type');
     table.string('db_type');
 
+    table.uuid('column_id');
     table.foreign('column_id').references('nc_columns.id');
+    table.uuid('ref_column_id');
     table.foreign('ref_column_id').references('nc_columns.id');
 
     table.string('ur');
     table.string('dr');
+
+    table.string('fkn');
 
     table.boolean('deleted');
     table.integer('order');
@@ -170,6 +179,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('tn');
@@ -177,6 +187,7 @@ const up = async knex => {
     table.string('cn');
     table.string('_cn');
 
+    table.uuid('column_id');
     table.foreign('column_id').references('nc_columns.id');
 
     table.string('comparison_op');
@@ -197,6 +208,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('tn');
@@ -210,13 +222,14 @@ const up = async knex => {
     table.index(['db_alias', 'tn']);
   });
 
-  await knex.schema.createTable('nc_shared_views', table => {
+  await knex.schema.createTable('nc_shared_views_2', table => {
     table
       .uuid('id')
       .primary()
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('tn');
@@ -234,13 +247,14 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_acl', table => {
+  await knex.schema.createTable('nc_acl_2', table => {
     table
       .uuid('id')
       .primary()
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('tn');
@@ -261,6 +275,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('heading');
@@ -287,6 +302,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     // todo: type
@@ -311,6 +327,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('uuid');
@@ -342,6 +359,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('uuid');
@@ -363,6 +381,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('uuid');
@@ -385,6 +404,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('db_alias').defaultTo('db');
+    table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases.id');
 
     table.string('uuid');
@@ -439,12 +459,15 @@ const up = async knex => {
       .notNullable();
 
     table.string('title');
+    table.uuid('org_id');
     table.foreign('org_id').references('nc_orgs.id');
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable('nc_team_users', table => {
+    table.uuid('org_id');
     table.foreign('org_id').references('nc_orgs.id');
+    table.uuid('user_id');
     table.foreign('user_id').references('nc_users.id');
     table.timestamps(true, true);
   });

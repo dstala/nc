@@ -535,6 +535,61 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               type: table.type || 'table'
             }
           );
+
+          const { id: modelId } = await this.xcMeta.metaInsert2(
+            this.projectId,
+            this.dbAlias,
+            'nc_models_2',
+            {
+              title: table.tn,
+              alias: meta._tn,
+              type: table.type || 'table'
+            }
+          );
+          for (const column of meta.columns) {
+            await this.xcMeta.metaInsert2(
+              this.projectId,
+              this.dbAlias,
+              'nc_columns',
+              {
+                model_id: modelId,
+                cn: column.cn,
+                _cn: column._cn,
+                uidt: column.uidt,
+                dt: column.dt,
+                np: column.np,
+                ns: column.ns,
+                clen: column.clen,
+                cop: column.cop,
+                pk: column.pk,
+                rqd: column.rqd,
+                un: column.un,
+                ct: column.ct,
+                ai: column.ai,
+                unique: column.unique,
+                ctf: column.ctf,
+                cc: column.cc,
+                csn: column.csn,
+                dtx: column.dtx,
+                dtxp: column.dtxp,
+                dtxs: column.dtxs,
+                au: column.au
+              }
+            );
+          }
+          for (const column of meta.v) {
+            await this.xcMeta.metaInsert2(
+              this.projectId,
+              this.dbAlias,
+              'nc_columns',
+              {
+                model_id: modelId,
+                cn: column.cn,
+                _cn: column._cn,
+                uidt: column.uidt
+              }
+            );
+          }
         }
 
         /* create routes for table */

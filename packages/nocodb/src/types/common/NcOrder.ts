@@ -1,3 +1,3 @@
 export default interface NcOrder {
-  order: number;
+  order?: number;
 }

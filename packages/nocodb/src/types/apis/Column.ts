@@ -1,7 +1,7 @@
-import UITypes from '../lib/sqlUi/UITypes';
-import NcTimestamps from './common/NcTimestamps';
-import NcOrder from './common/NcOrder';
-import NcSoftDelete from './common/NcSoftDelete';
+import NcSoftDelete from '../common/NcSoftDelete';
+import NcOrder from '../common/NcOrder';
+import NcTimestamps from '../common/NcTimestamps';
+import UITypes from '../../lib/sqlUi/UITypes';
 
 interface NcColumn extends NcTimestamps, NcOrder, NcSoftDelete {
   project_id: string;

@@ -6,21 +6,24 @@ export default interface NcRelation
   extends NcTimestamps,
     NcOrder,
     NcSoftDelete {
-  id: string;
-  project_id: string;
+  id?: string;
+  base_id: string;
   db_alias: 'db' | string;
-  tn: string;
-  _tn: string;
-  rtn: string;
-  _rtn: string;
-  cn: string;
-  _cn: string;
-  rcn: string;
-  _rcn: string;
-  ref_db_alias: string;
-  type: string;
-  db_type: string;
-  ur: string;
-  dr: string;
+  tn?: string;
+  _tn?: string;
+  rtn?: string;
+  _rtn?: string;
+  cn?: string;
+  _cn?: string;
+  rcn?: string;
+  _rcn?: string;
+  ref_db_alias?: string;
+  type?: string;
+  db_type?: string;
+  ur?: string;
+  dr?: string;
   fkn: string;
+
+  column_id: string;
+  ref_column_id: string;
 }
