@@ -131,7 +131,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_relations_2', table => {
+  await knex.schema.createTable('nc_col_relations', table => {
     table
       .uuid('id')
       .primary()
@@ -165,6 +165,48 @@ const up = async knex => {
     table.string('dr');
 
     table.string('fkn');
+
+    table.boolean('deleted');
+    table.integer('order');
+    table.timestamps(true, true);
+    table.index(['db_alias', 'tn']);
+  });
+
+  await knex.schema.createTable('nc_col_lookup', table => {
+    table
+      .uuid('id')
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 128);
+    table.foreign('base_id').references('nc_bases.id');
+    table.string('db_alias').defaultTo('db');
+
+    table.uuid('column_id');
+    table.foreign('column_id').references('nc_columns.id');
+    table.uuid('rel_column_id');
+    table.foreign('rel_column_id').references('nc_columns.id');
+    table.uuid('lookup_column_id');
+    table.foreign('lookup_column_id').references('nc_columns.id');
+    table.boolean('deleted');
+    table.integer('order');
+    table.timestamps(true, true);
+    table.index(['db_alias', 'tn']);
+  });
+  await knex.schema.createTable('nc_col_formula', table => {
+    table
+      .uuid('id')
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 128);
+    table.foreign('base_id').references('nc_bases.id');
+    table.string('db_alias').defaultTo('db');
+
+    table.uuid('column_id');
+    table.foreign('column_id').references('nc_columns.id');
+
+    table.text('formula').notNullable();
 
     table.boolean('deleted');
     table.integer('order');
@@ -824,6 +866,10 @@ const down = async knex => {
   await knex.schema.dropTable('nc_gallery_view_columns');
   await knex.schema.dropTable('nc_kanban_view');
   await knex.schema.dropTable('nc_kanban_view_columns');
+
+  await knex.schema.dropTable('nc_col_relations');
+  await knex.schema.dropTable('nc_col_lookup');
+  await knex.schema.dropTable('nc_col_formula');
 
   // await knex.schema.dropTable('nc_plugins');
   // await knex.schema.dropTable('nc_disabled_models_for_role');

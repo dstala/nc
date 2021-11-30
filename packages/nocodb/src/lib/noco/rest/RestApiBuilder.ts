@@ -578,6 +578,9 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
             );
           }
           for (const column of meta.v) {
+            // todo: insert virtual columns
+            // insert in nc_columns & nc_col_relations
+
             await this.xcMeta.metaInsert2(
               this.projectId,
               this.dbAlias,
