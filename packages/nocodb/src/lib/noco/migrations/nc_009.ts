@@ -143,14 +143,14 @@ const up = async knex => {
 
     // table.string('base_id');
     // table.string('db_alias');
-    table.string('tn');
-    table.string('rtn');
-    table.string('_tn');
-    table.string('_rtn');
-    table.string('cn');
-    table.string('rcn');
-    table.string('_cn');
-    table.string('_rcn');
+    // table.string('tn');
+    // table.string('rtn');
+    // table.string('_tn');
+    // table.string('_rtn');
+    // table.string('cn');
+    // table.string('rcn');
+    // table.string('_cn');
+    // table.string('_rcn');
 
     table.string('ref_db_alias');
     table.string('type');
@@ -158,8 +158,11 @@ const up = async knex => {
 
     table.uuid('column_id');
     table.foreign('column_id').references('nc_columns.id');
-    table.uuid('ref_column_id');
-    table.foreign('ref_column_id').references('nc_columns.id');
+
+    table.uuid('rel_column_id');
+    table.foreign('rel_column_id').references('nc_columns.id');
+    table.uuid('ref_rel_column_id');
+    table.foreign('ref_rel_column_id').references('nc_columns.id');
 
     table.string('ur');
     table.string('dr');
@@ -169,7 +172,7 @@ const up = async knex => {
     table.boolean('deleted');
     table.integer('order');
     table.timestamps(true, true);
-    table.index(['db_alias', 'tn']);
+    // table.index(['db_alias', 'tn']);
   });
 
   await knex.schema.createTable('nc_col_lookup', table => {
@@ -184,14 +187,17 @@ const up = async knex => {
 
     table.uuid('column_id');
     table.foreign('column_id').references('nc_columns.id');
+
     table.uuid('rel_column_id');
     table.foreign('rel_column_id').references('nc_columns.id');
+    table.uuid('ref_rel_column_id');
+    table.foreign('ref_rel_column_id').references('nc_columns.id');
+
     table.uuid('lookup_column_id');
     table.foreign('lookup_column_id').references('nc_columns.id');
     table.boolean('deleted');
     table.integer('order');
     table.timestamps(true, true);
-    table.index(['db_alias', 'tn']);
   });
   await knex.schema.createTable('nc_col_formula', table => {
     table
@@ -211,7 +217,6 @@ const up = async knex => {
     table.boolean('deleted');
     table.integer('order');
     table.timestamps(true, true);
-    table.index(['db_alias', 'tn']);
   });
 
   await knex.schema.createTable('nc_filter_exp', table => {

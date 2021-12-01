@@ -66,4 +66,19 @@ export default class Model implements NcModel {
       await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_models_2')
     ).map(m => new Model(m));
   }
+
+  public static async get({
+    base_id,
+    db_alias,
+    tn
+  }: {
+    base_id: string;
+    db_alias: string;
+    tn: string;
+  }): Promise<Model> {
+    const m = await Noco.ncMeta.metaGet2(base_id, db_alias, 'nc_models_2', {
+      title: tn
+    });
+    return m && new Model(m);
+  }
 }

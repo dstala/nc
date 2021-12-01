@@ -1,4 +1,5 @@
 import BaseRender from '../../BaseRender';
+import UITypes from '../../../../../../build/main/lib/sqlUi/UITypes';
 
 abstract class BaseModelXcMeta extends BaseRender {
   public abstract getXcColumnsObject(context: any): any[];
@@ -21,10 +22,14 @@ abstract class BaseModelXcMeta extends BaseRender {
   public getVitualColumns(): any[] {
     return [
       ...(this.ctx.hasMany || []).map(hm => ({
+        uidt: UITypes.LinkToAnotherRecord,
+        type: 'hm',
         hm,
         _cn: `${hm._rtn} => ${hm._tn}`
       })),
       ...(this.ctx.belongsTo || []).map(bt => ({
+        uidt: UITypes.LinkToAnotherRecord,
+        type: 'bt',
         bt,
         _cn: `${bt._rtn} <= ${bt._tn}`
       }))

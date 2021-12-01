@@ -175,6 +175,45 @@ export default class NcMetaIOImpl extends NcMetaIO {
 
     return query.first();
   }
+  public async metaGet2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    idOrCondition: string | { [p: string]: any },
+    fields?: string[],
+    xcCondition?
+  ): Promise<any> {
+    const query = this.knexConnection(target);
+
+    if (xcCondition) {
+      query.condition(xcCondition);
+    }
+
+    if (fields?.length) {
+      query.select(...fields);
+    }
+
+    if (base_id !== null && base_id !== undefined) {
+      query.where('base_id', base_id);
+    }
+    if (dbAlias !== null && dbAlias !== undefined) {
+      query.where('db_alias', dbAlias);
+    }
+
+    if (!idOrCondition) {
+      return query.first();
+    }
+
+    if (typeof idOrCondition !== 'object') {
+      query.where('id', idOrCondition);
+    } else {
+      query.where(idOrCondition);
+    }
+
+    // console.log(query.toQuery())
+
+    return query.first();
+  }
 
   public async metaInsert(
     project_id: string,

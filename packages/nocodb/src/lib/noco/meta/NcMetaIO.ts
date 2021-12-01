@@ -117,6 +117,14 @@ export default abstract class NcMetaIO {
     fields?: string[],
     xcCondition?: XcCondition
   ): Promise<any>;
+  public abstract metaGet2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    idOrCondition: string | { [key: string]: any },
+    fields?: string[],
+    xcCondition?: XcCondition
+  ): Promise<any>;
 
   public abstract metaList(
     project_id: string,

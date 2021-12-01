@@ -1,0 +1,16 @@
+GET http://localhost:3000/api/v1/nc/templates
+Content-Type: application/json
+
+###
+
+
+GET https://api.baserow.io/api/database/fields/table/37896/
+Content-Type: application/json
+Authorization: Token IYI9YorZH2vpNSNwI6qkSaySD5djz2iB
+###
+
+
+GET https://api.baserow.io/api/database/tables/database/18540/
+Content-Type: application/json
+Authorization: JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFtYXJuYXRoLmsucmFtQGdtYWlsLmNvbSIsImlhdCI6MTYzODAwMDU5NSwiZXhwIjoxNjM4MDA0MTk1LCJqdGkiOiI5N2ZmYzYyZi0yZWRlLTQ1MTQtODc4Yi1kNmYyZmYxNjM4OWMiLCJ1c2VyX2lkIjoxMDk4MCwidXNlcl9wcm9maWxlX2lkIjpbMTA2MDldLCJvcmlnX2lhdCI6MTYzNzk5ODg2Miwib3JpZ19qdGkiOiIyNDYzYzk3ZS1mMDU4LTQwM2MtYmI5Mi0wZGJmMmEyZTRkZTIifQ.MGvcNLWWLh7oGaZOgkXRVUtAgOQNvI1cUx7su6T9asM
+###
