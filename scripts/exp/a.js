@@ -1,12 +1,13 @@
 const path = require('path')
+const _ =require('lodash');
 // const fs = require('fs')
-// const knex = require('knex')({
-//   client: 'sqlite3',
-//   connection: {
-//     filename: path.join(__dirname,"../noco.db")
-//     // filename: path.join(__dirname, "./test.db")
-//   }
-// });
+const knex1 = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: path.join(__dirname, "../noco.db")
+    // filename: path.join(__dirname, "./test.db")
+  }
+});
 const knex = require('knex')({
   client: 'mysql2',
   connection: {
@@ -47,49 +48,48 @@ knex('nc_models_2 as tab')
 
 (async () => {
 
-// const res =   await knex('nc_models_2 as tab')
+// const res =   await knex1('nc_models_2 as tab')
 //     .select('tab.id')
 //     .join('nc_columns as col','tab.id','col.model_id')
 //     .where('title','country')
 //     console.log(res)
 
-  /*
-      const r = await knex('nc_models_2 as tab')
-         .select('col.*',
-           'col.id',
-           'col.cn',
-           'col._cn',
-           'col.uidt',
-           'rel.rel_cn',
-           'rel.ref_rel_cn',
-           'rel.rel_tn',
-           'rel.ref_rel_tn',
-           'rel.id as rel_id',
-           'lk.lcn',
-           'lk._lcn',
-           'tab.title'
-         )
-         .join('nc_columns as col','tab.id','col.model_id')
-         .leftJoin(
-           knex('nc_col_relations as r')
-             .select('r.*','col1.cn as rel_cn', 'col1._cn as _rel_cn', 'col2.cn as ref_rel_cn', 'col2._cn as _ref_rel_cn',
-               'tab1.title as rel_tn', 'tab1.alias as _rel_tn', 'tab2.title as ref_rel_tn', 'tab2.alias as _ref_rel_tn'
-               )
-             .join('nc_columns as col1', 'col1.id','r.rel_column_id')
-             .join('nc_models_2 as tab1', 'tab1.id','col1.model_id')
-             .join('nc_columns as col2', 'col2.id','r.ref_rel_column_id')
-             .join('nc_models_2 as tab2', 'tab2.id','col2.model_id'). as ('rel')
-           , 'col.id','rel.column_id')
-         .leftJoin(
-           knex('nc_col_lookup as l')
-             .select('l.column_id','col1.cn as lcn', 'col1._cn as _lcn','l.id as lk_id'  )
-             .join('nc_columns as col1', 'col1.id','l.lookup_column_id').as('lk')
-           , 'col.id','lk.column_id')
-         .whereIn('tab.title', ['country','city','address']).orderBy(
-          'tab.title');
+  /*      const r = await knex('nc_models_2 as tab')
+           .select('col.*',
+             'col.id',
+             'col.cn',
+             'col._cn',
+             'col.uidt',
+             'rel.rel_cn',
+             'rel.ref_rel_cn',
+             'rel.rel_tn',
+             'rel.ref_rel_tn',
+             'rel.id as rel_id',
+             'rel.type',
+             'lk.lcn',
+             'lk._lcn',
+             'tab.title'
+           )
+           .join('nc_columns as col','tab.id','col.model_id')
+           .leftJoin(
+             knex('nc_col_relations as r')
+               .select('r.*','col1.cn as rel_cn', 'col1._cn as _rel_cn', 'col2.cn as ref_rel_cn', 'col2._cn as _ref_rel_cn',
+                 'tab1.title as rel_tn', 'tab1.alias as _rel_tn', 'tab2.title as ref_rel_tn', 'tab2.alias as _ref_rel_tn'
+                 )
+               .join('nc_columns as col1', 'col1.id','r.rel_column_id')
+               .join('nc_models_2 as tab1', 'tab1.id','col1.model_id')
+               .join('nc_columns as col2', 'col2.id','r.ref_rel_column_id')
+               .join('nc_models_2 as tab2', 'tab2.id','col2.model_id'). as ('rel')
+             , 'col.id','rel.column_id')
+           .leftJoin(
+             knex('nc_col_lookup as l')
+               .select('l.column_id','col1.cn as lcn', 'col1._cn as _lcn','l.id as lk_id'  )
+               .join('nc_columns as col1', 'col1.id','l.lookup_column_id').as('lk')
+             , 'col.id','lk.column_id')
+           .whereIn('tab.title', ['film','actor','film_actor']).orderBy(
+            'tab.title');
 
-    console.log(r)
-  */
+      console.log(r)*/
   //
   // fs.writeFileSync(path.join(__dirname,'./columns.json'), JSON.stringify(r,0,2))
 
@@ -219,9 +219,12 @@ knex('nc_models_2 as tab')
   // //     knex('address').select('address.person_id').innerJoin('city', 'city.id', 'address.city_id').where('city.country_id', 1)
   // //   ).toQuery())
 
-  const qb = knex('country');
 
-  for (const col of columnsObj.country) {
+  console.time('address')
+
+  const qb = knex('address');
+
+  for (const col of columnsObj.address) {
     switch (col.uidt) {
 
       case 'LinkToAnotherRecord':
@@ -237,64 +240,132 @@ knex('nc_models_2 as tab')
 
   const data = await qb.limit(10);
 
-  const pk = columnsObj.country.find(c => c.pk)
+  const pk = columnsObj.address.find(c => c.pk)
   const ids = data.map(r => r[pk._cn])
 
 
-  for (const col of columnsObj.country) {
+  for (const col of columnsObj.address) {
 
 
     switch (col.uidt) {
 
 
       case 'LinkToAnotherRecord':
-        const children = await knex.union(ids.map(id => {
 
-            const query = knex(col.rel_tn)
-              .where(col.rel_cn, id)
-              .limit(10)
-            return query
-          }), true
-        )
 
-        const gb = children.reduce((gb, r) => {
-          gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || []
-          gb[r[col.rel_cn]].push(r)
-          return gb
-        }, {})
+        if (col.type === 'hm') {
+          const children = await knex.union(ids.map(id => {
 
-        for (const d of data) {
-          d[col._cn] = gb[d[pk._cn]]
+              const query = knex(col.rel_tn)
+                .where(col.rel_cn, id)
+                .limit(10)
+              return query
+            }), true
+          )
+
+          const gb = children.reduce((gb, r) => {
+            gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || []
+            gb[r[col.rel_cn]].push(r)
+            return gb
+          }, {})
+
+          for (const d of data) {
+            d[col._cn] = gb[d[pk._cn]]
+          }
+        }
+        if (col.type === 'bt') {
+
+          const parentIds = data.map(r => r[col._rel_cn])
+
+          const parents = await knex(col.ref_rel_tn)
+            .whereIn(col.ref_rel_cn, parentIds)
+            .limit(10)
+
+          const gb = parents.reduce((gb, r) => {
+            gb[r[col.ref_rel_cn]] = r
+            return gb
+          }, {})
+
+          for (const d of data) {
+            d[col._cn] = gb[d[col._rel_cn]]
+          }
         }
 
+        if (col.type === 'mm') {
+
+          const key = `${col.title}_${col.v_rel_cn}`;
+
+          const childs = await knex.union(
+            ids.map(id => {
+              const query = knex(col.ref_rel_tn)
+                .join(col.v_rel_tn, `${col.v_rel_tn}.${col.v_rel_cn}`, `${col.ref_rel_tn}.${col.ref_rel_cn}`)
+                .where(`${col.v_rel_tn}.${col.v_rel_cn}`, id) // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
+                // .xwhere(where, this.dbModels[child].selectQuery(''))
+                .select({
+                  [key]: `${col.v_rel_tn}.${col.v_rel_cn}`,
+                }).select(`${col.ref_rel_tn}.*`);
+
+              // return this.isSqlite() ? driver.select().from(query) :
+              return query;
+            }),
+            true
+          );
+
+          const gs = _.groupBy(childs, key);
+
+
+          for (const d of data) {
+            d[col._cn] = d[col._cn] || []
+            d[col._cn].push(gs[d[pk._cn]])
+          }
+        }
         break;
 
       // todo: combine with LinkToAnotherRecord
       case 'Lookup': {
 
-        // todo: decide based on type
-        let field = columnsObj[col.rel_tn].find(c => c.id === col.lookup_column_id)
+        let lkPk, prev, isArr = col.type !== 'bt';
+        let field,lkQb
+        prev=col;
+        if(col.type === 'hm'){
+          // todo: decide based on type
+          field = columnsObj[  col.rel_tn ].find(c => c.id === col.lookup_column_id)
 
-        const lkQb =      knex(col.ref_rel_tn).join(col.rel_tn,
-          `${col.rel_tn}.${col.rel_cn}`,
-          `${col.ref_rel_tn}.${col.ref_rel_cn}`
-        )
+          lkQb = knex(col.ref_rel_tn).join(col.rel_tn,
+            `${col.rel_tn}.${col.rel_cn}`,
+            `${col.ref_rel_tn}.${col.ref_rel_cn}`
+          )
 
-        let lkPk;
+
+          lkPk = columnsObj[col.rel_tn]?.find(c => c.pk) || lkPk
+
+        }else{
+          // todo: decide based on type
+          field = columnsObj[  col.ref_rel_tn ].find(c => c.id === col.lookup_column_id)
+
+          lkQb = knex(col.rel_tn).join(col.ref_rel_tn,
+            `${col.ref_rel_tn}.${col.ref_rel_cn}`,
+            `${col.rel_tn}.${col.rel_cn}`
+          )
+
+
+          lkPk = columnsObj[col.ref_rel_tn]?.find(c => c.pk) || lkPk
+
+        }
 
         while (field?.uidt === 'Lookup') {
+          isArr = isArr || col.type !== 'bt'
+          prev= field;
           lkQb.join(field.rel_tn,
             `${field.rel_tn}.${field.rel_cn}`,
             `${field.ref_rel_tn}.${field.ref_rel_cn}`
           )
           lkPk = columnsObj[field.rel_tn]?.find(c => c.pk) || lkPk
           field = columnsObj[field.rel_tn].find(c => c.id === field.lookup_column_id)
-
         }
 
 
-
-        console.log(lkQb.toQuery())
+        // console.log(lkQb.toQuery())
 
 
         // check the look up column type
@@ -303,18 +374,27 @@ knex('nc_models_2 as tab')
         //     else construct query
 
 
-
-
         const children = await knex.union(ids.map(id => {
-          // lkQb.select(`${field.title}.${field.cn} as ${field._cn}`)
+            // lkQb.select(`${field.title}.${field.cn} as ${field._cn}`)
 
-            const query = knex(`${field.title} as a`)
-              .select(`a.${field.cn} as ${field._cn}`, knex.raw('? as ??', [id,pk.cn]))
-              .whereIn(
-                lkPk.cn,
-                lkQb.clone().select(`${lkPk.title}.${lkPk.cn}`).where(`${col.ref_rel_tn}.${pk.cn}`, id)
+            let query ;
+            if(prev.type === 'hm') {
+              query = knex(`${field.title} as a`)
+                .select(`a.${field.cn} as ${field._cn}`, knex.raw('? as ??', [id, pk.cn]))
+                .whereIn(
+                  lkPk.cn,
+                  lkQb.clone().select(`${lkPk.title}.${lkPk.cn}`).where(`${col.ref_rel_tn}.${pk.cn}`, id)
                 )
-              .limit(10)
+                .limit(10)
+            }else{
+              query = knex(`${field.title} as a`)
+                .select(`a.${field.cn} as ${field._cn}`, knex.raw('? as ??', [id, pk.cn]))
+                .whereIn(
+                  lkPk.cn,
+                  lkQb.clone().select(`${prev.title}.${prev.rel_cn}`).where(`${pk.title}.${pk.cn}`, id)
+                )
+                .limit(10)
+            }
 
 
             console.log(query.toQuery())
@@ -324,13 +404,19 @@ knex('nc_models_2 as tab')
         )
 
         const gb = children.reduce((gb, r) => {
-          gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || []
-          gb[r[col.rel_cn]].push(r[col.lcn])
+          if(prev.type === 'hm') {
+            gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || []
+            gb[r[col.rel_cn]].push(r[field._cn])
+          }else{
+            gb[r[pk.cn]] = gb[r[pk.cn]] || []
+            gb[r[pk.cn]].push(r[field._cn])
+          }
           return gb
         }, {})
 
         for (const d of data) {
-          d[col._cn] = gb[d[pk._cn]]
+          d[col._cn] = isArr ? gb[d[pk._cn]] : gb[d[pk._cn]] &&gb[d[pk._cn]][0]
+          console.log(d, pk._cn, d[pk._cn])
         }
       }
         break;
@@ -342,5 +428,57 @@ knex('nc_models_2 as tab')
   }
 
   console.log(data)
+  console.timeEnd('address')
+
 
 })();
+
+
+
+
+/*
+*
+* SELECT
+   distinct(c.country_id)  -- c.*, c1.*, a.*
+FROM
+    country  c
+        left JOIN
+    city c1 ON c1.country_id = c.country_id
+        left JOIN
+     address a ON c1.city_id = a.city_id
+
+     where c.country LIKE '%a' OR (c1.city like '%a%' AND a.address like '%a%');
+
+
+
+SELECT
+    distinct(country_id)
+FROM
+    country
+WHERE
+    country LIKE '%a'
+        OR ((country_id IN (SELECT
+            city.country_id
+        FROM
+            city
+        WHERE
+            city.city LIKE '%a%'))
+        AND country_id IN (SELECT
+            city.country_id
+        FROM
+            city
+                JOIN
+            address ON city.city_id = address.city_id
+        WHERE
+            address.address LIKE '%a%'))
+
+* */
+
+
+// city => address
+
+
+
+
+
+// country => city => address

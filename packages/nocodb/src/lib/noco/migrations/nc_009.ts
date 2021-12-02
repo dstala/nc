@@ -164,6 +164,13 @@ const up = async knex => {
     table.uuid('ref_rel_column_id');
     table.foreign('ref_rel_column_id').references('nc_columns.id');
 
+    table.uuid('v_rel_tn');
+    table.foreign('v_rel_tn').references('nc_models.id');
+    table.uuid('v_ref_rel_cn_id');
+    table.foreign('v_ref_rel_cn_id').references('nc_columns.id');
+    table.uuid('v_rel_cn_id');
+    table.foreign('v_rel_cn_id').references('nc_columns.id');
+
     table.string('ur');
     table.string('dr');
 
