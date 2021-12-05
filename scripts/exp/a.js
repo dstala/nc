@@ -1,5 +1,5 @@
 const path = require('path')
-const _ =require('lodash');
+const _ = require('lodash');
 // const fs = require('fs')
 const knex1 = require('knex')({
   client: 'sqlite3',
@@ -54,42 +54,42 @@ knex('nc_models_2 as tab')
 //     .where('title','country')
 //     console.log(res)
 
-  /*      const r = await knex('nc_models_2 as tab')
-           .select('col.*',
-             'col.id',
-             'col.cn',
-             'col._cn',
-             'col.uidt',
-             'rel.rel_cn',
-             'rel.ref_rel_cn',
-             'rel.rel_tn',
-             'rel.ref_rel_tn',
-             'rel.id as rel_id',
-             'rel.type',
-             'lk.lcn',
-             'lk._lcn',
-             'tab.title'
-           )
-           .join('nc_columns as col','tab.id','col.model_id')
-           .leftJoin(
-             knex('nc_col_relations as r')
-               .select('r.*','col1.cn as rel_cn', 'col1._cn as _rel_cn', 'col2.cn as ref_rel_cn', 'col2._cn as _ref_rel_cn',
-                 'tab1.title as rel_tn', 'tab1.alias as _rel_tn', 'tab2.title as ref_rel_tn', 'tab2.alias as _ref_rel_tn'
-                 )
-               .join('nc_columns as col1', 'col1.id','r.rel_column_id')
-               .join('nc_models_2 as tab1', 'tab1.id','col1.model_id')
-               .join('nc_columns as col2', 'col2.id','r.ref_rel_column_id')
-               .join('nc_models_2 as tab2', 'tab2.id','col2.model_id'). as ('rel')
-             , 'col.id','rel.column_id')
-           .leftJoin(
-             knex('nc_col_lookup as l')
-               .select('l.column_id','col1.cn as lcn', 'col1._cn as _lcn','l.id as lk_id'  )
-               .join('nc_columns as col1', 'col1.id','l.lookup_column_id').as('lk')
-             , 'col.id','lk.column_id')
-           .whereIn('tab.title', ['film','actor','film_actor']).orderBy(
-            'tab.title');
+  /*        const r = await knex1('nc_models_2 as tab')
+             .select('col.*',
+               'col.id',
+               'col.cn',
+               'col._cn',
+               'col.uidt',
+               'rel.rel_cn',
+               'rel.ref_rel_cn',
+               'rel.rel_tn',
+               'rel.ref_rel_tn',
+               'rel.id as rel_id',
+               'rel.type',
+               'lk.lcn',
+               'lk._lcn',
+               'tab.title'
+             )
+             .join('nc_columns as col','tab.id','col.model_id')
+             .leftJoin(
+               knex('nc_col_relations as r')
+                 .select('r.*','col1.cn as rel_cn', 'col1._cn as _rel_cn', 'col2.cn as ref_rel_cn', 'col2._cn as _ref_rel_cn',
+                   'tab1.title as rel_tn', 'tab1.alias as _rel_tn', 'tab2.title as ref_rel_tn', 'tab2.alias as _ref_rel_tn'
+                   )
+                 .join('nc_columns as col1', 'col1.id','r.rel_column_id')
+                 .join('nc_models_2 as tab1', 'tab1.id','col1.model_id')
+                 .join('nc_columns as col2', 'col2.id','r.ref_rel_column_id')
+                 .join('nc_models_2 as tab2', 'tab2.id','col2.model_id'). as ('rel')
+               , 'col.id','rel.column_id')
+             .leftJoin(
+               knex('nc_col_lookup as l')
+                 .select('l.column_id','col1.cn as lcn', 'col1._cn as _lcn','l.id as lk_id'  )
+                 .join('nc_columns as col1', 'col1.id','l.lookup_column_id').as('lk')
+               , 'col.id','lk.column_id')
+             .whereIn('tab.title', ['language']).orderBy(
+              'tab.title');
 
-      console.log(r)*/
+        console.log(r)*/
   //
   // fs.writeFileSync(path.join(__dirname,'./columns.json'), JSON.stringify(r,0,2))
 
@@ -220,11 +220,11 @@ knex('nc_models_2 as tab')
   // //   ).toQuery())
 
 
-  console.time('address')
+  console.time('actor')
 
-  const qb = knex('address');
+  const qb = knex('actor');
 
-  for (const col of columnsObj.address) {
+  for (const col of columnsObj.actor) {
     switch (col.uidt) {
 
       case 'LinkToAnotherRecord':
@@ -240,11 +240,11 @@ knex('nc_models_2 as tab')
 
   const data = await qb.limit(10);
 
-  const pk = columnsObj.address.find(c => c.pk)
+  const pk = columnsObj.actor.find(c => c.pk)
   const ids = data.map(r => r[pk._cn])
 
 
-  for (const col of columnsObj.address) {
+  for (const col of columnsObj.actor) {
 
 
     switch (col.uidt) {
@@ -275,11 +275,11 @@ knex('nc_models_2 as tab')
         }
         if (col.type === 'bt') {
 
-          const parentIds = data.map(r => r[col._rel_cn])
+          const parentIds = data.map(r => r[col._rel_cn]).filter(id => id !== null && id !== undefined)
 
-          const parents = await knex(col.ref_rel_tn)
-            .whereIn(col.ref_rel_cn, parentIds)
-            .limit(10)
+          const parents = await knex(col.rel_tn)
+            .whereIn(col.rel_cn, parentIds)
+          // .limit(10)
 
           const gb = parents.reduce((gb, r) => {
             gb[r[col.ref_rel_cn]] = r
@@ -298,7 +298,7 @@ knex('nc_models_2 as tab')
           const childs = await knex.union(
             ids.map(id => {
               const query = knex(col.ref_rel_tn)
-                .join(col.v_rel_tn, `${col.v_rel_tn}.${col.v_rel_cn}`, `${col.ref_rel_tn}.${col.ref_rel_cn}`)
+                .join(col.v_rel_tn, `${col.v_rel_tn}.${col.v_ref_rel_cn}`, `${col.ref_rel_tn}.${col.ref_rel_cn}`)
                 .where(`${col.v_rel_tn}.${col.v_rel_cn}`, id) // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
                 // .xwhere(where, this.dbModels[child].selectQuery(''))
                 .select({
@@ -315,8 +315,7 @@ knex('nc_models_2 as tab')
 
 
           for (const d of data) {
-            d[col._cn] = d[col._cn] || []
-            d[col._cn].push(gs[d[pk._cn]])
+            d[col._cn] = gs[d[pk._cn]]
           }
         }
         break;
@@ -325,11 +324,11 @@ knex('nc_models_2 as tab')
       case 'Lookup': {
 
         let lkPk, prev, isArr = col.type !== 'bt';
-        let field,lkQb
-        prev=col;
-        if(col.type === 'hm'){
+        let field, lkQb
+        prev = col;
+        if (col.type === 'hm') {
           // todo: decide based on type
-          field = columnsObj[  col.rel_tn ].find(c => c.id === col.lookup_column_id)
+          field = columnsObj[col.rel_tn].find(c => c.id === col.lookup_column_id)
 
           lkQb = knex(col.ref_rel_tn).join(col.rel_tn,
             `${col.rel_tn}.${col.rel_cn}`,
@@ -339,9 +338,9 @@ knex('nc_models_2 as tab')
 
           lkPk = columnsObj[col.rel_tn]?.find(c => c.pk) || lkPk
 
-        }else{
+        } else if (col.type === 'bt') {
           // todo: decide based on type
-          field = columnsObj[  col.ref_rel_tn ].find(c => c.id === col.lookup_column_id)
+          field = columnsObj[col.ref_rel_tn].find(c => c.id === col.lookup_column_id)
 
           lkQb = knex(col.rel_tn).join(col.ref_rel_tn,
             `${col.ref_rel_tn}.${col.ref_rel_cn}`,
@@ -351,17 +350,46 @@ knex('nc_models_2 as tab')
 
           lkPk = columnsObj[col.ref_rel_tn]?.find(c => c.pk) || lkPk
 
+        } else if (col.type === 'mm') {
+          // throw new Error('"m2m" lookup not implemented')
+
+
+          // todo: decide based on type
+          field = columnsObj[col.ref_rel_tn].find(c => c.id === col.lookup_column_id)
+
+          lkQb = knex(col.rel_tn).join(col.v_rel_tn,
+            `${col.v_rel_tn}.${col.v_rel_cn}`,
+            `${col.rel_tn}.${col.rel_cn}`
+          ).join(col.ref_rel_tn,
+            `${col.v_rel_tn}.${col.v_ref_rel_cn}`,
+            `${col.ref_rel_tn}.${col.ref_rel_cn}`
+          )
+
+
+          lkPk = columnsObj[col.ref_rel_tn]?.find(c => c.pk) || lkPk
         }
 
         while (field?.uidt === 'Lookup') {
-          isArr = isArr || col.type !== 'bt'
-          prev= field;
-          lkQb.join(field.rel_tn,
-            `${field.rel_tn}.${field.rel_cn}`,
-            `${field.ref_rel_tn}.${field.ref_rel_cn}`
-          )
-          lkPk = columnsObj[field.rel_tn]?.find(c => c.pk) || lkPk
-          field = columnsObj[field.rel_tn].find(c => c.id === field.lookup_column_id)
+          isArr = isArr || col.type !== 'bt';
+          prev = field;
+
+          if (field.type === 'hm') {
+            lkQb.join(field.rel_tn,
+              `${field.rel_tn}.${field.rel_cn}`,
+              `${field.ref_rel_tn}.${field.ref_rel_cn}`
+            )
+            lkPk = columnsObj[field.rel_tn]?.find(c => c.pk) || lkPk
+            field = columnsObj[field.rel_tn].find(c => c.id === field.lookup_column_id)
+          } else if (field.type === 'bt') {
+            lkQb.join(field.ref_rel_tn,
+              `${field.ref_rel_tn}.${field.ref_rel_cn}`,
+              `${field.rel_tn}.${field.rel_cn}`
+            )
+            lkPk = columnsObj[field.ref_rel_tn]?.find(c => c.pk) || lkPk
+            field = columnsObj[field.ref_rel_tn].find(c => c.id === field.lookup_column_id)
+          } else if (field.type === 'mm') {
+            throw new Error('nested "m2m" lookup not implemented')
+          }
         }
 
 
@@ -377,8 +405,8 @@ knex('nc_models_2 as tab')
         const children = await knex.union(ids.map(id => {
             // lkQb.select(`${field.title}.${field.cn} as ${field._cn}`)
 
-            let query ;
-            if(prev.type === 'hm') {
+            let query;
+            if (prev.type === 'hm') {
               query = knex(`${field.title} as a`)
                 .select(`a.${field.cn} as ${field._cn}`, knex.raw('? as ??', [id, pk.cn]))
                 .whereIn(
@@ -386,12 +414,22 @@ knex('nc_models_2 as tab')
                   lkQb.clone().select(`${lkPk.title}.${lkPk.cn}`).where(`${col.ref_rel_tn}.${pk.cn}`, id)
                 )
                 .limit(10)
-            }else{
+            } else if (prev.type === 'bt') {
               query = knex(`${field.title} as a`)
                 .select(`a.${field.cn} as ${field._cn}`, knex.raw('? as ??', [id, pk.cn]))
                 .whereIn(
-                  lkPk.cn,
-                  lkQb.clone().select(`${prev.title}.${prev.rel_cn}`).where(`${pk.title}.${pk.cn}`, id)
+                  prev.ref_rel_cn,
+                  lkQb.clone().select(`${prev.rel_tn}.${prev.rel_cn}`).where(`${pk.title}.${pk.cn}`, id)
+                )
+                .limit(10)
+            } else if (prev.type === 'mm') {
+              // throw new Error('"m2m" lookup not implemented')
+
+              query = knex(`${field.title} as a`)
+                .select(`a.${field.cn} as ${field._cn}`, knex.raw('? as ??', [id, pk.cn]))
+                .whereIn(
+                  prev.ref_rel_cn,
+                  lkQb.clone().select(`${prev.v_rel_tn}.${prev.v_ref_rel_cn}`).where(`${col.rel_tn}.${pk.cn}`, id)
                 )
                 .limit(10)
             }
@@ -404,10 +442,14 @@ knex('nc_models_2 as tab')
         )
 
         const gb = children.reduce((gb, r) => {
-          if(prev.type === 'hm') {
+          if (prev.type === 'hm') {
             gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || []
             gb[r[col.rel_cn]].push(r[field._cn])
-          }else{
+          } else if (prev.type === 'bt') {
+            gb[r[pk.cn]] = gb[r[pk.cn]] || []
+            gb[r[pk.cn]].push(r[field._cn])
+          } else if (prev.type === 'mm') {
+            // throw new Error('"m2m" lookup not implemented')
             gb[r[pk.cn]] = gb[r[pk.cn]] || []
             gb[r[pk.cn]].push(r[field._cn])
           }
@@ -415,8 +457,7 @@ knex('nc_models_2 as tab')
         }, {})
 
         for (const d of data) {
-          d[col._cn] = isArr ? gb[d[pk._cn]] : gb[d[pk._cn]] &&gb[d[pk._cn]][0]
-          console.log(d, pk._cn, d[pk._cn])
+          d[col._cn] = isArr ? gb[d[pk._cn]] : gb[d[pk._cn]] && gb[d[pk._cn]][0]
         }
       }
         break;
@@ -428,12 +469,10 @@ knex('nc_models_2 as tab')
   }
 
   console.log(data)
-  console.timeEnd('address')
+  console.timeEnd('actor')
 
 
 })();
-
-
 
 
 /*
@@ -476,9 +515,6 @@ WHERE
 
 
 // city => address
-
-
-
 
 
 // country => city => address

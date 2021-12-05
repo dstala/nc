@@ -109,19 +109,19 @@ const up = async knex => {
     table.string('ns');
     table.string('clen');
     table.string('cop');
-    table.string('pk');
-    table.string('rqd');
-    table.string('un');
+    table.boolean('pk');
+    table.boolean('rqd');
+    table.boolean('un');
     table.string('ct');
-    table.string('ai');
-    table.string('unique');
+    table.boolean('ai');
+    table.boolean('unique');
     table.string('ctf');
     table.string('cc');
     table.string('csn');
     table.string('dtx');
     table.string('dtxp');
     table.string('dtxs');
-    table.string('au');
+    table.boolean('au');
 
     //todo: virtual, real, etc
     table.string('type');
