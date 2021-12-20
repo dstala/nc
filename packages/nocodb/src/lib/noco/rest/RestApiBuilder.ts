@@ -355,7 +355,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     );
     let tables;
     const swaggerRefs: { [table: string]: any[] } = {};
-    let order = await this.getOrderVal();
+    const order = await this.getOrderVal();
 
     /*    /!* Get all relations *!/
     let [
@@ -525,7 +525,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           const { id: modelId } = await this.xcMeta.metaInsert2(
             this.projectId,
             this.dbAlias,
-            'nc_models_2',
+            'nc_models_v2',
             {
               title: table.tn,
               alias: meta._tn,
@@ -536,7 +536,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
             await this.xcMeta.metaInsert2(
               this.projectId,
               this.dbAlias,
-              'nc_columns',
+              'nc_columns_v2',
               {
                 model_id: modelId,
                 cn: column.cn,
@@ -571,11 +571,11 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           virtualColumnsInsert.push(async () => {
             for (const column of meta.v) {
               // todo: insert virtual columns
-              // insert in nc_columns & nc_col_relations
+              // insert in nc_columns_v2 & nc_col_relations
               const { id: column_id } = await this.xcMeta.metaInsert2(
                 this.projectId,
                 this.dbAlias,
-                'nc_columns',
+                'nc_columns_v2',
                 {
                   model_id: modelId,
                   cn: column.cn,

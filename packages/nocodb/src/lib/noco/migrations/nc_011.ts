@@ -1,5 +1,5 @@
 const up = async knex => {
-  await knex.schema.createTable('nc_bases', table => {
+  await knex.schema.createTable('nc_bases_v2', table => {
     table.string('id', 128).primary();
     table.string('title');
     table.string('status');
@@ -11,7 +11,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_data_src', table => {
+  await knex.schema.createTable('nc_data_src_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -39,7 +39,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_models_2', table => {
+  await knex.schema.createTable('nc_models_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -79,7 +79,7 @@ const up = async knex => {
     table.index(['db_alias', 'title']);
   });
 
-  await knex.schema.createTable('nc_columns', table => {
+  await knex.schema.createTable('nc_columns_v2_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -131,7 +131,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_col_relations', table => {
+  await knex.schema.createTable('nc_col_relations_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -157,19 +157,19 @@ const up = async knex => {
     table.string('db_type');
 
     table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns.id');
+    table.foreign('column_id').references('nc_columns_v2.id');
 
     table.uuid('rel_column_id');
-    table.foreign('rel_column_id').references('nc_columns.id');
+    table.foreign('rel_column_id').references('nc_columns_v2.id');
     table.uuid('ref_rel_column_id');
-    table.foreign('ref_rel_column_id').references('nc_columns.id');
+    table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
 
     table.uuid('v_rel_tn');
     table.foreign('v_rel_tn').references('nc_models.id');
     table.uuid('v_ref_rel_cn_id');
-    table.foreign('v_ref_rel_cn_id').references('nc_columns.id');
+    table.foreign('v_ref_rel_cn_id').references('nc_columns_v2.id');
     table.uuid('v_rel_cn_id');
-    table.foreign('v_rel_cn_id').references('nc_columns.id');
+    table.foreign('v_rel_cn_id').references('nc_columns_v2.id');
 
     table.string('ur');
     table.string('dr');
@@ -182,7 +182,7 @@ const up = async knex => {
     // table.index(['db_alias', 'tn']);
   });
 
-  await knex.schema.createTable('nc_col_lookup', table => {
+  await knex.schema.createTable('nc_col_lookup_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -193,20 +193,20 @@ const up = async knex => {
     table.string('db_alias').defaultTo('db');
 
     table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns.id');
+    table.foreign('column_id').references('nc_columns_v2.id');
 
     table.uuid('rel_column_id');
-    table.foreign('rel_column_id').references('nc_columns.id');
+    table.foreign('rel_column_id').references('nc_columns_v2.id');
     table.uuid('ref_rel_column_id');
-    table.foreign('ref_rel_column_id').references('nc_columns.id');
+    table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
 
     table.uuid('lookup_column_id');
-    table.foreign('lookup_column_id').references('nc_columns.id');
+    table.foreign('lookup_column_id').references('nc_columns_v2.id');
     table.boolean('deleted');
     table.integer('order');
     table.timestamps(true, true);
   });
-  await knex.schema.createTable('nc_col_formula', table => {
+  await knex.schema.createTable('nc_col_formula_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -217,7 +217,7 @@ const up = async knex => {
     table.string('db_alias').defaultTo('db');
 
     table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns.id');
+    table.foreign('column_id').references('nc_columns_v2.id');
 
     table.text('formula').notNullable();
 
@@ -226,7 +226,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_filter_exp', table => {
+  await knex.schema.createTable('nc_filter_exp_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -242,7 +242,7 @@ const up = async knex => {
     table.string('_cn');
 
     table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns.id');
+    table.foreign('column_id').references('nc_columns_v2.id');
 
     table.string('comparison_op');
     table.string('value');
@@ -255,7 +255,7 @@ const up = async knex => {
     table.index(['db_alias', 'tn']);
   });
 
-  await knex.schema.createTable('nc_sort', table => {
+  await knex.schema.createTable('nc_sort_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -276,7 +276,7 @@ const up = async knex => {
     table.index(['db_alias', 'tn']);
   });
 
-  await knex.schema.createTable('nc_shared_views_2', table => {
+  await knex.schema.createTable('nc_shared_views_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -301,7 +301,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_acl_2', table => {
+  await knex.schema.createTable('nc_acl_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -322,7 +322,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_form_view', table => {
+  await knex.schema.createTable('nc_form_view_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -349,7 +349,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_form_view_columns', table => {
+  await knex.schema.createTable('nc_form_view_columns_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -374,7 +374,7 @@ const up = async knex => {
 
     table.timestamps(true, true);
   });
-  await knex.schema.createTable('nc_gallery_view', table => {
+  await knex.schema.createTable('nc_gallery_view_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -406,7 +406,7 @@ const up = async knex => {
 
     table.timestamps(true, true);
   });
-  await knex.schema.createTable('nc_gallery_view_columns', table => {
+  await knex.schema.createTable('nc_gallery_view_columns_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -428,7 +428,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_kanban_view', table => {
+  await knex.schema.createTable('nc_kanban_view_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -451,7 +451,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_kanban_view_columns', table => {
+  await knex.schema.createTable('nc_kanban_view_columns_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -473,7 +473,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_users', table => {
+  await knex.schema.createTable('nc_users_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -496,7 +496,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_orgs', table => {
+  await knex.schema.createTable('nc_orgs_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -506,7 +506,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_teams', table => {
+  await knex.schema.createTable('nc_teams_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -518,7 +518,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_team_users', table => {
+  await knex.schema.createTable('nc_team_users_v2', table => {
     table.uuid('org_id');
     table.foreign('org_id').references('nc_orgs.id');
     table.uuid('user_id');
@@ -866,7 +866,7 @@ const down = async knex => {
   await knex.schema.dropTable('nc_bases');
   await knex.schema.dropTable('nc_data_src');
   await knex.schema.dropTable('nc_models');
-  await knex.schema.dropTable('nc_columns');
+  await knex.schema.dropTable('nc_columns_v2');
   await knex.schema.dropTable('nc_relations');
   await knex.schema.dropTable('nc_filter_exp');
   await knex.schema.dropTable('nc_sort');

@@ -2165,7 +2165,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
       // await this.xcMeta.metaInsert2(
       //   this.projectId,
       //   this.dbAlias,
-      //   'nc_relations_2',
+      //   'nc_relations_v2',
       //   {
       //     // todo:
       //     // ref_column_id: null,

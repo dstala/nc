@@ -40,7 +40,7 @@ export default class Column implements NcColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_columns',
+      'nc_columns_v2',
       model
     );
   }
@@ -54,7 +54,7 @@ export default class Column implements NcColumn {
     condition: any;
   }): Promise<Column[]> {
     return (
-      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_columns', {
+      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_columns_v2', {
         condition
       })
     ).map(m => new Column(m));

@@ -21,7 +21,7 @@ const columnsObj = require('./columns');
 const UITypes = require("../build/main/lib/sqlUi/UITypes");
 
 
-// knex('nc_columns as col')
+// knex('nc_columns_v2 as col')
 //   .leftJoin('nc_col_relations as rel', 'col.id','rel.column_id')
 //   // .where('tab.title', 'country')
 //   .then(r=>{
@@ -30,14 +30,14 @@ const UITypes = require("../build/main/lib/sqlUi/UITypes");
 //
 
 /*
-knex('nc_models_2 as tab')
+knex('nc_models_v2 as tab')
   .select('col.id','col.cn','col._cn','col.uidt', 'rel.rel_cn','rel.ref_rel_cn', 'rel.id as rel_id')
-  .join('nc_columns as col','tab.id','col.model_id')
+  .join('nc_columns_v2 as col','tab.id','col.model_id')
   .leftJoin(
     knex('nc_col_relations as r')
       .select('r.*','col1.cn as rel_cn', 'col1._cn as _rel_cn', 'col2.cn as ref_rel_cn', 'col2._cn as _ref_rel_cn' )
-      .join('nc_columns as col1', 'col1.id','r.rel_column_id')
-      .join('nc_columns as col2', 'col2.id','r.ref_rel_column_id'). as ('rel')
+      .join('nc_columns_v2 as col1', 'col1.id','r.rel_column_id')
+      .join('nc_columns_v2 as col2', 'col2.id','r.ref_rel_column_id'). as ('rel')
     , 'col.id','rel.column_id')
   .where('tab.title', 'country')
   .then(r=>{
@@ -48,13 +48,13 @@ knex('nc_models_2 as tab')
 
 (async () => {
 
-// const res =   await knex1('nc_models_2 as tab')
+// const res =   await knex1('nc_models_v2 as tab')
 //     .select('tab.id')
-//     .join('nc_columns as col','tab.id','col.model_id')
+//     .join('nc_columns_v2 as col','tab.id','col.model_id')
 //     .where('title','country')
 //     console.log(res)
 
-  /*        const r = await knex1('nc_models_2 as tab')
+  /*        const r = await knex1('nc_models_v2 as tab')
              .select('col.*',
                'col.id',
                'col.cn',
@@ -70,21 +70,21 @@ knex('nc_models_2 as tab')
                'lk._lcn',
                'tab.title'
              )
-             .join('nc_columns as col','tab.id','col.model_id')
+             .join('nc_columns_v2 as col','tab.id','col.model_id')
              .leftJoin(
                knex('nc_col_relations as r')
                  .select('r.*','col1.cn as rel_cn', 'col1._cn as _rel_cn', 'col2.cn as ref_rel_cn', 'col2._cn as _ref_rel_cn',
                    'tab1.title as rel_tn', 'tab1.alias as _rel_tn', 'tab2.title as ref_rel_tn', 'tab2.alias as _ref_rel_tn'
                    )
-                 .join('nc_columns as col1', 'col1.id','r.rel_column_id')
-                 .join('nc_models_2 as tab1', 'tab1.id','col1.model_id')
-                 .join('nc_columns as col2', 'col2.id','r.ref_rel_column_id')
-                 .join('nc_models_2 as tab2', 'tab2.id','col2.model_id'). as ('rel')
+                 .join('nc_columns_v2 as col1', 'col1.id','r.rel_column_id')
+                 .join('nc_models_v2 as tab1', 'tab1.id','col1.model_id')
+                 .join('nc_columns_v2 as col2', 'col2.id','r.ref_rel_column_id')
+                 .join('nc_models_v2 as tab2', 'tab2.id','col2.model_id'). as ('rel')
                , 'col.id','rel.column_id')
              .leftJoin(
                knex('nc_col_lookup as l')
                  .select('l.column_id','col1.cn as lcn', 'col1._cn as _lcn','l.id as lk_id'  )
-                 .join('nc_columns as col1', 'col1.id','l.lookup_column_id').as('lk')
+                 .join('nc_columns_v2 as col1', 'col1.id','l.lookup_column_id').as('lk')
                , 'col.id','lk.column_id')
              .whereIn('tab.title', ['language']).orderBy(
               'tab.title');
@@ -94,7 +94,7 @@ knex('nc_models_2 as tab')
   // fs.writeFileSync(path.join(__dirname,'./columns.json'), JSON.stringify(r,0,2))
 
 //
-// knex('nc_columns').insert({
+// knex('nc_columns_v2').insert({
 //
 // }).then(r =>{
 //

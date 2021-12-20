@@ -11,7 +11,7 @@ export default class Relation implements NcRelation {
     await Noco.ncMeta.metaInsert2(
       relation.base_id,
       relation.db_alias,
-      'nc_relations_2',
+      'nc_relations_v2',
       relation
     );
   }
@@ -25,7 +25,7 @@ export default class Relation implements NcRelation {
     condition: any;
   }): Promise<Relation[]> {
     return (
-      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_relations_2', {
+      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_relations_v2', {
         condition
       })
     ).map(m => new Relation(m));

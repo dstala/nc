@@ -50,7 +50,7 @@ export default class Model implements NcModel {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_models_2',
+      'nc_models_v2',
       model
     );
   }
@@ -63,7 +63,7 @@ export default class Model implements NcModel {
     db_alias: string;
   }): Promise<Model[]> {
     return (
-      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_models_2')
+      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_models_v2')
     ).map(m => new Model(m));
   }
 
@@ -76,7 +76,7 @@ export default class Model implements NcModel {
     db_alias: string;
     tn: string;
   }): Promise<Model> {
-    const m = await Noco.ncMeta.metaGet2(base_id, db_alias, 'nc_models_2', {
+    const m = await Noco.ncMeta.metaGet2(base_id, db_alias, 'nc_models_v2', {
       title: tn
     });
     return m && new Model(m);
