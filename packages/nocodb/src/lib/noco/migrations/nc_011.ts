@@ -79,7 +79,7 @@ const up = async knex => {
     table.index(['db_alias', 'title']);
   });
 
-  await knex.schema.createTable('nc_columns_v2_v2', table => {
+  await knex.schema.createTable('nc_columns_v2', table => {
     table
       .uuid('id')
       .primary()
@@ -99,9 +99,59 @@ const up = async knex => {
     // table.string('tn');
     // table.string('_tn');
 
-    table.string('cn');
     table.string('_cn');
+    table.string('cn');
+    /*
+    table.string('cn');
+    // todo: decide type
+    table.string('uidt');
+    table.string('dt');
+    table.string('np');
+    table.string('ns');
+    table.string('clen');
+    table.string('cop');
+    table.boolean('pk');
+    table.boolean('rqd');
+    table.boolean('un');
+    table.string('ct');
+    table.boolean('ai');
+    table.boolean('unique');
+    table.string('ctf');
+    table.string('cc');
+    table.string('csn');
+    table.string('dtx');
+    table.string('dtxp');
+    table.string('dtxs');
+    table.boolean('au');*/
 
+    //todo: virtual, real, etc
+    table.string('type');
+
+    table.boolean('deleted');
+    table.integer('order');
+    table.timestamps(true, true);
+  });
+
+
+
+
+  await knex.schema.createTable('nc_col_props_v2', table => {
+    table
+      .uuid('id')
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 128);
+    table.foreign('base_id').references('nc_bases.id');
+    table.string('db_alias').defaultTo('db');
+
+
+
+      table.uuid('column_id');
+    table.foreign('column_id').references('nc_columns_v2.id');
+
+
+    table.string('cn');
     // todo: decide type
     table.string('uidt');
     table.string('dt');
@@ -122,14 +172,10 @@ const up = async knex => {
     table.string('dtxp');
     table.string('dtxs');
     table.boolean('au');
-
-    //todo: virtual, real, etc
-    table.string('type');
-
-    table.boolean('deleted');
-    table.integer('order');
     table.timestamps(true, true);
+    // table.index(['db_alias', 'tn']);
   });
+
 
   await knex.schema.createTable('nc_col_relations_v2', table => {
     table
@@ -202,6 +248,31 @@ const up = async knex => {
 
     table.uuid('lookup_column_id');
     table.foreign('lookup_column_id').references('nc_columns_v2.id');
+    table.boolean('deleted');
+    table.integer('order');
+    table.timestamps(true, true);
+  });
+  await knex.schema.createTable('nc_col_rollup_v2', table => {
+    table
+      .uuid('id')
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 128);
+    table.foreign('base_id').references('nc_bases.id');
+    table.string('db_alias').defaultTo('db');
+
+    table.uuid('column_id');
+    table.foreign('column_id').references('nc_columns_v2.id');
+
+    table.uuid('rel_column_id');
+    table.foreign('rel_column_id').references('nc_columns_v2.id');
+    table.uuid('ref_rel_column_id');
+    table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
+
+    table.uuid('rollup_column_id');
+    table.foreign('rollup_column_id').references('nc_columns_v2.id');
+    table.string('rollup_function');
     table.boolean('deleted');
     table.integer('order');
     table.timestamps(true, true);
@@ -863,25 +934,25 @@ const up = async knex => {
 };
 
 const down = async knex => {
-  await knex.schema.dropTable('nc_bases');
-  await knex.schema.dropTable('nc_data_src');
-  await knex.schema.dropTable('nc_models');
-  await knex.schema.dropTable('nc_columns_v2');
-  await knex.schema.dropTable('nc_relations');
-  await knex.schema.dropTable('nc_filter_exp');
-  await knex.schema.dropTable('nc_sort');
-  await knex.schema.dropTable('nc_shared_views');
-  await knex.schema.dropTable('nc_acl');
-  await knex.schema.dropTable('nc_form_view');
-  await knex.schema.dropTable('nc_form_view_columns');
-  await knex.schema.dropTable('nc_gallery_view');
-  await knex.schema.dropTable('nc_gallery_view_columns');
-  await knex.schema.dropTable('nc_kanban_view');
-  await knex.schema.dropTable('nc_kanban_view_columns');
+  await knex.schema.dropTable('nc_bases_v2');
+  await knex.schema.dropTable('nc_data_src_v2');
+  await knex.schema.dropTable('nc_models_v2');
+  await knex.schema.dropTable('nc_columns_v2_v2');
+  await knex.schema.dropTable('nc_relations_v2');
+  await knex.schema.dropTable('nc_filter_exp_v2');
+  await knex.schema.dropTable('nc_sort_v2');
+  await knex.schema.dropTable('nc_shared_views_v2');
+  await knex.schema.dropTable('nc_acl_v2');
+  await knex.schema.dropTable('nc_form_view_v2');
+  await knex.schema.dropTable('nc_form_view_columns_v2');
+  await knex.schema.dropTable('nc_gallery_view_v2');
+  await knex.schema.dropTable('nc_gallery_view_columns_v2');
+  await knex.schema.dropTable('nc_kanban_view_v2');
+  await knex.schema.dropTable('nc_kanban_view_columns_v2');
 
-  await knex.schema.dropTable('nc_col_relations');
-  await knex.schema.dropTable('nc_col_lookup');
-  await knex.schema.dropTable('nc_col_formula');
+  await knex.schema.dropTable('nc_col_relations_v2');
+  await knex.schema.dropTable('nc_col_lookup_v2');
+  await knex.schema.dropTable('nc_col_formula_v2');
 
   // await knex.schema.dropTable('nc_plugins');
   // await knex.schema.dropTable('nc_disabled_models_for_role');

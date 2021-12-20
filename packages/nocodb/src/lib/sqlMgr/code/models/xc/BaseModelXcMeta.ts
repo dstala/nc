@@ -1,5 +1,5 @@
 import BaseRender from '../../BaseRender';
-import UITypes from '../../../../../../build/main/lib/sqlUi/UITypes';
+import UITypes from '../../../../sqlUi/UITypes';
 
 abstract class BaseModelXcMeta extends BaseRender {
   public abstract getXcColumnsObject(context: any): any[];

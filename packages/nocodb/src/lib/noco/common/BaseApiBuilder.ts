@@ -28,9 +28,9 @@ import { XcCron } from './XcCron';
 import NcConnectionMgr from './NcConnectionMgr';
 import updateColumnNameInFormula from './helpers/updateColumnNameInFormula';
 import addErrorOnColumnDeleteInFormula from './helpers/addErrorOnColumnDeleteInFormula';
-import ncModelsOrderUpgrader from './jobs/ncModelsOrderUpgrader';
-import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
-import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
+// import ncModelsOrderUpgrader from './jobs/ncModelsOrderUpgrader';
+// import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
+// import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
 import Model from '../../noco-models/Model';
 
 const log = debug('nc:api:base');

@@ -28,6 +28,7 @@ import { RestCtrlCustom } from './RestCtrlCustom';
 import { RestCtrlHasMany } from './RestCtrlHasMany';
 import { RestCtrlProcedure } from './RestCtrlProcedure';
 import Model from '../../noco-models/Model';
+import Column from '../../noco-models/Column';
 
 const log = debug('nc:api:rest');
 const NC_CUSTOM_ROUTE_KEY = '__xc_custom';
@@ -355,6 +356,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     );
     let tables;
     const swaggerRefs: { [table: string]: any[] } = {};
+    // @ts-ignore
     const order = await this.getOrderVal();
 
     /*    /!* Get all relations *!/
@@ -570,38 +572,6 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           });
           virtualColumnsInsert.push(async () => {
             for (const column of meta.v) {
-              // todo: insert virtual columns
-              // insert in nc_columns_v2 & nc_col_relations
-              const { id: column_id } = await this.xcMeta.metaInsert2(
-                this.projectId,
-                this.dbAlias,
-                'nc_columns_v2',
-                {
-                  model_id: modelId,
-                  cn: column.cn,
-                  _cn: column._cn,
-                  uidt: column.uidt,
-                  dt: column.dt,
-                  np: column.np,
-                  ns: column.ns,
-                  clen: column.clen,
-                  cop: column.cop,
-                  pk: column.pk,
-                  rqd: column.rqd,
-                  un: column.un,
-                  ct: column.ct,
-                  ai: column.ai,
-                  unique: column.unique,
-                  ctf: column.ctf,
-                  cc: column.cc,
-                  csn: column.csn,
-                  dtx: column.dtx,
-                  dtxp: column.dtxp,
-                  dtxs: column.dtxs,
-                  au: column.au
-                }
-              );
-
               const rel = column.hm || column.bt;
 
               const rel_column_id = (
@@ -611,20 +581,49 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
                 await this.models2?.[rel.tn]?.columns
               )?.find(c => c.cn === rel.cn)?.id;
 
-              await this.xcMeta.metaInsert2(
-                this.projectId,
-                this.dbAlias,
-                'nc_col_relations',
-                {
-                  type: column.hm ? 'hm' : 'bt',
-                  column_id,
-                  rel_column_id,
-                  ref_rel_column_id,
-                  fkn: rel.fkn,
-                  ur: rel.ur,
-                  dr: rel.dr
-                }
-              );
+              await Column.insert({
+                model_id: modelId,
+                cn: column.cn,
+                _cn: column._cn,
+                uidt: column.uidt,
+                type: column.hm ? 'hm' : 'bt',
+                // column_id,
+                rel_column_id,
+                ref_rel_column_id,
+                fkn: rel.fkn,
+                ur: rel.ur,
+                dr: rel.dr
+              });
+
+              // todo: insert virtual columns
+              // insert in nc_columns_v2 & nc_col_relations
+              // const { id: column_id } =
+              // await this.xcMeta.metaInsert2(
+              //   this.projectId,
+              //   this.dbAlias,
+              //   'nc_columns_v2',
+              //   {
+              //     model_id: modelId,
+              //     cn: column.cn,
+              //     _cn: column._cn,
+              //     uidt: column.uidt
+              //   }
+              // );
+
+              // await this.xcMeta.metaInsert2(
+              //   this.projectId,
+              //   this.dbAlias,
+              //   'nc_col_relations',
+              //   {
+              //     type: column.hm ? 'hm' : 'bt',
+              //     column_id,
+              //     rel_column_id,
+              //     ref_rel_column_id,
+              //     fkn: rel.fkn,
+              //     ur: rel.ur,
+              //     dr: rel.dr
+              //   }
+              // );
             }
           });
         }
@@ -2721,8 +2720,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     );
   }
 
-  protected async ncUpManyToMany(): Promise<any> {
-    const metas = await super.ncUpManyToMany();
+  protected async ncUpManyToMany(ctx: any): Promise<any> {
+    const metas = await super.ncUpManyToMany(ctx);
     if (!metas) {
       return;
     }
