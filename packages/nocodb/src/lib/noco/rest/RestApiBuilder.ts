@@ -538,7 +538,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
             await Column.insert({
               project_id: this.projectId,
               db_alias: this.dbAlias,
-              model_id: modelId,
+              fk_model_id: modelId,
               cn: column.cn,
               _cn: column._cn,
               uidt: column.uidt,
@@ -581,15 +581,15 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               await Column.insert({
                 project_id: this.projectId,
                 db_alias: this.dbAlias,
-                model_id: modelId,
+                fk_model_id: modelId,
                 cn: column.cn,
                 _cn: column._cn,
                 uidt: column.uidt,
                 type: column.hm ? 'hm' : 'bt',
                 // column_id,
-                rel_column_id,
-                ref_rel_column_id,
-                fkn: rel.fkn,
+                fk_child_column_id: rel_column_id,
+                fk_parent_column_id: ref_rel_column_id,
+                fk_index_name: rel.fkn,
                 ur: rel.ur,
                 dr: rel.dr
               });

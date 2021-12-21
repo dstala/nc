@@ -40,7 +40,7 @@ export default class LookupColumn implements NcColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_columns_v2',
+      'nc_col_lookup_v2',
       {
         tn: model.tn,
         _tn: model._tn
@@ -52,8 +52,8 @@ export default class LookupColumn implements NcColumn {
     const column = await Noco.ncMeta.metaGet2(
       null, //,
       null, //model.db_alias,
-      'nc_columns_v2',
-      columnId
+      'nc_col_lookup_v2',
+      { fk_column_id: columnId }
     );
 
     return column ? new LookupColumn(column) : null;

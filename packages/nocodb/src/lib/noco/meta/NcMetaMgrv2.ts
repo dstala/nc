@@ -1,48 +1,17 @@
-import CryptoJS from 'crypto-js';
-import fs from 'fs';
-import path from 'path';
-
-import archiver from 'archiver';
-import axios from 'axios';
 import bodyParser from 'body-parser';
-import express, { Handler, Router } from 'express';
-import extract from 'extract-zip';
-import isDocker from 'is-docker';
+import { Handler, Router } from 'express';
 import multer from 'multer';
-import { nanoid } from 'nanoid';
-import { SqlClientFactory, Tele } from 'nc-help';
-import slash from 'slash';
-import { v4 as uuidv4 } from 'uuid';
-import { ncp } from 'ncp';
 
-import IEmailAdapter from '../../../interface/IEmailAdapter';
-import IStorageAdapter from '../../../interface/IStorageAdapter';
-import { NcConfig, Result } from '../../../interface/config';
-import { NcConfigFactory } from '../../index';
+import { NcConfig } from '../../../interface/config';
 import ProjectMgr from '../../sqlMgr/ProjectMgr';
-import ExpressXcTsRoutes from '../../sqlMgr/code/routes/xc-ts/ExpressXcTsRoutes';
-import ExpressXcTsRoutesBt from '../../sqlMgr/code/routes/xc-ts/ExpressXcTsRoutesBt';
-import ExpressXcTsRoutesHm from '../../sqlMgr/code/routes/xc-ts/ExpressXcTsRoutesHm';
-import NcHelp from '../../utils/NcHelp';
-import mimetypes, { mimeIcons } from '../../utils/mimeTypes';
 import projectAcl from '../../utils/projectAcl';
 import Noco from '../Noco';
-import { GqlApiBuilder } from '../gql/GqlApiBuilder';
 import NcPluginMgr from '../plugins/NcPluginMgr';
-import XcCache from '../plugins/adapters/cache/XcCache';
-import { RestApiBuilder } from '../rest/RestApiBuilder';
-import RestAuthCtrl from '../rest/RestAuthCtrlEE';
 import { packageVersion } from 'nc-help';
-import NcMetaIO, { META_TABLES } from './NcMetaIO';
-import { promisify } from 'util';
-import NcTemplateParser from '../../templateParser/NcTemplateParser';
-import UITypes from '../../sqlUi/UITypes';
+import NcMetaIO from './NcMetaIO';
 import { defaultConnectionConfig } from '../../utils/NcConfigFactory';
-import ncCreateLinkToAnotherRecord from "./handlersv2/ncCreateLinkToAnotherRecord";
-
-const XC_PLUGIN_DET = 'XC_PLUGIN_DET';
-
-const NOCO_RELEASE = 'NOCO_RELEASE';
+import ncCreateLookup from './handlersv2/ncCreateLookup';
+import ncGetMeta from './handlersv2/ncGetMeta';
 
 export default class NcMetaMgrv2 {
   public projectConfigs = {};
@@ -76,8 +45,6 @@ export default class NcMetaMgrv2 {
     await this.pluginMgr?.init();
 
     // await this.initTwilio();
-    await this.initCache();
-    this.eeVerify();
 
     const router = Router();
     for (const project of await this.xcMeta.projectList()) {
@@ -91,37 +58,6 @@ export default class NcMetaMgrv2 {
         .getSqlMgr({ ...project, config, metaDb: this.xcMeta?.knex })
         .projectOpenByWeb(config);
     }
-
-    // todo: acl
-    router.get(/^\/dl\/([^/]+)\/([^/]+)\/(.+)$/, async (req, res) => {
-      try {
-        // const type = mimetypes[path.extname(req.params.fileName).slice(1)] || 'text/plain';
-        const type =
-          mimetypes[
-            path
-              .extname(req.params[2])
-              .split('/')
-              .pop()
-              .slice(1)
-          ] || 'text/plain';
-        // const img = await this.storageAdapter.fileRead(slash(path.join('nc', req.params.projectId, req.params.dbAlias, 'uploads', req.params.fileName)));
-        const img = await this.storageAdapter.fileRead(
-          slash(
-            path.join(
-              'nc',
-              req.params[0],
-              req.params[1],
-              'uploads',
-              ...req.params[2].split('/')
-            )
-          )
-        );
-        res.writeHead(200, { 'Content-Type': type });
-        res.end(img, 'binary');
-      } catch (e) {
-        res.status(404).send('Not found');
-      }
-    });
 
     router.use(
       bodyParser.json({
@@ -140,49 +76,54 @@ export default class NcMetaMgrv2 {
       router.post(this.config.dashboardPath, upload.any());
     }
 
+    /*
     router.post(this.config.dashboardPath, (req, res, next) =>
-      this.handlePublicRequest(req, res, next)
+      // this.handlePublicRequest(req, res, next)
     );
+    */
 
     // @ts-ignore
-    router.post(this.config.dashboardPath, async (req: any, res, next) => {
-      if (req.files && req.body.json) {
-        req.body = JSON.parse(req.body.json);
-      }
-      if (req?.session?.passport?.user?.isAuthorized) {
-        if (
-          req?.body?.project_id &&
-          !req.session?.passport?.user?.isPublicBase &&
-          !(await this.xcMeta.isUserHaveAccessToProject(
-            req?.body?.project_id,
-            req?.session?.passport?.user?.id
-          ))
-        ) {
-          return res
-            .status(403)
-            .json({ msg: "User doesn't have project access" });
+    router.post(
+      this.config.dashboardPath + '/v2',
+      async (req: any, res, next) => {
+        if (req.files && req.body.json) {
+          req.body = JSON.parse(req.body.json);
         }
+        if (req?.session?.passport?.user?.isAuthorized) {
+          if (
+            req?.body?.project_id &&
+            !req.session?.passport?.user?.isPublicBase &&
+            !(await this.xcMeta.isUserHaveAccessToProject(
+              req?.body?.project_id,
+              req?.session?.passport?.user?.id
+            ))
+          ) {
+            return res
+              .status(403)
+              .json({ msg: "User doesn't have project access" });
+          }
 
-        if (req?.body?.api) {
-          const roles = req?.session?.passport?.user?.roles;
-          const isAllowed =
-            roles &&
-            Object.entries(roles).some(([name, hasRole]) => {
-              return (
-                hasRole &&
-                projectAcl[name] &&
-                (projectAcl[name] === '*' || projectAcl[name][req.body.api])
-              );
-            });
-          if (!isAllowed) {
-            return res.status(403).json({ msg: 'Not allowed' });
+          if (req?.body?.api) {
+            const roles = req?.session?.passport?.user?.roles;
+            const isAllowed =
+              roles &&
+              Object.entries(roles).some(([name, hasRole]) => {
+                return (
+                  hasRole &&
+                  projectAcl[name] &&
+                  (projectAcl[name] === '*' || projectAcl[name][req.body.api])
+                );
+              });
+            if (!isAllowed) {
+              return res.status(403).json({ msg: 'Not allowed' });
+            }
           }
         }
+        return next();
       }
-      next();
-    });
+    );
     router.post(
-      this.config.dashboardPath,
+      this.config.dashboardPath + '/v2',
       // handle request if it;s related to meta db
       (async (req: any, res, next): Promise<any> => {
         // auth to admin
@@ -218,7 +159,7 @@ export default class NcMetaMgrv2 {
         }
 
         if (req.files) {
-          await this.handleRequestWithFile(req, res, next);
+          // await this.handleRequestWithFile(req, res, next);
         } else {
           await this.handleRequest(req, res, next);
         }
@@ -267,7 +208,7 @@ export default class NcMetaMgrv2 {
     );
 
     router.get(
-      `${this.config.dashboardPath}/auth/type`,
+      `${this.config.dashboardPath + '/v2'}/auth/type`,
       async (_req, res): Promise<any> => {
         try {
           const projectHasDb = true; // this.toolMgr.projectHasDb();
@@ -351,11 +292,10 @@ export default class NcMetaMgrv2 {
     rootRouter.use(router);
   }
 
-
   public setListener(listener: (data) => Promise<any>) {
     this.listener = listener;
   }
-/*
+  /*
   protected async handlePublicRequest(req, res, next) {
    /!* let args = req.body;
 
@@ -419,8 +359,11 @@ export default class NcMetaMgrv2 {
       let result, postListenerCb;
 
       switch (args.api) {
-        case 'xcPluginDemoDefaults':
-          result = await ncCreateLinkToAnotherRecord.call(this.getContext(args),args);
+        case 'ncCreateLookup':
+          result = await ncCreateLookup.call(this.getContext(args), args);
+          break;
+        case 'ncGetMeta':
+          result = await ncGetMeta.call(this.getContext(args), args);
           break;
 
         default:
@@ -482,20 +425,18 @@ export default class NcMetaMgrv2 {
     return args.project_id;
   }
 
-
-  private getContext(args):NcContextV2{
+  private getContext(args): NcContextV2 {
     return {
       projectId: this.getProjectId(args),
-      dbAlias:this.getDbAlias(args),
-      xcMeta:this.xcMeta
-    }
+      dbAlias: this.getDbAlias(args),
+      xcMeta: this.xcMeta
+    };
   }
 }
 
-
-export interface NcContextV2{
+export interface NcContextV2 {
   projectId: string;
-  dbAlias:string;
+  dbAlias: string;
   xcMeta: NcMetaIO;
 }
 

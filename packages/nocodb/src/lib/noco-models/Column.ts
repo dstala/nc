@@ -38,6 +38,9 @@ export default class Column implements NcColumn {
   un: boolean;
   unique: boolean;
   updated_at: Date | number | string;
+  fk_model_id: string;
+
+  colOptions: any;
 
   constructor(data: NcColumn) {
     Object.assign(this, data);
@@ -49,24 +52,46 @@ export default class Column implements NcColumn {
       model.db_alias,
       'nc_columns_v2',
       {
-        tn: model.tn,
-        _tn: model._tn
+        fk_model_id: model.fk_model_id,
+        cn: model.cn,
+        _cn: model._cn,
+
+        uidt: model.uidt,
+        dt: model.dt,
+        np: model.np,
+        ns: model.ns,
+        clen: model.clen,
+        cop: model.cop,
+        pk: model.pk,
+        rqd: model.rqd,
+        un: model.un,
+        ct: model.ct,
+        ai: model.ai,
+        unique: model.unique,
+        ctf: model.ctf,
+        cc: model.cc,
+        csn: model.csn,
+        dtx: model.dtx,
+        dtxp: model.dtxp,
+        dtxs: model.dtxs,
+        au: model.au
       }
     );
 
     switch (model.uidt) {
       case UITypes.Lookup:
+        // LookupColumn.insert()
+
         await Noco.ncMeta.metaInsert2(
           model.project_id,
           model.db_alias,
           'nc_col_lookup_v2',
           {
-            column_id: row.id,
+            fk_column_id: row.id,
 
-            rel_column_id: model.rel_column_id,
-            ref_rel_column_id: model.ref_rel_column_id,
+            fk_relation_column_id: model.fk_relation_column_id,
 
-            lookup_column_id: model.lookup_column_id
+            fk_lookup_column_id: model.fk_lookup_column_id
           }
         );
         break;
@@ -76,10 +101,9 @@ export default class Column implements NcColumn {
           model.db_alias,
           'nc_col_rollup_v2',
           {
-            column_id: row.id,
+            fk_column_id: row.id,
 
-            rel_column_id: model.rel_column_id,
-            ref_rel_column_id: model.ref_rel_column_id,
+            fk_relation_column_id: model.fk_relation_column_id,
 
             rollup_column_id: model.rollup_column_id,
             rollup_function: model.rollup_function
@@ -93,23 +117,23 @@ export default class Column implements NcColumn {
           model.db_alias,
           'nc_col_relations_v2',
           {
-            column_id: row.id,
+            fk_column_id: row.id,
 
             // ref_db_alias
             type: model.type,
             // db_type:
 
-            rel_column_id: model.rel_column_id,
-            ref_rel_column_id: model.ref_rel_column_id,
+            fk_child_column_id: model.fk_child_column_id,
+            fk_parent_column_id: model.fk_parent_column_id,
 
-            v_rel_tn: model.v_rel_tn,
-            v_ref_rel_cn_id: model.v_ref_rel_cn_id,
-            v_rel_cn_id: model.v_rel_cn_id,
+            fk_mm_model_id: model.fk_mm_model_id,
+            fk_mm_child_column_id: model.fk_mm_child_column_id,
+            fk_mm_parent_column_id: model.fk_mm_parent_column_id,
 
             ur: model.ur,
             dr: model.dr,
 
-            fkn: model.fkn
+            fk_index_name: model.fk_index_name
           }
         );
         break;
@@ -119,7 +143,7 @@ export default class Column implements NcColumn {
           model.db_alias,
           'nc_col_formula_v2',
           {
-            column_id: row.id,
+            fk_column_id: row.id,
             formula: row.formula,
 
             fkn: model.fkn
@@ -127,7 +151,7 @@ export default class Column implements NcColumn {
         );
         break;
 
-      default:
+      /*  default:
         {
           await Noco.ncMeta.metaInsert2(
             model.project_id,
@@ -170,18 +194,16 @@ export default class Column implements NcColumn {
                 'nc_col_select_options_v2',
                 {
                   column_id: row.id,
-                  name: option,
-
-                  fkn: model.fkn
+                  name: option
                 }
               );
           }
         }
-        break;
+        break;*/
     }
   }
 
-  public async colOptions(): Promise<
+  public async loadColOptions(): Promise<
     | DbColumn
     | FormulaColumn
     | LinkToAnotherRecordColumn
@@ -211,11 +233,11 @@ export default class Column implements NcColumn {
       case UITypes.Formula:
         res = await FormulaColumn.read(this.id);
         break;
-      default:
-        res = await DbColumn.read(this.id);
-        break;
+      // default:
+      //   res = await DbColumn.read(this.id);
+      //   break;
     }
-
+    this.colOptions = res;
     return res;
   }
 
@@ -228,11 +250,17 @@ export default class Column implements NcColumn {
     db_alias: string;
     condition: any;
   }): Promise<Column[]> {
-    return (
-      await Noco.ncMeta.metaList2(base_id, db_alias, 'nc_columns_v2', {
-        condition
+    return Promise.all(
+      (
+        await Noco.ncMeta.metaList2(base_id, db_alias, 'nc_columns_v2', {
+          condition
+        })
+      ).map(async m => {
+        const column = new Column(m);
+        await column.loadColOptions();
+        return column;
       })
-    ).map(m => new Column(m));
+    );
 
     /*const columns = Noco.ncMeta
       .knex('nc_models_v2 as tab')

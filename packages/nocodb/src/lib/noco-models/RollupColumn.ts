@@ -1,37 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
-import UITypes from '../sqlUi/UITypes';
 
-export default class RollupColumn implements NcColumn {
-  _cn: string;
-  ai: boolean;
-  au: boolean;
-  cc: string;
-  clen: number | string;
-  cn: string;
-  cop: number | string;
-  created_at: Date | number | string;
-  csn: string;
-  ct: string;
-  ctf: any;
-  db_alias: 'db' | string;
-  deleted: boolean;
-  dt: string;
-  dtx: string;
-  dtxp: string | number;
-  dtxs: string | number;
-  model_id: string;
-  np: number | string;
-  ns: number | string;
-  order: number;
-  pk: boolean;
-  project_id: string;
-  rqd: boolean;
-  uidt: UITypes;
-  un: boolean;
-  unique: boolean;
-  updated_at: Date | number | string;
-
+export default class RollupColumn {
   constructor(data: NcColumn) {
     Object.assign(this, data);
   }
@@ -40,7 +10,7 @@ export default class RollupColumn implements NcColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_columns_v2',
+      'nc_col_rollup_v2',
       {
         tn: model.tn,
         _tn: model._tn
@@ -51,8 +21,8 @@ export default class RollupColumn implements NcColumn {
     const column = await Noco.ncMeta.metaGet2(
       null, //,
       null, //model.db_alias,
-      'nc_columns_v2',
-      columnId
+      'nc_col_rollup_v2',
+      { fk_column_id: columnId }
     );
 
     return column ? new RollupColumn(column) : null;

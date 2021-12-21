@@ -34,6 +34,7 @@ import RestAuthCtrlEE from './rest/RestAuthCtrlEE';
 import mkdirp from 'mkdirp';
 import MetaAPILogger from './meta/MetaAPILogger';
 import NcUpgrader from './upgrader/NcUpgrader';
+import NcMetaMgrv2 from './meta/NcMetaMgrv2';
 
 const log = debug('nc:app');
 require('dotenv').config();
@@ -75,6 +76,7 @@ export default class Noco {
   public readonly projectRouter: express.Router;
   public static _ncMeta: NcMetaIO;
   public readonly metaMgr: NcMetaMgrEE | NcMetaMgrCE;
+  public readonly metaMgrv2: NcMetaMgrv2;
   public env: string;
 
   public projectBuilders: Array<NcProjectBuilderCE | NcProjectBuilderEE> = [];
@@ -117,6 +119,7 @@ export default class Noco {
 
     Noco._ncMeta = new NcMetaImpl(this, this.config);
     this.metaMgr = new NcMetaMgr(this, this.config, Noco._ncMeta);
+    this.metaMgrv2 = new NcMetaMgrv2(this, this.config, Noco._ncMeta);
 
     /******************* setup : end *******************/
 
@@ -225,7 +228,9 @@ export default class Noco {
 
     this.ncToolApi.addListener(runTimeHandler);
     this.metaMgr.setListener(runTimeHandler);
+    this.metaMgrv2.setListener(runTimeHandler);
     await this.metaMgr.initHandler(this.router);
+    await this.metaMgrv2.initHandler(this.router);
     this.router.use(
       this.config.dashboardPath,
       await this.ncToolApi.expressMiddleware()

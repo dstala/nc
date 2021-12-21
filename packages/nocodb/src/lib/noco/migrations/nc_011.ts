@@ -20,7 +20,7 @@ const up = async knex => {
     // todo: foreign key
     // table.string('base_id', 128);
     // table.string('base_id', 128)
-    // table.foreign('base_id').references('nc_bases.id');
+    // table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('alias');
     table.string('hist');
@@ -49,7 +49,7 @@ const up = async knex => {
     // table.string('base_id');
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
     // table.foreign('data_src_id').references('nc_data_src.id');
 
     table.string('title');
@@ -89,20 +89,19 @@ const up = async knex => {
     // table.string('db_alias').defaultTo('db');
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     // table.string('base_id', 128)
     // table.foreign('base_id').references('nc_bases.id');
-    table.uuid('model_id');
-    table.foreign('model_id').references('nc_models.id');
+    table.uuid('fk_model_id');
+    table.foreign('fk_model_id').references('nc_models_v2.id');
 
     // table.string('tn');
     // table.string('_tn');
 
     table.string('_cn');
     table.string('cn');
-    /*
-    table.string('cn');
+
     // todo: decide type
     table.string('uidt');
     table.string('dt');
@@ -122,16 +121,18 @@ const up = async knex => {
     table.string('dtx');
     table.string('dtxp');
     table.string('dtxs');
-    table.boolean('au');*/
+    table.boolean('au');
 
     //todo: virtual, real, etc
     table.string('type');
 
     table.boolean('deleted');
+    table.boolean('visible').defaultTo(true);
     table.integer('order');
     table.timestamps(true, true);
   });
 
+  /*
   await knex.schema.createTable('nc_col_props_v2', table => {
     table
       .uuid('id')
@@ -139,11 +140,11 @@ const up = async knex => {
       .notNullable();
 
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns_v2.id');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     table.string('cn');
     // todo: decide type
@@ -169,6 +170,7 @@ const up = async knex => {
     table.timestamps(true, true);
     // table.index(['db_alias', 'tn']);
   });
+*/
 
   await knex.schema.createTable('nc_col_relations_v2', table => {
     table
@@ -177,7 +179,7 @@ const up = async knex => {
       .notNullable();
 
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
     // table.string('base_id');
@@ -195,25 +197,25 @@ const up = async knex => {
     table.string('type');
     table.string('db_type');
 
-    table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns_v2.id');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
 
-    table.uuid('rel_column_id');
-    table.foreign('rel_column_id').references('nc_columns_v2.id');
-    table.uuid('ref_rel_column_id');
-    table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
+    table.uuid('fk_child_column_id');
+    table.foreign('fk_child_column_id').references('nc_columns_v2.id');
+    table.uuid('fk_parent_column_id');
+    table.foreign('fk_parent_column_id').references('nc_columns_v2.id');
 
-    table.uuid('v_rel_tn');
-    table.foreign('v_rel_tn').references('nc_models.id');
-    table.uuid('v_ref_rel_cn_id');
-    table.foreign('v_ref_rel_cn_id').references('nc_columns_v2.id');
-    table.uuid('v_rel_cn_id');
-    table.foreign('v_rel_cn_id').references('nc_columns_v2.id');
+    table.uuid('fk_mm_model_id');
+    table.foreign('fk_mm_model_id').references('nc_models_v2.id');
+    table.uuid('fk_mm_child_column_id');
+    table.foreign('fk_mm_child_column_id').references('nc_columns_v2.id');
+    table.uuid('fk_mm_parent_column_id');
+    table.foreign('fk_mm_parent_column_id').references('nc_columns_v2.id');
 
     table.string('ur');
     table.string('dr');
 
-    table.string('fkn');
+    table.string('fk_index_name');
 
     table.boolean('deleted');
     table.integer('order');
@@ -228,29 +230,16 @@ const up = async knex => {
       .notNullable();
 
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    // table.string('base_id');
-    // table.string('db_alias');
-    // table.string('tn');
-    // table.string('rtn');
-    // table.string('_tn');
-    // table.string('_rtn');
-    // table.string('cn');
-    // table.string('rcn');
-    // table.string('_cn');
-    // table.string('_rcn');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
 
-    table.string('ref_db_alias');
-    table.string('type');
-    table.string('db_type');
+    table.string('title');
+    table.string('color');
 
-    table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns_v2.id');
-
-    table.string('name');
-
+    table.integer('order');
     table.timestamps(true, true);
     // table.index(['db_alias', 'tn']);
   });
@@ -262,20 +251,25 @@ const up = async knex => {
       .notNullable();
 
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns_v2.id');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
 
-    table.uuid('rel_column_id');
-    table.foreign('rel_column_id').references('nc_columns_v2.id');
-    table.uuid('ref_rel_column_id');
-    table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
+    // todo: refer relation column
+    // table.uuid('fk_child_column_id');
+    // table.foreign('fk_child_column_id').references('nc_columns_v2.id');
+    // table.uuid('fk_parent_column_id');
+    // table.foreign('fk_parent_column_id').references('nc_columns_v2.id');
 
-    table.uuid('lookup_column_id');
-    table.foreign('lookup_column_id').references('nc_columns_v2.id');
+    table.uuid('fk_relation_column_id');
+    table.foreign('fk_relation_column_id').references('nc_columns_v2.id');
+
+    table.uuid('fk_lookup_column_id');
+    table.foreign('fk_lookup_column_id').references('nc_columns_v2.id');
     table.boolean('deleted');
+
     table.integer('order');
     table.timestamps(true, true);
   });
@@ -286,19 +280,22 @@ const up = async knex => {
       .notNullable();
 
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns_v2.id');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
 
-    table.uuid('rel_column_id');
-    table.foreign('rel_column_id').references('nc_columns_v2.id');
-    table.uuid('ref_rel_column_id');
-    table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
+    // table.uuid('fk_child_column_id');
+    // table.foreign('fk_child_column_id').references('nc_columns_v2.id');
+    // table.uuid('fk_parent_column_id');
+    // table.foreign('fk_parent_column_id').references('nc_columns_v2.id');
 
-    table.uuid('rollup_column_id');
-    table.foreign('rollup_column_id').references('nc_columns_v2.id');
+    table.uuid('fk_relation_column_id');
+    table.foreign('fk_relation_column_id').references('nc_columns_v2.id');
+
+    table.uuid('fk_rollup_column_id');
+    table.foreign('fk_rollup_column_id').references('nc_columns_v2.id');
     table.string('rollup_function');
     table.boolean('deleted');
     table.integer('order');
@@ -311,11 +308,11 @@ const up = async knex => {
       .notNullable();
 
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns_v2.id');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     table.text('formula').notNullable();
 
@@ -332,15 +329,17 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('tn');
     table.string('_tn');
     table.string('cn');
     table.string('_cn');
 
-    table.uuid('column_id');
-    table.foreign('column_id').references('nc_columns_v2.id');
+    table.uuid('fk_model_id');
+    table.foreign('fk_model_id').references('nc_models_v2.id');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     table.string('comparison_op');
     table.string('value');
@@ -361,17 +360,22 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
-    table.string('tn');
-    table.string('_tn');
-    table.string('cn');
-    table.string('_cn');
+    table.uuid('fk_model_id');
+    table.foreign('fk_model_id').references('nc_models_v2.id');
+    table.uuid('fk_column_id');
+    table.foreign('fk_column_id').references('nc_columns_v2.id');
+
+    // table.string('tn');
+    // table.string('_tn');
+    // table.string('cn');
+    // table.string('_cn');
 
     table.boolean('direction').defaultTo(false);
     table.integer('order');
     table.timestamps(true, true);
-    table.index(['db_alias', 'tn']);
+    table.index(['db_alias']);
   });
 
   await knex.schema.createTable('nc_shared_views_v2', table => {
@@ -382,7 +386,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('tn');
 
@@ -407,7 +411,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('tn');
     table.string('_tn');
@@ -428,7 +432,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('heading');
     table.string('subheading');
@@ -455,7 +459,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     // todo: type
     table.string('uuid');
@@ -480,7 +484,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('uuid');
     table.string('tn');
@@ -512,7 +516,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('uuid');
     table.string('tn');
@@ -534,7 +538,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('uuid');
     table.string('tn');
@@ -557,7 +561,7 @@ const up = async knex => {
 
     table.string('db_alias').defaultTo('db');
     table.string('base_id', 128);
-    table.foreign('base_id').references('nc_bases.id');
+    table.foreign('base_id').references('nc_bases_v2.id');
 
     table.string('uuid');
     table.string('tn');
@@ -612,15 +616,15 @@ const up = async knex => {
 
     table.string('title');
     table.uuid('org_id');
-    table.foreign('org_id').references('nc_orgs.id');
+    table.foreign('org_id').references('nc_orgs_v2.id');
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable('nc_team_users_v2', table => {
     table.uuid('org_id');
-    table.foreign('org_id').references('nc_orgs.id');
+    table.foreign('org_id').references('nc_orgs_v2.id');
     table.uuid('user_id');
-    table.foreign('user_id').references('nc_users.id');
+    table.foreign('user_id').references('nc_users_v2.id');
     table.timestamps(true, true);
   });
   /**
@@ -964,7 +968,7 @@ const down = async knex => {
   await knex.schema.dropTable('nc_bases_v2');
   await knex.schema.dropTable('nc_data_src_v2');
   await knex.schema.dropTable('nc_models_v2');
-  await knex.schema.dropTable('nc_columns_v2_v2');
+  await knex.schema.dropTable('nc_columns_v2');
   await knex.schema.dropTable('nc_relations_v2');
   await knex.schema.dropTable('nc_filter_exp_v2');
   await knex.schema.dropTable('nc_sort_v2');

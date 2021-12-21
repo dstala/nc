@@ -26,25 +26,21 @@ export default class Model implements NcModel {
 
   uuid: string;
 
-  private _columns: Column[];
+  columns: Column[];
 
   constructor(data: NcModel) {
     Object.assign(this, data);
   }
 
-  public get columns(): Promise<Column[]> {
-    return new Promise<Column[]>((resolve, reject) => {
-      if (this._columns) return resolve(this._columns);
-      Column.list({
-        base_id: this.base_id,
-        db_alias: this.db_alias,
-        condition: {
-          model_id: this.id
-        }
-      })
-        .then(resolve)
-        .catch(reject);
+  public async columnList(): Promise<Column[]> {
+    this.columns = await Column.list({
+      base_id: this.base_id,
+      db_alias: this.db_alias,
+      condition: {
+        fk_model_id: this.id
+      }
     });
+    return this.columns;
   }
 
   public static async insert(model: NcModel) {

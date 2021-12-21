@@ -476,7 +476,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
       });
 
       // todo
-      await this.knexConnection('nc_bases').insert({
+      await this.knexConnection('nc_bases_v2').insert({
         id,
         title: projectName
       });

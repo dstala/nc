@@ -12,7 +12,7 @@ export default class FormulaColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_columns_v2',
+      'nc_col_formula_v2',
       {
         tn: model.tn,
         _tn: model._tn
@@ -24,8 +24,8 @@ export default class FormulaColumn {
     const column = await Noco.ncMeta.metaGet2(
       null, //,
       null, //model.db_alias,
-      'nc_columns_v2',
-      columnId
+      'nc_col_formula_v2',
+      { fk_column_id: columnId }
     );
 
     return column ? new FormulaColumn(column) : null;
