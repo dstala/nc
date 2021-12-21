@@ -6,6 +6,7 @@ export default class Model implements NcModel {
   copy_enabled: boolean;
   created_at: Date | number | string;
   db_alias: 'db' | string;
+  base_id: string;
   deleted: boolean;
   enabled: boolean;
   export_enabled: boolean;
@@ -35,7 +36,7 @@ export default class Model implements NcModel {
     return new Promise<Column[]>((resolve, reject) => {
       if (this._columns) return resolve(this._columns);
       Column.list({
-        project_id: this.project_id,
+        base_id: this.base_id,
         db_alias: this.db_alias,
         condition: {
           model_id: this.id
@@ -48,7 +49,7 @@ export default class Model implements NcModel {
 
   public static async insert(model: NcModel) {
     await Noco.ncMeta.metaInsert2(
-      model.project_id,
+      model.base_id,
       model.db_alias,
       'nc_models_v2',
       model

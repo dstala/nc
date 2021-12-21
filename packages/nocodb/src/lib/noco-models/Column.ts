@@ -1,6 +1,13 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import UITypes from '../sqlUi/UITypes';
+import DbColumn from './DbColumn';
+import FormulaColumn from './FormulaColumn';
+import LinkToAnotherRecordColumn from './LinkToAnotherRecordColumn';
+import LookupColumn from './LookupColumn';
+import RollupColumn from './RollupColumn';
+import SingleSelectColumn from './SingleSelectColumn';
+import MultiSelectColumn from './MultiSelectColumn';
 
 export default class Column implements NcColumn {
   _cn: string;
@@ -37,23 +44,19 @@ export default class Column implements NcColumn {
   }
 
   public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(
+    const row = await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
       'nc_columns_v2',
-      model
-    );
-
-    const row = await Noco.ncMeta.metaGet2(
-      model.project_id,
-      model.db_alias,
-      'nc_columns_v2',
-      model
+      {
+        tn: model.tn,
+        _tn: model._tn
+      }
     );
 
     switch (model.uidt) {
       case UITypes.Lookup:
-        await Noco.ncMeta.metaGet2(
+        await Noco.ncMeta.metaInsert2(
           model.project_id,
           model.db_alias,
           'nc_col_lookup_v2',
@@ -68,7 +71,7 @@ export default class Column implements NcColumn {
         );
         break;
       case UITypes.Rollup:
-        await Noco.ncMeta.metaGet2(
+        await Noco.ncMeta.metaInsert2(
           model.project_id,
           model.db_alias,
           'nc_col_rollup_v2',
@@ -83,8 +86,9 @@ export default class Column implements NcColumn {
           }
         );
         break;
+      case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord:
-        await Noco.ncMeta.metaGet2(
+        await Noco.ncMeta.metaInsert2(
           model.project_id,
           model.db_alias,
           'nc_col_relations_v2',
@@ -92,7 +96,7 @@ export default class Column implements NcColumn {
             column_id: row.id,
 
             // ref_db_alias
-            type: model.type || 'real',
+            type: model.type,
             // db_type:
 
             rel_column_id: model.rel_column_id,
@@ -110,10 +114,10 @@ export default class Column implements NcColumn {
         );
         break;
       case UITypes.Formula:
-        await Noco.ncMeta.metaGet2(
+        await Noco.ncMeta.metaInsert2(
           model.project_id,
           model.db_alias,
-          'nc_col_relations_v2',
+          'nc_col_formula_v2',
           {
             column_id: row.id,
             formula: row.formula,
@@ -125,10 +129,10 @@ export default class Column implements NcColumn {
 
       default:
         {
-          await Noco.ncMeta.metaGet2(
+          await Noco.ncMeta.metaInsert2(
             model.project_id,
             model.db_alias,
-            'nc_col_relations_v2',
+            'nc_col_props_v2',
             {
               column_id: model.column_id,
 
@@ -155,150 +159,82 @@ export default class Column implements NcColumn {
               au: model.au
             }
           );
+          if (
+            model.uidt === UITypes.MultiSelect ||
+            model.uidt === UITypes.SingleSelect
+          ) {
+            for (const option of model.dtxp.split(','))
+              await Noco.ncMeta.metaInsert2(
+                model.project_id,
+                model.db_alias,
+                'nc_col_select_options_v2',
+                {
+                  column_id: row.id,
+                  name: option,
+
+                  fkn: model.fkn
+                }
+              );
+          }
         }
         break;
-
-      /*
-
-
-        await knex.schema.createTable('nc_col_rollup_v2', table => {
-          table
-            .uuid('id')
-            .primary()
-            .notNullable();
-
-          table.string('base_id', 128);
-          table.foreign('base_id').references('nc_bases.id');
-          table.string('db_alias').defaultTo('db');
-
-          table.uuid('column_id');
-          table.foreign('column_id').references('nc_columns_v2.id');
-
-          table.uuid('rel_column_id');
-          table.foreign('rel_column_id').references('nc_columns_v2.id');
-          table.uuid('ref_rel_column_id');
-          table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
-
-          table.uuid('rollup_column_id');
-          table.foreign('rollup_column_id').references('nc_columns_v2.id');
-          table.string('rollup_function');
-          table.boolean('deleted');
-          table.integer('order');
-          table.timestamps(true, true);
-        });
-              await knex.schema.createTable('nc_col_relations_v2', table => {
-                table
-                  .uuid('id')
-                  .primary()
-                  .notNullable();
-
-                table.string('base_id', 128);
-                table.foreign('base_id').references('nc_bases.id');
-                table.string('db_alias').defaultTo('db');
-
-                // table.string('base_id');
-                // table.string('db_alias');
-                // table.string('tn');
-                // table.string('rtn');
-                // table.string('_tn');
-                // table.string('_rtn');
-                // table.string('cn');
-                // table.string('rcn');
-                // table.string('_cn');
-                // table.string('_rcn');
-
-                table.string('ref_db_alias');
-                table.string('type');
-                table.string('db_type');
-
-                table.uuid('column_id');
-                table.foreign('column_id').references('nc_columns_v2.id');
-
-                table.uuid('rel_column_id');
-                table.foreign('rel_column_id').references('nc_columns_v2.id');
-                table.uuid('ref_rel_column_id');
-                table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
-
-                table.uuid('v_rel_tn');
-                table.foreign('v_rel_tn').references('nc_models.id');
-                table.uuid('v_ref_rel_cn_id');
-                table.foreign('v_ref_rel_cn_id').references('nc_columns_v2.id');
-                table.uuid('v_rel_cn_id');
-                table.foreign('v_rel_cn_id').references('nc_columns_v2.id');
-
-                table.string('ur');
-                table.string('dr');
-
-                table.string('fkn');
-
-                table.boolean('deleted');
-                table.integer('order');
-                table.timestamps(true, true);
-                // table.index(['db_alias', 'tn']);
-              });
-
-              await knex.schema.createTable('nc_col_lookup_v2', table => {
-                table
-                  .uuid('id')
-                  .primary()
-                  .notNullable();
-
-                table.string('base_id', 128);
-                table.foreign('base_id').references('nc_bases.id');
-                table.string('db_alias').defaultTo('db');
-
-                table.uuid('column_id');
-                table.foreign('column_id').references('nc_columns_v2.id');
-
-                table.uuid('rel_column_id');
-                table.foreign('rel_column_id').references('nc_columns_v2.id');
-                table.uuid('ref_rel_column_id');
-                table.foreign('ref_rel_column_id').references('nc_columns_v2.id');
-
-                table.uuid('lookup_column_id');
-                table.foreign('lookup_column_id').references('nc_columns_v2.id');
-                table.boolean('deleted');
-                table.integer('order');
-                table.timestamps(true, true);
-              });
-              await knex.schema.createTable('nc_col_formula_v2', table => {
-                table
-                  .uuid('id')
-                  .primary()
-                  .notNullable();
-
-                table.string('base_id', 128);
-                table.foreign('base_id').references('nc_bases.id');
-                table.string('db_alias').defaultTo('db');
-
-                table.uuid('column_id');
-                table.foreign('column_id').references('nc_columns_v2.id');
-
-                table.text('formula').notNullable();
-
-                table.boolean('deleted');
-                table.integer('order');
-                table.timestamps(true, true);
-              });*/
     }
   }
 
+  public async colOptions(): Promise<
+    | DbColumn
+    | FormulaColumn
+    | LinkToAnotherRecordColumn
+    | LookupColumn
+    | RollupColumn
+    | SingleSelectColumn
+    | MultiSelectColumn
+  > {
+    let res: any;
+
+    switch (this.uidt) {
+      case UITypes.Lookup:
+        res = await LookupColumn.read(this.id);
+        break;
+      case UITypes.Rollup:
+        res = await RollupColumn.read(this.id);
+        break;
+      case UITypes.LinkToAnotherRecord:
+        res = await LinkToAnotherRecordColumn.read(this.id);
+        break;
+      case UITypes.MultiSelect:
+        res = await MultiSelectColumn.read(this.id);
+        break;
+      case UITypes.SingleSelect:
+        res = await SingleSelectColumn.read(this.id);
+        break;
+      case UITypes.Formula:
+        res = await FormulaColumn.read(this.id);
+        break;
+      default:
+        res = await DbColumn.read(this.id);
+        break;
+    }
+
+    return res;
+  }
+
   public static async list({
-    project_id,
+    base_id,
     db_alias,
     condition
   }: {
-    project_id: string;
+    base_id: string;
     db_alias: string;
     condition: any;
   }): Promise<Column[]> {
-    // return (
-    //   await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_columns_v2', {
-    //     condition
-    //   })
-    // ).map(m => new Column(m));
+    return (
+      await Noco.ncMeta.metaList2(base_id, db_alias, 'nc_columns_v2', {
+        condition
+      })
+    ).map(m => new Column(m));
 
-    const columns = Noco.ncMeta
+    /*const columns = Noco.ncMeta
       .knex('nc_models_v2 as tab')
       .select(
         'col.id',
@@ -326,9 +262,13 @@ export default class Column implements NcColumn {
         'col.id',
         'rel.column_id'
       )
-      .condition(condition);
+      .condition(condition)
+      .where({
+        'tab.base_id': base_id,
+        'tab.db_alias': db_alias
+      });
 
-    return columns.map(c => new Column(c));
+    return columns.map(c => new Column(c));*/
   }
 
   id: string;

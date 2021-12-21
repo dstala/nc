@@ -12,7 +12,7 @@ export default interface NcModel extends NcTimestamps, NcOrder, NcSoftDelete {
   id: string;
   title: string;
   alias: string;
-  project_id: string;
+  base_id: string;
   db_alias: 'db' | string;
   type: 'table' | 'view' | 'grid' | 'form' | 'kanban' | 'calendar' | 'gantt';
   schema: any;

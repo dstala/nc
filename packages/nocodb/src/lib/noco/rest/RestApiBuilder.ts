@@ -535,35 +535,32 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
             }
           );
           for (const column of meta.columns) {
-            await this.xcMeta.metaInsert2(
-              this.projectId,
-              this.dbAlias,
-              'nc_columns_v2',
-              {
-                model_id: modelId,
-                cn: column.cn,
-                _cn: column._cn,
-                uidt: column.uidt,
-                dt: column.dt,
-                np: column.np,
-                ns: column.ns,
-                clen: column.clen,
-                cop: column.cop,
-                pk: column.pk,
-                rqd: column.rqd,
-                un: column.un,
-                ct: column.ct,
-                ai: column.ai,
-                unique: column.unique,
-                ctf: column.ctf,
-                cc: column.cc,
-                csn: column.csn,
-                dtx: column.dtx,
-                dtxp: column.dtxp,
-                dtxs: column.dtxs,
-                au: column.au
-              }
-            );
+            await Column.insert({
+              project_id: this.projectId,
+              db_alias: this.dbAlias,
+              model_id: modelId,
+              cn: column.cn,
+              _cn: column._cn,
+              uidt: column.uidt,
+              dt: column.dt,
+              np: column.np,
+              ns: column.ns,
+              clen: column.clen,
+              cop: column.cop,
+              pk: column.pk,
+              rqd: column.rqd,
+              un: column.un,
+              ct: column.ct,
+              ai: column.ai,
+              unique: column.unique,
+              ctf: column.ctf,
+              cc: column.cc,
+              csn: column.csn,
+              dtx: column.dtx,
+              dtxp: column.dtxp,
+              dtxs: column.dtxs,
+              au: column.au
+            });
           }
           this.models2[table.tn] = await Model.get({
             base_id: this.projectId,
@@ -582,6 +579,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               )?.find(c => c.cn === rel.cn)?.id;
 
               await Column.insert({
+                project_id: this.projectId,
+                db_alias: this.dbAlias,
                 model_id: modelId,
                 cn: column.cn,
                 _cn: column._cn,

@@ -132,9 +132,6 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-
-
-
   await knex.schema.createTable('nc_col_props_v2', table => {
     table
       .uuid('id')
@@ -145,11 +142,8 @@ const up = async knex => {
     table.foreign('base_id').references('nc_bases.id');
     table.string('db_alias').defaultTo('db');
 
-
-
-      table.uuid('column_id');
+    table.uuid('column_id');
     table.foreign('column_id').references('nc_columns_v2.id');
-
 
     table.string('cn');
     // todo: decide type
@@ -175,7 +169,6 @@ const up = async knex => {
     table.timestamps(true, true);
     // table.index(['db_alias', 'tn']);
   });
-
 
   await knex.schema.createTable('nc_col_relations_v2', table => {
     table
@@ -224,6 +217,40 @@ const up = async knex => {
 
     table.boolean('deleted');
     table.integer('order');
+    table.timestamps(true, true);
+    // table.index(['db_alias', 'tn']);
+  });
+
+  await knex.schema.createTable('nc_col_select_options_v2', table => {
+    table
+      .uuid('id')
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 128);
+    table.foreign('base_id').references('nc_bases.id');
+    table.string('db_alias').defaultTo('db');
+
+    // table.string('base_id');
+    // table.string('db_alias');
+    // table.string('tn');
+    // table.string('rtn');
+    // table.string('_tn');
+    // table.string('_rtn');
+    // table.string('cn');
+    // table.string('rcn');
+    // table.string('_cn');
+    // table.string('_rcn');
+
+    table.string('ref_db_alias');
+    table.string('type');
+    table.string('db_type');
+
+    table.uuid('column_id');
+    table.foreign('column_id').references('nc_columns_v2.id');
+
+    table.string('name');
+
     table.timestamps(true, true);
     // table.index(['db_alias', 'tn']);
   });

@@ -245,7 +245,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
       updated_at: this.knexConnection?.fn?.now(),
       ...data
     });
-    return { id };
+    return { ...data, id };
   }
 
   public async metaList(
@@ -300,6 +300,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
       offset?: number;
       xcCondition?;
       fields?: string[];
+      orderBy: { [key: string]: 'asc' | 'desc' };
     }
   ): Promise<any[]> {
     const query = this.knexConnection(target);
