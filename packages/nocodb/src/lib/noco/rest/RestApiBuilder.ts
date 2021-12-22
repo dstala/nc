@@ -236,7 +236,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
         routes,
         rootPath,
         this.acls,
-        middlewareBody
+        middlewareBody,
+        this.baseModels2
       );
       this.controllers[meta.title].mapRoutes(router, this.customRoutes);
 
@@ -722,7 +723,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           routes,
           rootPath,
           this.acls,
-          null
+          null,
+          this.baseModels2
         );
         this.controllers[table.tn].mapRoutes(router, this.customRoutes);
         this.router.use(encodeURI(rootPath), router);

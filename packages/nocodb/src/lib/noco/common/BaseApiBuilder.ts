@@ -32,6 +32,7 @@ import addErrorOnColumnDeleteInFormula from './helpers/addErrorOnColumnDeleteInF
 // import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
 // import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
 import Model from '../../noco-models/Model';
+import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const log = debug('nc:api:base');
 
@@ -67,6 +68,10 @@ export default abstract class BaseApiBuilder<T extends Noco>
   public abstract readonly type: string;
   protected models2: {
     [key: string]: Model;
+  };
+
+  protected baseModels2: {
+    [key: string]: BaseModelSqlv2;
   };
 
   public get knex(): XKnex {
@@ -162,6 +167,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
   ) {
     this.models = {};
     this.models2 = {};
+    this.baseModels2 = {};
     this.app = app;
     this.config = config;
     this.connectionConfig = connectionConfig;
@@ -2019,7 +2025,11 @@ export default abstract class BaseApiBuilder<T extends Noco>
     });
 
     for (const model of models) {
-      this.models2[model.tn] = model;
+      this.models2[model.title] = model;
+      this.baseModels2[model.title] = new BaseModelSqlv2({
+        model,
+        dbDriver: this.dbDriver
+      });
     }
 
     const enabledModels = [];
