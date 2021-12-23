@@ -28,23 +28,23 @@ class Country {
     }).first()).count
   }
 
-  async addressCount(args) {
+  // async addressCount(args) {
+  //
+  //   return await Promise.all(args.map(c => c.addressCount()))
+  //
+  //   // return (await knex('city').count('city_id as count').where({
+  //   //   country_id: this.country_id
+  //   // }).first()).count
+  // }
 
-    return await Promise.all(args.map(c => c.addressCount()))
-
-    // return (await knex('city').count('city_id as count').where({
-    //   country_id: this.country_id
-    // }).first()).count
-  }
-
-  async addressList(args) {
-
-    return await Promise.all((await this.cityList()).map(c => c.addressList()))
-
-    // return (await knex('city').count('city_id as count').where({
-    //   country_id: this.country_id
-    // }).first()).count
-  }
+  // async addressList(args) {
+  //
+  //   return await Promise.all((await this.cityList()).map(c => c.addressList()))
+  //
+  //   // return (await knex('city').count('city_id as count').where({
+  //   //   country_id: this.country_id
+  //   // }).first()).count
+  // }
 }
 
 
@@ -52,6 +52,14 @@ class Address {
   constructor(data) {
     Object.assign(this, data)
   }
+
+  async City() {
+    return new City(await knex('city').select('*').where({
+      city_id: this.city_id
+    }).first())
+  }
+
+
 }
 
 class City {
@@ -59,7 +67,7 @@ class City {
     Object.assign(this, data)
   }
 
-  async countryRead() {
+  async Country() {
     return new Country((await knex('country').select('*').where({
       country_id: this.country_id
     }).first()))
@@ -71,11 +79,11 @@ class City {
       })).map(c => new Address(c))
     }*/
 
-  /*  async addressCount() {
+    async addressCount() {
       return (await knex('address').count('city_id as count').where({
         city_id: this.city_id
       }).first()).count
-    }*/
+    }
 
 
 }
@@ -111,20 +119,26 @@ const rootAst = {
       }, country: {
         name: 'country',
         type: 'string'
-      }, cityList: {
+      },
+
+      cityList: {
         name: 'cityList',
         type: 'array',
         elementType: 'City',
-        nested: {
-          level: 1, dependsOn: ['country_id']
-        }
-      }, cityCount: {
+        // nested: {
+        //   level: 1, dependsOn: ['country_id']
+        // }
+      },
+      cityCount: {
         name: 'cityCount',
         type: 'number',
-        nested: {
-          level: 1, dependsOn: ['country_id']
-        }
-      }, addressCount: {
+        // nested: {
+        //   level: 1, dependsOn: ['country_id']
+        // }
+      },
+
+
+      addressCount: {
         name: 'addressCount',
         type: 'number',
         nested: {level: 2, dependsOn: ['cityList', 'addressCount']}
@@ -153,7 +167,14 @@ const rootAst = {
       }, addressCount: {
         name: 'addressCount',
         type: 'number'
-      }
+      },
+      Country: {
+        name: 'Country',
+        type: 'Country',
+        // nested: {
+        //   level: 1, dependsOn: ['country_id']
+        // }
+      },
     }
   }, Address: {
     name: 'Address',
@@ -162,12 +183,32 @@ const rootAst = {
       address: {
         name: 'address',
         type: 'string'
+      },
+      City: {
+        name: 'City',
+        type: 'City',
+        // nested: {
+        //   level: 1,
+        //   dependsOn: ['city_id']
+        // }
+      },
+      Country: {
+        name: 'Country',
+        type: 'Country',
+        nested: {
+          level: 1,
+          dependsOn: ['City', 'Country']
+        }
       }
     }
   },
   CountryList: {
     type: 'array',
     elementType: 'Country'
+  },
+  AddressList: {
+    type: 'array',
+    elementType: 'Address'
   },
 }
 
@@ -178,33 +219,28 @@ const nestResolver = {
   },
 
   async CountryList() {
-    return (await knex('country').limit(10)).map(c => new Country(c))
+    return (await knex('country').limit(1)).map(c => new Country(c))
+  },
+
+  async AddressList() {
+    return (await knex('address').limit(10)).map(c => new Address(c))
   }
 }
 
 
-const req = {
-  CountryList: {
-    country: 1,
-    cityList: {
-      addressCount: 1
-    },
-    addressCount: 1,
-  },
-}
-
+/*
 
 const reqExecutor = async (reqObj, resObj, _ast) => {
 
   const res = {}
   // const dependedFields = Object.keys(reqObj).map(k => (ast.fields && ast.fields[k] && ast.fields[k].nested && ast.fields[k].nested.dependsOn))
-  /*  const dependFields = new Set();
+  /!*  const dependFields = new Set();
     for(const k of Object.keys(reqObj)){
       if(ast.fields && ast.fields[k] && ast.fields[k].nested && ast.fields[k].nested.dependsOn){
         dependFields.add(ast.fields[k].nested.dependsOn)
 
       }
-    }*/
+    }*!/
 
   function extractDependsOn(key, i = 0, prev, __ast) {
     const ast = __ast || _ast
@@ -294,15 +330,10 @@ const reqExecutor = async (reqObj, resObj, _ast) => {
 
   return out
 }
+*/
 
-(async () => {
-  console.time('start')
-  console.log(JSON.stringify(await reqExecutor(req, nestResolver, rootAst), 0, 2));
-  console.timeEnd('start')
-})().catch(e => console.log(e)).finally(() => process.exit(0))
-
-
-const reqExecutorOld = async (reqObj, resObj, ast) => {
+/*
+const reqExecutor = async (reqObj, resObj, ast) => {
 
   const res = {}
 
@@ -334,3 +365,189 @@ const reqExecutorOld = async (reqObj, resObj, ast) => {
 
   return res
 }
+
+*/
+
+
+const execute = async (requestObj, resolverObj, ast) => {
+
+  const res = {}
+  // const dependedFields = Object.keys(reqObj).map(k => (ast.fields && ast.fields[k] && ast.fields[k].nested && ast.fields[k].nested.dependsOn))
+  /*  const dependFields = new Set();
+    for(const k of Object.keys(reqObj)){
+      if(ast.fields && ast.fields[k] && ast.fields[k].nested && ast.fields[k].nested.dependsOn){
+        dependFields.add(ast.fields[k].nested.dependsOn)
+
+      }
+    }*/
+
+
+  const extractNested = (path, o = {}, resolver) => {
+    if (path.length) {
+      const key =path[0]
+      if (!o[key]) {
+
+
+
+        if (typeof resolver[key] === 'function') {
+          o[path[0]] = resolver[key]()//.call(res);
+          // console.log(prefix + o[path[0]])
+        } else if (typeof resolver[key] === 'object') {
+          o[path[0]] = Promise.resolve(resolver[key])
+          // console.log(prefix + o[path[0]])
+        } else {
+          o[path[0]] = Promise.resolve(resolver[key])
+          // console.log(prefix + o[path[0]])
+        }
+
+
+      }else if(typeof o[key] === 'function'){
+        o[key] = o[key]()
+      }
+
+
+
+      return (o[path[0]] instanceof  Promise ? o[path[0]] : Promise.resolve(o[path[0]])).then(res1 => {
+
+        if (Array.isArray(res1)) {
+          return Promise.all(res1.map(r => extractNested(path.slice(1), r)))
+        } else {
+          return extractNested(path.slice(1), res1)
+        }
+
+      })
+    } else {
+      return Promise.resolve(o)
+    }
+  };
+
+
+  function extractField(key) {
+    if (!(ast && ast && ast[key] && ast[key].nested)) {
+      if (typeof resolverObj[key] === 'function') {
+        res[key] = resolverObj[key]()//.call(res);
+        // console.log(prefix + res[key])
+      } else if (typeof resolverObj[key] === 'object') {
+        res[key] = Promise.resolve(resolverObj[key])
+        // console.log(prefix + res[key])
+      } else {
+        res[key] = Promise.resolve(resolverObj[key])
+        // console.log(prefix + res[key])
+      }
+    } else {
+/*      if (!res[ast[key].nested])
+        extractField(ast[key].nested.dependsOn)
+
+
+      res[key] = res[ast.fields[key].nested.dependsOn].then(res => {
+        if (typeof resolverObj[key] === 'function') {
+          return resolverObj[key](res)//.call(res);
+          // console.log(prefix + res[key])
+        } else if (typeof resolverObj[key] === 'object') {
+          return Promise.resolve(resolverObj[key])
+          // console.log(prefix + res[key])
+        } else {
+          return Promise.resolve(resolverObj[key])
+          // console.log(prefix + res[key])
+        }
+      })*/
+      res[key] = extractNested(ast[key].nested.dependsOn, res, resolverObj)
+
+
+
+    }
+
+
+  }
+
+
+  for (const key of Object.keys(requestObj)) {
+    // if (key in resolverObj) {
+      extractField(key);
+    // }
+
+
+    if (requestObj[key] && typeof requestObj[key] === 'object') {
+      res[key] = res[key].then(res1 => {
+        if (Array.isArray(res1)) {
+          return Promise.all(res1.map(r => execute(requestObj[key], r, rootAst[ast[key].elementType] && rootAst[ast[key].elementType].fields)))
+        } else {
+          return execute(requestObj[key], res1, ast[key].fields)
+        }
+      })
+    }
+
+
+  }
+
+  await Promise.all(Object.values(res))
+
+  const out = {};
+  for (const [k, v] of Object.entries(res)) {
+    out[k] = await v
+  }
+
+
+  return out
+}
+
+
+const req = {
+  // AddressList: {
+  //   City: {
+  //     Country: 1
+  //   },
+  //   Country: 1
+  // },
+  CountryList:{
+    // cityList:{
+    //   addressCount:1
+    // },
+    addressCount:1
+  }
+};
+
+
+const extractNested = (path, o = {}) => {
+  if (path.length) {
+    if (!o[path[0]]) {
+      o[path[0]] = Promise.resolve({})
+    }
+    return o[path[0]].then(r => extractNested(path.slice(1), r))
+  } else {
+    return Promise.resolve(o)
+  }
+};
+
+(async () => {
+
+  console.time('start')
+  console.log(JSON.stringify(await execute(req, nestResolver, rootAst), 0, 2));
+  console.timeEnd('start')
+
+
+
+/*  console.log(JSON.stringify(await extractNested(['a', 'b'], {
+    a: Promise.resolve({
+      b: Promise.resolve({
+        t: 1
+      })
+    })
+  }), 0, 2))*/
+
+
+/*  const o = {};*/
+
+/*  console.log(JSON.stringify(await extractNested(['a', 'b'], o), 0, 2))
+  console.log(o)
+  console.log(JSON.stringify(await extractNested(['a', 'c'], o), 0, 2))
+  console.log(JSON.stringify(await extractNested(['a', 'b', 'c'], o), 0, 2))
+  console.log(JSON.stringify(await extractNested(['a', 'b'], o), 0, 2))*/
+
+})().catch(e => console.log(e)).finally(() => process.exit(0))
+
+
+
+
+
+
