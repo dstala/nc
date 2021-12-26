@@ -8,39 +8,42 @@ import LookupColumn from './LookupColumn';
 import RollupColumn from './RollupColumn';
 import SingleSelectColumn from './SingleSelectColumn';
 import MultiSelectColumn from './MultiSelectColumn';
+import Model from './Model';
 
 export default class Column implements NcColumn {
-  _cn: string;
-  ai: boolean;
-  au: boolean;
-  cc: string;
-  clen: number | string;
-  cn: string;
-  cop: number | string;
-  created_at: Date | number | string;
-  csn: string;
-  ct: string;
-  ctf: any;
-  db_alias: 'db' | string;
-  deleted: boolean;
-  dt: string;
-  dtx: string;
-  dtxp: string | number;
-  dtxs: string | number;
-  model_id: string;
-  np: number | string;
-  ns: number | string;
-  order: number;
-  pk: boolean;
-  project_id: string;
-  rqd: boolean;
-  uidt: UITypes;
-  un: boolean;
-  unique: boolean;
-  updated_at: Date | number | string;
-  fk_model_id: string;
+  public _cn: string;
+  public ai: boolean;
+  public au: boolean;
+  public cc: string;
+  public clen: number | string;
+  public cn: string;
+  public cop: number | string;
+  public created_at: Date | number | string;
+  public csn: string;
+  public ct: string;
+  public ctf: any;
+  public base_id: string;
+  public db_alias: 'db' | string;
+  public deleted: boolean;
+  public dt: string;
+  public dtx: string;
+  public dtxp: string | number;
+  public dtxs: string | number;
+  public model_id: string;
+  public np: number | string;
+  public ns: number | string;
+  public order: number;
+  public pk: boolean;
+  public project_id: string;
+  public rqd: boolean;
+  public uidt: UITypes;
+  public un: boolean;
+  public unique: boolean;
+  public updated_at: Date | number | string;
+  public fk_model_id: string;
 
-  colOptions: any;
+  public colOptions: any;
+  public model: Model;
 
   constructor(data: NcColumn) {
     Object.assign(this, data);
@@ -224,6 +227,9 @@ export default class Column implements NcColumn {
       case UITypes.LinkToAnotherRecord:
         res = await LinkToAnotherRecordColumn.read(this.id);
         break;
+      case UITypes.ForeignKey:
+        res = await LinkToAnotherRecordColumn.read(this.id);
+        break;
       case UITypes.MultiSelect:
         res = await MultiSelectColumn.read(this.id);
         break;
@@ -239,6 +245,18 @@ export default class Column implements NcColumn {
     }
     this.colOptions = res;
     return res;
+  }
+
+  async loadModel(force = false): Promise<Model> {
+    if (!this.model || force) {
+      this.model = await Model.get({
+        base_id: this.base_id,
+        db_alias: this.db_alias,
+        id: this.fk_model_id
+      });
+    }
+
+    return this.model;
   }
 
   public static async list({

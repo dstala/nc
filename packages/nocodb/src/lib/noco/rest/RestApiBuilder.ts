@@ -29,6 +29,9 @@ import { RestCtrlHasMany } from './RestCtrlHasMany';
 import { RestCtrlProcedure } from './RestCtrlProcedure';
 import Model from '../../noco-models/Model';
 import Column from '../../noco-models/Column';
+import NocoTypeGenerator from '../noco-resolver/NocoTypeGenerator';
+import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
+import { RestCtrlv2 } from './RestCtrlv2';
 
 const log = debug('nc:api:rest');
 const NC_CUSTOM_ROUTE_KEY = '__xc_custom';
@@ -42,6 +45,9 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       | RestCtrlHasMany
       | RestCtrlCustom;
   };
+
+  protected nocoTypes: any;
+  protected nocoRootResolvers: any;
   private procedureCtrl: RestCtrlProcedure;
   private routers: { [key: string]: Router };
   private apiCount = 0;
@@ -133,6 +139,22 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     this.procedureCtrl.mapRoutes(router, this.customRoutes);
     swagger.push(this.procedureCtrl.getSwaggerObj());
     this.router.use('/api/' + this.routeVersionLetter, router);
+    this.nocoTypes = await NocoTypeGenerator.generate(
+      Object.values(this.models2),
+      {
+        models: this.models,
+        ncMeta: this.xcMeta
+      }
+    );
+
+    this.nocoRootResolvers = await NocoResolverGenerator.generate(
+      Object.values(this.models2),
+      {
+        models: this.models,
+        ncMeta: this.xcMeta,
+        types: this.nocoTypes
+      }
+    );
 
     const routesArr = (
       await this.xcMeta.metaList(this.projectId, this.dbAlias, 'nc_routes', {
@@ -239,6 +261,24 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
         middlewareBody,
         this.baseModels2
       );
+
+      new RestCtrlv2({
+        app: this.app,
+        models: this.models,
+        table: meta.title,
+        rootResolver: this.nocoRootResolvers,
+        baseModels2: this.baseModels2
+        // baseModel2: this.baseModels2
+        // this.app,
+        // this.models,
+        // meta.title,
+        // routes,
+        // rootPath,
+        // this.acls,
+        // middlewareBody,
+        // this.baseModels2
+      }).mapRoutes(router);
+
       this.controllers[meta.title].mapRoutes(router, this.customRoutes);
 
       relationRoutes.push(async () => {
@@ -570,31 +610,50 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           });
           virtualColumnsInsert.push(async () => {
             for (const column of meta.v) {
-              const rel = column.hm || column.bt;
+              const rel = column.hm || column.bt || column.mm;
 
               const rel_column_id = (
-                await this.models2?.[rel.tn]?.columns
+                await this.models2?.[rel.tn]?.loadColumns()
               )?.find(c => c.cn === rel.cn)?.id;
               const ref_rel_column_id = (
-                await this.models2?.[rel.tn]?.columns
-              )?.find(c => c.cn === rel.cn)?.id;
+                await this.models2?.[rel.rtn]?.loadColumns()
+              )?.find(c => c.cn === rel.rcn)?.id;
 
-              await Column.insert({
-                project_id: this.projectId,
-                db_alias: this.dbAlias,
-                fk_model_id: modelId,
-                cn: column.cn,
-                _cn: column._cn,
-                uidt: column.uidt,
-                type: column.hm ? 'hm' : 'bt',
-                // column_id,
-                fk_child_column_id: rel_column_id,
-                fk_parent_column_id: ref_rel_column_id,
-                fk_index_name: rel.fkn,
-                ur: rel.ur,
-                dr: rel.dr
-              });
+              let fk_mm_model_id;
+              let fk_mm_child_column_id;
+              let fk_mm_parent_column_id;
 
+              if (column.mm) {
+                fk_mm_model_id = this.models2?.[rel.vtn]?.id;
+                fk_mm_child_column_id = (
+                  await this.models2?.[rel.vtn]?.loadColumns()
+                )?.find(c => c.cn === rel.vcn)?.id;
+                fk_mm_parent_column_id = (
+                  await this.models2?.[rel.vtn]?.loadColumns()
+                )?.find(c => c.cn === rel.vrcn)?.id;
+              }
+              try {
+                await Column.insert({
+                  project_id: this.projectId,
+                  db_alias: this.dbAlias,
+                  fk_model_id: modelId,
+                  cn: column.cn,
+                  _cn: column._cn,
+                  uidt: column.uidt,
+                  type: column.hm ? 'hm' : column.mm ? 'mm' : 'bt',
+                  // column_id,
+                  fk_child_column_id: rel_column_id,
+                  fk_parent_column_id: ref_rel_column_id,
+                  fk_index_name: rel.fkn,
+                  ur: rel.ur,
+                  dr: rel.dr,
+                  fk_mm_model_id,
+                  fk_mm_child_column_id,
+                  fk_mm_parent_column_id
+                });
+              } catch (e) {
+                console.log(e);
+              }
               // todo: insert virtual columns
               // insert in nc_columns_v2 & nc_col_relations
               // const { id: column_id } =
@@ -894,10 +953,6 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       relationRoutes,
       this.connectionConfig.client
     );
-    await NcHelp.executeOperations(
-      virtualColumnsInsert,
-      this.connectionConfig.client
-    );
 
     const swaggerDoc = {
       tags: [],
@@ -940,6 +995,11 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     }
 
     await this.getManyToManyRelations();
+
+    await NcHelp.executeOperations(
+      virtualColumnsInsert,
+      this.connectionConfig.client
+    );
   }
 
   // NOTE: xc-meta

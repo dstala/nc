@@ -32,15 +32,20 @@ export default class Model implements NcModel {
     Object.assign(this, data);
   }
 
-  public async columnList(): Promise<Column[]> {
-    this.columns = await Column.list({
-      base_id: this.base_id,
-      db_alias: this.db_alias,
-      condition: {
-        fk_model_id: this.id
-      }
-    });
+  public async loadColumns(force = false): Promise<Column[]> {
+    if (!this.columns || force)
+      this.columns = await Column.list({
+        base_id: this.base_id,
+        db_alias: this.db_alias,
+        condition: {
+          fk_model_id: this.id
+        }
+      });
     return this.columns;
+  }
+
+  public get pk(): Column {
+    return this.columns?.find(c => c.pk);
   }
 
   public static async insert(model: NcModel) {
@@ -67,15 +72,22 @@ export default class Model implements NcModel {
   public static async get({
     base_id,
     db_alias,
-    tn
+    tn,
+    id
   }: {
     base_id: string;
     db_alias: string;
-    tn: string;
+    tn?: string;
+    id?: string;
   }): Promise<Model> {
-    const m = await Noco.ncMeta.metaGet2(base_id, db_alias, 'nc_models_v2', {
-      title: tn
-    });
+    const m = await Noco.ncMeta.metaGet2(
+      base_id,
+      db_alias,
+      'nc_models_v2',
+      id || {
+        title: tn
+      }
+    );
     return m && new Model(m);
   }
 }

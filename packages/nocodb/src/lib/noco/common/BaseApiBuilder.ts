@@ -33,6 +33,7 @@ import addErrorOnColumnDeleteInFormula from './helpers/addErrorOnColumnDeleteInF
 // import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
 import Model from '../../noco-models/Model';
 import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
+import UITypes from '../../sqlUi/UITypes';
 
 const log = debug('nc:api:base');
 
@@ -2424,6 +2425,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
 
             return {
               mm,
+              uidt: UITypes.LinkToAnotherRecord,
               _cn: `${mm._tn} <=> ${mm._rtn}`
             };
           })

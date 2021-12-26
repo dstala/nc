@@ -195,6 +195,7 @@ const up = async knex => {
 
     table.string('ref_db_alias');
     table.string('type');
+    table.boolean('virtual');
     table.string('db_type');
 
     table.uuid('fk_column_id');

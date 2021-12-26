@@ -7,7 +7,7 @@ export default async function(this: NcContextV2, { args }: any) {
     db_alias: this.dbAlias,
     tn: args.tn
   });
-  await meta.columnList();
+  await meta.loadColumns();
 
   return meta;
 }

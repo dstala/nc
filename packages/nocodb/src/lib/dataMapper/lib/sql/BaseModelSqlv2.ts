@@ -23,7 +23,7 @@ class BaseModelSqlv2 {
   public async nestedList(): Promise<any> {
     const qb = this.dbDriver(this.model.title);
 
-    for (const col of await this.model.columnList()) {
+    for (const col of await this.model.loadColumns()) {
       switch (col.uidt) {
         case 'LinkToAnotherRecord':
         case 'Lookup':
@@ -298,6 +298,80 @@ class BaseModelSqlv2 {
           break;
       }
     }*/
+  }
+
+  /*async hasManyListGQL({ child, ids, ...rest }) {
+    try {
+      const {
+        where,
+        limit,
+        offset,
+        conditionGraph,
+        sort
+        // ...restArgs
+      } = this.dbModels[child]._getChildListArgs(rest);
+      // let { fields } = restArgs;
+      // todo: get only required fields
+      let fields = '*';
+
+      const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
+
+      if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
+        fields += ',' + cn;
+      }
+
+      fields = fields
+        .split(',')
+        .map(c => `${child}.${c}`)
+        .join(',');
+
+      const childs = await this._run(
+        this._paginateAndSort(
+          this.dbDriver.queryBuilder().from(
+            this.dbDriver
+              .union(
+                ids.map(p => {
+                  const query = this.dbDriver(this.dbModels[child].tnPath)
+                    .where({ [cn]: p })
+                    .conditionGraph(conditionGraph)
+                    .xwhere(where, this.selectQuery(''))
+                    // .select(...fields.split(','));
+                    .select(this.dbModels?.[child]?.selectQuery(fields));
+
+                  this._paginateAndSort(query, { limit, offset }, child);
+                  return this.isSqlite()
+                    ? this.dbDriver.select().from(query)
+                    : query;
+                }),
+                !this.isSqlite()
+              )
+              .as('list')
+          ),
+          { sort, ignoreLimit: true } as any,
+          child
+        )
+      );
+
+      // return _.groupBy(childs, cn);
+      return _.groupBy(childs, this.dbModels?.[child]?.columnToAlias[cn]);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+*/
+  public get defaultResolverReq() {
+    return this.model.loadColumns().then(columns =>
+      Promise.resolve(
+        columns.reduce(
+          (obj, o) => ({
+            ...obj,
+            [o._cn]: 1
+          }),
+          {}
+        )
+      )
+    );
   }
 }
 

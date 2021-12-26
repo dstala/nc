@@ -2,6 +2,15 @@ import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 
 export default class LinkToAnotherRecordColumn {
+  fk_column_id?: string;
+  fk_child_column_id?: string;
+  fk_parent_column_id?: string;
+  fk_mm_model_id?: string;
+  fk_mm_child_column_id?: string;
+  fk_mm_parent_column_id?: string;
+  type: 'hm' | 'bt' | 'mm';
+  virtual = false;
+
   constructor(data: NcColumn) {
     Object.assign(this, data);
   }

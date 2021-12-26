@@ -20,13 +20,16 @@ abstract class BaseModelXcMeta extends BaseRender {
   }
 
   public getVitualColumns(): any[] {
+    // todo: handle duplicate relation
     return [
-      ...(this.ctx.hasMany || []).map(hm => ({
-        uidt: UITypes.LinkToAnotherRecord,
-        type: 'hm',
-        hm,
-        _cn: `${hm._rtn} => ${hm._tn}`
-      })),
+      ...(this.ctx.hasMany || []).map(hm => {
+        return {
+          uidt: UITypes.LinkToAnotherRecord,
+          type: 'hm',
+          hm,
+          _cn: `${hm._rtn} => ${hm._tn}`
+        };
+      }),
       ...(this.ctx.belongsTo || []).map(bt => ({
         uidt: UITypes.LinkToAnotherRecord,
         type: 'bt',
