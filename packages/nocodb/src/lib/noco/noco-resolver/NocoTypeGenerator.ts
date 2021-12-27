@@ -6,8 +6,8 @@ import RollupColumn from '../../noco-models/RollupColumn';
 import LinkToAnotherRecordColumn from '../../noco-models/LinkToAnotherRecordColumn';
 import NcMetaIO from '../meta/NcMetaIO';
 import DataLoader from 'dataloader';
-import { BaseModelSql } from '../../dataMapper';
 import Column from '../../noco-models/Column';
+import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const groupBy = (arr, field) => {
   return (arr || []).reduce((obj, o) => {
@@ -29,8 +29,11 @@ class NocoType {
 
 interface NocoTypeGeneratorCtx {
   ncMeta: NcMetaIO;
-  models: {
-    [tn: string]: BaseModelSql;
+  // models: {
+  //   [tn: string]: BaseModelSql;
+  // };
+  baseModels2: {
+    [tn: string]: BaseModelSqlv2;
   };
 }
 
@@ -51,24 +54,24 @@ export default class NocoTypeGenerator {
       };
       types[model.title] = type;
       generateColRefCallback.push(async function() {
-        for (const column of await model.loadColumns()) {
+        for (const column of await model.getColumns()) {
           columnsRef[column.id] = column;
         }
       });
 
       generateNestedPropCallback.push(async function() {
-        for (const column of await model.loadColumns()) {
+        for (const column of await model.getColumns()) {
           switch (column.uidt) {
             case UITypes.Rollup:
               {
                 // @ts-ignore
-                const colOptions: RollupColumn = await column.loadColOptions();
+                const colOptions: RollupColumn = await column.getColOptions();
               }
               break;
             case UITypes.Lookup:
               {
                 // @ts-ignore
-                const colOptions: LookupColumn = await column.loadColOptions();
+                const colOptions: LookupColumn = await column.getColOptions();
                 type.__columnAliases[column._cn] = {
                   path: [
                     columnsRef[colOptions.fk_relation_column_id]._cn,
@@ -79,22 +82,28 @@ export default class NocoTypeGenerator {
               break;
             case UITypes.LinkToAnotherRecord:
               {
-                const colOptions = (await column.loadColOptions()) as LinkToAnotherRecordColumn;
+                const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
 
                 console.log(`${column._cn}\t\t::\t\t${colOptions.type}`);
 
                 if (colOptions?.type === 'hm') {
                   const countLoader = new DataLoader(async (ids: string[]) => {
-                    const data = await ctx.models[model.title].hasManyListCount(
-                      {
-                        child:
-                          modelsRef[
-                            columnsRef[colOptions.fk_child_column_id]
-                              .fk_model_id
-                          ].title,
-                        ids
-                      }
-                    );
+                    // const data = await ctx.models[model.title].hasManyListCount(
+                    //   {
+                    //     child:
+                    //       modelsRef[
+                    //         columnsRef[colOptions.fk_child_column_id]
+                    //           .fk_model_id
+                    //       ].title,
+                    //     ids
+                    //   }
+                    // );
+                    const data = await ctx.baseModels2[
+                      model.title
+                    ].hasManyListCount({
+                      colId: column.id,
+                      ids
+                    });
                     return data;
                   });
 
@@ -117,16 +126,23 @@ export default class NocoTypeGenerator {
 
                   const listLoader = new DataLoader(async (ids: string[]) => {
                     try {
-                      const data = await ctx.models[model.title].hasManyListGQL(
-                        {
-                          child:
-                            modelsRef[
-                              columnsRef[colOptions.fk_child_column_id]
-                                .fk_model_id
-                            ].title,
-                          ids
-                        }
-                      );
+                      // const data = await ctx.models[model.title].hasManyListGQL(
+                      //   {
+                      //     child:
+                      //       modelsRef[
+                      //         columnsRef[colOptions.fk_child_column_id]
+                      //           .fk_model_id
+                      //       ].title,
+                      //     ids
+                      //   }
+                      // );
+                      //
+                      const data = await ctx.baseModels2[
+                        model.title
+                      ].hasManyListGQL({
+                        colId: column.id,
+                        ids
+                      });
                       return ids.map((id: string) =>
                         data[id]
                           ? data[id].map(
@@ -157,34 +173,41 @@ export default class NocoTypeGenerator {
                 } else if (colOptions.type === 'mm') {
                   const listLoader = new DataLoader(async (ids: string[]) => {
                     try {
-                      const data = await ctx.models[
+                      /*const data = await ctx.models[
+                          model.title
+                        ]._getGroupedManyToManyList({
+                          parentIds: ids,
+                          child:
+                            modelsRef[
+                              columnsRef[colOptions.fk_parent_column_id]
+                                .fk_model_id
+                            ].title,
+                          // todo: optimize - query only required fields
+                          rest: {
+                            mfields1: '*'
+                          }
+                        });*/
+
+                      const data = await ctx.baseModels2[
                         model.title
                       ]._getGroupedManyToManyList({
                         parentIds: ids,
-                        child:
-                          modelsRef[
-                            columnsRef[colOptions.fk_parent_column_id]
-                              .fk_model_id
-                          ].title,
-                        // todo: optimize - query only required fields
-                        rest: {
-                          mfields1: '*'
-                        }
+                        colId: column.id
                       });
-                      return ids.map((id: string) =>
-                        data[id]
-                          ? data[id].map(
-                              c =>
-                                new types[
-                                  modelsRef[
-                                    columnsRef[
-                                      colOptions.fk_parent_column_id
-                                    ].fk_model_id
-                                  ].title
-                                ](c)
-                            )
-                          : []
+                      const res = data.map(arr =>
+                        arr?.map(
+                          c =>
+                            new types[
+                              modelsRef[
+                                columnsRef[
+                                  colOptions.fk_parent_column_id
+                                ].fk_model_id
+                              ].title
+                            ](c)
+                        )
                       );
+
+                      return res;
                     } catch (e) {
                       console.log(e);
                       return [];
@@ -193,21 +216,32 @@ export default class NocoTypeGenerator {
 
                   Object.defineProperty(type.prototype, column._cn, {
                     async value(): Promise<any> {
-                      return listLoader.load(this[model.pk._cn]);
+                      return await listLoader.load(this[model.pk._cn]);
                     },
                     configurable: true
                   });
                 } else if (colOptions.type === 'bt') {
                   // @ts-ignore
-                  const colOptions = (await column.loadColOptions()) as LinkToAnotherRecordColumn;
-                  const countLoader = new DataLoader(async (ids: string[]) => {
+                  const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
+                  const readLoader = new DataLoader(async (ids: string[]) => {
                     try {
-                      const data = await ctx.models[
+                      // const data = await ctx.models[
+                      //   modelsRef[
+                      //     columnsRef[colOptions.fk_parent_column_id].fk_model_id
+                      //   ].title
+                      // ].list({
+                      //   limit: ids.length,
+                      //   where: `(${
+                      //     columnsRef[colOptions.fk_parent_column_id].cn
+                      //   },in,${ids.join(',')})`
+                      // });
+
+                      const data = await ctx.baseModels2[
                         modelsRef[
                           columnsRef[colOptions.fk_parent_column_id].fk_model_id
                         ].title
                       ].list({
-                        limit: ids.length,
+                        // limit: ids.length,
                         where: `(${
                           columnsRef[colOptions.fk_parent_column_id].cn
                         },in,${ids.join(',')})`
@@ -239,7 +273,7 @@ export default class NocoTypeGenerator {
                     // context: any,
                     // info: any
                     Promise<any> {
-                      return countLoader.load(
+                      return readLoader.load(
                         this[columnsRef[colOptions.fk_parent_column_id]._cn]
                       );
                     },

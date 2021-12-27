@@ -32,6 +32,8 @@ import Column from '../../noco-models/Column';
 import NocoTypeGenerator from '../noco-resolver/NocoTypeGenerator';
 import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
 import { RestCtrlv2 } from './RestCtrlv2';
+import registerRestCtrl from './registerRestCtrl';
+import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const log = debug('nc:api:rest');
 const NC_CUSTOM_ROUTE_KEY = '__xc_custom';
@@ -142,17 +144,17 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     this.nocoTypes = await NocoTypeGenerator.generate(
       Object.values(this.models2),
       {
-        models: this.models,
-        ncMeta: this.xcMeta
+        ncMeta: this.xcMeta,
+        baseModels2: this.baseModels2
       }
     );
 
     this.nocoRootResolvers = await NocoResolverGenerator.generate(
       Object.values(this.models2),
       {
-        models: this.models,
         ncMeta: this.xcMeta,
-        types: this.nocoTypes
+        types: this.nocoTypes,
+        baseModels2: this.baseModels2
       }
     );
 
@@ -375,6 +377,14 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       /* generate swagger docs */
       await this.generateSwaggerJson(swaggerDoc);
     }
+
+    registerRestCtrl({
+      router: this.router,
+      dbAlias: this.dbAlias,
+      baseId: this.projectId,
+      nocoRootResolvers: this.nocoRootResolvers,
+      baseModels2: this.baseModels2
+    });
 
     // const minRouter = new RestCtrlMin(this.app,this.models,this.acls);
     // minRouter.mapRoutes(this.router)
@@ -613,10 +623,10 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               const rel = column.hm || column.bt || column.mm;
 
               const rel_column_id = (
-                await this.models2?.[rel.tn]?.loadColumns()
+                await this.models2?.[rel.tn]?.getColumns()
               )?.find(c => c.cn === rel.cn)?.id;
               const ref_rel_column_id = (
-                await this.models2?.[rel.rtn]?.loadColumns()
+                await this.models2?.[rel.rtn]?.getColumns()
               )?.find(c => c.cn === rel.rcn)?.id;
 
               let fk_mm_model_id;
@@ -626,10 +636,10 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               if (column.mm) {
                 fk_mm_model_id = this.models2?.[rel.vtn]?.id;
                 fk_mm_child_column_id = (
-                  await this.models2?.[rel.vtn]?.loadColumns()
+                  await this.models2?.[rel.vtn]?.getColumns()
                 )?.find(c => c.cn === rel.vcn)?.id;
                 fk_mm_parent_column_id = (
-                  await this.models2?.[rel.vtn]?.loadColumns()
+                  await this.models2?.[rel.vtn]?.getColumns()
                 )?.find(c => c.cn === rel.vrcn)?.id;
               }
               try {
@@ -1000,6 +1010,43 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       virtualColumnsInsert,
       this.connectionConfig.client
     );
+
+    this.baseModels2 = (
+      await Model.list({ project_id: this.projectId, db_alias: this.dbAlias })
+    ).reduce((models, m) => {
+      return {
+        ...models,
+        [m.title]: new BaseModelSqlv2({
+          model: m,
+          dbDriver: this.dbDriver
+        })
+      };
+    }, {});
+
+    this.nocoTypes = await NocoTypeGenerator.generate(
+      Object.values(this.models2),
+      {
+        ncMeta: this.xcMeta,
+        baseModels2: this.baseModels2
+      }
+    );
+
+    this.nocoRootResolvers = await NocoResolverGenerator.generate(
+      Object.values(this.models2),
+      {
+        ncMeta: this.xcMeta,
+        types: this.nocoTypes,
+        baseModels2: this.baseModels2
+      }
+    );
+
+    registerRestCtrl({
+      router: this.router,
+      dbAlias: this.dbAlias,
+      baseId: this.projectId,
+      nocoRootResolvers: this.nocoRootResolvers,
+      baseModels2: this.baseModels2
+    });
   }
 
   // NOTE: xc-meta

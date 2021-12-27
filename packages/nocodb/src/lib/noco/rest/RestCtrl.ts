@@ -18,7 +18,7 @@ export class RestCtrl extends RestBaseCtrl {
   private table: string;
   private models: { [key: string]: BaseModelSql };
   private acls: Acls;
-  private baseModel2?: {
+  protected baseModel2?: {
     [key: string]: BaseModelSqlv2;
   };
 
@@ -158,9 +158,7 @@ export class RestCtrl extends RestBaseCtrl {
 
   public async list(req: Request | any, res): Promise<void> {
     const startTime = process.hrtime();
-    if (this.baseModel2?.[this.table]) {
-      return await this.baseModel2[this.table].nestedList();
-    }
+
     try {
       if (
         req.query.conditionGraph &&
@@ -187,10 +185,6 @@ export class RestCtrl extends RestBaseCtrl {
   }
 
   public async nestedList(req: Request | any, res): Promise<void> {
-    if (this.baseModel2?.[this.table]) {
-      return this.baseModel2[this.table].nestedList();
-    }
-
     const startTime = process.hrtime();
 
     try {

@@ -1,7 +1,9 @@
 import autoBind from 'auto-bind';
+import _ from 'lodash';
 
 import Model from '../../../noco-models/Model';
 import { XKnex } from '../..';
+import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 
 /**
  * Base class for models
@@ -20,20 +22,19 @@ class BaseModelSqlv2 {
     autoBind(this);
   }
 
-  public async nestedList(): Promise<any> {
+  public async readByPk(id?: any): Promise<any> {
     const qb = this.dbDriver(this.model.title);
 
-    for (const col of await this.model.loadColumns()) {
-      switch (col.uidt) {
-        case 'LinkToAnotherRecord':
-        case 'Lookup':
-        case 'Formula':
-          break;
-        default:
-          qb.select(this.dbDriver.raw(`?? as ??`, [col.cn, col._cn]));
-          break;
-      }
-    }
+    await this.select(qb);
+
+    const data = await qb.where(this.model.pk.cn, id).first();
+    return data;
+  }
+
+  public async list(args?: { where?: string; limit }): Promise<any> {
+    const qb = this.dbDriver(this.model.title);
+    qb.select(await this.model.selectObject());
+    qb.xwhere(args?.where);
 
     const data = await qb.limit(10);
 
@@ -300,68 +301,22 @@ class BaseModelSqlv2 {
     }*/
   }
 
-  /*async hasManyListGQL({ child, ids, ...rest }) {
-    try {
-      const {
-        where,
-        limit,
-        offset,
-        conditionGraph,
-        sort
-        // ...restArgs
-      } = this.dbModels[child]._getChildListArgs(rest);
-      // let { fields } = restArgs;
-      // todo: get only required fields
-      let fields = '*';
-
-      const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
-
-      if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
-        fields += ',' + cn;
+  private async select(qb) {
+    for (const col of await this.model.getColumns()) {
+      switch (col.uidt) {
+        case 'LinkToAnotherRecord':
+        case 'Lookup':
+        case 'Formula':
+          break;
+        default:
+          qb.select(this.dbDriver.raw(`?? as ??`, [col.cn, col._cn]));
+          break;
       }
-
-      fields = fields
-        .split(',')
-        .map(c => `${child}.${c}`)
-        .join(',');
-
-      const childs = await this._run(
-        this._paginateAndSort(
-          this.dbDriver.queryBuilder().from(
-            this.dbDriver
-              .union(
-                ids.map(p => {
-                  const query = this.dbDriver(this.dbModels[child].tnPath)
-                    .where({ [cn]: p })
-                    .conditionGraph(conditionGraph)
-                    .xwhere(where, this.selectQuery(''))
-                    // .select(...fields.split(','));
-                    .select(this.dbModels?.[child]?.selectQuery(fields));
-
-                  this._paginateAndSort(query, { limit, offset }, child);
-                  return this.isSqlite()
-                    ? this.dbDriver.select().from(query)
-                    : query;
-                }),
-                !this.isSqlite()
-              )
-              .as('list')
-          ),
-          { sort, ignoreLimit: true } as any,
-          child
-        )
-      );
-
-      // return _.groupBy(childs, cn);
-      return _.groupBy(childs, this.dbModels?.[child]?.columnToAlias[cn]);
-    } catch (e) {
-      console.log(e);
-      throw e;
     }
   }
-*/
+
   public get defaultResolverReq() {
-    return this.model.loadColumns().then(columns =>
+    return this.model.getColumns().then(columns =>
       Promise.resolve(
         columns.reduce(
           (obj, o) => ({
@@ -372,6 +327,153 @@ class BaseModelSqlv2 {
         )
       )
     );
+  }
+
+  async hasManyListGQL({ colId, ids }) {
+    try {
+      /*      const {
+        where,
+        limit,
+        offset,
+        conditionGraph,
+        sort
+        // ...restArgs
+      } = this.dbModels[child]._getChildListArgs(rest);*/
+      // let { fields } = restArgs;
+      // todo: get only required fields
+      let fields = '*';
+
+      // const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
+      const relColumn = (await this.model.getColumns()).find(
+        c => c.id === colId
+      );
+
+      const chilCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getChildColumn();
+      const chilMod = await chilCol.getModel();
+
+      // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
+      //   fields += ',' + cn;
+      // }
+
+      fields = fields
+        .split(',')
+        .map(c => `${chilCol.cn}.${c}`)
+        .join(',');
+      const colSelect = await chilMod.selectObject();
+
+      const childs = await this.dbDriver.queryBuilder().from(
+        this.dbDriver
+          .union(
+            ids.map(p => {
+              const query = this.dbDriver(chilMod.title)
+                .where({ [chilCol.cn]: p })
+                // .select(...fields.split(','));
+                .select(colSelect);
+
+              return this.isSqlite()
+                ? this.dbDriver.select().from(query)
+                : query;
+            }),
+            !this.isSqlite()
+          )
+          .as('list')
+      );
+
+      // return _.groupBy(childs, cn);
+      return _.groupBy(childs, chilCol._cn);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  async hasManyListCount({ colId, ids }) {
+    try {
+      // const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
+      const relColumn = (await this.model.getColumns()).find(
+        c => c.id === colId
+      );
+
+      const chilCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getChildColumn();
+      const chilMod = await chilCol.getModel();
+
+      const childs = await this.dbDriver.unionAll(
+        ids.map(p => {
+          const query = this.dbDriver(chilMod.title)
+            .count(`${chilCol?.cn} as count`)
+            .where({ [chilCol?.cn]: p })
+            .first();
+          return this.isSqlite() ? this.dbDriver.select().from(query) : query;
+        }),
+        !this.isSqlite()
+      );
+
+      return childs.map(({ count }) => count);
+      // return _.groupBy(childs, cn);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  public async _getGroupedManyToManyList({ colId, parentIds }) {
+    // const { where, limit, offset, sort, ...restArgs } = this._getChildListArgs(
+    //   rest,
+    //   index,
+    //   child,
+    //   'm'
+    // );
+    // const driver = trx || this.dbDriver;
+    // let { fields } = restArgs;
+
+    const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
+    const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
+
+    const tn = this.model.title;
+    // const cn = (await relColOptions.getChildColumn()).cn;
+    const vtn = (await relColOptions.getMMModel()).title;
+    const vcn = (await relColOptions.getMMChildColumn()).cn;
+    const vrcn = (await relColOptions.getMMParentColumn()).cn;
+    const rcn = (await relColOptions.getParentColumn()).cn;
+    const childModel = await (await relColOptions.getParentColumn()).getModel();
+    const rtn = childModel.title;
+
+    // const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
+    // @ts-ignore
+    // const _cn = this.dbModels[tn].columnToAlias?.[cn];
+
+    // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
+    //   fields += ',' + cn;
+    // }
+    //
+    // if (!this.dbModels[child]) {
+    //   return;
+    // }
+    const colSelect = await childModel.selectObject();
+    const childs = await this.dbDriver.union(
+      parentIds.map(id => {
+        const query = this.dbDriver(rtn)
+          .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
+          .where(`${vtn}.${vcn}`, id) // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
+          // .xwhere(where, this.dbModels[child].selectQuery(''))
+          .select(colSelect)
+          .select({
+            [`${tn}_${vcn}`]: `${vtn}.${vcn}`
+            // ...this.dbModels[child].selectQuery(fields)
+          }); // ...fields.split(','));
+
+        // this._paginateAndSort(query, { sort, limit, offset }, null, true);
+        return this.isSqlite() ? this.dbDriver.select().from(query) : query;
+      }),
+      !this.isSqlite()
+    );
+
+    const gs = _.groupBy(childs, `${tn}_${vcn}`);
+    return parentIds.map(id => gs[id] || []);
+  }
+
+  isSqlite() {
+    return this.dbDriver.clientType() === 'sqlite3';
   }
 }
 

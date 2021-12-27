@@ -1,5 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
+import Column from './Column';
+import Model from './Model';
 
 export default class LinkToAnotherRecordColumn {
   fk_column_id?: string;
@@ -13,6 +15,24 @@ export default class LinkToAnotherRecordColumn {
 
   constructor(data: NcColumn) {
     Object.assign(this, data);
+  }
+
+  public async getChildColumn(): Promise<Column> {
+    return Column.get({ colId: this.fk_child_column_id });
+  }
+
+  public async getMMChildColumn(): Promise<Column> {
+    return Column.get({ colId: this.fk_mm_child_column_id });
+  }
+
+  public async getParentColumn(): Promise<Column> {
+    return Column.get({ colId: this.fk_child_column_id });
+  }
+  public async getMMParentColumn(): Promise<Column> {
+    return Column.get({ colId: this.fk_mm_parent_column_id });
+  }
+  public async getMMModel(): Promise<Model> {
+    return Model.get({ id: this.fk_mm_model_id });
   }
 
   public static async insert(model: NcColumn | any) {

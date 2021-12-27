@@ -1,5 +1,5 @@
 import autoBind from 'auto-bind';
-import { Request, Router } from 'express';
+import { Router } from 'express';
 
 import { Acls } from '../../../interface/config';
 import { BaseModelSql } from '../../dataMapper';
@@ -7,10 +7,10 @@ import { BaseModelSql } from '../../dataMapper';
 import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 import { nocoExecute } from '../noco-resolver/NocoExecute';
 
-function parseHrtimeToSeconds(hrtime) {
-  const seconds = (hrtime[0] + hrtime[1] / 1e6).toFixed(3);
-  return seconds;
-}
+// function parseHrtimeToSeconds(hrtime) {
+//   const seconds = (hrtime[0] + hrtime[1] / 1e6).toFixed(3);
+//   return seconds;
+// }
 
 export class RestCtrlv2 {
   public app: any;
@@ -46,38 +46,6 @@ export class RestCtrlv2 {
     this.rootResolver = rootResolver;
     this.models = models;
     // this.router = Router();
-  }
-
-  public async nestedList(req: Request | any, res): Promise<void> {
-    if (this.baseModels2?.[this.table]) {
-      return this.baseModels2[this.table].nestedList();
-    }
-
-    const startTime = process.hrtime();
-
-    try {
-      if (
-        req.query.conditionGraph &&
-        typeof req.query.conditionGraph === 'string'
-      ) {
-        req.query.conditionGraph = {
-          models: this.models,
-          condition: JSON.parse(req.query.conditionGraph)
-        };
-      }
-      if (req.query.condition && typeof req.query.condition === 'string') {
-        req.query.condition = JSON.parse(req.query.condition);
-      }
-    } catch (e) {
-      /* ignore parse error */
-    }
-
-    const data = await req.model.nestedList({
-      ...req.query
-    } as any);
-    const elapsedSeconds = parseHrtimeToSeconds(process.hrtime(startTime));
-    res.setHeader('xc-db-response', elapsedSeconds);
-    res.xcJson(data);
   }
 
   public mapRoutes(router: Router): any {

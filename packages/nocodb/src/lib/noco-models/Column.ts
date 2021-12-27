@@ -49,6 +49,12 @@ export default class Column implements NcColumn {
     Object.assign(this, data);
   }
 
+  public async getModel(): Promise<Model> {
+    return Model.get({
+      id: this.fk_model_id
+    });
+  }
+
   public static async insert(model: NcColumn | any) {
     const row = await Noco.ncMeta.metaInsert2(
       model.project_id,
@@ -206,7 +212,7 @@ export default class Column implements NcColumn {
     }
   }
 
-  public async loadColOptions(): Promise<
+  public async getColOptions(): Promise<
     | DbColumn
     | FormulaColumn
     | LinkToAnotherRecordColumn
@@ -275,7 +281,7 @@ export default class Column implements NcColumn {
         })
       ).map(async m => {
         const column = new Column(m);
-        await column.loadColOptions();
+        await column.getColOptions();
         return column;
       })
     );
@@ -315,6 +321,29 @@ export default class Column implements NcColumn {
       });
 
     return columns.map(c => new Column(c));*/
+  }
+
+  public static async get({
+    base_id,
+    db_alias,
+    colId
+  }: {
+    base_id?: string;
+    db_alias?: string;
+    colId: string;
+  }): Promise<Column> {
+    const colData = await Noco.ncMeta.metaGet2(
+      base_id,
+      db_alias,
+      'nc_columns_v2',
+      colId
+    );
+    if (colData) {
+      const column = new Column(colData);
+      await column.getColOptions();
+      return column;
+    }
+    return null;
   }
 
   id: string;

@@ -32,15 +32,15 @@ export default class Model implements NcModel {
     Object.assign(this, data);
   }
 
-  public async loadColumns(force = false): Promise<Column[]> {
-    if (!this.columns || force)
-      this.columns = await Column.list({
-        base_id: this.base_id,
-        db_alias: this.db_alias,
-        condition: {
-          fk_model_id: this.id
-        }
-      });
+  // @ts-ignore
+  public async getColumns(force = false): Promise<Column[]> {
+    this.columns = await Column.list({
+      base_id: this.base_id,
+      db_alias: this.db_alias,
+      condition: {
+        fk_model_id: this.id
+      }
+    });
     return this.columns;
   }
 
@@ -69,14 +69,30 @@ export default class Model implements NcModel {
     ).map(m => new Model(m));
   }
 
+  public async selectObject(): Promise<{ [name: string]: string }> {
+    const res = {};
+    for (const col of await this.getColumns()) {
+      switch (col.uidt) {
+        case 'LinkToAnotherRecord':
+        case 'Lookup':
+        case 'Formula':
+          break;
+        default:
+          res[col._cn] = `${this.title}.${col.cn}`;
+          break;
+      }
+    }
+    return res;
+  }
+
   public static async get({
     base_id,
     db_alias,
     tn,
     id
   }: {
-    base_id: string;
-    db_alias: string;
+    base_id?: string;
+    db_alias?: string;
     tn?: string;
     id?: string;
   }): Promise<Model> {

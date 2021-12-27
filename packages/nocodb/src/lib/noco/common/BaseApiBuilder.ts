@@ -2027,7 +2027,9 @@ export default abstract class BaseApiBuilder<T extends Noco>
 
     for (const model of models) {
       this.models2[model.title] = model;
-      this.baseModels2[model.title] = new BaseModelSqlv2({
+      this.baseModels2[model.title] = this.baseModels2[
+        model.id
+      ] = new BaseModelSqlv2({
         model,
         dbDriver: this.dbDriver
       });
