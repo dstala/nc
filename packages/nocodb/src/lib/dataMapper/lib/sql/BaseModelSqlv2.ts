@@ -393,7 +393,7 @@ class BaseModelSqlv2 {
           .as('list')
       );
 
-      const proto = (
+      const proto = await (
         await Model.getBaseModelSQL({ id: chilMod.id, dbDriver: this.dbDriver })
       ).getProto();
 
@@ -541,7 +541,7 @@ class BaseModelSqlv2 {
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = this.hasManyListGQL({
+                  const data = await this.hasManyListGQL({
                     colId: column.id,
                     ids
                   });
@@ -567,7 +567,7 @@ class BaseModelSqlv2 {
             } else if (colOptions.type === 'mm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = this._getGroupedManyToManyList({
+                  const data = await this._getGroupedManyToManyList({
                     parentIds: ids,
                     colId: column.id
                   });

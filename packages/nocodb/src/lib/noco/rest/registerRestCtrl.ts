@@ -106,11 +106,6 @@ export default function registerRestCtrl(ctx: {
         db_alias: ctx.dbAlias,
         tn: 'city'
       });
-      // const address = await Model.get({
-      //   base_id: ctx.baseId,
-      //   db_alias: ctx.dbAlias,
-      //   tn: 'country'
-      // });
 
       await Column.insert<LookupColumn>({
         base_id: ctx.baseId,
@@ -119,7 +114,7 @@ export default function registerRestCtrl(ctx: {
         fk_model_id: country.id,
         uidt: UITypes.Lookup,
         fk_lookup_column_id: (await city.getColumns()).find(
-          c => c.uidt === UITypes.LinkToAnotherRecord
+          c => c._cn === 'City => Address'
         )?.id,
         fk_relation_column_id: (await country.getColumns()).find(
           c => c.uidt === UITypes.LinkToAnotherRecord
@@ -152,6 +147,9 @@ export default function registerRestCtrl(ctx: {
           c => c._cn === 'Country <= City'
         )?.id
       });
+
+      await Model.clear({ id: city.id });
+      await Model.clear({ id: country.id });
 
       res.json({ mesg: 'success' });
     } catch (e) {

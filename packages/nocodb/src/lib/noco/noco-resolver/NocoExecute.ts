@@ -26,10 +26,10 @@ const nocoExecute = async (
           dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
         }
       } else if (typeof dataTreeObj[key] === 'function') {
-        const proto = dataTreeObj.__proto__;
-        delete proto[key];
-        dataTreeObj.__proto__ = proto;
-        dataTreeObj[key] = dataTreeObj[key]();
+        dataTreeObj.__proto__ = {
+          ...dataTreeObj.__proto__,
+          [key]: dataTreeObj[key]()
+        };
       }
 
       // todo: handle lookup
@@ -51,7 +51,7 @@ const nocoExecute = async (
 
   // function for extracting field
   function extractField(key) {
-    if (!resolverObj?.__proto__?.constructor?.__columnAliases?.[key]) {
+    if (!resolverObj?.__proto__?.__columnAliases?.[key]) {
       if (resolverObj) {
         // resolve if it's resolver function
         if (typeof resolverObj[key] === 'function') {
@@ -67,7 +67,7 @@ const nocoExecute = async (
     } else {
       // if nested extract the nested value
       res[key] = extractNested(
-        resolverObj?.__proto__?.constructor?.__columnAliases?.[key]?.path,
+        resolverObj?.__proto__?.__columnAliases?.[key]?.path,
         dataTree,
         resolverObj
       ).then(res => {
@@ -79,6 +79,8 @@ const nocoExecute = async (
   let extractKeys = Object.keys(requestObj);
   if (!extractKeys?.length) extractKeys = Object.keys(requestObj);
 
+  const out: any = {};
+  const resolPromises = [];
   for (const key of extractKeys) {
     extractField(key);
 
@@ -99,12 +101,16 @@ const nocoExecute = async (
         }
       });
     }
+    if (res[key]) {
+      resolPromises.push(
+        (async () => {
+          out[key] = await res[key];
+        })()
+      );
+    }
   }
 
-  const out = {};
-  for (const [k, v] of Object.entries(res)) {
-    if (k in requestObj) out[k] = await v;
-  }
+  await Promise.all(resolPromises);
 
   return out;
 };
