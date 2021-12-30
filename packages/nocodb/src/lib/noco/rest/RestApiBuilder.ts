@@ -382,7 +382,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       router: this.router,
       dbAlias: this.dbAlias,
       baseId: this.projectId,
-      baseModels2: this.baseModels2
+      dbDriver: this.dbDriver
     });
 
     // const minRouter = new RestCtrlMin(this.app,this.models,this.acls);
@@ -1044,7 +1044,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       router: this.router,
       dbAlias: this.dbAlias,
       baseId: this.projectId,
-      baseModels2: this.baseModels2
+      dbDriver: this.dbDriver
     });
   }
 

@@ -37,4 +37,9 @@ export default class RedisCacheMgr extends CacheMgr {
   getOne(pattern: string): Promise<any> {
     return Promise.resolve(undefined);
   }
+
+  // @ts-ignore
+  delAll(pattern: string): Promise<any[]> {
+    return Promise.resolve([]);
+  }
 }

@@ -19,20 +19,10 @@ import Column from '../../../noco-models/Column';
 class BaseModelSqlv2 {
   protected dbDriver: XKnex;
   protected model: Model;
-  protected baseModels: {
-    [key: string]: BaseModelSqlv2;
-  };
+  private _proto: any;
 
-  constructor({
-    dbDriver,
-    model,
-    baseModels
-  }: {
-    [key: string]: any;
-    model: Model;
-  }) {
+  constructor({ dbDriver, model }: { [key: string]: any; model: Model }) {
     this.dbDriver = dbDriver;
-    this.baseModels = baseModels;
     this.model = model;
     autoBind(this);
   }
@@ -403,7 +393,9 @@ class BaseModelSqlv2 {
           .as('list')
       );
 
-      const proto = await this.baseModels[chilMod.title].getProto();
+      const proto = (
+        await Model.getBaseModelSQL({ id: chilMod.id, dbDriver: this.dbDriver })
+      ).getProto();
 
       // return _.groupBy(childs, cn);
       return _.groupBy(
@@ -500,7 +492,9 @@ class BaseModelSqlv2 {
       !this.isSqlite()
     );
 
-    const proto = await this.baseModels[rtn].getProto();
+    const proto = await (
+      await Model.getBaseModelSQL({ tn: rtn, dbDriver: this.dbDriver })
+    ).getProto();
     const gs = _.groupBy(
       childs.map(c => {
         c.__proto__ = proto;
@@ -512,6 +506,10 @@ class BaseModelSqlv2 {
   }
 
   async getProto() {
+    if (this._proto) {
+      return this._proto;
+    }
+
     const proto: any = { __columnAliases: {} };
     const columns = await this.model.getColumns();
     for (const column of columns) {
@@ -540,14 +538,10 @@ class BaseModelSqlv2 {
           {
             const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
 
-            console.log(`${column._cn}\t\t::\t\t${colOptions.type}`);
-
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.baseModels[
-                    this.model.title
-                  ].hasManyListGQL({
+                  const data = this.hasManyListGQL({
                     colId: column.id,
                     ids
                   });
@@ -573,9 +567,7 @@ class BaseModelSqlv2 {
             } else if (colOptions.type === 'mm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await await this.baseModels[
-                    this.model.title
-                  ]._getGroupedManyToManyList({
+                  const data = this._getGroupedManyToManyList({
                     parentIds: ids,
                     colId: column.id
                   });
@@ -603,9 +595,12 @@ class BaseModelSqlv2 {
               });
               const readLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.baseModels[
-                    (await pCol.getModel()).title
-                  ].list({
+                  const data = await (
+                    await Model.getBaseModelSQL({
+                      id: pCol.fk_model_id,
+                      dbDriver: this.dbDriver
+                    })
+                  ).list({
                     // limit: ids.length,
                     where: `(${pCol.cn},in,${ids.join(',')})`
                   });
@@ -627,6 +622,7 @@ class BaseModelSqlv2 {
           break;
       }
     }
+    this._proto = proto;
     return proto;
   }
 

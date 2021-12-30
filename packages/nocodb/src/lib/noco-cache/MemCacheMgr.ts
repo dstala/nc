@@ -51,4 +51,13 @@ export default class MemCacheMgr extends CacheMgr {
     const key = this.instance.keys().find(filterBy(pattern));
     return this.get(key);
   }
+
+  delAll(pattern: string): Promise<any[]> {
+    return Promise.all(
+      this.instance
+        .keys()
+        .filter(filterBy(pattern))
+        .map(k => this.del(k))
+    );
+  }
 }

@@ -279,6 +279,20 @@ export default class Column implements NcColumn {
     return this.model;
   }
 
+  public static async clearList({ fk_model_id }) {
+    const columnList = await NocoCache.getAll(`${fk_model_id}_cl*`);
+    if (columnList?.length) {
+      for (const { id } of columnList) {
+        this.clear({ id });
+      }
+    }
+  }
+
+  public static async clear({ id }) {
+    await NocoCache.delAll(`${id}_*`);
+    await NocoCache.delAll(`*_${id}`);
+  }
+
   public static async list({
     base_id,
     db_alias,
