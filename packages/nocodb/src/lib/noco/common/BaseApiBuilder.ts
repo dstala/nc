@@ -2031,7 +2031,8 @@ export default abstract class BaseApiBuilder<T extends Noco>
         model.id
       ] = new BaseModelSqlv2({
         model,
-        dbDriver: this.dbDriver
+        dbDriver: this.dbDriver,
+        baseModels: this.baseModels2
       });
     }
 

@@ -35,6 +35,7 @@ import mkdirp from 'mkdirp';
 import MetaAPILogger from './meta/MetaAPILogger';
 import NcUpgrader from './upgrader/NcUpgrader';
 import NcMetaMgrv2 from './meta/NcMetaMgrv2';
+import NocoCache from '../noco-cache/NocoCache';
 
 const log = debug('nc:app');
 require('dotenv').config();
@@ -161,6 +162,7 @@ export default class Noco {
     mkdirp.sync(this.config.toolDir);
 
     this.initSentry();
+    NocoCache.init({ driver: 'memory' });
 
     this.initWebSocket();
 

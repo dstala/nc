@@ -13,7 +13,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_data_src_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -41,7 +41,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_models_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -81,7 +81,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_columns_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -93,7 +93,7 @@ const up = async knex => {
 
     // table.string('base_id', 128)
     // table.foreign('base_id').references('nc_bases.id');
-    table.uuid('fk_model_id');
+    table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references('nc_models_v2.id');
 
     // table.string('tn');
@@ -135,7 +135,7 @@ const up = async knex => {
   /*
   await knex.schema.createTable('nc_col_props_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -143,7 +143,7 @@ const up = async knex => {
     table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('fk_column_id');
+    table.string('fk_column_id',20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     table.string('cn');
@@ -174,7 +174,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_col_relations_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -198,19 +198,19 @@ const up = async knex => {
     table.boolean('virtual');
     table.string('db_type');
 
-    table.uuid('fk_column_id');
+    table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
-    table.uuid('fk_child_column_id');
+    table.string('fk_child_column_id', 20);
     table.foreign('fk_child_column_id').references('nc_columns_v2.id');
-    table.uuid('fk_parent_column_id');
+    table.string('fk_parent_column_id', 20);
     table.foreign('fk_parent_column_id').references('nc_columns_v2.id');
 
-    table.uuid('fk_mm_model_id');
+    table.string('fk_mm_model_id', 20);
     table.foreign('fk_mm_model_id').references('nc_models_v2.id');
-    table.uuid('fk_mm_child_column_id');
+    table.string('fk_mm_child_column_id', 20);
     table.foreign('fk_mm_child_column_id').references('nc_columns_v2.id');
-    table.uuid('fk_mm_parent_column_id');
+    table.string('fk_mm_parent_column_id', 20);
     table.foreign('fk_mm_parent_column_id').references('nc_columns_v2.id');
 
     table.string('ur');
@@ -226,7 +226,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_col_select_options_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -234,7 +234,7 @@ const up = async knex => {
     table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('fk_column_id');
+    table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     table.string('title');
@@ -247,7 +247,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_col_lookup_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -255,19 +255,19 @@ const up = async knex => {
     table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('fk_column_id');
+    table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     // todo: refer relation column
-    // table.uuid('fk_child_column_id');
+    // table.string('fk_child_column_id',20);
     // table.foreign('fk_child_column_id').references('nc_columns_v2.id');
-    // table.uuid('fk_parent_column_id');
+    // table.string('fk_parent_column_id',20);
     // table.foreign('fk_parent_column_id').references('nc_columns_v2.id');
 
-    table.uuid('fk_relation_column_id');
+    table.string('fk_relation_column_id', 20);
     table.foreign('fk_relation_column_id').references('nc_columns_v2.id');
 
-    table.uuid('fk_lookup_column_id');
+    table.string('fk_lookup_column_id', 20);
     table.foreign('fk_lookup_column_id').references('nc_columns_v2.id');
     table.boolean('deleted');
 
@@ -276,7 +276,7 @@ const up = async knex => {
   });
   await knex.schema.createTable('nc_col_rollup_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -284,18 +284,18 @@ const up = async knex => {
     table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('fk_column_id');
+    table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
-    // table.uuid('fk_child_column_id');
+    // table.string('fk_child_column_id',20);
     // table.foreign('fk_child_column_id').references('nc_columns_v2.id');
-    // table.uuid('fk_parent_column_id');
+    // table.string('fk_parent_column_id',20);
     // table.foreign('fk_parent_column_id').references('nc_columns_v2.id');
 
-    table.uuid('fk_relation_column_id');
+    table.string('fk_relation_column_id', 20);
     table.foreign('fk_relation_column_id').references('nc_columns_v2.id');
 
-    table.uuid('fk_rollup_column_id');
+    table.string('fk_rollup_column_id', 20);
     table.foreign('fk_rollup_column_id').references('nc_columns_v2.id');
     table.string('rollup_function');
     table.boolean('deleted');
@@ -304,7 +304,7 @@ const up = async knex => {
   });
   await knex.schema.createTable('nc_col_formula_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -312,7 +312,7 @@ const up = async knex => {
     table.foreign('base_id').references('nc_bases_v2.id');
     table.string('db_alias').defaultTo('db');
 
-    table.uuid('fk_column_id');
+    table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     table.text('formula').notNullable();
@@ -324,7 +324,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_filter_exp_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -337,9 +337,9 @@ const up = async knex => {
     table.string('cn');
     table.string('_cn');
 
-    table.uuid('fk_model_id');
+    table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references('nc_models_v2.id');
-    table.uuid('fk_column_id');
+    table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     table.string('comparison_op');
@@ -355,7 +355,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_sort_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -363,9 +363,9 @@ const up = async knex => {
     table.string('base_id', 128);
     table.foreign('base_id').references('nc_bases_v2.id');
 
-    table.uuid('fk_model_id');
+    table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references('nc_models_v2.id');
-    table.uuid('fk_column_id');
+    table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
     // table.string('tn');
@@ -381,7 +381,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_shared_views_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -406,7 +406,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_acl_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -427,7 +427,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_form_view_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -454,7 +454,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_form_view_columns_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -479,7 +479,7 @@ const up = async knex => {
   });
   await knex.schema.createTable('nc_gallery_view_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -511,7 +511,7 @@ const up = async knex => {
   });
   await knex.schema.createTable('nc_gallery_view_columns_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -533,7 +533,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_kanban_view_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -556,7 +556,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_kanban_view_columns_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -578,7 +578,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_users_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -601,7 +601,7 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_orgs_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
@@ -611,20 +611,20 @@ const up = async knex => {
 
   await knex.schema.createTable('nc_teams_v2', table => {
     table
-      .uuid('id')
+      .string('id', 20)
       .primary()
       .notNullable();
 
     table.string('title');
-    table.uuid('org_id');
+    table.string('org_id', 20);
     table.foreign('org_id').references('nc_orgs_v2.id');
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable('nc_team_users_v2', table => {
-    table.uuid('org_id');
+    table.string('org_id', 20);
     table.foreign('org_id').references('nc_orgs_v2.id');
-    table.uuid('user_id');
+    table.string('user_id', 20);
     table.foreign('user_id').references('nc_users_v2.id');
     table.timestamps(true, true);
   });

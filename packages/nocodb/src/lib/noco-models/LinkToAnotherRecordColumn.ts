@@ -2,6 +2,7 @@ import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import Column from './Column';
 import Model from './Model';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class LinkToAnotherRecordColumn {
   fk_column_id?: string;
@@ -26,7 +27,7 @@ export default class LinkToAnotherRecordColumn {
   }
 
   public async getParentColumn(): Promise<Column> {
-    return Column.get({ colId: this.fk_child_column_id });
+    return Column.get({ colId: this.fk_parent_column_id });
   }
   public async getMMParentColumn(): Promise<Column> {
     return Column.get({ colId: this.fk_mm_parent_column_id });
@@ -48,14 +49,17 @@ export default class LinkToAnotherRecordColumn {
   }
 
   public static async read(columnId: string) {
-    const column = await Noco.ncMeta.metaGet2(
-      null, //,
-      null, //model.db_alias,
-      'nc_col_relations_v2',
-      { fk_column_id: columnId }
-    );
-
-    return column ? new LinkToAnotherRecordColumn(column) : null;
+    let colData = await NocoCache.getOne(`${columnId}_ln*`);
+    if (!colData) {
+      colData = await Noco.ncMeta.metaGet2(
+        null, //,
+        null, //model.db_alias,
+        'nc_col_relations_v2',
+        { fk_column_id: columnId }
+      );
+      await NocoCache.set(`${columnId}_${colData.id}`, colData);
+    }
+    return colData ? new LinkToAnotherRecordColumn(colData) : null;
   }
 
   id: string;

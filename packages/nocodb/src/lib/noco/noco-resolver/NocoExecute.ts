@@ -14,24 +14,29 @@ const nocoExecute = async (
 ): Promise<any> => {
   const res = [];
   // extract nested(lookup) recursively
-  const extractNested = (path, o = {}, resolver = {}): any => {
+  const extractNested = (path, dataTreeObj: any = {}, resolver = {}): any => {
     if (path.length) {
       const key = path[0];
-      if (!o[key]) {
+      if (!dataTreeObj[key]) {
         if (typeof resolver[key] === 'function') {
-          o[path[0]] = resolver[key](args);
+          dataTreeObj[path[0]] = resolver[key](args);
         } else if (typeof resolver[key] === 'object') {
-          o[path[0]] = Promise.resolve(resolver[key]);
+          dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
         } else {
-          o[path[0]] = Promise.resolve(resolver[key]);
+          dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
         }
-      } else if (typeof o[key] === 'function') {
-        o[key] = o[key]();
+      } else if (typeof dataTreeObj[key] === 'function') {
+        const proto = dataTreeObj.__proto__;
+        delete proto[key];
+        dataTreeObj.__proto__ = proto;
+        dataTreeObj[key] = dataTreeObj[key]();
       }
 
-      return (o[path[0]] instanceof Promise
-        ? o[path[0]]
-        : Promise.resolve(o[path[0]])
+      // todo: handle lookup
+
+      return (dataTreeObj[path[0]] instanceof Promise
+        ? dataTreeObj[path[0]]
+        : Promise.resolve(dataTreeObj[path[0]])
       ).then(res1 => {
         if (Array.isArray(res1)) {
           return Promise.all(res1.map(r => extractNested(path.slice(1), r)));
@@ -40,7 +45,7 @@ const nocoExecute = async (
         }
       });
     } else {
-      return Promise.resolve(o);
+      return Promise.resolve(dataTreeObj);
     }
   };
 

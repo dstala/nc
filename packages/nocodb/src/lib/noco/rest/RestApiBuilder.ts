@@ -382,7 +382,6 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       router: this.router,
       dbAlias: this.dbAlias,
       baseId: this.projectId,
-      nocoRootResolvers: this.nocoRootResolvers,
       baseModels2: this.baseModels2
     });
 
@@ -1018,7 +1017,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
         ...models,
         [m.title]: new BaseModelSqlv2({
           model: m,
-          dbDriver: this.dbDriver
+          dbDriver: this.dbDriver,
+          baseModels: this.baseModels2
         })
       };
     }, {});
@@ -1044,7 +1044,6 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       router: this.router,
       dbAlias: this.dbAlias,
       baseId: this.projectId,
-      nocoRootResolvers: this.nocoRootResolvers,
       baseModels2: this.baseModels2
     });
   }

@@ -538,7 +538,12 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
   knex:client releasing connection to pool: __knexUid21 +0ms
   knex:client acquired connection from pool: __knexUid21 +1ms
   knex:query select * from `nc_col_relations_v2` where `fk_column_id` = ? limit ? undefined +3ms
-  knex:bindings [ 'e5da5b88-b280-4b67-b302-d44756c4d470', 1 ] undefined +3ms
+  knex:bindings [ 'e5da5b88-b280-4b67-b302-d44756c4d470', 1 ] undefined +3
+  
+  
+  
+  
+  ms
   knex:client releasing connection to pool: __knexUid26 +3ms
   knex:client releasing connection to pool: __knexUid27 +0ms
   knex:client releasing connection to pool: __knexUid28 +0ms
@@ -565,3 +570,34 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
   knex:client releasing connection to pool: __knexUid18 +38ms
 GET /nc/civil_pony_0uaa/api/v2/film 200 41139 - 584.371 ms
 ```
+
+
+# Lookup creation
+
+- Add a row to lookup
+- Update model cache
+
+
+
+
+
+
+# Type generatr
+
+class Country{
+
+constructor(data){
+ 
+}
+
+
+countryList() {
+
+}
+
+}
+
+
+
+
+

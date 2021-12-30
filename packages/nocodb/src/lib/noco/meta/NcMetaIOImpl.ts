@@ -9,8 +9,10 @@ import XcMigrationSource from '../common/XcMigrationSource';
 import NcMetaIO, { META_TABLES } from './NcMetaIO';
 import NcConnectionMgr from '../common/NcConnectionMgr';
 
-import { v4 as uuidv4 } from 'uuid';
+// import { nanoid } from 'nanoid';
+/*import { v4 as uuidv4 } from 'uuid';*/
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
+const nanoidv2 = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 14);
 
 export default class NcMetaIOImpl extends NcMetaIO {
   public async metaPaginatedList(
@@ -175,6 +177,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
 
     return query.first();
   }
+
   public async metaGet2(
     base_id: string,
     dbAlias: string,
@@ -236,7 +239,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
     target: string,
     data: any
   ): Promise<any> {
-    const id = uuidv4();
+    const id = this.genNanoid(target);
     await this.knexConnection(target).insert({
       id,
       db_alias,
@@ -711,6 +714,80 @@ export default class NcMetaIOImpl extends NcMetaIO {
       return Promise.resolve(undefined);
     }
     return this.metaInsert(project_id, dbAlias, target, data);
+  }
+
+  private genNanoid(target: string) {
+    let prefix;
+    switch (target) {
+      case 'nc_bases_v2':
+        prefix = 'bs_';
+        break;
+      case 'nc_data_src_v2':
+        prefix = 'ds_';
+        break;
+      case 'nc_models_v2':
+        prefix = 'md_';
+        break;
+      case 'nc_columns_v2':
+        prefix = 'cl_';
+        break;
+      case 'nc_col_relations_v2':
+        prefix = 'ln_';
+        break;
+      case 'nc_col_select_options_v2':
+        prefix = 'sl_';
+        break;
+      case 'nc_col_lookup_v2':
+        prefix = 'lk_';
+        break;
+      case 'nc_col_rollup_v2':
+        prefix = 'rl_';
+        break;
+      case 'nc_col_formula_v2':
+        prefix = 'fm_';
+        break;
+      case 'nc_filter_exp_v2':
+        prefix = 'fi_';
+        break;
+      case 'nc_sort_v2':
+        prefix = 'so_';
+        break;
+      case 'nc_shared_views_v2':
+        prefix = 'sv_';
+        break;
+      case 'nc_acl_v2':
+        prefix = 'ac_';
+        break;
+      case 'nc_form_view_v2':
+        prefix = 'fv_';
+        break;
+      case 'nc_form_view_columns_v2':
+        prefix = 'fvc_';
+        break;
+      case 'nc_gallery_view_v2':
+        prefix = 'gv_';
+        break;
+      case 'nc_gallery_view_columns_v2':
+        prefix = 'gvc_';
+        break;
+      case 'nc_kanban_view_v2':
+        prefix = 'kv_';
+        break;
+      case 'nc_kanban_view_columns_v2':
+        prefix = 'kvc_';
+        break;
+      case 'nc_users_v2':
+        prefix = 'us_';
+        break;
+      case 'nc_orgs_v2':
+        prefix = 'org_';
+        break;
+      case 'nc_teams_v2':
+        prefix = 'tm_';
+        break;
+    }
+
+    return `${prefix}${nanoidv2()}`;
   }
 }
 /**

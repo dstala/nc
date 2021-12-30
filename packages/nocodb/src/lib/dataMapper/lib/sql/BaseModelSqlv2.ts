@@ -4,6 +4,11 @@ import _ from 'lodash';
 import Model from '../../../noco-models/Model';
 import { XKnex } from '../..';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
+import UITypes from '../../../sqlUi/UITypes';
+import RollupColumn from '../../../noco-models/RollupColumn';
+import LookupColumn from '../../../noco-models/LookupColumn';
+import DataLoader from 'dataloader';
+import Column from '../../../noco-models/Column';
 
 /**
  * Base class for models
@@ -14,10 +19,20 @@ import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordC
 class BaseModelSqlv2 {
   protected dbDriver: XKnex;
   protected model: Model;
+  protected baseModels: {
+    [key: string]: BaseModelSqlv2;
+  };
 
-  constructor({ dbDriver, model }: { [key: string]: any; model: Model }) {
+  constructor({
+    dbDriver,
+    model,
+    baseModels
+  }: {
+    [key: string]: any;
+    model: Model;
+  }) {
     this.dbDriver = dbDriver;
-
+    this.baseModels = baseModels;
     this.model = model;
     autoBind(this);
   }
@@ -28,17 +43,26 @@ class BaseModelSqlv2 {
     await this.select(qb);
 
     const data = await qb.where(this.model.pk.cn, id).first();
+
+    if (data) {
+      const proto = await this.getProto();
+      data.__proto__ = proto;
+    }
     return data;
   }
 
-  public async list(args?: { where?: string; limit }): Promise<any> {
+  public async list(args?: { where?: string; limit? }): Promise<any> {
     const qb = this.dbDriver(this.model.title);
     qb.select(await this.model.selectObject());
     qb.xwhere(args?.where);
 
     const data = await qb.limit(10);
+    const proto = await this.getProto();
 
-    return data;
+    return data.map(d => {
+      d.__proto__ = proto;
+      return d;
+    });
 
     /* const pk = columnsObj.actor.find(c => c.pk);
     const ids = data.map(r => r[pk._cn]);
@@ -379,8 +403,16 @@ class BaseModelSqlv2 {
           .as('list')
       );
 
+      const proto = await this.baseModels[chilMod.title].getProto();
+
       // return _.groupBy(childs, cn);
-      return _.groupBy(childs, chilCol._cn);
+      return _.groupBy(
+        childs.map(c => {
+          c.__proto__ = proto;
+          return c;
+        }),
+        chilCol._cn
+      );
     } catch (e) {
       console.log(e);
       throw e;
@@ -468,8 +500,134 @@ class BaseModelSqlv2 {
       !this.isSqlite()
     );
 
-    const gs = _.groupBy(childs, `${tn}_${vcn}`);
+    const proto = await this.baseModels[rtn].getProto();
+    const gs = _.groupBy(
+      childs.map(c => {
+        c.__proto__ = proto;
+        return c;
+      }),
+      `${tn}_${vcn}`
+    );
     return parentIds.map(id => gs[id] || []);
+  }
+
+  async getProto() {
+    const proto: any = { __columnAliases: {} };
+    const columns = await this.model.getColumns();
+    for (const column of columns) {
+      switch (column.uidt) {
+        case UITypes.Rollup:
+          {
+            // @ts-ignore
+            const colOptions: RollupColumn = await column.getColOptions();
+          }
+          break;
+        case UITypes.Lookup:
+          {
+            // @ts-ignore
+            const colOptions: LookupColumn = await column.getColOptions();
+            proto.__columnAliases[column._cn] = {
+              path: [
+                (await Column.get({ colId: colOptions.fk_relation_column_id }))
+                  ?._cn,
+                (await Column.get({ colId: colOptions.fk_lookup_column_id }))
+                  ?._cn
+              ]
+            };
+          }
+          break;
+        case UITypes.LinkToAnotherRecord:
+          {
+            const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
+
+            console.log(`${column._cn}\t\t::\t\t${colOptions.type}`);
+
+            if (colOptions?.type === 'hm') {
+              const listLoader = new DataLoader(async (ids: string[]) => {
+                try {
+                  const data = await this.baseModels[
+                    this.model.title
+                  ].hasManyListGQL({
+                    colId: column.id,
+                    ids
+                  });
+                  return ids.map((id: string) => (data[id] ? data[id] : []));
+                } catch (e) {
+                  console.log(e);
+                  return [];
+                }
+              });
+              const self: any = this;
+
+              proto[column._cn] = async function(): Promise<any> {
+                return listLoader.load(this[self?.model?.pk?._cn]);
+              };
+
+              // defining HasMany count method within GQL Type class
+              // Object.defineProperty(type.prototype, column._cn, {
+              //   async value(): Promise<any> {
+              //     return listLoader.load(this[model.pk._cn]);
+              //   },
+              //   configurable: true
+              // });
+            } else if (colOptions.type === 'mm') {
+              const listLoader = new DataLoader(async (ids: string[]) => {
+                try {
+                  const data = await await this.baseModels[
+                    this.model.title
+                  ]._getGroupedManyToManyList({
+                    parentIds: ids,
+                    colId: column.id
+                  });
+
+                  return data;
+                } catch (e) {
+                  console.log(e);
+                  return [];
+                }
+              });
+
+              const self = this;
+
+              proto[column._cn] = async function(): Promise<any> {
+                return await listLoader.load(this[self.model.pk._cn]);
+              };
+            } else if (colOptions.type === 'bt') {
+              // @ts-ignore
+              const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
+              const pCol = await Column.get({
+                colId: colOptions.fk_parent_column_id
+              });
+              const cCol = await Column.get({
+                colId: colOptions.fk_child_column_id
+              });
+              const readLoader = new DataLoader(async (ids: string[]) => {
+                try {
+                  const data = await this.baseModels[
+                    (await pCol.getModel()).title
+                  ].list({
+                    // limit: ids.length,
+                    where: `(${pCol.cn},in,${ids.join(',')})`
+                  });
+                  const gs = _.groupBy(data, pCol._cn);
+                  return ids.map(async (id: string) => gs?.[id]?.[0]);
+                } catch (e) {
+                  console.log(e);
+                  return [];
+                }
+              });
+
+              // defining HasMany count method within GQL Type class
+              proto[column._cn] = async function() {
+                return readLoader.load(this[cCol._cn]);
+              };
+              // todo : handle mm
+            }
+          }
+          break;
+      }
+    }
+    return proto;
   }
 
   isSqlite() {

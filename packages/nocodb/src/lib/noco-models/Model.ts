@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import Column from './Column';
 import NcModel from '../../types/NcModel';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class Model implements NcModel {
   copy_enabled: boolean;
@@ -37,9 +38,7 @@ export default class Model implements NcModel {
     this.columns = await Column.list({
       base_id: this.base_id,
       db_alias: this.db_alias,
-      condition: {
-        fk_model_id: this.id
-      }
+      fk_model_id: this.id
     });
     return this.columns;
   }
@@ -64,9 +63,20 @@ export default class Model implements NcModel {
     project_id: string;
     db_alias: string;
   }): Promise<Model[]> {
-    return (
-      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_models_v2')
-    ).map(m => new Model(m));
+    let modelList = await NocoCache.getAll(`${project_id}_md*`);
+    if (!modelList.length) {
+      modelList = await Noco.ncMeta.metaList2(
+        project_id,
+        db_alias,
+        'nc_models_v2'
+      );
+
+      for (const model of modelList) {
+        await NocoCache.set(`${project_id}_${model.id}`, model);
+      }
+    }
+
+    return modelList.map(m => new Model(m));
   }
 
   public async selectObject(): Promise<{ [name: string]: string }> {
@@ -96,14 +106,21 @@ export default class Model implements NcModel {
     tn?: string;
     id?: string;
   }): Promise<Model> {
-    const m = await Noco.ncMeta.metaGet2(
-      base_id,
-      db_alias,
-      'nc_models_v2',
-      id || {
-        title: tn
-      }
-    );
-    return m && new Model(m);
+    let modelData = id && (await NocoCache.getOne(`*_${id}`));
+    if (!modelData) {
+      modelData = await Noco.ncMeta.metaGet2(
+        base_id,
+        db_alias,
+        'nc_models_v2',
+        id || {
+          title: tn
+        }
+      );
+      await NocoCache.set(`${modelData.base_id}_${id}`, modelData);
+    }
+    if (modelData) {
+      return new Model(modelData);
+    }
+    return null;
   }
 }

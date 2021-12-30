@@ -9,6 +9,7 @@ import RollupColumn from './RollupColumn';
 import SingleSelectColumn from './SingleSelectColumn';
 import MultiSelectColumn from './MultiSelectColumn';
 import Model from './Model';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class Column implements NcColumn {
   public _cn: string;
@@ -55,9 +56,9 @@ export default class Column implements NcColumn {
     });
   }
 
-  public static async insert(model: NcColumn | any) {
+  public static async insert<T>(model: Partial<Column & T & any>) {
     const row = await Noco.ncMeta.metaInsert2(
-      model.project_id,
+      model.project_id || model.base_id,
       model.db_alias,
       'nc_columns_v2',
       {
@@ -158,6 +159,19 @@ export default class Column implements NcColumn {
             fkn: model.fkn
           }
         );
+        break;
+      case UITypes.MultiSelect:
+      case UITypes.SingleSelect:
+        for (const option of model.dtxp?.split(',') || [])
+          await Noco.ncMeta.metaInsert2(
+            model.project_id,
+            model.db_alias,
+            'nc_col_select_options_v2',
+            {
+              fk_column_id: row.id,
+              title: option
+            }
+          );
         break;
 
       /*  default:
@@ -268,18 +282,30 @@ export default class Column implements NcColumn {
   public static async list({
     base_id,
     db_alias,
-    condition
+    fk_model_id
   }: {
     base_id: string;
     db_alias: string;
-    condition: any;
+    fk_model_id: string;
   }): Promise<Column[]> {
+    let columnsList = await NocoCache.getAll(`${fk_model_id}_cl*`);
+    if (!columnsList.length) {
+      columnsList = await Noco.ncMeta.metaList2(
+        base_id,
+        db_alias,
+        'nc_columns_v2',
+        {
+          condition: {
+            fk_model_id
+          }
+        }
+      );
+      for (const column of columnsList) {
+        await NocoCache.set(`${fk_model_id}_${column.id}`, column);
+      }
+    }
     return Promise.all(
-      (
-        await Noco.ncMeta.metaList2(base_id, db_alias, 'nc_columns_v2', {
-          condition
-        })
-      ).map(async m => {
+      columnsList.map(async m => {
         const column = new Column(m);
         await column.getColOptions();
         return column;
@@ -332,12 +358,16 @@ export default class Column implements NcColumn {
     db_alias?: string;
     colId: string;
   }): Promise<Column> {
-    const colData = await Noco.ncMeta.metaGet2(
-      base_id,
-      db_alias,
-      'nc_columns_v2',
-      colId
-    );
+    let colData = await NocoCache.getOne(`*_${colId}`);
+    if (!colData) {
+      colData = await Noco.ncMeta.metaGet2(
+        base_id,
+        db_alias,
+        'nc_columns_v2',
+        colId
+      );
+      await NocoCache.set(`${colData.fk_model_id}_${colId}`, colData);
+    }
     if (colData) {
       const column = new Column(colData);
       await column.getColOptions();

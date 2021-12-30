@@ -1,8 +1,9 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class MultiSelectColumn {
-  name: string;
+  title: string;
 
   constructor(data: NcColumn) {
     Object.assign(this, data);
@@ -21,20 +22,24 @@ export default class MultiSelectColumn {
   }
 
   public static async read(columnId: string) {
-    const columns = await Noco.ncMeta.metaList2(
-      null, //,
-      null, //model.db_alias,
-      'nc_col_select_options_v2',
-      {
-        condition: { fk_column_id: columnId }
-      }
-    );
+    let options = await NocoCache.getAll(`${columnId}_sl_*`);
+    if (!options.length) {
+      options = await Noco.ncMeta.metaList2(
+        null, //,
+        null, //model.db_alias,
+        'nc_col_select_options_v2',
+        { condition: { fk_column_id: columnId } }
+      );
+      for (const option of options)
+        await NocoCache.set(`${columnId}_${option.id}`, option);
+    }
 
-    return columns?.length
+    return options?.length
       ? {
-          options: columns.map(c => new MultiSelectColumn(c))
+          options: options.map(c => new MultiSelectColumn(c))
         }
       : null;
   }
+
   id: string;
 }

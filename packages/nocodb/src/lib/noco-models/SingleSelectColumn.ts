@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import UITypes from '../sqlUi/UITypes';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class SingleSelectColumn implements NcColumn {
   _cn: string;
@@ -49,14 +50,24 @@ export default class SingleSelectColumn implements NcColumn {
   }
 
   public static async read(columnId: string) {
-    const column = await Noco.ncMeta.metaGet2(
-      null, //,
-      null, //model.db_alias,
-      'nc_col_select_options_v2',
-      { fk_column_id: columnId }
-    );
+    let options = await NocoCache.getAll(`${columnId}_sl_*`);
+    if (!options.length) {
+      options = await Noco.ncMeta.metaList2(
+        null, //,
+        null, //model.db_alias,
+        'nc_col_select_options_v2',
+        { condition: { fk_column_id: columnId } }
+      );
+      for (const option of options)
+        await NocoCache.set(`${columnId}_${option.id}`, option);
+    }
 
-    return column ? new SingleSelectColumn(column) : null;
+    return options?.length
+      ? {
+          options: options.map(c => new SingleSelectColumn(c))
+        }
+      : null;
   }
+
   id: string;
 }

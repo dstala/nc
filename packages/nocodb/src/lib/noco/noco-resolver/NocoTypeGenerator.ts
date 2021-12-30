@@ -74,8 +74,8 @@ export default class NocoTypeGenerator {
                 const colOptions: LookupColumn = await column.getColOptions();
                 type.__columnAliases[column._cn] = {
                   path: [
-                    columnsRef[colOptions.fk_relation_column_id]._cn,
-                    columnsRef[colOptions.fk_lookup_column_id]._cn
+                    columnsRef[colOptions.fk_relation_column_id]?._cn,
+                    columnsRef[colOptions.fk_lookup_column_id]?._cn
                   ]
                 };
               }
@@ -120,7 +120,8 @@ export default class NocoTypeGenerator {
                       async value(): Promise<any> {
                         return countLoader.load(this[model.pk._cn]);
                       },
-                      configurable: true
+                      configurable: true,
+                      writable: true
                     }
                   );
 
@@ -174,19 +175,19 @@ export default class NocoTypeGenerator {
                   const listLoader = new DataLoader(async (ids: string[]) => {
                     try {
                       /*const data = await ctx.models[
-                          model.title
-                        ]._getGroupedManyToManyList({
-                          parentIds: ids,
-                          child:
-                            modelsRef[
-                              columnsRef[colOptions.fk_parent_column_id]
-                                .fk_model_id
-                            ].title,
-                          // todo: optimize - query only required fields
-                          rest: {
-                            mfields1: '*'
-                          }
-                        });*/
+                        model.title
+                      ]._getGroupedManyToManyList({
+                        parentIds: ids,
+                        child:
+                          modelsRef[
+                            columnsRef[colOptions.fk_parent_column_id]
+                              .fk_model_id
+                          ].title,
+                        // todo: optimize - query only required fields
+                        rest: {
+                          mfields1: '*'
+                        }
+                      });*/
 
                       const data = await ctx.baseModels2[
                         model.title
@@ -218,7 +219,8 @@ export default class NocoTypeGenerator {
                     async value(): Promise<any> {
                       return await listLoader.load(this[model.pk._cn]);
                     },
-                    configurable: true
+                    configurable: true,
+                    writable: true
                   });
                 } else if (colOptions.type === 'bt') {
                   // @ts-ignore
@@ -277,7 +279,8 @@ export default class NocoTypeGenerator {
                         this[columnsRef[colOptions.fk_parent_column_id]._cn]
                       );
                     },
-                    configurable: true
+                    configurable: true,
+                    writable: true
                   });
                 }
 
