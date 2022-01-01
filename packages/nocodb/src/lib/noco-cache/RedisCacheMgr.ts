@@ -42,4 +42,13 @@ export default class RedisCacheMgr extends CacheMgr {
   delAll(pattern: string): Promise<any[]> {
     return Promise.resolve([]);
   }
+
+  setv2(
+    _key: string,
+    _secondaryKey: string,
+    _value: any,
+    _config?: any
+  ): Promise<any> {
+    return Promise.resolve(undefined);
+  }
 }

@@ -32,7 +32,7 @@ import addErrorOnColumnDeleteInFormula from './helpers/addErrorOnColumnDeleteInF
 // import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
 // import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
 import Model from '../../noco-models/Model';
-import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
+// import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 import UITypes from '../../sqlUi/UITypes';
 
 const log = debug('nc:api:base');
@@ -70,10 +70,10 @@ export default abstract class BaseApiBuilder<T extends Noco>
   protected models2: {
     [key: string]: Model;
   };
-
-  protected baseModels2: {
-    [key: string]: BaseModelSqlv2;
-  };
+  //
+  // protected baseModels2: {
+  //   [key: string]: BaseModelSqlv2;
+  // };
 
   public get knex(): XKnex {
     return this.sqlClient?.knex || this.dbDriver;
@@ -168,7 +168,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
   ) {
     this.models = {};
     this.models2 = {};
-    this.baseModels2 = {};
+    // this.baseModels2 = {};
     this.app = app;
     this.config = config;
     this.connectionConfig = connectionConfig;
@@ -2019,22 +2019,22 @@ export default abstract class BaseApiBuilder<T extends Noco>
       this.dbAlias,
       'nc_models'
     );
-
-    const models: any[] = await Model.list({
-      project_id: this.projectId,
-      db_alias: this.dbAlias
-    });
-
-    for (const model of models) {
-      this.models2[model.title] = model;
-      this.baseModels2[model.title] = this.baseModels2[
-        model.id
-      ] = new BaseModelSqlv2({
-        model,
-        dbDriver: this.dbDriver,
-        baseModels: this.baseModels2
-      });
-    }
+    //
+    // const models: any[] = await Model.list({
+    //   project_id: this.projectId,
+    //   db_alias: this.dbAlias
+    // });
+    //
+    // for (const model of models) {
+    //   this.models2[model.title] = model;
+    //   this.baseModels2[model.title] = this.baseModels2[
+    //     model.id
+    //   ] = new BaseModelSqlv2({
+    //     model,
+    //     dbDriver: this.dbDriver,
+    //     baseModels: this.baseModels2
+    //   });
+    // }
 
     const enabledModels = [];
 

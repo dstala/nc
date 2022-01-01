@@ -49,7 +49,7 @@ export default class LinkToAnotherRecordColumn {
   }
 
   public static async read(columnId: string) {
-    let colData = await NocoCache.getOne(`${columnId}_ln*`);
+    let colData = (await NocoCache.getv2(columnId))?.[0];
     if (!colData) {
       colData = await Noco.ncMeta.metaGet2(
         null, //,
@@ -57,7 +57,7 @@ export default class LinkToAnotherRecordColumn {
         'nc_col_relations_v2',
         { fk_column_id: columnId }
       );
-      await NocoCache.set(`${columnId}_${colData.id}`, colData);
+      await NocoCache.setv2(colData.id, columnId, colData);
     }
     return colData ? new LinkToAnotherRecordColumn(colData) : null;
   }

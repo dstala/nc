@@ -302,7 +302,7 @@ export default class Column implements NcColumn {
     db_alias: string;
     fk_model_id: string;
   }): Promise<Column[]> {
-    let columnsList = await NocoCache.getAll(`${fk_model_id}_cl*`);
+    let columnsList = await NocoCache.getv2(fk_model_id);
     if (!columnsList.length) {
       columnsList = await Noco.ncMeta.metaList2(
         base_id,
@@ -315,7 +315,7 @@ export default class Column implements NcColumn {
         }
       );
       for (const column of columnsList) {
-        await NocoCache.set(`${fk_model_id}_${column.id}`, column);
+        await NocoCache.setv2(column.id, fk_model_id, column);
       }
     }
     return Promise.all(
@@ -372,7 +372,7 @@ export default class Column implements NcColumn {
     db_alias?: string;
     colId: string;
   }): Promise<Column> {
-    let colData = await NocoCache.getOne(`*_${colId}`);
+    let colData = await NocoCache.get(colId);
     if (!colData) {
       colData = await Noco.ncMeta.metaGet2(
         base_id,
@@ -380,7 +380,7 @@ export default class Column implements NcColumn {
         'nc_columns_v2',
         colId
       );
-      await NocoCache.set(`${colData.fk_model_id}_${colId}`, colData);
+      await NocoCache.set(colId, colData);
     }
     if (colData) {
       const column = new Column(colData);

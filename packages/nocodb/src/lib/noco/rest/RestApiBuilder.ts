@@ -29,11 +29,11 @@ import { RestCtrlHasMany } from './RestCtrlHasMany';
 import { RestCtrlProcedure } from './RestCtrlProcedure';
 import Model from '../../noco-models/Model';
 import Column from '../../noco-models/Column';
-import NocoTypeGenerator from '../noco-resolver/NocoTypeGenerator';
-import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
-import { RestCtrlv2 } from './RestCtrlv2';
+// import NocoTypeGenerator from '../noco-resolver/NocoTypeGenerator';
+// import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
+// import { RestCtrlv2 } from './RestCtrlv2';
 import registerRestCtrl from './registerRestCtrl';
-import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
+// import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const log = debug('nc:api:rest');
 const NC_CUSTOM_ROUTE_KEY = '__xc_custom';
@@ -141,22 +141,22 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     this.procedureCtrl.mapRoutes(router, this.customRoutes);
     swagger.push(this.procedureCtrl.getSwaggerObj());
     this.router.use('/api/' + this.routeVersionLetter, router);
-    this.nocoTypes = await NocoTypeGenerator.generate(
-      Object.values(this.models2),
-      {
-        ncMeta: this.xcMeta,
-        baseModels2: this.baseModels2
-      }
-    );
-
-    this.nocoRootResolvers = await NocoResolverGenerator.generate(
-      Object.values(this.models2),
-      {
-        ncMeta: this.xcMeta,
-        types: this.nocoTypes,
-        baseModels2: this.baseModels2
-      }
-    );
+    // this.nocoTypes = await NocoTypeGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
+    //
+    // this.nocoRootResolvers = await NocoResolverGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     types: this.nocoTypes,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
 
     const routesArr = (
       await this.xcMeta.metaList(this.projectId, this.dbAlias, 'nc_routes', {
@@ -260,26 +260,26 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
         routes,
         rootPath,
         this.acls,
-        middlewareBody,
-        this.baseModels2
+        middlewareBody
+        // this.baseModels2
       );
 
-      new RestCtrlv2({
-        app: this.app,
-        models: this.models,
-        table: meta.title,
-        rootResolver: this.nocoRootResolvers,
-        baseModels2: this.baseModels2
-        // baseModel2: this.baseModels2
-        // this.app,
-        // this.models,
-        // meta.title,
-        // routes,
-        // rootPath,
-        // this.acls,
-        // middlewareBody,
-        // this.baseModels2
-      }).mapRoutes(router);
+      // new RestCtrlv2({
+      //   app: this.app,
+      //   models: this.models,
+      //   table: meta.title,
+      //   rootResolver: this.nocoRootResolvers,
+      //   // baseModels2: this.baseModels2
+      //   // baseModel2: this.baseModels2
+      //   // this.app,
+      //   // this.models,
+      //   // meta.title,
+      //   // routes,
+      //   // rootPath,
+      //   // this.acls,
+      //   // middlewareBody,
+      //   // this.baseModels2
+      // }).mapRoutes(router);
 
       this.controllers[meta.title].mapRoutes(router, this.customRoutes);
 
@@ -791,8 +791,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           routes,
           rootPath,
           this.acls,
-          null,
-          this.baseModels2
+          null
+          // this.baseModels2
         );
         this.controllers[table.tn].mapRoutes(router, this.customRoutes);
         this.router.use(encodeURI(rootPath), router);
@@ -1010,35 +1010,35 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       this.connectionConfig.client
     );
 
-    this.baseModels2 = (
-      await Model.list({ project_id: this.projectId, db_alias: this.dbAlias })
-    ).reduce((models, m) => {
-      return {
-        ...models,
-        [m.title]: new BaseModelSqlv2({
-          model: m,
-          dbDriver: this.dbDriver,
-          baseModels: this.baseModels2
-        })
-      };
-    }, {});
+    // this.baseModels2 = (
+    //   await Model.list({ project_id: this.projectId, db_alias: this.dbAlias })
+    // ).reduce((models, m) => {
+    //   return {
+    //     ...models,
+    //     [m.title]: new BaseModelSqlv2({
+    //       model: m,
+    //       dbDriver: this.dbDriver,
+    //       baseModels: this.baseModels2
+    //     })
+    //   };
+    // }, {});
 
-    this.nocoTypes = await NocoTypeGenerator.generate(
-      Object.values(this.models2),
-      {
-        ncMeta: this.xcMeta,
-        baseModels2: this.baseModels2
-      }
-    );
-
-    this.nocoRootResolvers = await NocoResolverGenerator.generate(
-      Object.values(this.models2),
-      {
-        ncMeta: this.xcMeta,
-        types: this.nocoTypes,
-        baseModels2: this.baseModels2
-      }
-    );
+    // this.nocoTypes = await NocoTypeGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
+    //
+    // this.nocoRootResolvers = await NocoResolverGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     types: this.nocoTypes,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
 
     registerRestCtrl({
       router: this.router,

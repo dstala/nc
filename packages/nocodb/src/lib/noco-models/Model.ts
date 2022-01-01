@@ -73,7 +73,7 @@ export default class Model implements NcModel {
     project_id: string;
     db_alias: string;
   }): Promise<Model[]> {
-    let modelList = await NocoCache.getAll(`${project_id}_md*`);
+    let modelList = await NocoCache.getv2(project_id);
     if (!modelList.length) {
       modelList = await Noco.ncMeta.metaList2(
         project_id,
@@ -82,7 +82,7 @@ export default class Model implements NcModel {
       );
 
       for (const model of modelList) {
-        await NocoCache.set(`${project_id}_${model.id}`, model);
+        await NocoCache.setv2(model.id, project_id, model);
       }
     }
 
@@ -91,7 +91,8 @@ export default class Model implements NcModel {
 
   public async selectObject(): Promise<{ [name: string]: string }> {
     const res = {};
-    for (const col of await this.getColumns()) {
+    const columns = await this.getColumns();
+    for (const col of columns) {
       switch (col.uidt) {
         case 'LinkToAnotherRecord':
         case 'Lookup':
@@ -121,7 +122,7 @@ export default class Model implements NcModel {
     tn?: string;
     id?: string;
   }): Promise<Model> {
-    let modelData = id && (await NocoCache.getOne(`*_${id}`));
+    let modelData = id && (await NocoCache.get(id));
     if (!modelData) {
       modelData = await Noco.ncMeta.metaGet2(
         base_id,
@@ -131,7 +132,7 @@ export default class Model implements NcModel {
           title: tn
         }
       );
-      await NocoCache.set(`${modelData.base_id}_${id}`, modelData);
+      await NocoCache.setv2(id, modelData.base_id, modelData);
       if (
         this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
           modelData.title
@@ -161,11 +162,14 @@ export default class Model implements NcModel {
     id?: string;
     tn?: string;
     dbDriver: XKnex;
+    model?: Model;
   }): Promise<BaseModelSqlv2> {
-    const model = await this.get({
-      id: args.id,
-      tn: args.tn
-    });
+    const model =
+      args?.model ||
+      (await this.get({
+        id: args.id,
+        tn: args.tn
+      }));
 
     if (
       this.baseModels?.[model.base_id]?.[model.db_alias]?.[args.tn || args.id]

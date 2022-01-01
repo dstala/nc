@@ -52,8 +52,6 @@ export default class MemCacheMgr extends CacheMgr {
     return this.get(key);
   }
 
-  base_id_model_id;
-
   delAll(pattern: string): Promise<any[]> {
     return Promise.all(
       this.instance

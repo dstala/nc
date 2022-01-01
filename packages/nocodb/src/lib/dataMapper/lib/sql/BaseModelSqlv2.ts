@@ -614,7 +614,10 @@ class BaseModelSqlv2 {
 
               // defining HasMany count method within GQL Type class
               proto[column._cn] = async function() {
-                return readLoader.load(this[cCol._cn]);
+                return (
+                  this?.[cCol?._cn] ??
+                  (await readLoader.load(this?.[cCol?._cn]))
+                );
               };
               // todo : handle mm
             }
