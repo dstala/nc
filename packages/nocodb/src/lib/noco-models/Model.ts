@@ -171,19 +171,24 @@ export default class Model implements NcModel {
         tn: args.tn
       }));
 
-    if (
-      this.baseModels?.[model.base_id]?.[model.db_alias]?.[args.tn || args.id]
-    ) {
-      return this.baseModels[model.base_id][model.db_alias][args.tn || args.id];
-    }
-    this.baseModels[model.base_id] = this.baseModels[model.base_id] || {};
-    this.baseModels[model.base_id][model.db_alias] =
-      this.baseModels[model.base_id][model.db_alias] || {};
-    return (this.baseModels[model.base_id][model.db_alias][
-      args.tn || args.id
-    ] = new BaseModelSqlv2({
+    // if (
+    //   this.baseModels?.[model.base_id]?.[model.db_alias]?.[args.tn || args.id]
+    // ) {
+    //   return this.baseModels[model.base_id][model.db_alias][args.tn || args.id];
+    // }
+    // this.baseModels[model.base_id] = this.baseModels[model.base_id] || {};
+    // this.baseModels[model.base_id][model.db_alias] =
+    //   this.baseModels[model.base_id][model.db_alias] || {};
+    // return (this.baseModels[model.base_id][model.db_alias][
+    //   args.tn || args.id
+    // ] = new BaseModelSqlv2({
+    //   dbDriver: args.dbDriver,
+    //   model
+    // }));
+
+    return new BaseModelSqlv2({
       dbDriver: args.dbDriver,
       model
-    }));
+    });
   }
 }
