@@ -518,3 +518,51 @@ WHERE
 
 
 // country => city => address
+
+
+
+
+
+
+
+
+
+{
+  CountryList : {
+    Country : 1
+  }
+}
+
+
+
+
+{
+  CountryList : [
+    {
+
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

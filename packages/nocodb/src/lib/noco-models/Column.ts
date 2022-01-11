@@ -112,10 +112,9 @@ export default class Column implements NcColumn {
           'nc_col_rollup_v2',
           {
             fk_column_id: row.id,
-
             fk_relation_column_id: model.fk_relation_column_id,
 
-            rollup_column_id: model.rollup_column_id,
+            fk_rollup_column_id: model.fk_rollup_column_id,
             rollup_function: model.rollup_function
           }
         );

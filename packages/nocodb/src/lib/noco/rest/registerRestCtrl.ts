@@ -4,6 +4,7 @@ import Model from '../../noco-models/Model';
 import Column from '../../noco-models/Column';
 import UITypes from '../../sqlUi/UITypes';
 import LookupColumn from '../../noco-models/LookupColumn';
+import RollupColumn from '../../noco-models/RollupColumn';
 
 export default function registerRestCtrl(ctx: {
   router: Router;
@@ -44,12 +45,12 @@ export default function registerRestCtrl(ctx: {
       const data = await nocoExecute(
         requestObj,
         {
-          [`${model.alias}List`]: async () => {
-            return await baseModel.list();
+          [`${model.alias}List`]: async args => {
+            return await baseModel.list(args);
           }
         },
         {},
-        1
+        req.query
       );
       console.timeEnd('nocoExecute');
 
@@ -146,6 +147,22 @@ export default function registerRestCtrl(ctx: {
         fk_relation_column_id: (await city.getColumns()).find(
           c => c._cn === 'Country <= City'
         )?.id
+      });
+
+      // Rollup
+      await Column.insert<RollupColumn>({
+        base_id: ctx.baseId,
+        db_alias: 'db',
+        fk_model_id: country.id,
+        uidt: UITypes.Rollup,
+        _cn: 'CityCount',
+        fk_rollup_column_id: (await city.getColumns()).find(
+          c => c._cn === 'CityId'
+        )?.id,
+        fk_relation_column_id: (await country.getColumns()).find(
+          c => c._cn === 'Country => City'
+        )?.id,
+        rollup_function: 'count'
       });
 
       await Model.clear({ id: city.id });

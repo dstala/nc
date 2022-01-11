@@ -9,6 +9,7 @@ import RollupColumn from '../../../noco-models/RollupColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
 import DataLoader from 'dataloader';
 import Column from '../../../noco-models/Column';
+import { XcFilter, XcFilterWithAlias } from '../BaseModel';
 
 /**
  * Base class for models
@@ -20,6 +21,11 @@ class BaseModelSqlv2 {
   protected dbDriver: XKnex;
   protected model: Model;
   private _proto: any;
+  private config: any = {
+    limitDefault: 25,
+    limitMin: 1,
+    limitMax: 1000
+  };
 
   constructor({ dbDriver, model }: { [key: string]: any; model: Model }) {
     this.dbDriver = dbDriver;
@@ -41,15 +47,21 @@ class BaseModelSqlv2 {
     return data;
   }
 
-  public async list(args?: { where?: string; limit? }): Promise<any> {
-    const qb = this.dbDriver(this.model.title);
-    qb.select(await this.model.selectObject());
-    qb.xwhere(args?.where);
+  public async list(args: { where?: string; limit? } = {}): Promise<any> {
+    const { where, ...rest } = this._getListArgs(args);
 
-    const data = await qb.limit(10);
+    const qb = this.dbDriver(this.model.title);
+
+    qb.select(await this.model.selectObject({ knex: this.dbDriver, qb }));
+    qb.xwhere(where);
+
+    this._paginateAndSort(qb, rest);
+
     const proto = await this.getProto();
 
-    return data.map(d => {
+    console.log(qb.toQuery());
+
+    return (await qb).map(d => {
       d.__proto__ = proto;
       return d;
     });
@@ -373,7 +385,7 @@ class BaseModelSqlv2 {
         .split(',')
         .map(c => `${chilCol.cn}.${c}`)
         .join(',');
-      const colSelect = await chilMod.selectObject();
+      const colSelect = await chilMod.selectObject({ knex: this.dbDriver });
 
       const childs = await this.dbDriver.queryBuilder().from(
         this.dbDriver
@@ -632,6 +644,118 @@ class BaseModelSqlv2 {
   isSqlite() {
     return this.dbDriver.clientType() === 'sqlite3';
   }
+
+  _getListArgs(args: XcFilterWithAlias): XcFilter {
+    const obj: XcFilter = {};
+    obj.where = args.where || args.w || '';
+    obj.having = args.having || args.h || '';
+    obj.condition = args.condition || args.c || {};
+    obj.conditionGraph = args.conditionGraph || {};
+    obj.limit = Math.max(
+      Math.min(
+        args.limit || args.l || this.config.limitDefault,
+        this.config.limitMax
+      ),
+      this.config.limitMin
+    );
+    obj.offset = Math.max(+(args.offset || args.o) || 0, 0);
+    obj.fields = args.fields || args.f || '*';
+    obj.sort = args.sort || args.s || this.model.pk?.[0]?.cn;
+    return obj;
+  }
+
+  _paginateAndSort(
+    query,
+    {
+      limit = 20,
+      offset = 0,
+      sort = '',
+      ignoreLimit = false
+    }: XcFilter & { ignoreLimit?: boolean }
+  ) {
+    query.offset(offset);
+    if (!ignoreLimit) query.limit(limit);
+
+    // if (!table && !sort && this.db === 'mssql' && !isUnion) {
+    //   sort =         this.model.pk?._cn;
+    // }
+
+    if (sort) {
+      sort.split(',').forEach(o => {
+        if (o[0] === '-') {
+          query.orderBy(
+            this.model.selectObject({ knex: this.dbDriver })[o.slice(1)] ||
+              o.slice(1),
+            'desc'
+          );
+        } else {
+          query.orderBy(
+            this.model.selectObject({ knex: this.dbDriver })[o] || o,
+            'asc'
+          );
+        }
+      });
+    }
+
+    return query;
+  }
+
+  // protected get selectFormulas() {
+  //   if (!this._selectFormulas) {
+  //     this._selectFormulas = (this.virtualColumns || [])?.reduce((arr, v) => {
+  //       if (v.formula?.value && !v.formula?.error?.length) {
+  //         arr.push(
+  //           formulaQueryBuilder(
+  //             v.formula?.tree,
+  //             v._cn,
+  //             this.dbDriver,
+  //             this.aliasToColumn
+  //           )
+  //         );
+  //       }
+  //       return arr;
+  //     }, []);
+  //   }
+  //   return this._selectFormulas;
+  // }
+  //
+  // protected get selectFormulasObj() {
+  //   if (!this._selectFormulasObj) {
+  //     this._selectFormulasObj = (this.virtualColumns || [])?.reduce(
+  //       (obj, v) => {
+  //         if (v.formula?.value && !v.formula?.error?.length) {
+  //           obj[v._cn] = formulaQueryBuilder(
+  //             v.formula?.tree,
+  //             null,
+  //             this.dbDriver,
+  //             this.aliasToColumn
+  //           );
+  //         }
+  //         return obj;
+  //       },
+  //       {}
+  //     );
+  //   }
+  //   return this._selectFormulasObj;
+  // }
+
+  // todo: optimize
+  // protected get selectRollups() {
+  //   return (this.virtualColumns || [])?.reduce((arr, v) => {
+  //     if (v.rl) {
+  //       arr.push(
+  //         genRollupSelectv2({
+  //           tn: this.tn,
+  //           knex: this.dbDriver,
+  //           rollup: v.rl,
+  //           hasMany: this.hasManyRelations,
+  //           manyToMany: this.manyToManyRelations
+  //         }).as(v._cn)
+  //       );
+  //     }
+  //     return arr;
+  //   }, []);
+  // }
 }
 
 export { BaseModelSqlv2 };

@@ -4,6 +4,8 @@ import NcModel from '../../types/NcModel';
 import NocoCache from '../noco-cache/NocoCache';
 import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
+import genRollupSelectv2 from '../dataMapper/lib/sql/genRollupSelectv2';
+import RollupColumn from './RollupColumn';
 
 export default class Model implements NcModel {
   copy_enabled: boolean;
@@ -31,13 +33,13 @@ export default class Model implements NcModel {
 
   columns: Column[];
 
-  private static baseModels: {
-    [baseId: string]: {
-      [dbAlias: string]: {
-        [tableIdOrName: string]: BaseModelSqlv2;
-      };
-    };
-  } = {};
+  // private static baseModels: {
+  //   [baseId: string]: {
+  //     [dbAlias: string]: {
+  //       [tableIdOrName: string]: BaseModelSqlv2;
+  //     };
+  //   };
+  // } = {};
 
   constructor(data: NcModel) {
     Object.assign(this, data);
@@ -89,17 +91,32 @@ export default class Model implements NcModel {
     return modelList.map(m => new Model(m));
   }
 
-  public async selectObject(): Promise<{ [name: string]: string }> {
+  public async selectObject(args: {
+    knex: XKnex;
+    qb?: any;
+  }): Promise<{ [name: string]: string }> {
     const res = {};
     const columns = await this.getColumns();
-    for (const col of columns) {
-      switch (col.uidt) {
+    for (const column of columns) {
+      switch (column.uidt) {
         case 'LinkToAnotherRecord':
         case 'Lookup':
         case 'Formula':
           break;
+        case 'Rollup':
+          args?.qb?.select(
+            (
+              await genRollupSelectv2({
+                tn: this.title,
+                knex: args.knex,
+                column,
+                columnOptions: (await column.getColOptions()) as RollupColumn
+              })
+            ).rlSelect.as(column._cn)
+          );
+          break;
         default:
-          res[col._cn] = `${this.title}.${col.cn}`;
+          res[column._cn] = `${this.title}.${column.cn}`;
           break;
       }
     }
@@ -132,25 +149,25 @@ export default class Model implements NcModel {
           title: tn
         }
       );
-      await NocoCache.setv2(id, modelData.base_id, modelData);
-      if (
-        this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
-          modelData.title
-        ]
-      ) {
-        delete this.baseModels[modelData.base_id][modelData.db_alias][
-          modelData.title
-        ];
-      }
-      if (
-        this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
-          modelData.id
-        ]
-      ) {
-        delete this.baseModels[modelData.base_id][modelData.db_alias][
-          modelData.id
-        ];
-      }
+      await NocoCache.setv2(id, modelData?.base_id, modelData);
+      // if (
+      //   this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
+      //     modelData.title
+      //   ]
+      // ) {
+      //   delete this.baseModels[modelData.base_id][modelData.db_alias][
+      //     modelData.title
+      //   ];
+      // }
+      // if (
+      //   this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
+      //     modelData.id
+      //   ]
+      // ) {
+      //   delete this.baseModels[modelData.base_id][modelData.db_alias][
+      //     modelData.id
+      //   ];
+      // }
     }
     if (modelData) {
       return new Model(modelData);

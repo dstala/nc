@@ -40,15 +40,6 @@
       }
     ],
     "eslint-comments/no-unused-disable": "error",
-    "import/order": [
-      "error",
-      {
-        "newlines-between": "always",
-        "alphabetize": {
-          "order": "asc"
-        }
-      }
-    ],
     "sort-imports": [
       "error",
       {

@@ -131,7 +131,7 @@ export default class NcConfigFactory implements NcConfig {
 
   public static urlToDbConfig(
     urlString: string,
-    key?: string,
+    key = '',
     config?: NcConfigFactory,
     type?: string
   ): DbConfig {
