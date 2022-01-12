@@ -342,11 +342,13 @@ const up = async knex => {
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
+    table.string('fk_parent_id', 20);
+    table.foreign('fk_parent_id').references('nc_filter_exp_v2.id');
+
+    table.string('logical_op');
     table.string('comparison_op');
     table.string('value');
-    table.string('start');
-    table.string('stop');
-    table.string('op');
+    table.boolean('is_group');
 
     table.integer('order');
     table.timestamps(true, true);

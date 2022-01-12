@@ -5,6 +5,7 @@ import Column from '../../noco-models/Column';
 import UITypes from '../../sqlUi/UITypes';
 import LookupColumn from '../../noco-models/LookupColumn';
 import RollupColumn from '../../noco-models/RollupColumn';
+import Filter from '../../noco-models/Filter';
 
 export default function registerRestCtrl(ctx: {
   router: Router;
@@ -46,6 +47,14 @@ export default function registerRestCtrl(ctx: {
         requestObj,
         {
           [`${model.alias}List`]: async args => {
+            console.log(
+              JSON.stringify(
+                await Filter.getFilterObject({ modelId: model.id }),
+                null,
+                2
+              )
+            );
+
             return await baseModel.list(args);
           }
         },
@@ -167,6 +176,46 @@ export default function registerRestCtrl(ctx: {
 
       await Model.clear({ id: city.id });
       await Model.clear({ id: country.id });
+
+      // Filter
+      await Filter.insert({
+        fk_model_id: country.id,
+        logical_op: 'OR',
+        is_group: true,
+        children: [
+          {
+            fk_model_id: country.id,
+            fk_column_id: (await country.getColumns())?.find(
+              c => c.cn === 'country'
+            )?.id,
+            comparison_op: 'like',
+            value: 'i%'
+          },
+          {
+            fk_model_id: country.id,
+            logical_op: 'AND',
+            is_group: true,
+            children: [
+              {
+                fk_model_id: country.id,
+                fk_column_id: (await country.getColumns())?.find(
+                  c => c.cn === 'country'
+                )?.id,
+                comparison_op: 'like',
+                value: '%e'
+              },
+              {
+                fk_model_id: country.id,
+                fk_column_id: (await country.getColumns())?.find(
+                  c => c.cn === 'country'
+                )?.id,
+                comparison_op: 'like',
+                value: '%a'
+              }
+            ]
+          }
+        ]
+      });
 
       res.json({ mesg: 'success' });
     } catch (e) {
