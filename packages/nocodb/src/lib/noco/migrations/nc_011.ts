@@ -110,6 +110,7 @@ const up = async knex => {
     table.string('clen');
     table.string('cop');
     table.boolean('pk');
+    table.boolean('pv');
     table.boolean('rqd');
     table.boolean('un');
     table.string('ct');

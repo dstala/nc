@@ -58,6 +58,9 @@ export default class Model implements NcModel {
   public get pk(): Column {
     return this.columns?.find(c => c.pk);
   }
+  public get pv(): Column {
+    return this.columns?.find(c => c.pv);
+  }
 
   public static async insert(model: NcModel) {
     await Noco.ncMeta.metaInsert2(
@@ -112,7 +115,7 @@ export default class Model implements NcModel {
                 column,
                 columnOptions: (await column.getColOptions()) as RollupColumn
               })
-            ).rlSelect.as(column._cn)
+            ).builder.as(column._cn)
           );
           break;
         default:
@@ -139,7 +142,7 @@ export default class Model implements NcModel {
     tn?: string;
     id?: string;
   }): Promise<Model> {
-    let modelData = id && (await NocoCache.get(id));
+    let modelData = null; //id && (await NocoCache.get(id));
     if (!modelData) {
       modelData = await Noco.ncMeta.metaGet2(
         base_id,

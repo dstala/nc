@@ -1,10 +1,11 @@
-import Knex from 'knex';
+import Knex, { QueryBuilder } from 'knex';
 
 const types = require('pg').types;
 // override parsing date column to Date()
 types.setTypeParser(1082, val => val);
 
 import { BaseModelSql } from './BaseModelSql';
+import Filter, { FilterObject } from '../../../noco-models/Filter';
 
 const opMapping = {
   eq: '=',
@@ -474,6 +475,10 @@ declare module 'knex' {
       columnAliases?: {
         [columnAlias: string]: string;
       }
+    ): Knex.QueryBuilder<TRecord, TResult>;
+
+    conditionv2<TRecord, TResult>(
+      conditionObj: FilterObject
     ): Knex.QueryBuilder<TRecord, TResult>;
 
     conditionGraph<TRecord, TResult>(condition: {
@@ -1156,6 +1161,77 @@ function parseNestedConditionv2(obj, qb, pKey?, table?, tableAlias?) {
 
   return qb;
 }
+
+// Conditionv2
+
+/**
+ * Append custom where condition(nested object) to knex query builder
+ */
+Knex.QueryBuilder.extend('conditionv2', function(conditionObj: Filter) {
+  if (!conditionObj || typeof conditionObj !== 'object') {
+    return this;
+  }
+  return parseConditionv2(conditionObj, this);
+} as any);
+
+const parseConditionv2 = (obj: FilterObject, qb: QueryBuilder) => {
+  if (obj.is_group) {
+    qb = qb.where(function() {
+      const children = obj.children;
+      if (obj.logical_op?.toLowerCase() === 'or') {
+        for (const filter of children || []) {
+          this.orWhere(function() {
+            return parseConditionv2(filter, this);
+          });
+        }
+      } else {
+        for (const filter of children || []) {
+          this.andWhere(function() {
+            return parseConditionv2(filter, this);
+          });
+        }
+      }
+    });
+  } else {
+    const col = obj.column;
+    const fieldName = col.cn;
+    const val = obj.value;
+    switch (obj.comparison_op) {
+      case 'eq':
+        qb = qb.where(fieldName, val);
+        break;
+      case 'neq':
+        qb = qb.whereNot(fieldName, val);
+        break;
+      case 'like':
+        qb = qb.where(fieldName, 'like', val);
+        break;
+      case 'nlike':
+        qb = qb.whereNot(fieldName, 'like', val);
+        break;
+      case 'gt':
+        qb = qb.where(fieldName, '>', val);
+        break;
+      case 'ge':
+        qb = qb.where(fieldName, '>=', val);
+        break;
+      case 'lt':
+        qb = qb.where(fieldName, '<', val);
+        break;
+      case 'le':
+        qb = qb.where(fieldName, '<=', val);
+        break;
+      // case 'in':
+      //   qb = qb.whereIn(fieldName, val);
+      //   break;
+      // case 'nin':
+      //   qb = qb.whereNotIn(fieldName, val);
+      //   break;
+    }
+  }
+
+  return qb;
+};
 
 export default CustomKnex;
 export { Knex };

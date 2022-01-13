@@ -106,12 +106,12 @@ export default function registerRestCtrl(ctx: {
 
   router.post('/generateLookup', async (_req: any, res) => {
     try {
-      const country = await Model.get({
+      let country = await Model.get({
         base_id: ctx.baseId,
         db_alias: ctx.dbAlias,
         tn: 'country'
       });
-      const city = await Model.get({
+      let city = await Model.get({
         base_id: ctx.baseId,
         db_alias: ctx.dbAlias,
         tn: 'city'
@@ -130,6 +130,7 @@ export default function registerRestCtrl(ctx: {
           c => c.uidt === UITypes.LinkToAnotherRecord
         )?.id
       });
+
       await Column.insert<LookupColumn>({
         base_id: ctx.baseId,
         db_alias: 'db',
@@ -158,6 +159,20 @@ export default function registerRestCtrl(ctx: {
         )?.id
       });
 
+      await Model.clear({ id: city.id });
+      await Model.clear({ id: country.id });
+
+      country = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'country'
+      });
+      city = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'city'
+      });
+
       // Rollup
       await Column.insert<RollupColumn>({
         base_id: ctx.baseId,
@@ -177,6 +192,17 @@ export default function registerRestCtrl(ctx: {
       await Model.clear({ id: city.id });
       await Model.clear({ id: country.id });
 
+      country = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'country'
+      });
+      city = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'city'
+      });
+
       // Filter
       await Filter.insert({
         fk_model_id: country.id,
@@ -186,38 +212,86 @@ export default function registerRestCtrl(ctx: {
           {
             fk_model_id: country.id,
             fk_column_id: (await country.getColumns())?.find(
-              c => c.cn === 'country'
+              c => c._cn === 'addressList'
             )?.id,
             comparison_op: 'like',
-            value: 'i%'
-          },
+            value: '%1836%'
+          }
+          // {
+          //   fk_model_id: country.id,
+          //   fk_column_id: (await country.getColumns())?.find(
+          //     c => c._cn === 'Country => City'
+          //   )?.id,
+          //   comparison_op: 'like',
+          //   value: '%ban%'
+          // },
+          // {
+          //   fk_model_id: country.id,
+          //   logical_op: 'AND',
+          //   is_group: true,
+          //   children: [
+          //     {
+          //       fk_model_id: country.id,
+          //       fk_column_id: (await country.getColumns())?.find(
+          //         c => c.cn === 'country'
+          //       )?.id,
+          //       comparison_op: 'like',
+          //       value: 'z%'
+          //     },
+          //     {
+          //       fk_model_id: country.id,
+          //       fk_column_id: (await country.getColumns())?.find(
+          //         c => c.cn === 'country'
+          //       )?.id,
+          //       comparison_op: 'like',
+          //       value: '%a'
+          //     }
+          //   ]
+          // }
+        ]
+      });
+
+      // city - filter
+      await Filter.insert({
+        fk_model_id: city.id,
+        logical_op: 'AND',
+        is_group: true,
+        children: [
           {
-            fk_model_id: country.id,
-            logical_op: 'AND',
-            is_group: true,
-            children: [
-              {
-                fk_model_id: country.id,
-                fk_column_id: (await country.getColumns())?.find(
-                  c => c.cn === 'country'
-                )?.id,
-                comparison_op: 'like',
-                value: '%e'
-              },
-              {
-                fk_model_id: country.id,
-                fk_column_id: (await country.getColumns())?.find(
-                  c => c.cn === 'country'
-                )?.id,
-                comparison_op: 'like',
-                value: '%a'
-              }
-            ]
+            fk_model_id: city.id,
+            fk_column_id: (await city.getColumns())?.find(
+              c => c._cn === 'Country <= City'
+            )?.id,
+            comparison_op: 'like',
+            value: '%dia%'
           }
         ]
       });
 
-      res.json({ mesg: 'success' });
+      const film = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'film'
+      });
+
+      // film - filter
+      await Filter.insert({
+        fk_model_id: film.id,
+        logical_op: 'AND',
+        is_group: true,
+        children: [
+          {
+            fk_model_id: city.id,
+            fk_column_id: (await film.getColumns())?.find(
+              c => c._cn === 'Film <=> Actor'
+            )?.id,
+            comparison_op: 'like',
+            value: '%Son%'
+          }
+        ]
+      });
+
+      res.json({ msg: 'success' });
     } catch (e) {
       console.log(e);
       res.status(500).json({ msg: e.message });

@@ -14,7 +14,7 @@ export default async function({
   tn: string;
   column: Column;
   columnOptions: RollupColumn;
-}): Promise<{ rlSelect: QueryBuilder }> {
+}): Promise<{ builder: QueryBuilder }> {
   const relationColumn = await columnOptions.getRelationColumn();
   const relationColumnOption: LinkToAnotherRecordColumn = (await relationColumn.getColOptions()) as LinkToAnotherRecordColumn;
   const rollupColumn = await columnOptions.getRollupColumn();
@@ -29,7 +29,7 @@ export default async function({
       //   rollup = { ...rollup, ...hasMany.find(hm => hm.tn === rollup.rltn) };
       // }
       return {
-        rlSelect: knex(childModel?.title)
+        builder: knex(childModel?.title)
           [columnOptions.rollup_function]?.(
             knex.ref(`${childModel?.title}.${rollupColumn.cn}`)
           )
@@ -45,7 +45,7 @@ export default async function({
       const mmParentCol = await relationColumnOption.getMMParentColumn();
 
       return {
-        rlSelect: knex(parentModel.title)
+        builder: knex(parentModel.title)
           [columnOptions.rollup_function]?.(
             knex.ref(`${parentModel.title}.${rollupColumn.cn}`)
           )
@@ -62,26 +62,6 @@ export default async function({
           )
       };
     }
-
-    //   if (!rollup.tn || !rollup.rtn || !rollup.vtn) {
-    //     rollup = {
-    //       ...rollup,
-    //       ...manyToMany.find(mm => mm.rtn === rollup.rltn)
-    //     };
-    //   }
-    //   return knex(rollup.rltn)
-    //     [rollup.fn]?.(knex.ref(`${rollup.rltn}.${rollup.rlcn}`))
-    //     .innerJoin(
-    //       rollup.vtn,
-    //       knex.ref(`${rollup.vtn}.${rollup.vrcn}`),
-    //       '=',
-    //       knex.ref(`${rollup.rtn}.${rollup.rcn}`)
-    //     )
-    //     .where(
-    //       knex.ref(`${rollup.vtn}.${rollup.vcn}`),
-    //       '=',
-    //       knex.ref(`${rollup.tn}.${rollup.cn}`)
-    //     );
 
     default:
       throw Error(`Unsupported relation type '${relationColumnOption.type}'`);

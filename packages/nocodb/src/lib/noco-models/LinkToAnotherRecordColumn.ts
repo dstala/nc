@@ -14,26 +14,42 @@ export default class LinkToAnotherRecordColumn {
   type: 'hm' | 'bt' | 'mm';
   virtual = false;
 
+  mmModel: Model;
+  // childModel: Model;
+  // parentModel: Model;
+  mmChildColumn: Column;
+  mmParentColumn: Column;
+  childColumn: Column;
+  parentColumn: Column;
+
   constructor(data: NcColumn) {
     Object.assign(this, data);
   }
 
   public async getChildColumn(): Promise<Column> {
-    return Column.get({ colId: this.fk_child_column_id });
+    return (this.childColumn = await Column.get({
+      colId: this.fk_child_column_id
+    }));
   }
 
   public async getMMChildColumn(): Promise<Column> {
-    return Column.get({ colId: this.fk_mm_child_column_id });
+    return (this.mmChildColumn = await Column.get({
+      colId: this.fk_mm_child_column_id
+    }));
   }
 
   public async getParentColumn(): Promise<Column> {
-    return Column.get({ colId: this.fk_parent_column_id });
+    return (this.parentColumn = await Column.get({
+      colId: this.fk_parent_column_id
+    }));
   }
   public async getMMParentColumn(): Promise<Column> {
-    return Column.get({ colId: this.fk_mm_parent_column_id });
+    return (this.mmParentColumn = await Column.get({
+      colId: this.fk_mm_parent_column_id
+    }));
   }
   public async getMMModel(): Promise<Model> {
-    return Model.get({ id: this.fk_mm_model_id });
+    return (this.mmModel = await Model.get({ id: this.fk_mm_model_id }));
   }
 
   public static async insert(model: NcColumn | any) {

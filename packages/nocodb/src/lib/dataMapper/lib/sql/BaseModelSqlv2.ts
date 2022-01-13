@@ -10,6 +10,8 @@ import LookupColumn from '../../../noco-models/LookupColumn';
 import DataLoader from 'dataloader';
 import Column from '../../../noco-models/Column';
 import { XcFilter, XcFilterWithAlias } from '../BaseModel';
+import conditionV2 from './conditionV2';
+import Filter from '../../../noco-models/Filter';
 
 /**
  * Base class for models
@@ -21,6 +23,8 @@ class BaseModelSqlv2 {
   protected dbDriver: XKnex;
   protected model: Model;
   private _proto: any;
+  private _columns = {};
+
   private config: any = {
     limitDefault: 25,
     limitMin: 1,
@@ -47,13 +51,26 @@ class BaseModelSqlv2 {
     return data;
   }
 
-  public async list(args: { where?: string; limit? } = {}): Promise<any> {
+  public async list(
+    args: { where?: string; limit? } = {},
+    ignoreFilter = false
+  ): Promise<any> {
     const { where, ...rest } = this._getListArgs(args);
 
     const qb = this.dbDriver(this.model.title);
 
     qb.select(await this.model.selectObject({ knex: this.dbDriver, qb }));
     qb.xwhere(where);
+
+    /*    await qb.conditionv2(
+          await Filter.getFilterObject({ modelId: this.model.id })
+        );*/
+    if (!ignoreFilter)
+      await conditionV2(
+        await Filter.getFilter({ modelId: this.model.id }),
+        qb,
+        this.dbDriver
+      );
 
     this._paginateAndSort(qb, rest);
 
@@ -548,6 +565,7 @@ class BaseModelSqlv2 {
           break;
         case UITypes.LinkToAnotherRecord:
           {
+            this._columns[column._cn] = column;
             const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
 
             if (colOptions?.type === 'hm') {
@@ -612,10 +630,13 @@ class BaseModelSqlv2 {
                       id: pCol.fk_model_id,
                       dbDriver: this.dbDriver
                     })
-                  ).list({
-                    // limit: ids.length,
-                    where: `(${pCol.cn},in,${ids.join(',')})`
-                  });
+                  ).list(
+                    {
+                      // limit: ids.length,
+                      where: `(${pCol.cn},in,${ids.join(',')})`
+                    },
+                    true
+                  );
                   const gs = _.groupBy(data, pCol._cn);
                   return ids.map(async (id: string) => gs?.[id]?.[0]);
                 } catch (e) {
@@ -626,10 +647,7 @@ class BaseModelSqlv2 {
 
               // defining HasMany count method within GQL Type class
               proto[column._cn] = async function() {
-                return (
-                  this?.[cCol?._cn] ??
-                  (await readLoader.load(this?.[cCol?._cn]))
-                );
+                return await readLoader.load(this?.[cCol?._cn]);
               };
               // todo : handle mm
             }

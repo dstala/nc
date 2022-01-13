@@ -1,7 +1,8 @@
 import Noco from '../../lib/noco/Noco';
-import NcColumn from '../../types/NcColumn';
 import Model from './Model';
 import Column from './Column';
+import UITypes from '../sqlUi/UITypes';
+import LinkToAnotherRecordColumn from './LinkToAnotherRecordColumn';
 
 export default class Filter {
   id: string;
@@ -16,7 +17,7 @@ export default class Filter {
   logical_op?: string;
   is_group?: boolean;
 
-  constructor(data: NcColumn) {
+  constructor(data: Filter | FilterObject) {
     Object.assign(this, data);
   }
 
@@ -72,7 +73,7 @@ export default class Filter {
       'nc_filter_exp_v2',
       {
         condition: {
-          fk_parent_id: this.fk_parent_id
+          fk_parent_id: this.id
         }
       }
     );
@@ -92,9 +93,7 @@ export default class Filter {
       base_id,
       db_alias,
       'nc_filter_exp_v2',
-      {
-        condition: { fk_model_id: modelId, fk_parent_id: null }
-      }
+      { fk_model_id: modelId, fk_parent_id: null }
     );
     return filterObj && new Filter(filterObj);
   }
@@ -130,11 +129,14 @@ export default class Filter {
         grouped[filter.fk_parent_id] = grouped[filter.fk_parent_id] || [];
         grouped[filter.fk_parent_id].push(filter);
         idFilterMapping[filter.id] = filter;
+        filter.column = await new Filter(filter).getColumn();
+        if (filter.column?.uidt === UITypes.LinkToAnotherRecord) {
+        }
       }
     }
 
     for (const [id, children] of Object.entries(grouped)) {
-      idFilterMapping[id].children = children;
+      if (idFilterMapping?.[id]) idFilterMapping[id].children = children;
     }
 
     return result;
@@ -153,4 +155,7 @@ export interface FilterObject {
   logical_op?: string;
   is_group?: boolean;
   children?: FilterObject[];
+  column?: Column & {
+    colOptions?: LinkToAnotherRecordColumn;
+  };
 }

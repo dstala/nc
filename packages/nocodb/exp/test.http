@@ -16,13 +16,6 @@ xc-auth: {{token}}
 
 
 
-###
-GET http://localhost:8080/nc/{{projectId}}/api/v2/Country?limit=1&sort=-Country
-Accept: application/json
-Content-Type: application/json
-xc-auth: {{token}}
-
-
 
 
 ###
@@ -34,6 +27,13 @@ Accept: application/json
 Content-Type: application/json
 xc-auth: {{token}}
 
+
+
+###
+GET http://localhost:8080/nc/{{projectId}}/api/v2/City
+Accept: application/json
+Content-Type: application/json
+xc-auth: {{token}}
 
 
 

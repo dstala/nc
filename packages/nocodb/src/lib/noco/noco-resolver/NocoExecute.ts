@@ -23,7 +23,9 @@ const nocoExecute = async (
         } else if (typeof resolver[key] === 'object') {
           dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
         } else {
-          dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
+          if (typeof dataTreeObj === 'object') {
+            dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
+          }
         }
       } else if (typeof dataTreeObj[key] === 'function') {
         dataTreeObj.__proto__ = {

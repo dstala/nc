@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import NocoCache from '../noco-cache/NocoCache';
+import Column from './Column';
 
 export default class LookupColumn {
   fk_relation_column_id: string;
@@ -8,6 +9,18 @@ export default class LookupColumn {
 
   constructor(data: NcColumn) {
     Object.assign(this, data);
+  }
+
+  public async getRelationColumn(): Promise<Column> {
+    return await Column.get({
+      colId: this.fk_relation_column_id
+    });
+  }
+
+  public async getLookupColumn(): Promise<Column> {
+    return await Column.get({
+      colId: this.fk_lookup_column_id
+    });
   }
 
   public static async insert(model: NcColumn | any) {

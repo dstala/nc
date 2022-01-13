@@ -589,27 +589,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               project_id: this.projectId,
               db_alias: this.dbAlias,
               fk_model_id: modelId,
-              cn: column.cn,
-              _cn: column._cn,
-              uidt: column.uidt,
-              dt: column.dt,
-              np: column.np,
-              ns: column.ns,
-              clen: column.clen,
-              cop: column.cop,
-              pk: column.pk,
-              rqd: column.rqd,
-              un: column.un,
-              ct: column.ct,
-              ai: column.ai,
-              unique: column.unique,
-              ctf: column.ctf,
-              cc: column.cc,
-              csn: column.csn,
-              dtx: column.dtx,
-              dtxp: column.dtxp,
-              dtxs: column.dtxs,
-              au: column.au
+              ...column
             });
           }
           this.models2[table.tn] = await Model.get({

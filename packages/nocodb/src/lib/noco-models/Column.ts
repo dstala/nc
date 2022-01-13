@@ -35,6 +35,7 @@ export default class Column implements NcColumn {
   public ns: number | string;
   public order: number;
   public pk: boolean;
+  public pv: boolean;
   public project_id: string;
   public rqd: boolean;
   public uidt: UITypes;
@@ -84,7 +85,8 @@ export default class Column implements NcColumn {
         dtx: model.dtx,
         dtxp: model.dtxp,
         dtxs: model.dtxs,
-        au: model.au
+        au: model.au,
+        pv: model.pv
       }
     );
 
@@ -301,8 +303,8 @@ export default class Column implements NcColumn {
     db_alias: string;
     fk_model_id: string;
   }): Promise<Column[]> {
-    let columnsList = await NocoCache.getv2(fk_model_id);
-    if (!columnsList.length) {
+    let columnsList = null; // await NocoCache.getv2(fk_model_id);
+    if (!columnsList?.length) {
       columnsList = await Noco.ncMeta.metaList2(
         base_id,
         db_alias,
@@ -371,7 +373,7 @@ export default class Column implements NcColumn {
     db_alias?: string;
     colId: string;
   }): Promise<Column> {
-    let colData = await NocoCache.get(colId);
+    let colData = null; // await NocoCache.get(colId);
     if (!colData) {
       colData = await Noco.ncMeta.metaGet2(
         base_id,
