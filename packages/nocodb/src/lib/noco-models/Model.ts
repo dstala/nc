@@ -110,9 +110,9 @@ export default class Model implements NcModel {
           args?.qb?.select(
             (
               await genRollupSelectv2({
-                tn: this.title,
+                // tn: this.title,
                 knex: args.knex,
-                column,
+                // column,
                 columnOptions: (await column.getColOptions()) as RollupColumn
               })
             ).builder.as(column._cn)

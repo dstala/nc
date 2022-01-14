@@ -30,7 +30,7 @@ xc-auth: {{token}}
 
 
 ###
-GET http://localhost:8080/nc/{{projectId}}/api/v2/City
+GET http://localhost:8080/nc/{{projectId}}/api/v2/Actor?limit=10
 Accept: application/json
 Content-Type: application/json
 xc-auth: {{token}}

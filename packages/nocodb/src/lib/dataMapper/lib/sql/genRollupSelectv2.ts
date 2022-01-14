@@ -1,7 +1,6 @@
 import RollupColumn from '../../../noco-models/RollupColumn';
 import { XKnex } from '../..';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import Column from '../../../noco-models/Column';
 import { QueryBuilder } from 'knex';
 
 export default async function({
@@ -11,8 +10,6 @@ export default async function({
   columnOptions
 }: {
   knex: XKnex;
-  tn: string;
-  column: Column;
   columnOptions: RollupColumn;
 }): Promise<{ builder: QueryBuilder }> {
   const relationColumn = await columnOptions.getRelationColumn();

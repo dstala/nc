@@ -22,6 +22,11 @@ const nocoExecute = async (
           dataTreeObj[path[0]] = resolver[key](args);
         } else if (typeof resolver[key] === 'object') {
           dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
+        } else if (dataTreeObj?.__proto__?.__columnAliases?.[path[0]]) {
+          dataTreeObj[path[0]] = extractNested(
+            dataTreeObj?.__proto__?.__columnAliases?.[path[0]]?.path,
+            dataTreeObj
+          );
         } else {
           if (typeof dataTreeObj === 'object') {
             dataTreeObj[path[0]] = Promise.resolve(resolver[key]);
@@ -73,7 +78,7 @@ const nocoExecute = async (
         dataTree,
         resolverObj
       ).then(res => {
-        return Promise.resolve(flattenArray(res));
+        return Promise.resolve([...new Set(flattenArray(res))]);
       });
     }
   }

@@ -212,11 +212,19 @@ export default function registerRestCtrl(ctx: {
           {
             fk_model_id: country.id,
             fk_column_id: (await country.getColumns())?.find(
-              c => c._cn === 'addressList'
+              c => c._cn === 'CityCount'
             )?.id,
-            comparison_op: 'like',
-            value: '%1836%'
+            comparison_op: 'eq',
+            value: '1'
           }
+          // {
+          //   fk_model_id: country.id,
+          //   fk_column_id: (await country.getColumns())?.find(
+          //     c => c._cn === 'addressList'
+          //   )?.id,
+          //   comparison_op: 'like',
+          //   value: '%1836%'
+          // }
           // {
           //   fk_model_id: country.id,
           //   fk_column_id: (await country.getColumns())?.find(
@@ -268,25 +276,71 @@ export default function registerRestCtrl(ctx: {
         ]
       });
 
-      const film = await Model.get({
+      let film = await Model.get({
         base_id: ctx.baseId,
         db_alias: ctx.dbAlias,
         tn: 'film'
       });
+      let actor = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'actor'
+      });
+      const category = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'category'
+      });
 
+      await Column.insert<LookupColumn>({
+        base_id: ctx.baseId,
+        db_alias: 'db',
+        fk_model_id: film.id,
+        uidt: UITypes.Lookup,
+        _cn: 'CategoryNames',
+        fk_lookup_column_id: (await category.getColumns()).find(
+          c => c._cn === 'Name'
+        )?.id,
+        fk_relation_column_id: (await film.getColumns()).find(
+          c => c._cn === 'Film <=> Category'
+        )?.id
+      });
+      film = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'film'
+      });
+      await Column.insert<LookupColumn>({
+        base_id: ctx.baseId,
+        db_alias: 'db',
+        fk_model_id: actor.id,
+        uidt: UITypes.Lookup,
+        _cn: 'CategoryNames',
+        fk_lookup_column_id: (await film.getColumns()).find(
+          c => c._cn === 'CategoryNames'
+        )?.id,
+        fk_relation_column_id: (await actor.getColumns()).find(
+          c => c._cn === 'Actor <=> Film'
+        )?.id
+      });
+      actor = await Model.get({
+        base_id: ctx.baseId,
+        db_alias: ctx.dbAlias,
+        tn: 'actor'
+      });
       // film - filter
       await Filter.insert({
-        fk_model_id: film.id,
+        fk_model_id: actor.id,
         logical_op: 'AND',
         is_group: true,
         children: [
           {
-            fk_model_id: city.id,
-            fk_column_id: (await film.getColumns())?.find(
-              c => c._cn === 'Film <=> Actor'
+            fk_model_id: actor.id,
+            fk_column_id: (await actor.getColumns())?.find(
+              c => c._cn === 'CategoryNames'
             )?.id,
-            comparison_op: 'like',
-            value: '%Son%'
+            comparison_op: 'eq',
+            value: 'Travel'
           }
         ]
       });

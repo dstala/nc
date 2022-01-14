@@ -1,7 +1,6 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import UITypes from '../sqlUi/UITypes';
-import DbColumn from './DbColumn';
 import FormulaColumn from './FormulaColumn';
 import LinkToAnotherRecordColumn from './LinkToAnotherRecordColumn';
 import LookupColumn from './LookupColumn';
@@ -227,15 +226,7 @@ export default class Column implements NcColumn {
     }
   }
 
-  public async getColOptions(): Promise<
-    | DbColumn
-    | FormulaColumn
-    | LinkToAnotherRecordColumn
-    | LookupColumn
-    | RollupColumn
-    | SingleSelectColumn
-    | MultiSelectColumn
-  > {
+  public async getColOptions<T>(): Promise<T> {
     let res: any;
 
     switch (this.uidt) {
