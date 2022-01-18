@@ -78,7 +78,9 @@ const nocoExecute = async (
         dataTree,
         resolverObj
       ).then(res => {
-        return Promise.resolve([...new Set(flattenArray(res))]);
+        return Promise.resolve(
+          Array.isArray(res) ? [...new Set(flattenArray(res))] : res
+        );
       });
     }
   }

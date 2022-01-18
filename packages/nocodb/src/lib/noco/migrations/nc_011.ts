@@ -376,7 +376,7 @@ const up = async knex => {
     // table.string('cn');
     // table.string('_cn');
 
-    table.boolean('direction').defaultTo(false);
+    table.string('direction').defaultTo(false);
     table.integer('order');
     table.timestamps(true, true);
     table.index(['db_alias']);

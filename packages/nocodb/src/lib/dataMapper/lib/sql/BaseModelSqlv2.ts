@@ -12,6 +12,8 @@ import Column from '../../../noco-models/Column';
 import { XcFilter, XcFilterWithAlias } from '../BaseModel';
 import conditionV2 from './conditionV2';
 import Filter from '../../../noco-models/Filter';
+import sortV2 from './sortV2';
+import Sort from '../../../noco-models/Sort';
 
 /**
  * Base class for models
@@ -53,7 +55,7 @@ class BaseModelSqlv2 {
 
   public async list(
     args: { where?: string; limit? } = {},
-    ignoreFilter = false
+    ignoreFilterSort = false
   ): Promise<any> {
     const { where, ...rest } = this._getListArgs(args);
 
@@ -65,14 +67,20 @@ class BaseModelSqlv2 {
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
         );*/
-    if (!ignoreFilter)
+    if (!ignoreFilterSort) {
       await conditionV2(
         await Filter.getFilter({ modelId: this.model.id }),
         qb,
         this.dbDriver
       );
 
-    this._paginateAndSort(qb, rest);
+      await sortV2(
+        await Sort.list({ modelId: this.model.id }),
+        qb,
+        this.dbDriver
+      );
+      this._paginateAndSort(qb, rest);
+    }
 
     const proto = await this.getProto();
 

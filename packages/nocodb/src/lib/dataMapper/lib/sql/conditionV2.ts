@@ -20,23 +20,19 @@ export default async function conditionV2(
   (await parseConditionV2(conditionObj, knex))(qb);
 }
 
-const negatedMapping = {
-  nlike: { comparison_op: 'like' },
-  neq: { comparison_op: 'eq' }
-};
-
 const parseConditionV2 = async (
   filter: Filter,
   knex: XKnex,
+  aliasCount = { count: 0 },
   alias?,
-  _field?
+  customWhereClause?
 ) => {
   // const model = await filter.getModel();
   if (filter.is_group) {
     const children = await filter.getChildren();
 
     const qbs = await Promise.all(
-      (children || []).map(child => parseConditionV2(child, knex))
+      (children || []).map(child => parseConditionV2(child, knex, aliasCount))
     );
 
     return qbP => {
@@ -53,10 +49,10 @@ const parseConditionV2 = async (
       });
     };
   } else {
-    const col = await filter.getColumn();
+    const column = await filter.getColumn();
 
-    if (col.uidt === UITypes.LinkToAnotherRecord) {
-      const colOptions = (await col.getColOptions()) as LinkToAnotherRecordColumn;
+    if (column.uidt === UITypes.LinkToAnotherRecord) {
+      const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
       const childColumn = await colOptions.getChildColumn();
       const parentColumn = await colOptions.getParentColumn();
       const childModel = await childColumn.getModel();
@@ -75,7 +71,8 @@ const parseConditionV2 = async (
               fk_model_id: childModel.id,
               fk_column_id: childModel?.pv?.id
             }),
-            knex
+            knex,
+            aliasCount
           )
         )(selectQb);
 
@@ -96,7 +93,8 @@ const parseConditionV2 = async (
               fk_model_id: parentModel.id,
               fk_column_id: parentModel?.pv?.id
             }),
-            knex
+            knex,
+            aliasCount
           )
         )(selectQb);
 
@@ -127,7 +125,8 @@ const parseConditionV2 = async (
               fk_model_id: parentModel.id,
               fk_column_id: parentModel?.pv?.id
             }),
-            knex
+            knex,
+            aliasCount
           )
         )(selectQb);
 
@@ -139,25 +138,32 @@ const parseConditionV2 = async (
       }
 
       return _qb => {};
-    } else if (col.uidt === UITypes.Lookup) {
-      return await generateLookupCondition(col, filter, knex);
-    } else if (col.uidt === UITypes.Rollup) {
+    } else if (column.uidt === UITypes.Lookup) {
+      return await generateLookupCondition(column, filter, knex, aliasCount);
+    } else if (column.uidt === UITypes.Rollup && !customWhereClause) {
+      const builder = (
+        await genRollupSelectv2({
+          knex,
+          columnOptions: (await column.getColOptions()) as RollupColumn
+        })
+      ).builder;
       return parseConditionV2(
-        filter,
+        new Filter({ ...filter, value: knex.raw(filter.value) } as any),
         knex,
+        aliasCount,
         alias,
-        (
-          await genRollupSelectv2({
-            knex,
-            columnOptions: (await col.getColOptions()) as RollupColumn
-          })
-        ).builder
+        builder
       );
-    } else if (col.uidt === UITypes.Formula) {
+    } else if (column.uidt === UITypes.Formula) {
+      // todo:
       return _qb => {};
     } else {
-      const field = _field ?? (alias ? `${alias}.${col.cn}` : col.cn);
-      const val = filter.value;
+      const field = customWhereClause
+        ? filter.value
+        : alias
+        ? `${alias}.${column.cn}`
+        : column.cn;
+      const val = customWhereClause ? customWhereClause : filter.value;
       return qb => {
         switch (filter.comparison_op) {
           case 'eq':
@@ -196,13 +202,22 @@ const parseConditionV2 = async (
   }
 };
 
+const negatedMapping = {
+  nlike: { comparison_op: 'like' },
+  neq: { comparison_op: 'eq' }
+};
+
+function getAlias(aliasCount: { count: number }) {
+  return `__nc${aliasCount.count++}`;
+}
+
 // todo: refactor child , parent in mm
 async function generateLookupCondition(
   col: Column,
   filter: Filter,
-  knex
+  knex,
+  aliasCount = { count: 0 }
 ): Promise<any> {
-  const aliasCount = { count: 0 };
   const colOptions = await col.getColOptions<LookupColumn>();
   const relationColumn = await colOptions.getRelationColumn();
   const relationColumnOptions = await relationColumn.getColOptions<
@@ -210,7 +225,7 @@ async function generateLookupCondition(
   >();
   // const relationModel = await relationColumn.getModel();
   const lookupColumn = await colOptions.getLookupColumn();
-  const alias = `__nc${aliasCount.count++}`;
+  const alias = getAlias(aliasCount);
   let qb;
   {
     const childColumn = await relationColumnOptions.getChildColumn();
@@ -399,6 +414,7 @@ async function nestedConditionJoin(
                   fk_column_id: childModel.pv?.id
                 }),
                 knex,
+                aliasCount,
                 relAlias
               )
             )(qb);
@@ -414,6 +430,7 @@ async function nestedConditionJoin(
                   fk_column_id: parentModel?.pv?.id
                 }),
                 knex,
+                aliasCount,
                 relAlias
               )
             )(qb);
@@ -429,6 +446,7 @@ async function nestedConditionJoin(
                   fk_column_id: parentModel.pv?.id
                 }),
                 knex,
+                aliasCount,
                 relAlias
               )
             )(qb);
@@ -445,6 +463,7 @@ async function nestedConditionJoin(
           fk_column_id: lookupColumn?.id
         }),
         knex,
+        aliasCount,
         alias
       )
     )(qb);

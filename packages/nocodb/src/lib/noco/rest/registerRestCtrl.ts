@@ -6,6 +6,7 @@ import UITypes from '../../sqlUi/UITypes';
 import LookupColumn from '../../noco-models/LookupColumn';
 import RollupColumn from '../../noco-models/RollupColumn';
 import Filter from '../../noco-models/Filter';
+import Sort from '../../noco-models/Sort';
 
 export default function registerRestCtrl(ctx: {
   router: Router;
@@ -260,21 +261,21 @@ export default function registerRestCtrl(ctx: {
       });
 
       // city - filter
-      await Filter.insert({
-        fk_model_id: city.id,
-        logical_op: 'AND',
-        is_group: true,
-        children: [
-          {
-            fk_model_id: city.id,
-            fk_column_id: (await city.getColumns())?.find(
-              c => c._cn === 'Country <= City'
-            )?.id,
-            comparison_op: 'like',
-            value: '%dia%'
-          }
-        ]
-      });
+      // await Filter.insert({
+      //   fk_model_id: city.id,
+      //   logical_op: 'AND',
+      //   is_group: true,
+      //   children: [
+      //     {
+      //       fk_model_id: city.id,
+      //       fk_column_id: (await city.getColumns())?.find(
+      //         c => c._cn === 'Country <= City'
+      //       )?.id,
+      //       comparison_op: 'like',
+      //       value: '%dia%'
+      //     }
+      //   ]
+      // });
 
       let film = await Model.get({
         base_id: ctx.baseId,
@@ -343,6 +344,22 @@ export default function registerRestCtrl(ctx: {
             value: 'Travel'
           }
         ]
+      });
+
+      await Sort.insert({
+        direction: 'desc',
+        fk_model_id: country.id,
+        fk_column_id: (await country.getColumns())?.find(
+          c => c._cn === 'CityCount'
+        )?.id
+      });
+
+      await Sort.insert({
+        direction: 'desc',
+        fk_model_id: city.id,
+        fk_column_id: (await city.getColumns())?.find(
+          c => c._cn === 'Country <= City'
+        )?.id
       });
 
       res.json({ msg: 'success' });
