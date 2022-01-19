@@ -11,7 +11,7 @@ export default async function({
 }: {
   knex: XKnex;
   columnOptions: RollupColumn;
-}): Promise<{ builder: QueryBuilder }> {
+}): Promise<{ builder: QueryBuilder | any }> {
   const relationColumn = await columnOptions.getRelationColumn();
   const relationColumnOption: LinkToAnotherRecordColumn = (await relationColumn.getColOptions()) as LinkToAnotherRecordColumn;
   const rollupColumn = await columnOptions.getRollupColumn();

@@ -5,7 +5,7 @@ import UITypes from '../../../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import genRollupSelectv2 from './genRollupSelectv2';
 import RollupColumn from '../../../noco-models/RollupColumn';
-// import LookupColumn from '../../../noco-models/LookupColumn';
+import LookupColumn from '../../../noco-models/LookupColumn';
 
 export default async function sortV2(
   sortList: Sort[],
@@ -33,34 +33,113 @@ export default async function sortV2(
         break;
       case UITypes.Lookup:
         {
-          /*   {
-
-            let selectQb;
-            let lookupColumn = column;
-
+          {
+            let aliasCount = 0,
+              selectQb;
+            const alias = `__nc_sort${aliasCount++}`;
             const lookup = await column.getColOptions<LookupColumn>();
-            const relation = await lookup.getRelationColumn();
-            if (relation.type !== 'bt') return;
+            {
+              const relationCol = await lookup.getRelationColumn();
+              const relation = await relationCol.getColOptions<
+                LinkToAnotherRecordColumn
+              >();
+              if (relation.type !== 'bt') return;
 
-            do {
-              const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
-              const childColumn = await colOptions.getChildColumn();
-              const parentColumn = await colOptions.getParentColumn();
+              const childColumn = await relation.getChildColumn();
+              const parentColumn = await relation.getParentColumn();
               const childModel = await childColumn.getModel();
               await childModel.getColumns();
               const parentModel = await parentColumn.getModel();
               await parentModel.getColumns();
 
-              selectQb = knex(parentModel.title)
-                .select(parentModel?.pv?.cn)
-                .where(
-                  `${parentModel.title}.${parentColumn.cn}`,
-                  knex.raw(`??`, [`${childModel.title}.${childColumn.cn}`])
-                );
+              selectQb = knex(`${parentModel.title} as ${alias}`).where(
+                `${alias}.${parentColumn.cn}`,
+                knex.raw(`??`, [`${childModel.title}.${childColumn.cn}`])
+              );
+            }
+            let lookupColumn = await lookup.getLookupColumn();
+            let prevAlias = alias;
+            while (lookupColumn.uidt === UITypes.Lookup) {
+              const nestedAlias = `__nc_sort${aliasCount++}`;
+              const nestedLookup = await lookupColumn.getColOptions<
+                LookupColumn
+              >();
+              const relationCol = await nestedLookup.getRelationColumn();
+              const relation = await relationCol.getColOptions<
+                LinkToAnotherRecordColumn
+              >();
+              // if any of the relation in nested lookup is
+              // not belongs to then ignore the sort option
+              if (relation.type !== 'bt') return;
 
-              qb.orderBy(selectQb, sort.direction || 'asc');
-            }while()
-          }*/
+              const childColumn = await relation.getChildColumn();
+              const parentColumn = await relation.getParentColumn();
+              const childModel = await childColumn.getModel();
+              await childModel.getColumns();
+              const parentModel = await parentColumn.getModel();
+              await parentModel.getColumns();
+
+              selectQb.join(
+                `${parentModel.title} as ${nestedAlias}`,
+                `${nestedAlias}.${parentColumn.cn}`,
+                `${prevAlias}.${childColumn.cn}`
+              );
+
+              lookupColumn = await nestedLookup.getLookupColumn();
+              prevAlias = nestedAlias;
+            }
+
+            switch (lookupColumn.uidt) {
+              case UITypes.Rollup:
+                {
+                  const builder = (
+                    await genRollupSelectv2({
+                      knex,
+                      columnOptions: (await lookupColumn.getColOptions()) as RollupColumn
+                    })
+                  ).builder;
+                  selectQb.select(builder);
+                }
+                break;
+              case UITypes.LinkToAnotherRecord:
+                {
+                  const nestedAlias = `__nc_sort${aliasCount++}`;
+                  const relation = await lookupColumn.getColOptions<
+                    LinkToAnotherRecordColumn
+                  >();
+                  if (relation.type !== 'bt') return;
+
+                  const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
+                  const childColumn = await colOptions.getChildColumn();
+                  const parentColumn = await colOptions.getParentColumn();
+                  const childModel = await childColumn.getModel();
+                  await childModel.getColumns();
+                  const parentModel = await parentColumn.getModel();
+                  await parentModel.getColumns();
+
+                  selectQb
+                    .join(
+                      `${parentModel.title} as ${nestedAlias}`,
+                      `${nestedAlias}.${parentColumn.cn}`,
+                      `${prevAlias}.${childColumn.cn}`
+                    )
+                    .select(parentModel?.pv?.cn);
+                }
+                break;
+              case UITypes.Formula:
+                {
+                }
+                break;
+              default:
+                {
+                  selectQb.select(`${prevAlias}.${lookupColumn.cn}`);
+                }
+
+                break;
+            }
+
+            qb.orderBy(selectQb, sort.direction || 'asc');
+          }
         }
         break;
       case UITypes.LinkToAnotherRecord:

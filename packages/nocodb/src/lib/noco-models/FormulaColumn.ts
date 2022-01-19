@@ -3,6 +3,7 @@ import NcColumn from '../../types/NcColumn';
 
 export default class FormulaColumn {
   formula: string;
+  fk_column_id: string;
 
   constructor(data: NcColumn) {
     Object.assign(this, data);

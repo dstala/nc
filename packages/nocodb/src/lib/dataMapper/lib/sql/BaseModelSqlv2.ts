@@ -14,6 +14,9 @@ import conditionV2 from './conditionV2';
 import Filter from '../../../noco-models/Filter';
 import sortV2 from './sortV2';
 import Sort from '../../../noco-models/Sort';
+import FormulaColumn from '../../../noco-models/FormulaColumn';
+import genRollupSelectv2 from './genRollupSelectv2';
+import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
 
 /**
  * Base class for models
@@ -61,7 +64,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.title);
 
-    qb.select(await this.model.selectObject({ knex: this.dbDriver, qb }));
+    qb.select(await this.selectObject({ qb }));
     qb.xwhere(where);
 
     /*    await qb.conditionv2(
@@ -366,7 +369,13 @@ class BaseModelSqlv2 {
     }
   }
 
-  public get defaultResolverReq() {
+  public defaultResolverReq(query?: any) {
+    const fields = query?.fields || query?.f;
+
+    if (fields && fields !== '*') {
+      return fields.split(',').reduce((obj, f) => ({ ...obj, [f]: 1 }), {});
+    }
+
     return this.model.getColumns().then(columns =>
       Promise.resolve(
         columns.reduce(
@@ -400,8 +409,11 @@ class BaseModelSqlv2 {
       );
 
       const chilCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getChildColumn();
-      const chilMod = await chilCol.getModel();
-
+      const childTable = await chilCol.getModel();
+      const childModel = await Model.getBaseModelSQL({
+        model: childTable,
+        dbDriver: this.dbDriver
+      });
       // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
       //   fields += ',' + cn;
       // }
@@ -410,13 +422,13 @@ class BaseModelSqlv2 {
         .split(',')
         .map(c => `${chilCol.cn}.${c}`)
         .join(',');
-      const colSelect = await chilMod.selectObject({ knex: this.dbDriver });
+      const colSelect = await childModel.selectObject({});
 
       const childs = await this.dbDriver.queryBuilder().from(
         this.dbDriver
           .union(
             ids.map(p => {
-              const query = this.dbDriver(chilMod.title)
+              const query = this.dbDriver(childTable.title)
                 .where({ [chilCol.cn]: p })
                 // .select(...fields.split(','));
                 .select(colSelect);
@@ -431,7 +443,10 @@ class BaseModelSqlv2 {
       );
 
       const proto = await (
-        await Model.getBaseModelSQL({ id: chilMod.id, dbDriver: this.dbDriver })
+        await Model.getBaseModelSQL({
+          id: childTable.id,
+          dbDriver: this.dbDriver
+        })
       ).getProto();
 
       // return _.groupBy(childs, cn);
@@ -714,15 +729,11 @@ class BaseModelSqlv2 {
       sort.split(',').forEach(o => {
         if (o[0] === '-') {
           query.orderBy(
-            this.model.selectObject({ knex: this.dbDriver })[o.slice(1)] ||
-              o.slice(1),
+            this.selectObject({})[o.slice(1)] || o.slice(1),
             'desc'
           );
         } else {
-          query.orderBy(
-            this.model.selectObject({ knex: this.dbDriver })[o] || o,
-            'asc'
-          );
+          query.orderBy(this.selectObject({})[o] || o, 'asc');
         }
       });
     }
@@ -786,6 +797,52 @@ class BaseModelSqlv2 {
   //     return arr;
   //   }, []);
   // }
+
+  public async selectObject(args: {
+    qb?: any;
+  }): Promise<{ [name: string]: string }> {
+    const res = {};
+    const columns = await this.model.getColumns();
+    for (const column of columns) {
+      switch (column.uidt) {
+        case 'LinkToAnotherRecord':
+        case 'Lookup':
+          break;
+        case 'Formula':
+          {
+            const formula = await column.getColOptions<FormulaColumn>();
+            const selectQb = await formulaQueryBuilderv2(
+              formula.formula,
+              null,
+              this.dbDriver,
+              this.model
+              // this.aliasToColumn
+            );
+            // todo:  verify syntax of as ? / ??
+            args?.qb?.select(
+              this.dbDriver.raw(`?? as ??`, [selectQb.builder, column._cn])
+            );
+          }
+          break;
+        case 'Rollup':
+          args?.qb?.select(
+            (
+              await genRollupSelectv2({
+                // tn: this.title,
+                knex: this.dbDriver,
+                // column,
+                columnOptions: (await column.getColOptions()) as RollupColumn
+              })
+            ).builder.as(column._cn)
+          );
+          break;
+        default:
+          res[column._cn] = `${this.model.title}.${column.cn}`;
+          break;
+      }
+    }
+    return res;
+  }
 }
 
 export { BaseModelSqlv2 };

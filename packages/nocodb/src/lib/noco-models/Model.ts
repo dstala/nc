@@ -4,8 +4,6 @@ import NcModel from '../../types/NcModel';
 import NocoCache from '../noco-cache/NocoCache';
 import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
-import genRollupSelectv2 from '../dataMapper/lib/sql/genRollupSelectv2';
-import RollupColumn from './RollupColumn';
 
 export default class Model implements NcModel {
   copy_enabled: boolean;
@@ -92,38 +90,6 @@ export default class Model implements NcModel {
     }
 
     return modelList.map(m => new Model(m));
-  }
-
-  public async selectObject(args: {
-    knex: XKnex;
-    qb?: any;
-  }): Promise<{ [name: string]: string }> {
-    const res = {};
-    const columns = await this.getColumns();
-    for (const column of columns) {
-      switch (column.uidt) {
-        case 'LinkToAnotherRecord':
-        case 'Lookup':
-        case 'Formula':
-          break;
-        case 'Rollup':
-          args?.qb?.select(
-            (
-              await genRollupSelectv2({
-                // tn: this.title,
-                knex: args.knex,
-                // column,
-                columnOptions: (await column.getColOptions()) as RollupColumn
-              })
-            ).builder.as(column._cn)
-          );
-          break;
-        default:
-          res[column._cn] = `${this.title}.${column.cn}`;
-          break;
-      }
-    }
-    return res;
   }
 
   public static async clear({ id }: { id: string }): Promise<void> {

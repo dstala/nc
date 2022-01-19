@@ -56,7 +56,9 @@ export default class Column implements NcColumn {
     });
   }
 
-  public static async insert<T>(model: Partial<Column & T & any>) {
+  public static async insert<T>(
+    model: Partial<T> & { base_id?: string; [key: string]: any }
+  ) {
     const row = await Noco.ncMeta.metaInsert2(
       model.project_id || model.base_id,
       model.db_alias,
@@ -154,9 +156,7 @@ export default class Column implements NcColumn {
           'nc_col_formula_v2',
           {
             fk_column_id: row.id,
-            formula: row.formula,
-
-            fkn: model.fkn
+            formula: model.formula
           }
         );
         break;
