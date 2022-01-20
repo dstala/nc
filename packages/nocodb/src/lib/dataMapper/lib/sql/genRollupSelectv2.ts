@@ -7,9 +7,11 @@ export default async function({
   knex,
   // tn,
   // column,
+  alias,
   columnOptions
 }: {
   knex: XKnex;
+  alias?: string;
   columnOptions: RollupColumn;
 }): Promise<{ builder: QueryBuilder | any }> {
   const relationColumn = await columnOptions.getRelationColumn();
@@ -31,7 +33,7 @@ export default async function({
             knex.ref(`${childModel?.title}.${rollupColumn.cn}`)
           )
           .where(
-            knex.ref(`${parentModel.title}.${parentCol.cn}`),
+            knex.ref(`${alias || parentModel.title}.${parentCol.cn}`),
             '=',
             knex.ref(`${childModel.title}.${childCol.cn}`)
           )
@@ -55,7 +57,7 @@ export default async function({
           .where(
             knex.ref(`${mmModel.title}.${mmChildCol.cn}`),
             '=',
-            knex.ref(`${childModel.title}.${childCol.cn}`)
+            knex.ref(`${alias || childModel.title}.${childCol.cn}`)
           )
       };
     }

@@ -2421,15 +2421,15 @@ export default abstract class BaseApiBuilder<T extends Noco>
           .map(mm => {
             if (
               queryParams?.showFields &&
-              !(`${mm._tn} <=> ${mm._rtn}` in queryParams.showFields)
+              !(`${mm._rtn}MMList` in queryParams.showFields)
             ) {
-              queryParams.showFields[`${mm._tn} <=> ${mm._rtn}`] = true;
+              queryParams.showFields[`${mm._rtn}MMList`] = true;
             }
 
             return {
               mm,
               uidt: UITypes.LinkToAnotherRecord,
-              _cn: `${mm._tn} <=> ${mm._rtn}`
+              _cn: `${mm._rtn}MMList`
             };
           })
       ];

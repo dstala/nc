@@ -36,7 +36,6 @@ export default async function formulaQueryBuilderv2(
             aliasToColumn
           );
           aliasToColumn[col.id] = builder;
-          console.log(builder);
         }
         break;
       case UITypes.Lookup:

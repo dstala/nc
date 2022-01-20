@@ -17,6 +17,7 @@ import Sort from '../../../noco-models/Sort';
 import FormulaColumn from '../../../noco-models/FormulaColumn';
 import genRollupSelectv2 from './genRollupSelectv2';
 import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
+import { QueryBuilder } from 'knex';
 
 /**
  * Base class for models
@@ -45,7 +46,7 @@ class BaseModelSqlv2 {
   public async readByPk(id?: any): Promise<any> {
     const qb = this.dbDriver(this.model.title);
 
-    await this.select(qb);
+    await this.selectObject({ qb });
 
     const data = await qb.where(this.model.pk.cn, id).first();
 
@@ -64,7 +65,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.title);
 
-    qb.select(await this.selectObject({ qb }));
+    await this.selectObject({ qb });
     qb.xwhere(where);
 
     /*    await qb.conditionv2(
@@ -355,7 +356,7 @@ class BaseModelSqlv2 {
     }*/
   }
 
-  private async select(qb) {
+  /*  private async select(qb) {
     for (const col of await this.model.getColumns()) {
       switch (col.uidt) {
         case 'LinkToAnotherRecord':
@@ -367,7 +368,7 @@ class BaseModelSqlv2 {
           break;
       }
     }
-  }
+  }*/
 
   public defaultResolverReq(query?: any) {
     const fields = query?.fields || query?.f;
@@ -422,16 +423,16 @@ class BaseModelSqlv2 {
         .split(',')
         .map(c => `${chilCol.cn}.${c}`)
         .join(',');
-      const colSelect = await childModel.selectObject({});
+
+      const qb = this.dbDriver(childTable.title);
+      await childModel.selectObject({ qb });
 
       const childs = await this.dbDriver.queryBuilder().from(
         this.dbDriver
           .union(
             ids.map(p => {
-              const query = this.dbDriver(childTable.title)
-                .where({ [chilCol.cn]: p })
-                // .select(...fields.split(','));
-                .select(colSelect);
+              const query = qb.clone().where({ [chilCol.cn]: p });
+              // .select(...fields.split(','));;
 
               return this.isSqlite()
                 ? this.dbDriver.select().from(query)
@@ -511,8 +512,12 @@ class BaseModelSqlv2 {
     const vcn = (await relColOptions.getMMChildColumn()).cn;
     const vrcn = (await relColOptions.getMMParentColumn()).cn;
     const rcn = (await relColOptions.getParentColumn()).cn;
-    const childModel = await (await relColOptions.getParentColumn()).getModel();
-    const rtn = childModel.title;
+    const childTable = await (await relColOptions.getParentColumn()).getModel();
+    const childModel = await Model.getBaseModelSQL({
+      dbDriver: this.dbDriver,
+      model: childTable
+    });
+    const rtn = childTable.title;
 
     // const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
     // @ts-ignore
@@ -525,19 +530,29 @@ class BaseModelSqlv2 {
     // if (!this.dbModels[child]) {
     //   return;
     // }
-    const colSelect = await childModel.selectObject();
+
+    const qb = this.dbDriver(rtn)
+      .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
+      // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
+      // .xwhere(where, this.dbModels[child].selectQuery(''))
+      .select({
+        [`${tn}_${vcn}`]: `${vtn}.${vcn}`
+        // ...this.dbModels[child].selectQuery(fields)
+      });
+
+    await childModel.selectObject({ qb });
     const childs = await this.dbDriver.union(
       parentIds.map(id => {
-        const query = this.dbDriver(rtn)
-          .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
-          .where(`${vtn}.${vcn}`, id) // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
-          // .xwhere(where, this.dbModels[child].selectQuery(''))
-          .select(colSelect)
-          .select({
-            [`${tn}_${vcn}`]: `${vtn}.${vcn}`
-            // ...this.dbModels[child].selectQuery(fields)
-          }); // ...fields.split(','));
-
+        // const query = this.dbDriver(rtn)
+        //   .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
+        //   .where(`${vtn}.${vcn}`, id) // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
+        //   // .xwhere(where, this.dbModels[child].selectQuery(''))
+        //   .select(colSelect)
+        //   .select({
+        //     [`${tn}_${vcn}`]: `${vtn}.${vcn}`
+        //     // ...this.dbModels[child].selectQuery(fields)
+        //   }); // ...fields.split(','));
+        const query = qb.clone().where(`${vtn}.${vcn}`, id);
         // this._paginateAndSort(query, { sort, limit, offset }, null, true);
         return this.isSqlite() ? this.dbDriver.select().from(query) : query;
       }),
@@ -714,7 +729,7 @@ class BaseModelSqlv2 {
     {
       limit = 20,
       offset = 0,
-      sort = '',
+      // sort = '',
       ignoreLimit = false
     }: XcFilter & { ignoreLimit?: boolean }
   ) {
@@ -725,7 +740,7 @@ class BaseModelSqlv2 {
     //   sort =         this.model.pk?._cn;
     // }
 
-    if (sort) {
+    /*    if (sort) {
       sort.split(',').forEach(o => {
         if (o[0] === '-') {
           query.orderBy(
@@ -736,7 +751,7 @@ class BaseModelSqlv2 {
           query.orderBy(this.selectObject({})[o] || o, 'asc');
         }
       });
-    }
+    }*/
 
     return query;
   }
@@ -798,9 +813,7 @@ class BaseModelSqlv2 {
   //   }, []);
   // }
 
-  public async selectObject(args: {
-    qb?: any;
-  }): Promise<{ [name: string]: string }> {
+  public async selectObject({ qb }: { qb: QueryBuilder }): Promise<void> {
     const res = {};
     const columns = await this.model.getColumns();
     for (const column of columns) {
@@ -819,13 +832,13 @@ class BaseModelSqlv2 {
               // this.aliasToColumn
             );
             // todo:  verify syntax of as ? / ??
-            args?.qb?.select(
+            qb.select(
               this.dbDriver.raw(`?? as ??`, [selectQb.builder, column._cn])
             );
           }
           break;
         case 'Rollup':
-          args?.qb?.select(
+          qb.select(
             (
               await genRollupSelectv2({
                 // tn: this.title,
@@ -841,7 +854,7 @@ class BaseModelSqlv2 {
           break;
       }
     }
-    return res;
+    qb.select(res);
   }
 }
 

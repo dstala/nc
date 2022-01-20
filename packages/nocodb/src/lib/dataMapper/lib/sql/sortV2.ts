@@ -6,6 +6,8 @@ import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordC
 import genRollupSelectv2 from './genRollupSelectv2';
 import RollupColumn from '../../../noco-models/RollupColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
+import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
+import FormulaColumn from '../../../noco-models/FormulaColumn';
 
 export default async function sortV2(
   sortList: Sort[],
@@ -18,6 +20,7 @@ export default async function sortV2(
 
   for (const sort of sortList) {
     const column = await sort.getColumn();
+    const model = await column.getModel();
     switch (column.uidt) {
       case UITypes.Rollup:
         {
@@ -28,6 +31,19 @@ export default async function sortV2(
             })
           ).builder;
 
+          qb.orderBy(builder, sort.direction || 'asc');
+        }
+        break;
+      case UITypes.Formula:
+        {
+          const builder = (
+            await formulaQueryBuilderv2(
+              (await column.getColOptions<FormulaColumn>()).formula,
+              null,
+              knex,
+              model
+            )
+          ).builder;
           qb.orderBy(builder, sort.direction || 'asc');
         }
         break;
@@ -128,6 +144,16 @@ export default async function sortV2(
                 break;
               case UITypes.Formula:
                 {
+                  const builder = (
+                    await formulaQueryBuilderv2(
+                      (await column.getColOptions<FormulaColumn>()).formula,
+                      null,
+                      knex,
+                      model
+                    )
+                  ).builder;
+
+                  selectQb.select(builder);
                 }
                 break;
               default:
@@ -166,8 +192,6 @@ export default async function sortV2(
 
           qb.orderBy(selectQb, sort.direction || 'asc');
         }
-        break;
-      case UITypes.Formula:
         break;
       default:
         qb.orderBy(`${column.cn}`, sort.direction || 'asc');

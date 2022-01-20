@@ -11,6 +11,7 @@ import LinkToAnotherRecordColumn from '../../noco-models/LinkToAnotherRecordColu
 import jsep from 'jsep';
 import jsepTreeToFormula from '../common/helpers/jsepTreeToFormula';
 import FormulaColumn from '../../noco-models/FormulaColumn';
+import Noco from '../Noco';
 
 export default function registerRestCtrl(ctx: {
   router: Router;
@@ -52,13 +53,13 @@ export default function registerRestCtrl(ctx: {
         requestObj,
         {
           [`${model.alias}List`]: async args => {
-            console.log(
-              JSON.stringify(
-                await Filter.getFilterObject({ modelId: model.id }),
-                null,
-                2
-              )
-            );
+            // console.log(
+            //   JSON.stringify(
+            //     await Filter.getFilterObject({ modelId: model.id }),
+            //     null,
+            //     2
+            //   )
+            // );
 
             return await baseModel.list(args);
           }
@@ -410,165 +411,305 @@ export default function registerRestCtrl(ctx: {
 
   router.post('/generate', async (req: any, res) => {
     try {
-      const body = req.body;
+      for (const body of Array.isArray(req.body) ? req.body : [req.body]) {
+        if (!body?.type) throw new Error("Missing 'type' property");
 
-      if (!body?.type) throw new Error("Missing 'type' property");
-
-      switch (body.type) {
-        case 'Lookup':
-          {
-            validateParams(
-              ['table', 'lookupColumn', 'alias', 'relationColumn'],
-              body
-            );
-
-            const model = await Model.get({
-              base_id: ctx.baseId,
-              db_alias: ctx.dbAlias,
-              tn: body.table
-            });
-
-            const relationColumn = (await model.getColumns()).find(
-              c =>
-                (c._cn === body.relationColumn ||
-                  c.cn === body.relationColumn) &&
-                c.uidt === UITypes.LinkToAnotherRecord
-            );
-
-            if (!relationColumn)
-              throw new Error(
-                `Relation column named '${body.relationColumn}' is not found`
+        switch (body.type) {
+          case UITypes.Lookup:
+            {
+              validateParams(
+                ['table', 'lookupColumn', 'alias', 'relationColumn'],
+                body
               );
 
-            const relation = await relationColumn.getColOptions<
-              LinkToAnotherRecordColumn
-            >();
-            const relatedModel = await (relation.type === 'hm'
-              ? await relation.getChildColumn()
-              : await relation.getParentColumn()
-            ).getModel();
+              const model = await Model.get({
+                base_id: ctx.baseId,
+                db_alias: ctx.dbAlias,
+                tn: body.table
+              });
 
-            const lookupColumn = (await relatedModel.getColumns()).find(
-              c => c._cn === body.lookupColumn
-            );
-
-            await Column.insert<LookupColumn>({
-              base_id: ctx.baseId,
-              db_alias: 'db',
-              _cn: body.alias,
-              fk_model_id: model.id,
-              uidt: UITypes.Lookup,
-              fk_lookup_column_id: lookupColumn?.id,
-              fk_relation_column_id: relationColumn?.id
-            });
-          }
-          break;
-        case 'Rollup':
-          {
-            validateParams(
-              [
-                'table',
-                'rollupColumn',
-                'relationColumn',
-                'alias',
-                'rollupFunction'
-              ],
-              body
-            );
-
-            const model = await Model.get({
-              base_id: ctx.baseId,
-              db_alias: ctx.dbAlias,
-              tn: body.table
-            });
-
-            const relationColumn = (await model.getColumns()).find(
-              c =>
-                (c._cn === body.relationColumn ||
-                  c.cn === body.relationColumn) &&
-                c.uidt === UITypes.LinkToAnotherRecord
-            );
-
-            if (!relationColumn)
-              throw new Error(
-                `Relation column named '${body.relationColumn}' is not found`
+              const relationColumn = (await model.getColumns()).find(
+                c =>
+                  (c._cn === body.relationColumn ||
+                    c.cn === body.relationColumn) &&
+                  c.uidt === UITypes.LinkToAnotherRecord
               );
 
-            const relation = await relationColumn.getColOptions<
-              LinkToAnotherRecordColumn
-            >();
-
-            if (relation.type === 'bt') throw new Error('');
-
-            const relatedModel = await (relation.type === 'hm'
-              ? await relation.getChildColumn()
-              : await relation.getParentColumn()
-            ).getModel();
-
-            const rollupColumn = (await relatedModel.getColumns()).find(
-              c => c._cn === body.rollupColumn
-            );
-
-            await Column.insert<RollupColumn>({
-              base_id: ctx.baseId,
-              db_alias: 'db',
-              _cn: body.alias,
-              fk_model_id: model.id,
-              uidt: UITypes.Rollup,
-              fk_relation_column_id: relationColumn.id,
-              fk_rollup_column_id: rollupColumn.id,
-
-              rollup_function: body.rollupFunction
-            });
-          }
-          break;
-        case 'Formula':
-          {
-            const model = await Model.get({
-              base_id: ctx.baseId,
-              db_alias: ctx.dbAlias,
-              tn: body.table
-            });
-            const columns = await model.getColumns();
-            validateParams(['table', 'formula', 'alias'], body);
-            const substituteId = async (pt: any) => {
-              if (pt.type === 'CallExpression') {
-                for (const arg of pt.arguments || []) {
-                  await substituteId(arg);
-                }
-              } else if (pt.type === 'Literal') {
-                return;
-              } else if (pt.type === 'Identifier') {
-                const colNameOrId = pt.name;
-                const column = columns.find(
-                  c =>
-                    c.id === colNameOrId ||
-                    c.cn === colNameOrId ||
-                    c._cn === colNameOrId
+              if (!relationColumn)
+                throw new Error(
+                  `Relation column named '${body.relationColumn}' is not found`
                 );
-                pt.name = column.id;
-              } else if (pt.type === 'BinaryExpression') {
-                await substituteId(pt.left);
-                await substituteId(pt.right);
+
+              const relation = await relationColumn.getColOptions<
+                LinkToAnotherRecordColumn
+              >();
+              const relatedModel = await (relation.type === 'hm'
+                ? await relation.getChildColumn()
+                : await relation.getParentColumn()
+              ).getModel();
+
+              const lookupColumn = (await relatedModel.getColumns()).find(
+                c => c._cn === body.lookupColumn
+              );
+
+              await Column.insert<LookupColumn>({
+                base_id: ctx.baseId,
+                db_alias: 'db',
+                _cn: body.alias,
+                fk_model_id: model.id,
+                uidt: UITypes.Lookup,
+                fk_lookup_column_id: lookupColumn?.id,
+                fk_relation_column_id: relationColumn?.id
+              });
+            }
+            break;
+          case UITypes.Rollup:
+            {
+              validateParams(
+                [
+                  'table',
+                  'rollupColumn',
+                  'relationColumn',
+                  'alias',
+                  'rollupFunction'
+                ],
+                body
+              );
+
+              const model = await Model.get({
+                base_id: ctx.baseId,
+                db_alias: ctx.dbAlias,
+                tn: body.table
+              });
+
+              const relationColumn = (await model.getColumns()).find(
+                c =>
+                  (c._cn === body.relationColumn ||
+                    c.cn === body.relationColumn) &&
+                  c.uidt === UITypes.LinkToAnotherRecord
+              );
+
+              if (!relationColumn)
+                throw new Error(
+                  `Relation column named '${body.relationColumn}' is not found`
+                );
+
+              const relation = await relationColumn.getColOptions<
+                LinkToAnotherRecordColumn
+              >();
+
+              if (relation.type === 'bt') throw new Error('');
+
+              const relatedModel = await (relation.type === 'hm'
+                ? await relation.getChildColumn()
+                : await relation.getParentColumn()
+              ).getModel();
+
+              const rollupColumn = (await relatedModel.getColumns()).find(
+                c => c._cn === body.rollupColumn
+              );
+
+              await Column.insert<RollupColumn>({
+                base_id: ctx.baseId,
+                db_alias: 'db',
+                _cn: body.alias,
+                fk_model_id: model.id,
+                uidt: UITypes.Rollup,
+                fk_relation_column_id: relationColumn.id,
+                fk_rollup_column_id: rollupColumn.id,
+
+                rollup_function: body.rollupFunction
+              });
+            }
+            break;
+          case UITypes.Formula:
+            {
+              validateParams(['table', 'formula', 'alias'], body);
+              const model = await Model.get({
+                base_id: ctx.baseId,
+                db_alias: ctx.dbAlias,
+                tn: body.table
+              });
+              const columns = await model.getColumns();
+              const substituteId = async (pt: any) => {
+                if (pt.type === 'CallExpression') {
+                  for (const arg of pt.arguments || []) {
+                    await substituteId(arg);
+                  }
+                } else if (pt.type === 'Literal') {
+                  return;
+                } else if (pt.type === 'Identifier') {
+                  const colNameOrId = pt.name;
+                  const column = columns.find(
+                    c =>
+                      c.id === colNameOrId ||
+                      c.cn === colNameOrId ||
+                      c._cn === colNameOrId
+                  );
+                  pt.name = column.id;
+                } else if (pt.type === 'BinaryExpression') {
+                  await substituteId(pt.left);
+                  await substituteId(pt.right);
+                }
+              };
+
+              const parsedFormula = jsep(body.formula);
+              await substituteId(parsedFormula);
+              // console.log(parsedFormula);
+              const formula = jsepTreeToFormula(parsedFormula);
+
+              await Column.insert<FormulaColumn>({
+                base_id: ctx.baseId,
+                db_alias: 'db',
+                _cn: body.alias,
+                fk_model_id: model.id,
+                uidt: UITypes.Formula,
+                formula
+              });
+            }
+
+            break;
+
+          case 'DeleteAllSort':
+            {
+              validateParams(['table'], body);
+              const model = await Model.get({
+                base_id: ctx.baseId,
+                db_alias: ctx.dbAlias,
+                tn: body.table
+              });
+              if (!model) {
+                throw new Error(`Table not found - ${body.table}`);
               }
-            };
+              await Sort.deleteAll(model.id);
+            }
+            break;
+          case 'Sort':
+            {
+              validateParams(['table', 'column', 'direction'], body);
+              const model = await Model.get({
+                base_id: ctx.baseId,
+                db_alias: ctx.dbAlias,
+                tn: body.table
+              });
+              if (!model) {
+                throw new Error(`Table not found - ${body.table}`);
+              }
 
-            const parsedFormula = jsep(body.formula);
-            await substituteId(parsedFormula);
-            console.log(parsedFormula);
-            const formula = jsepTreeToFormula(parsedFormula);
+              const columns = await model.getColumns();
 
-            await Column.insert<FormulaColumn>({
-              base_id: ctx.baseId,
-              db_alias: 'db',
-              _cn: body.alias,
-              fk_model_id: model.id,
-              uidt: UITypes.Formula,
-              formula
-            });
-          }
+              const column = columns.find(
+                c => c._cn === body.column || c.cn === body.column
+              );
+              if (!model) {
+                throw new Error(`Column not found - ${body.column}`);
+              }
 
-          break;
+              await Sort.insert({
+                direction: body.direction || 'asc',
+                fk_model_id: model.id,
+                fk_column_id: column?.id
+              });
+            }
+            break;
+          case 'DeleteAllFilter':
+            {
+              validateParams(['table'], body);
+              const model = await Model.get({
+                base_id: ctx.baseId,
+                db_alias: ctx.dbAlias,
+                tn: body.table
+              });
+              if (!model) {
+                throw new Error(`Table not found - ${body.table}`);
+              }
+              await Filter.deleteAll(model.id);
+            }
+            break;
+          case 'Filter':
+            {
+              validateParams(['table', 'filter'], body);
+              const model = await Model.get({
+                base_id: ctx.baseId,
+                db_alias: ctx.dbAlias,
+                tn: body.table
+              });
+              if (!model) {
+                throw new Error(`Table not found - ${body.table}`);
+              }
+
+              const columns = await model.getColumns();
+
+              let filter = body.filter;
+              if (!filter.logical_op) {
+                filter = {
+                  logical_op: 'OR',
+                  is_group: true,
+                  children: Array.isArray(filter) ? filter : [filter]
+                };
+              }
+
+              const replaceWithId = async condition => {
+                if (!condition) return;
+                condition.fk_model_id = model.id;
+                if (condition.logical_op) {
+                  condition.is_group = true;
+                  if (condition.children && !Array.isArray(condition.children))
+                    throw Error('children property should be an array');
+                  for (const con of condition.children || []) {
+                    await replaceWithId(con);
+                  }
+                } else {
+                  const column = columns.find(
+                    c => c.cn === condition.column || c._cn === condition.column
+                  );
+                  if (!column)
+                    throw new Error(
+                      `Column with following name is not found ${condition.column}`
+                    );
+                  condition.fk_column_id = column.id;
+                  if (!('comparison_op' in condition)) {
+                    throw new Error('comparison_op not found');
+                  }
+                  if (!('value' in condition)) {
+                    throw new Error('value not found');
+                  }
+                }
+              };
+              await replaceWithId(filter);
+              await Filter.insert(filter);
+            }
+            break;
+
+          case 'DeleteAllMetas':
+            {
+              // validateParams([''], body);
+
+              for (const model of await Model.list({
+                project_id: ctx.baseId,
+                db_alias: ctx.dbAlias
+              })) {
+                if (model?.id) {
+                  await Filter.deleteAll(model.id);
+                  await Sort.deleteAll(model.id);
+                }
+              }
+              await Noco.ncMeta.metaDelete(null, null, 'nc_col_lookup_v2', {});
+              await Noco.ncMeta.metaDelete(null, null, 'nc_col_rollup_v2', {});
+              await Noco.ncMeta.metaDelete(null, null, 'nc_col_formula_v2', {});
+
+              await Noco.ncMeta.metaDelete(null, null, 'nc_columns_v2', null, {
+                _or: [
+                  { uidt: { eq: UITypes.Lookup } },
+                  { uidt: { eq: UITypes.Rollup } },
+                  { uidt: { eq: UITypes.Formula } }
+                ]
+              });
+            }
+            break;
+          default:
+            continue;
+        }
       }
 
       res.json({ msg: 'success' });

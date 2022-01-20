@@ -27,6 +27,12 @@ export default class Sort {
     });
   }
 
+  public static async deleteAll(modelId: string) {
+    await Noco.ncMeta.metaDelete(null, null, 'nc_sort_v2', {
+      fk_model_id: modelId
+    });
+  }
+
   public getColumn(): Promise<Column> {
     if (!this.fk_column_id) return null;
     return Column.get({

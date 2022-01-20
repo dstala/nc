@@ -141,6 +141,17 @@ export default class Filter {
 
     return result;
   }
+
+  static async deleteAll(modelId: string) {
+    const filter = await this.getFilterObject({ modelId });
+
+    const deleteRecursively = async filter => {
+      if (!filter) return;
+      for (const f of filter?.children || []) await deleteRecursively(f);
+      await Noco.ncMeta.metaDelete(null, null, 'nc_filter_exp_v2', filter.id);
+    };
+    await deleteRecursively(filter);
+  }
 }
 
 export interface FilterObject {

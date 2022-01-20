@@ -73,7 +73,7 @@ export default class LinkToAnotherRecordColumn {
         'nc_col_relations_v2',
         { fk_column_id: columnId }
       );
-      await NocoCache.setv2(colData.id, columnId, colData);
+      await NocoCache.setv2(colData?.id, columnId, colData);
     }
     return colData ? new LinkToAnotherRecordColumn(colData) : null;
   }

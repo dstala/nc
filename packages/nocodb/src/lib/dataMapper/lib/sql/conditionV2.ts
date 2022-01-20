@@ -7,6 +7,8 @@ import Column from '../../../noco-models/Column';
 import LookupColumn from '../../../noco-models/LookupColumn';
 import genRollupSelectv2 from './genRollupSelectv2';
 import RollupColumn from '../../../noco-models/RollupColumn';
+import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
+import FormulaColumn from '../../../noco-models/FormulaColumn';
 // import LookupColumn from '../../../noco-models/LookupColumn';
 
 export default async function conditionV2(
@@ -144,6 +146,7 @@ const parseConditionV2 = async (
       const builder = (
         await genRollupSelectv2({
           knex,
+          alias,
           columnOptions: (await column.getColOptions()) as RollupColumn
         })
       ).builder;
@@ -154,9 +157,23 @@ const parseConditionV2 = async (
         alias,
         builder
       );
-    } else if (column.uidt === UITypes.Formula) {
-      // todo:
-      return _qb => {};
+    } else if (column.uidt === UITypes.Formula && !customWhereClause) {
+      const model = await column.getModel();
+      const builder = (
+        await formulaQueryBuilderv2(
+          (await column.getColOptions<FormulaColumn>()).formula,
+          null,
+          knex,
+          model
+        )
+      ).builder;
+      return parseConditionV2(
+        new Filter({ ...filter, value: knex.raw(filter.value) } as any),
+        knex,
+        aliasCount,
+        alias,
+        builder
+      );
     } else {
       const field = customWhereClause
         ? filter.value
@@ -179,16 +196,16 @@ const parseConditionV2 = async (
             qb = qb.whereNot(field, 'like', val);
             break;
           case 'gt':
-            qb = qb.where(field, '>', val);
+            qb = qb.where(field, customWhereClause ? '<' : '>', val);
             break;
           case 'ge':
-            qb = qb.where(field, '>=', val);
+            qb = qb.where(field, customWhereClause ? '<=' : '>=', val);
             break;
           case 'lt':
-            qb = qb.where(field, '<', val);
+            qb = qb.where(field, customWhereClause ? '>' : '<', val);
             break;
           case 'le':
-            qb = qb.where(field, '<=', val);
+            qb = qb.where(field, customWhereClause ? '>=' : '<=', val);
             break;
           // case 'in':
           //   qb = qb.whereIn(fieldName, val);

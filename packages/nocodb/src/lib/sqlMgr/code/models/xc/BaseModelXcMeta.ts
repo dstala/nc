@@ -27,14 +27,14 @@ abstract class BaseModelXcMeta extends BaseRender {
           uidt: UITypes.LinkToAnotherRecord,
           type: 'hm',
           hm,
-          _cn: `${hm._rtn} => ${hm._tn}`
+          _cn: `${hm._tn}List`
         };
       }),
       ...(this.ctx.belongsTo || []).map(bt => ({
         uidt: UITypes.LinkToAnotherRecord,
         type: 'bt',
         bt,
-        _cn: `${bt._rtn} <= ${bt._tn}`
+        _cn: `${bt._rtn}Read`
       }))
     ];
   }
