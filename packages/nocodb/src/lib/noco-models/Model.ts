@@ -56,6 +56,7 @@ export default class Model implements NcModel {
   public get pk(): Column {
     return this.columns?.find(c => c.pk);
   }
+
   public get pv(): Column {
     return this.columns?.find(c => c.pv);
   }

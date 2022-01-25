@@ -13,3 +13,5 @@ export class Nc {
   public static auth = Auth;
   public static org = Org;
 }
+
+Nc.init({ token: 'fdfjdjfdjfjdkjf' });

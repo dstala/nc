@@ -141,9 +141,9 @@ describe('Noco v2 Tests', () => {
     });
 
     it('Simple country list', function(done) {
-      console.log(`/nc/${projectId}/api/v2/Country`);
+      console.log(`/nc/${projectId}/api/v2/country`);
       request(app)
-        .get(`/nc/${projectId}/api/v2/Country`)
+        .get(`/nc/${projectId}/api/v2/country`)
         .set('xc-auth', token)
         .expect(200, (err, res) => {
           if (err) done(err);
@@ -180,7 +180,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -212,7 +212,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Actor/1`)
+            .get(`/nc/${projectId}/api/v2/actor/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -239,7 +239,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -273,7 +273,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Address`)
+            .get(`/nc/${projectId}/api/v2/address`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -310,7 +310,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -351,7 +351,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Address/1`)
+            .get(`/nc/${projectId}/api/v2/address/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -388,7 +388,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country/1`)
+            .get(`/nc/${projectId}/api/v2/country/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -414,7 +414,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Actor/1`)
+            .get(`/nc/${projectId}/api/v2/actor/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -444,7 +444,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country/1`)
+            .get(`/nc/${projectId}/api/v2/country/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -482,7 +482,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country/1`)
+            .get(`/nc/${projectId}/api/v2/country/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -512,7 +512,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Address/1`)
+            .get(`/nc/${projectId}/api/v2/address/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -555,7 +555,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Address/1`)
+            .get(`/nc/${projectId}/api/v2/address/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -590,7 +590,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country/1`)
+            .get(`/nc/${projectId}/api/v2/country/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -627,7 +627,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country/1`)
+            .get(`/nc/${projectId}/api/v2/country/1`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -659,7 +659,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -693,7 +693,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -733,7 +733,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -768,7 +768,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Address`)
+            .get(`/nc/${projectId}/api/v2/address`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -812,7 +812,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Address`)
+            .get(`/nc/${projectId}/api/v2/address`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -843,7 +843,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -884,7 +884,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -924,7 +924,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -963,7 +963,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -995,7 +995,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -1033,7 +1033,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -1079,7 +1079,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Address`)
+            .get(`/nc/${projectId}/api/v2/address`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -1126,7 +1126,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -1165,7 +1165,7 @@ describe('Noco v2 Tests', () => {
         .expect(200, err => {
           if (err) done(err);
           request(app)
-            .get(`/nc/${projectId}/api/v2/Country`)
+            .get(`/nc/${projectId}/api/v2/country`)
             .set('xc-auth', token)
             .expect(200, (err, res) => {
               if (err) done(err);
@@ -1173,6 +1173,202 @@ describe('Noco v2 Tests', () => {
               for (const c of res.body?.CountryList)
                 expect(c.addressList.some(a => a.Address.includes('11'))).to.be
                   .true;
+              done();
+            });
+        });
+    });
+
+    it('Add formula column with hm column - citykist', function(done) {
+      const payload = [
+        { type: 'DeleteAllMetas' },
+        {
+          table: 'Country',
+          type: UITypes.Formula,
+          alias: 'formula',
+          formula: "CONCAT('City name is : ', CityList)"
+        }
+      ];
+      request(app)
+        .post(`/nc/${projectId}/generate`)
+        .send(payload)
+        .set('xc-auth', token)
+        .expect(200, err => {
+          if (err) done(err);
+          request(app)
+            .get(`/nc/${projectId}/api/v2/country`)
+            .set('xc-auth', token)
+            .expect(200, (err, res) => {
+              if (err) done(err);
+              expect(res.body?.CountryList?.['formula']).to.be.a('String');
+              expect(res.body?.CountryList?.['formula']).to.be.eq(
+                'City name is : ' + res.body?.AddressRead?.CityRead?.City
+              );
+              done();
+            });
+        });
+    });
+
+    it('Add formula column with hm - Addition', function(done) {
+      const payload = [
+        { type: 'DeleteAllMetas' },
+        {
+          table: 'Country',
+          type: UITypes.Formula,
+          alias: 'formula',
+          formula: 'ADD(CityList, 1)'
+        },
+        {
+          table: 'Country',
+          type: UITypes.Formula,
+          alias: 'formula',
+          formula: 'MAX(CityList, 100)'
+        }
+      ];
+      request(app)
+        .post(`/nc/${projectId}/generate`)
+        .send(payload)
+        .set('xc-auth', token)
+        .expect(200, err => {
+          if (err) done(err);
+          request(app)
+            .get(`/nc/${projectId}/api/v2/country`)
+            .set('xc-auth', token)
+            .expect(200, (err, res) => {
+              if (err) done(err);
+              expect(res.body?.CountryList?.['formula']).to.be.a('String');
+              expect(res.body?.CountryList?.['formula']).to.be.eq(
+                'City name is : ' + res.body?.AddressRead?.CityRead?.City
+              );
+              done();
+            });
+        });
+    });
+
+    it('Add formula column with hm lookup - sum, avg, min, max', function(done) {
+      const payload = [
+        { type: 'DeleteAllMetas' },
+        {
+          table: 'Country',
+          type: UITypes.Lookup,
+          alias: 'cityIds',
+          lookupColumn: 'CityId',
+          relationColumn: 'CityList'
+        },
+        {
+          table: 'Country',
+          type: UITypes.Formula,
+          alias: 'sum',
+          formula: 'ADD(cityIds, 100)'
+        },
+        {
+          table: 'Country',
+          type: UITypes.Formula,
+          alias: 'avg',
+          formula: 'AVG(cityIds, 100)'
+        },
+        {
+          table: 'Country',
+          type: UITypes.Formula,
+          alias: 'min',
+          formula: 'MIN(cityIds, 100)'
+        },
+        {
+          table: 'Country',
+          type: UITypes.Formula,
+          alias: 'max',
+          formula: 'MAX(cityIds, 100)'
+        }
+      ];
+      request(app)
+        .post(`/nc/${projectId}/generate`)
+        .send(payload)
+        .set('xc-auth', token)
+        .expect(200, err => {
+          if (err) done(err);
+          request(app)
+            .get(`/nc/${projectId}/api/v2/country`)
+            .set('xc-auth', token)
+            .expect(200, (err, res) => {
+              if (err) done(err);
+              expect(res.body?.CountryList).to.be.an('Array');
+              res.body?.CountryList.forEach(country => {
+                expect(+country.min).to.be.eq(
+                  Math.min(...country.cityIds, 100)
+                );
+                expect(+country.max).to.be.eq(
+                  Math.max(...country.cityIds, 100)
+                );
+                expect(+country.sum).to.be.eq(
+                  [...country.cityIds, 100].reduce((s, v) => s + v)
+                );
+                expect(+country.avg).to.be.eq(
+                  [...country.cityIds, 100].reduce((s, v) => s + v) / 2
+                );
+              });
+
+              done();
+            });
+        });
+    });
+
+    it('Add formula column with mm lookup - sum, avg, min, max', function(done) {
+      const payload = [
+        { type: 'DeleteAllMetas' },
+        {
+          table: 'Actor',
+          type: UITypes.Lookup,
+          alias: 'filmIds',
+          lookupColumn: 'FilmId',
+          relationColumn: 'FilmMMList'
+        },
+        {
+          table: 'Actor',
+          type: UITypes.Formula,
+          alias: 'sum',
+          formula: 'ADD(filmIds, 100)'
+        },
+        {
+          table: 'Actor',
+          type: UITypes.Formula,
+          alias: 'min',
+          formula: 'MIN(filmIds, 100)'
+        },
+        {
+          table: 'Actor',
+          type: UITypes.Formula,
+          alias: 'max',
+          formula: 'MAX(filmIds, 100)'
+        },
+        {
+          table: 'Actor',
+          type: UITypes.Formula,
+          alias: 'avg',
+          formula: 'AVG(filmIds, 100)'
+        }
+      ];
+      request(app)
+        .post(`/nc/${projectId}/generate`)
+        .send(payload)
+        .set('xc-auth', token)
+        .expect(200, err => {
+          if (err) done(err);
+          request(app)
+            .get(`/nc/${projectId}/api/v2/actor`)
+            .set('xc-auth', token)
+            .expect(200, (err, res) => {
+              if (err) done(err);
+              expect(res.body?.ActorList).to.be.an('Array');
+              res.body?.ActorList.forEach(film => {
+                expect(+film.min).to.be.eq(Math.min(...film.filmIds, 100));
+                expect(+film.max).to.be.eq(Math.max(...film.filmIds, 100));
+                expect(+film.sum).to.be.eq(
+                  [...film.filmIds, 100].reduce((s, v) => s + v)
+                );
+                expect(+film.avg).to.be.eq(
+                  [...film.filmIds, 100].reduce((s, v) => s + v) / 2
+                );
+              });
+
               done();
             });
         });
