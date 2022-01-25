@@ -190,10 +190,18 @@ const parseConditionV2 = async (
             qb = qb.whereNot(field, val);
             break;
           case 'like':
-            qb = qb.where(field, 'like', val);
+            qb = qb.where(
+              field,
+              qb?.client?.config?.client === 'pg' ? 'ilike' : 'like',
+              val
+            );
             break;
           case 'nlike':
-            qb = qb.whereNot(field, 'like', val);
+            qb = qb.whereNot(
+              field,
+              qb?.client?.config?.client === 'pg' ? 'ilike' : 'like',
+              val
+            );
             break;
           case 'gt':
             qb = qb.where(field, customWhereClause ? '<' : '>', val);

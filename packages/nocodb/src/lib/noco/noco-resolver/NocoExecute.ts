@@ -14,7 +14,7 @@ const nocoExecute = async (
 ): Promise<any> => {
   const res = [];
   // extract nested(lookup) recursively
-  const extractNested = (path, dataTreeObj: any = {}, resolver = {}): any => {
+  const extractNested = (path, dataTreeObj: any, resolver = {}): any => {
     if (path.length) {
       const key = path[0];
       if (!dataTreeObj[key]) {
@@ -79,7 +79,9 @@ const nocoExecute = async (
         resolverObj
       ).then(res => {
         return Promise.resolve(
-          Array.isArray(res) ? [...new Set(flattenArray(res))] : res
+          // use Set to avoid duplicate entry
+          // Array.isArray(res) ? [...new Set(flattenArray(res))] : res
+          Array.isArray(res) ? flattenArray(res) : res
         );
       });
     }

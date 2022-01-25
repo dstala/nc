@@ -7,7 +7,7 @@ types.setTypeParser(1082, val => val);
 import { BaseModelSql } from './BaseModelSql';
 import Filter, { FilterObject } from '../../../noco-models/Filter';
 
-const opMapping = {
+const opMappingGen = {
   eq: '=',
   lt: '<',
   gt: '>',
@@ -93,6 +93,10 @@ const appendWhereCondition = function(
   knexRef,
   isHaving = false
 ) {
+  const opMapping = {
+    ...opMappingGen,
+    ...(knexRef?.client?.config?.client === 'pg' ? { like: 'ilike' } : {})
+  };
   const camKey = isHaving ? 'Having' : 'Where';
   const key = isHaving ? 'having' : 'where';
 
@@ -481,6 +485,10 @@ declare module 'knex' {
       conditionObj: FilterObject
     ): Knex.QueryBuilder<TRecord, TResult>;
 
+    concat<TRecord, TResult>(
+      cn: string | any
+    ): Knex.QueryBuilder<TRecord, TResult>;
+
     conditionGraph<TRecord, TResult>(condition: {
       condition: XcXonditionObj;
       models: { [key: string]: BaseModelSql };
@@ -506,6 +514,27 @@ Knex.QueryBuilder.extend('xwhere', function(
 ) {
   const conditions = toArrayOfConditions(conditionString);
   return appendWhereCondition(conditions, columnAliases || {}, this);
+});
+/**
+ * Append concat to knex query builder
+ */
+Knex.QueryBuilder.extend('concat', function(cn: any) {
+  switch (this?.client?.config?.client) {
+    case 'pg':
+      this.select(this.client.raw(`STRING_AGG(?? , ',')`, [cn]));
+      break;
+    case 'mysql':
+    case 'mysql2':
+      this.select(this.client.raw(`GROUP_CONCAT(?? SEPARATOR ',')`, [cn]));
+      break;
+    case 'mssql':
+      this.select(this.client.raw(`STRING_AGG(??, ',')`, [cn]));
+      break;
+    case 'sqlite3':
+      this.select(this.client.raw(`GROUP_CONCAT(?? , ',')`, [cn]));
+      break;
+  }
+  return this;
 });
 
 /**

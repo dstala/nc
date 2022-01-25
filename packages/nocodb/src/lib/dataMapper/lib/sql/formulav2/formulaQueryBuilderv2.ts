@@ -24,7 +24,7 @@ const getAggregateFn: (
     case 'SUM':
     case 'FLOAT':
     case 'NUMBER':
-    case 'BINARY':
+    case 'ARITH':
       return ({ qb, cn }) => qb.clear('select').sum(cn);
 
     case 'AVG':
@@ -38,11 +38,8 @@ const getAggregateFn: (
     //         knex.raw('sum(??)/(count(??)) + ?)', [cn, cn, (argsCount || 1) - 1])
     //       );
     case 'CONCAT':
-      return ({ qb, knex, cn }) =>
-        qb.clear('select').select(knex.raw(`GROUP_CONCAT(??)`, [cn]));
     default:
-      return ({ qb, knex, cn }) =>
-        qb.clear('select').select(knex.raw(`GROUP_CONCAT(??)`, [cn]));
+      return ({ qb, cn }) => qb.clear('select').concat(cn);
     // return '';
   }
 };
@@ -210,6 +207,7 @@ export default async function formulaQueryBuilderv2(
                   const builder = (
                     await genRollupSelectv2({
                       knex,
+                      alias: prevAlias,
                       columnOptions: (await lookupColumn.getColOptions()) as RollupColumn
                     })
                   ).builder;
@@ -223,7 +221,7 @@ export default async function formulaQueryBuilderv2(
                           getAggregateFn(fn)({
                             qb,
                             knex,
-                            cn: builder
+                            cn: knex.raw(builder).wrap('(', ')')
                           })
                         )
                         .wrap('(', ')');
@@ -328,6 +326,32 @@ export default async function formulaQueryBuilderv2(
                 break;
               case UITypes.Formula:
                 {
+                  const formulaOption = await lookupColumn.getColOptions<
+                    FormulaColumn
+                  >();
+                  const lookupModel = await lookupColumn.getModel();
+                  const { builder } = await formulaQueryBuilderv2(
+                    formulaOption.formula,
+                    '',
+                    knex,
+                    lookupModel,
+                    aliasToColumn
+                  );
+                  if (isMany) {
+                    const qb = selectQb;
+                    selectQb = fn =>
+                      knex
+                        .raw(
+                          getAggregateFn(fn)({
+                            qb,
+                            knex,
+                            cn: knex.raw(builder).wrap('(', ')')
+                          })
+                        )
+                        .wrap('(', ')');
+                  } else {
+                    selectQb.select(builder);
+                  }
                 }
                 break;
               default:
@@ -571,8 +595,8 @@ export default async function formulaQueryBuilderv2(
           arguments: [pt.left]
         };
       }
-      pt.left.fnName = pt.left.fnName || 'BINARY';
-      pt.right.fnName = pt.right.fnName || 'BINARY';
+      pt.left.fnName = pt.left.fnName || 'ARITH';
+      pt.right.fnName = pt.right.fnName || 'ARITH';
 
       const query = knex.raw(
         `${fn(pt.left, null, pt.operator).toQuery()} ${pt.operator} ${fn(
