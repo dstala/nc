@@ -96,7 +96,7 @@ abstract class BaseModelXcMeta extends BaseRender {
 
   public getVitualColumns(): any[] {
     // todo: handle duplicate relation
-    return [
+    const virtualColumns = [
       ...(this.ctx.hasMany || []).map(hm => {
         return {
           uidt: UITypes.LinkToAnotherRecord,

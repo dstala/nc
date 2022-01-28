@@ -36,8 +36,8 @@ import xcMetaDiffSync from './handlers/xcMetaDiffSync';
 // import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
 // import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
 import Model from '../../noco-models/Model';
-// import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 import UITypes from '../../sqlUi/UITypes';
+// import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const log = debug('nc:api:base');
 
@@ -226,29 +226,45 @@ export default abstract class BaseApiBuilder<T extends Noco>
 
   public abstract onToggleModelRelation(relationInModels: any): Promise<void>;
 
-  public async onTableDelete(tn: string): Promise<void> {
+  public async onTableDelete(
+    tn: string,
+    extras?: {
+      ignoreVirtualRelations?: boolean;
+      ignoreRelations?: boolean;
+      ignoreViews?: boolean;
+    }
+  ): Promise<void> {
     this.baseLog(`onTableDelete : '%s'`, tn);
     XcCache.del([this.projectId, this.dbAlias, 'table', tn].join('::'));
-    await this.xcMeta.metaDelete(
-      this.projectId,
-      this.dbAlias,
-      'nc_relations',
-      null,
-      {
-        _or: [
-          {
-            tn: {
-              eq: tn
-            }
-          },
-          {
-            rtn: {
-              eq: tn
-            }
-          }
-        ]
-      }
-    );
+    if (!extras?.ignoreRelations)
+      await this.xcMeta.metaDelete(
+        this.projectId,
+        this.dbAlias,
+        'nc_relations',
+        null,
+        {
+          _and: [
+            {
+              _or: [
+                {
+                  tn: {
+                    eq: tn
+                  }
+                },
+                {
+                  rtn: {
+                    eq: tn
+                  }
+                }
+              ]
+            },
+            ...(extras?.ignoreVirtualRelations
+              ? [{ type: { neq: 'virtual' } }]
+              : [])
+          ]
+        }
+      );
+
     await this.deleteTableNameInACL(tn);
 
     await this.xcMeta.metaDelete(
@@ -2399,14 +2415,15 @@ export default abstract class BaseApiBuilder<T extends Noco>
           .map(mm => {
             if (
               queryParams?.showFields &&
-              !(`${mm._tn} <=> ${mm._rtn}` in queryParams.showFields)
+              !(`${mm._rtn}MMList` in queryParams.showFields)
             ) {
-              queryParams.showFields[`${mm._tn} <=> ${mm._rtn}`] = true;
+              queryParams.showFields[`${mm._rtn}MMList`] = true;
             }
 
             return {
               mm,
-              _cn: `${mm._tn} <=> ${mm._rtn}`
+              uidt: UITypes.LinkToAnotherRecord,
+              _cn: `${mm._rtn}MMList`
             };
           })
       ];

@@ -2,7 +2,7 @@ import CacheMgr from './CacheMgr';
 import { createClient, RedisClientType } from 'redis';
 
 export default class RedisCacheMgr extends CacheMgr {
-  client: RedisClientType<any>;
+  client: RedisClientType<any, any>;
 
   constructor(config: any) {
     super();

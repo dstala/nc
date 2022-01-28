@@ -402,7 +402,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     let tables;
     const swaggerRefs: { [table: string]: any[] } = {};
     // @ts-ignore
-    const order = await this.getOrderVal();
+    let order = await this.getOrderVal();
 
     /*    /!* Get all relations *!/
     let [
@@ -456,12 +456,12 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       }));
       tables.push(...relatedTableList.map(t => ({ tn: t })));
     } else {
-      tables = (await this.sqlClient.tableList())?.data?.list?.filter(
-        ({ tn }) => !IGNORE_TABLES.includes(tn)
-      )?.map(t => {
-        t.order = ++order;
-        return t;
-      });
+      tables = (await this.sqlClient.tableList())?.data?.list
+        ?.filter(({ tn }) => !IGNORE_TABLES.includes(tn))
+        ?.map(t => {
+          t.order = ++order;
+          return t;
+        });
 
       // enable extra
       /*      tables.push(...(await this.sqlClient.viewList())?.data?.list?.map(v => {
@@ -579,7 +579,6 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               type: table.type || 'table'
             }
           );
-
 
           const { id: modelId } = await this.xcMeta.metaInsert2(
             this.projectId,
@@ -1008,6 +1007,47 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     }
 
     await this.getManyToManyRelations();
+    await NcHelp.executeOperations(
+      virtualColumnsInsert,
+      this.connectionConfig.client
+    );
+
+    // this.baseModels2 = (
+    //   await Model.list({ project_id: this.projectId, db_alias: this.dbAlias })
+    // ).reduce((models, m) => {
+    //   return {
+    //     ...models,
+    //     [m.title]: new BaseModelSqlv2({
+    //       model: m,
+    //       dbDriver: this.dbDriver,
+    //       baseModels: this.baseModels2
+    //     })
+    //   };
+    // }, {});
+
+    // this.nocoTypes = await NocoTypeGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
+    //
+    // this.nocoRootResolvers = await NocoResolverGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     types: this.nocoTypes,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
+
+    registerRestCtrl({
+      router: this.router,
+      dbAlias: this.dbAlias,
+      baseId: this.projectId,
+      dbDriver: this.dbDriver
+    });
   }
 
   // NOTE: xc-meta
