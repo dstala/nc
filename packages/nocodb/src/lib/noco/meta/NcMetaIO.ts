@@ -73,6 +73,13 @@ export default abstract class NcMetaIO {
     data: any
   ): Promise<any>;
 
+  public abstract metaInsert2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    data: any
+  ): Promise<any>;
+
   public abstract audit(
     project_id: string,
     dbAlias: string,
@@ -110,6 +117,14 @@ export default abstract class NcMetaIO {
     fields?: string[],
     xcCondition?: XcCondition
   ): Promise<any>;
+  public abstract metaGet2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    idOrCondition: string | { [key: string]: any },
+    fields?: string[],
+    xcCondition?: XcCondition
+  ): Promise<any>;
 
   public abstract metaList(
     project_id: string,
@@ -122,6 +137,18 @@ export default abstract class NcMetaIO {
       xcCondition?: XcCondition;
       fields?: string[];
       orderBy?: { [key: string]: 'asc' | 'desc' };
+    }
+  ): Promise<any[]>;
+  public abstract metaList2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    args?: {
+      condition?: { [key: string]: any };
+      limit?: number;
+      offset?: number;
+      xcCondition?: XcCondition;
+      fields?: string[];
     }
   ): Promise<any[]>;
 

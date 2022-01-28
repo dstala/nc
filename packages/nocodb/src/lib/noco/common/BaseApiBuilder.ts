@@ -32,6 +32,12 @@ import ncModelsOrderUpgrader from './jobs/ncModelsOrderUpgrader';
 import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
 import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
 import xcMetaDiffSync from './handlers/xcMetaDiffSync';
+// import ncModelsOrderUpgrader from './jobs/ncModelsOrderUpgrader';
+// import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
+// import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
+import Model from '../../noco-models/Model';
+// import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
+import UITypes from '../../sqlUi/UITypes';
 
 const log = debug('nc:api:base');
 
@@ -65,6 +71,13 @@ const IGNORE_TABLES = [
 export default abstract class BaseApiBuilder<T extends Noco>
   implements XcDynamicChanges {
   public abstract readonly type: string;
+  protected models2: {
+    [key: string]: Model;
+  };
+  //
+  // protected baseModels2: {
+  //   [key: string]: BaseModelSqlv2;
+  // };
 
   public get knex(): XKnex {
     return this.sqlClient?.knex || this.dbDriver;
@@ -162,6 +175,8 @@ export default abstract class BaseApiBuilder<T extends Noco>
     connectionConfig: DbConfig
   ) {
     this.models = {};
+    this.models2 = {};
+    // this.baseModels2 = {};
     this.app = app;
     this.config = config;
     this.connectionConfig = connectionConfig;
@@ -186,12 +201,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
   }
 
   public getSqlClient(): any {
-    return NcConnectionMgr.getSqlClient({
-      dbAlias: this.dbAlias,
-      env: this.config.env,
-      config: this.config,
-      projectId: this.projectId
-    });
+    return this.sqlClient;
   }
 
   public abstract onViewCreate(viewName: string): Promise<void>;
@@ -216,45 +226,29 @@ export default abstract class BaseApiBuilder<T extends Noco>
 
   public abstract onToggleModelRelation(relationInModels: any): Promise<void>;
 
-  public async onTableDelete(
-    tn: string,
-    extras?: {
-      ignoreVirtualRelations?: boolean;
-      ignoreRelations?: boolean;
-      ignoreViews?: boolean;
-    }
-  ): Promise<void> {
+  public async onTableDelete(tn: string): Promise<void> {
     this.baseLog(`onTableDelete : '%s'`, tn);
     XcCache.del([this.projectId, this.dbAlias, 'table', tn].join('::'));
-    if (!extras?.ignoreRelations)
-      await this.xcMeta.metaDelete(
-        this.projectId,
-        this.dbAlias,
-        'nc_relations',
-        null,
-        {
-          _and: [
-            {
-              _or: [
-                {
-                  tn: {
-                    eq: tn
-                  }
-                },
-                {
-                  rtn: {
-                    eq: tn
-                  }
-                }
-              ]
-            },
-            ...(extras?.ignoreVirtualRelations
-              ? [{ type: { neq: 'virtual' } }]
-              : [])
-          ]
-        }
-      );
-
+    await this.xcMeta.metaDelete(
+      this.projectId,
+      this.dbAlias,
+      'nc_relations',
+      null,
+      {
+        _or: [
+          {
+            tn: {
+              eq: tn
+            }
+          },
+          {
+            rtn: {
+              eq: tn
+            }
+          }
+        ]
+      }
+    );
     await this.deleteTableNameInACL(tn);
 
     await this.xcMeta.metaDelete(
@@ -377,7 +371,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
         /* update fieldsOrder */
         const index = fieldsOrder.indexOf(alias);
         if (index > -1) {
-          fieldsOrder.splice(index, 1);
+          fieldsOrder.splice(index, 0);
         }
 
         /* update formView params */
@@ -1052,7 +1046,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
           /* update fieldsOrder */
           const index = fieldsOrder.indexOf(column.cno);
           if (index > -1) {
-            fieldsOrder.splice(index, 1);
+            fieldsOrder.splice(index, 0);
           }
 
           /* update formView params */

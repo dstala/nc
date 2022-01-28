@@ -9,7 +9,10 @@ import XcMigrationSource from '../common/XcMigrationSource';
 import NcMetaIO, { META_TABLES } from './NcMetaIO';
 import NcConnectionMgr from '../common/NcConnectionMgr';
 
+// import { nanoid } from 'nanoid';
+/*import { v4 as uuidv4 } from 'uuid';*/
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
+const nanoidv2 = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 14);
 
 export default class NcMetaIOImpl extends NcMetaIO {
   public async metaPaginatedList(
@@ -175,6 +178,46 @@ export default class NcMetaIOImpl extends NcMetaIO {
     return query.first();
   }
 
+  public async metaGet2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    idOrCondition: string | { [p: string]: any },
+    fields?: string[],
+    xcCondition?
+  ): Promise<any> {
+    const query = this.knexConnection(target);
+
+    if (xcCondition) {
+      query.condition(xcCondition);
+    }
+
+    if (fields?.length) {
+      query.select(...fields);
+    }
+
+    if (base_id !== null && base_id !== undefined) {
+      query.where('base_id', base_id);
+    }
+    if (dbAlias !== null && dbAlias !== undefined) {
+      query.where('db_alias', dbAlias);
+    }
+
+    if (!idOrCondition) {
+      return query.first();
+    }
+
+    if (typeof idOrCondition !== 'object') {
+      query.where('id', idOrCondition);
+    } else {
+      query.where(idOrCondition);
+    }
+
+    // console.log(query.toQuery())
+
+    return query.first();
+  }
+
   public async metaInsert(
     project_id: string,
     dbAlias: string,
@@ -190,9 +233,27 @@ export default class NcMetaIOImpl extends NcMetaIO {
     });
   }
 
+  public async metaInsert2(
+    base_id: string,
+    db_alias: string,
+    target: string,
+    data: any
+  ): Promise<any> {
+    const id = this.genNanoid(target);
+    await this.knexConnection(target).insert({
+      id,
+      db_alias,
+      base_id,
+      created_at: this.knexConnection?.fn?.now(),
+      updated_at: this.knexConnection?.fn?.now(),
+      ...data
+    });
+    return { ...data, id };
+  }
+
   public async metaList(
     project_id: string,
-    dbAlias: string,
+    _dbAlias: string,
     target: string,
     args?: {
       condition?: { [p: string]: any };
@@ -207,6 +268,48 @@ export default class NcMetaIOImpl extends NcMetaIO {
 
     if (project_id !== null && project_id !== undefined) {
       query.where('project_id', project_id);
+    }
+    /*    if (dbAlias !== null && dbAlias !== undefined) {
+      query.where('db_alias', dbAlias);
+    }*/
+
+    if (args?.condition) {
+      query.where(args.condition);
+    }
+    if (args?.limit) {
+      query.limit(args.limit);
+    }
+    if (args?.offset) {
+      query.offset(args.offset);
+    }
+    if (args?.xcCondition) {
+      (query as any).condition(args.xcCondition);
+    }
+
+    if (args?.fields?.length) {
+      query.select(...args.fields);
+    }
+
+    return query;
+  }
+
+  public async metaList2(
+    base_id: string,
+    dbAlias: string,
+    target: string,
+    args?: {
+      condition?: { [p: string]: any };
+      limit?: number;
+      offset?: number;
+      xcCondition?;
+      fields?: string[];
+      orderBy: { [key: string]: 'asc' | 'desc' };
+    }
+  ): Promise<any[]> {
+    const query = this.knexConnection(target);
+
+    if (base_id !== null && base_id !== undefined) {
+      query.where('base_id', base_id);
     }
     if (dbAlias !== null && dbAlias !== undefined) {
       query.where('db_alias', dbAlias);
@@ -375,6 +478,12 @@ export default class NcMetaIOImpl extends NcMetaIO {
         ...project,
         created_at: this.knexConnection?.fn?.now(),
         updated_at: this.knexConnection?.fn?.now()
+      });
+
+      // todo
+      await this.knexConnection('nc_bases_v2').insert({
+        id,
+        title: projectName
       });
 
       project.prefix = config.prefix;
@@ -609,6 +718,80 @@ export default class NcMetaIOImpl extends NcMetaIO {
       return Promise.resolve(undefined);
     }
     return this.metaInsert(project_id, dbAlias, target, data);
+  }
+
+  private genNanoid(target: string) {
+    let prefix;
+    switch (target) {
+      case 'nc_bases_v2':
+        prefix = 'bs_';
+        break;
+      case 'nc_data_src_v2':
+        prefix = 'ds_';
+        break;
+      case 'nc_models_v2':
+        prefix = 'md_';
+        break;
+      case 'nc_columns_v2':
+        prefix = 'cl_';
+        break;
+      case 'nc_col_relations_v2':
+        prefix = 'ln_';
+        break;
+      case 'nc_col_select_options_v2':
+        prefix = 'sl_';
+        break;
+      case 'nc_col_lookup_v2':
+        prefix = 'lk_';
+        break;
+      case 'nc_col_rollup_v2':
+        prefix = 'rl_';
+        break;
+      case 'nc_col_formula_v2':
+        prefix = 'fm_';
+        break;
+      case 'nc_filter_exp_v2':
+        prefix = 'fi_';
+        break;
+      case 'nc_sort_v2':
+        prefix = 'so_';
+        break;
+      case 'nc_shared_views_v2':
+        prefix = 'sv_';
+        break;
+      case 'nc_acl_v2':
+        prefix = 'ac_';
+        break;
+      case 'nc_form_view_v2':
+        prefix = 'fv_';
+        break;
+      case 'nc_form_view_columns_v2':
+        prefix = 'fvc_';
+        break;
+      case 'nc_gallery_view_v2':
+        prefix = 'gv_';
+        break;
+      case 'nc_gallery_view_columns_v2':
+        prefix = 'gvc_';
+        break;
+      case 'nc_kanban_view_v2':
+        prefix = 'kv_';
+        break;
+      case 'nc_kanban_view_columns_v2':
+        prefix = 'kvc_';
+        break;
+      case 'nc_users_v2':
+        prefix = 'us_';
+        break;
+      case 'nc_orgs_v2':
+        prefix = 'org_';
+        break;
+      case 'nc_teams_v2':
+        prefix = 'tm_';
+        break;
+    }
+
+    return `${prefix}${nanoidv2()}`;
   }
 }
 /**

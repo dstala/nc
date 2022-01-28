@@ -31,6 +31,13 @@ import { RestCtrlBelongsTo } from './RestCtrlBelongsTo';
 import { RestCtrlCustom } from './RestCtrlCustom';
 import { RestCtrlHasMany } from './RestCtrlHasMany';
 import { RestCtrlProcedure } from './RestCtrlProcedure';
+import Model from '../../noco-models/Model';
+import Column from '../../noco-models/Column';
+// import NocoTypeGenerator from '../noco-resolver/NocoTypeGenerator';
+// import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
+// import { RestCtrlv2 } from './RestCtrlv2';
+import registerRestCtrl from './registerRestCtrl';
+// import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const log = debug('nc:api:rest');
 const NC_CUSTOM_ROUTE_KEY = '__xc_custom';
@@ -44,6 +51,9 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       | RestCtrlHasMany
       | RestCtrlCustom;
   };
+
+  protected nocoTypes: any;
+  protected nocoRootResolvers: any;
   private procedureCtrl: RestCtrlProcedure;
   private routers: { [key: string]: Router };
   private apiCount = 0;
@@ -135,6 +145,22 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     this.procedureCtrl.mapRoutes(router, this.customRoutes);
     swagger.push(this.procedureCtrl.getSwaggerObj());
     this.router.use('/api/' + this.routeVersionLetter, router);
+    // this.nocoTypes = await NocoTypeGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
+    //
+    // this.nocoRootResolvers = await NocoResolverGenerator.generate(
+    //   Object.values(this.models2),
+    //   {
+    //     ncMeta: this.xcMeta,
+    //     types: this.nocoTypes,
+    //     baseModels2: this.baseModels2
+    //   }
+    // );
 
     const routesArr = (
       await this.xcMeta.metaList(this.projectId, this.dbAlias, 'nc_routes', {
@@ -239,7 +265,26 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
         rootPath,
         this.acls,
         middlewareBody
+        // this.baseModels2
       );
+
+      // new RestCtrlv2({
+      //   app: this.app,
+      //   models: this.models,
+      //   table: meta.title,
+      //   rootResolver: this.nocoRootResolvers,
+      //   // baseModels2: this.baseModels2
+      //   // baseModel2: this.baseModels2
+      //   // this.app,
+      //   // this.models,
+      //   // meta.title,
+      //   // routes,
+      //   // rootPath,
+      //   // this.acls,
+      //   // middlewareBody,
+      //   // this.baseModels2
+      // }).mapRoutes(router);
+
       this.controllers[meta.title].mapRoutes(router, this.customRoutes);
 
       relationRoutes.push(async () => {
@@ -337,6 +382,13 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       await this.generateSwaggerJson(swaggerDoc);
     }
 
+    registerRestCtrl({
+      router: this.router,
+      dbAlias: this.dbAlias,
+      baseId: this.projectId,
+      dbDriver: this.dbDriver
+    });
+
     // const minRouter = new RestCtrlMin(this.app,this.models,this.acls);
     // minRouter.mapRoutes(this.router)
   }
@@ -349,7 +401,8 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     );
     let tables;
     const swaggerRefs: { [table: string]: any[] } = {};
-    let order = await this.getOrderVal();
+    // @ts-ignore
+    const order = await this.getOrderVal();
 
     /*    /!* Get all relations *!/
     let [
@@ -358,6 +411,9 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       missingRelations
     ] = await this.getRelationsAndMissingRelations();
     relations = relations.concat(missingRelations);*/
+    const virtualColumnsInsert = [];
+
+    /* Get all relations */
     const relations = await this.relationsSyncAndGet();
 
     // set table name alias
@@ -392,44 +448,34 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           }
         }
 
-      tables = args.tableNames
-        .sort((a, b) => (a.tn || a._tn).localeCompare(b.tn || b._tn))
-        .map(({ tn, _tn }) => ({
-          tn,
-          type: args.type,
-          _tn,
-          order: ++order
-        }));
+      tables = args.tableNames.map(({ tn, _tn }) => ({
+        tn,
+        type: args.type,
+        order: ++order,
+        _tn
+      }));
       tables.push(...relatedTableList.map(t => ({ tn: t })));
     } else {
-      tables = (await this.sqlClient.tableList())?.data?.list
-        ?.filter(({ tn }) => !IGNORE_TABLES.includes(tn))
-        ?.map(t => {
-          t.order = ++order;
-          return t;
-        });
+      tables = (await this.sqlClient.tableList())?.data?.list?.filter(
+        ({ tn }) => !IGNORE_TABLES.includes(tn)
+      )?.map(t => {
+        t.order = ++order;
+        return t;
+      });
 
       // enable extra
-      tables.push(
-        ...(await this.sqlClient.viewList())?.data?.list
-          ?.sort((a, b) =>
-            (a.view_name || a.tn).localeCompare(b.view_name || b.tn)
-          )
-          ?.map(v => {
-            this.viewsCount++;
-            v.type = 'view';
-            v.tn = v.view_name;
-            v.order = ++order;
-            return v;
-          })
-          .filter(v => {
-            /* filter based on prefix */
-            if (this.projectBuilder?.prefix) {
-              return v.view_name.startsWith(this.projectBuilder?.prefix);
-            }
-            return true;
-          })
-      );
+      /*      tables.push(...(await this.sqlClient.viewList())?.data?.list?.map(v => {
+              this.viewsCount++;
+              v.type = 'view';
+              v.tn = v.view_name;
+              return v;
+            }).filter(v => {
+              /!* filter based on prefix *!/
+              if (this.projectBuilder?.prefix) {
+                return v.view_name.startsWith(this.projectBuilder?.prefix)
+              }
+              return true;
+            }));*/
 
       // enable extra
       await this.populteProcedureAndFunctionRoutes();
@@ -533,6 +579,108 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               type: table.type || 'table'
             }
           );
+
+
+          const { id: modelId } = await this.xcMeta.metaInsert2(
+            this.projectId,
+            this.dbAlias,
+            'nc_models_v2',
+            {
+              title: table.tn,
+              alias: meta._tn,
+              type: table.type || 'table'
+            }
+          );
+          for (const column of meta.columns) {
+            await Column.insert({
+              project_id: this.projectId,
+              db_alias: this.dbAlias,
+              fk_model_id: modelId,
+              ...column
+            });
+          }
+          this.models2[table.tn] = await Model.get({
+            base_id: this.projectId,
+            db_alias: this.dbAlias,
+            tn: table.tn
+          });
+          virtualColumnsInsert.push(async () => {
+            for (const column of meta.v) {
+              const rel = column.hm || column.bt || column.mm;
+
+              const rel_column_id = (
+                await this.models2?.[rel.tn]?.getColumns()
+              )?.find(c => c.cn === rel.cn)?.id;
+              const ref_rel_column_id = (
+                await this.models2?.[rel.rtn]?.getColumns()
+              )?.find(c => c.cn === rel.rcn)?.id;
+
+              let fk_mm_model_id;
+              let fk_mm_child_column_id;
+              let fk_mm_parent_column_id;
+
+              if (column.mm) {
+                fk_mm_model_id = this.models2?.[rel.vtn]?.id;
+                fk_mm_child_column_id = (
+                  await this.models2?.[rel.vtn]?.getColumns()
+                )?.find(c => c.cn === rel.vcn)?.id;
+                fk_mm_parent_column_id = (
+                  await this.models2?.[rel.vtn]?.getColumns()
+                )?.find(c => c.cn === rel.vrcn)?.id;
+              }
+              try {
+                await Column.insert({
+                  project_id: this.projectId,
+                  db_alias: this.dbAlias,
+                  fk_model_id: modelId,
+                  cn: column.cn,
+                  _cn: column._cn,
+                  uidt: column.uidt,
+                  type: column.hm ? 'hm' : column.mm ? 'mm' : 'bt',
+                  // column_id,
+                  fk_child_column_id: rel_column_id,
+                  fk_parent_column_id: ref_rel_column_id,
+                  fk_index_name: rel.fkn,
+                  ur: rel.ur,
+                  dr: rel.dr,
+                  fk_mm_model_id,
+                  fk_mm_child_column_id,
+                  fk_mm_parent_column_id
+                });
+              } catch (e) {
+                console.log(e);
+              }
+              // todo: insert virtual columns
+              // insert in nc_columns_v2 & nc_col_relations
+              // const { id: column_id } =
+              // await this.xcMeta.metaInsert2(
+              //   this.projectId,
+              //   this.dbAlias,
+              //   'nc_columns_v2',
+              //   {
+              //     model_id: modelId,
+              //     cn: column.cn,
+              //     _cn: column._cn,
+              //     uidt: column.uidt
+              //   }
+              // );
+
+              // await this.xcMeta.metaInsert2(
+              //   this.projectId,
+              //   this.dbAlias,
+              //   'nc_col_relations',
+              //   {
+              //     type: column.hm ? 'hm' : 'bt',
+              //     column_id,
+              //     rel_column_id,
+              //     ref_rel_column_id,
+              //     fkn: rel.fkn,
+              //     ur: rel.ur,
+              //     dr: rel.dr
+              //   }
+              // );
+            }
+          });
         } else if (args?.oldMetas?.[table.tn]?.id) {
           this.log(
             "xcTablesPopulate : Updating model metadata for '%s' - %s",
@@ -552,7 +700,6 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
             args?.oldMetas?.[table.tn]?.id
           );
         }
-
         /* create routes for table */
         const routes = new ExpressXcTsRoutes({
           dir: '',
@@ -649,6 +796,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           rootPath,
           this.acls,
           null
+          // this.baseModels2
         );
         this.controllers[table.tn].mapRoutes(router, this.customRoutes);
         this.router.use(encodeURI(rootPath), router);

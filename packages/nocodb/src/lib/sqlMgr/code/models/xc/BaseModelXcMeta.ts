@@ -95,14 +95,21 @@ abstract class BaseModelXcMeta extends BaseRender {
   }
 
   public getVitualColumns(): any[] {
-    const virtualColumns = [
-      ...(this.ctx.hasMany || []).map(hm => ({
-        hm,
-        _cn: `${hm._rtn} => ${hm._tn}`
-      })),
+    // todo: handle duplicate relation
+    return [
+      ...(this.ctx.hasMany || []).map(hm => {
+        return {
+          uidt: UITypes.LinkToAnotherRecord,
+          type: 'hm',
+          hm,
+          _cn: `${hm._tn}List`
+        };
+      }),
       ...(this.ctx.belongsTo || []).map(bt => ({
+        uidt: UITypes.LinkToAnotherRecord,
+        type: 'bt',
         bt,
-        _cn: `${bt._rtn} <= ${bt._tn}`
+        _cn: `${bt._rtn}Read`
       }))
     ];
 
