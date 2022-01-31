@@ -30,12 +30,12 @@ export default async function({
       return {
         builder: knex(childModel?.title)
           [columnOptions.rollup_function]?.(
-            knex.ref(`${childModel?.title}.${rollupColumn.cn}`)
+            knex.ref(`${childModel?.title}.${rollupColumn.title}`)
           )
           .where(
-            knex.ref(`${alias || parentModel.title}.${parentCol.cn}`),
+            knex.ref(`${alias || parentModel.title}.${parentCol.title}`),
             '=',
-            knex.ref(`${childModel.title}.${childCol.cn}`)
+            knex.ref(`${childModel.title}.${childCol.title}`)
           )
       };
     case 'mm': {
@@ -46,18 +46,18 @@ export default async function({
       return {
         builder: knex(parentModel.title)
           [columnOptions.rollup_function]?.(
-            knex.ref(`${parentModel.title}.${rollupColumn.cn}`)
+            knex.ref(`${parentModel.title}.${rollupColumn.title}`)
           )
           .innerJoin(
             mmModel.title,
-            knex.ref(`${mmModel.title}.${mmParentCol.cn}`),
+            knex.ref(`${mmModel.title}.${mmParentCol.title}`),
             '=',
-            knex.ref(`${parentModel.title}.${parentCol.cn}`)
+            knex.ref(`${parentModel.title}.${parentCol.title}`)
           )
           .where(
-            knex.ref(`${mmModel.title}.${mmChildCol.cn}`),
+            knex.ref(`${mmModel.title}.${mmChildCol.title}`),
             '=',
-            knex.ref(`${alias || childModel.title}.${childCol.cn}`)
+            knex.ref(`${alias || childModel.title}.${childCol.title}`)
           )
       };
     }

@@ -140,7 +140,7 @@ export default abstract class NcMetaIO {
     }
   ): Promise<any[]>;
   public abstract metaList2(
-    base_id: string,
+    project_id: string,
     dbAlias: string,
     target: string,
     args?: {

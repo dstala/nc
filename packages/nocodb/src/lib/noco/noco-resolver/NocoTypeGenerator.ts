@@ -118,7 +118,7 @@ export default class NocoTypeGenerator {
                     // column._cn,
                     {
                       async value(): Promise<any> {
-                        return countLoader.load(this[model.pk._cn]);
+                        return countLoader.load(this[model.primaryKey._cn]);
                       },
                       configurable: true,
                       writable: true
@@ -167,7 +167,7 @@ export default class NocoTypeGenerator {
                   // defining HasMany count method within GQL Type class
                   Object.defineProperty(type.prototype, column._cn, {
                     async value(): Promise<any> {
-                      return listLoader.load(this[model.pk._cn]);
+                      return listLoader.load(this[model.primaryKey._cn]);
                     },
                     configurable: true
                   });
@@ -217,7 +217,7 @@ export default class NocoTypeGenerator {
 
                   Object.defineProperty(type.prototype, column._cn, {
                     async value(): Promise<any> {
-                      return await listLoader.load(this[model.pk._cn]);
+                      return await listLoader.load(this[model.primaryKey._cn]);
                     },
                     configurable: true,
                     writable: true

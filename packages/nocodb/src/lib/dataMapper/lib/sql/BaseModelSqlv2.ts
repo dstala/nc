@@ -48,7 +48,7 @@ class BaseModelSqlv2 {
 
     await this.selectObject({ qb });
 
-    const data = await qb.where(this.model.pk.cn, id).first();
+    const data = await qb.where(this.model.primaryKey.title, id).first();
 
     if (data) {
       const proto = await this.getProto();
@@ -96,7 +96,7 @@ class BaseModelSqlv2 {
     });
 
     /* const pk = columnsObj.actor.find(c => c.pk);
-    const ids = data.map(r => r[pk._cn]);
+    const ids = data.map(r => r[pk.alias]);
 
     for (const col of columnsObj.actor) {
       switch (col.uidt) {
@@ -119,7 +119,7 @@ class BaseModelSqlv2 {
             }, {});
 
             for (const d of data) {
-              d[col._cn] = gb[d[pk._cn]];
+              d[col.alias] = gb[d[pk.alias]];
             }
           }
           if (col.type === 'bt') {
@@ -139,7 +139,7 @@ class BaseModelSqlv2 {
             }, {});
 
             for (const d of data) {
-              d[col._cn] = gb[d[col._rel_cn]];
+              d[col.alias] = gb[d[col._rel_cn]];
             }
           }
 
@@ -154,7 +154,7 @@ class BaseModelSqlv2 {
                     `${col.v_rel_tn}.${col.v_ref_rel_cn}`,
                     `${col.ref_rel_tn}.${col.ref_rel_cn}`
                   )
-                  .where(`${col.v_rel_tn}.${col.v_rel_cn}`, id) // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
+                  .where(`${col.v_rel_tn}.${col.v_rel_cn}`, id) // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].cn])
                   // .xwhere(where, this.dbModels[child].selectQuery(''))
                   .select({
                     [key]: `${col.v_rel_tn}.${col.v_rel_cn}`
@@ -170,7 +170,7 @@ class BaseModelSqlv2 {
             const gs = _.groupBy(childs, key);
 
             for (const d of data) {
-              d[col._cn] = gs[d[pk._cn]];
+              d[col.alias] = gs[d[pk.alias]];
             }
           }
           break;
@@ -270,13 +270,13 @@ class BaseModelSqlv2 {
 
             const children = await knex.union(
               ids.map(id => {
-                // lkQb.select(`${field.title}.${field.cn} as ${field._cn}`)
+                // lkQb.select(`${field.title}.${field.cn} as ${field.alias}`)
 
                 let query;
                 if (prev.type === 'hm') {
                   query = knex(`${field.title} as a`)
                     .select(
-                      `a.${field.cn} as ${field._cn}`,
+                      `a.${field.cn} as ${field.alias}`,
                       knex.raw('? as ??', [id, pk.cn])
                     )
                     .whereIn(
@@ -290,7 +290,7 @@ class BaseModelSqlv2 {
                 } else if (prev.type === 'bt') {
                   query = knex(`${field.title} as a`)
                     .select(
-                      `a.${field.cn} as ${field._cn}`,
+                      `a.${field.cn} as ${field.alias}`,
                       knex.raw('? as ??', [id, pk.cn])
                     )
                     .whereIn(
@@ -306,7 +306,7 @@ class BaseModelSqlv2 {
 
                   query = knex(`${field.title} as a`)
                     .select(
-                      `a.${field.cn} as ${field._cn}`,
+                      `a.${field.cn} as ${field.alias}`,
                       knex.raw('? as ??', [id, pk.cn])
                     )
                     .whereIn(
@@ -329,22 +329,22 @@ class BaseModelSqlv2 {
             const gb = children.reduce((gb, r) => {
               if (prev.type === 'hm') {
                 gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || [];
-                gb[r[col.rel_cn]].push(r[field._cn]);
+                gb[r[col.rel_cn]].push(r[field.alias]);
               } else if (prev.type === 'bt') {
                 gb[r[pk.cn]] = gb[r[pk.cn]] || [];
-                gb[r[pk.cn]].push(r[field._cn]);
+                gb[r[pk.cn]].push(r[field.alias]);
               } else if (prev.type === 'mm') {
                 // throw new Error('"m2m" lookup not implemented')
                 gb[r[pk.cn]] = gb[r[pk.cn]] || [];
-                gb[r[pk.cn]].push(r[field._cn]);
+                gb[r[pk.cn]].push(r[field.alias]);
               }
               return gb;
             }, {});
 
             for (const d of data) {
-              d[col._cn] = isArr
-                ? gb[d[pk._cn]]
-                : gb[d[pk._cn]] && gb[d[pk._cn]][0];
+              d[col.alias] = isArr
+                ? gb[d[pk.alias]]
+                : gb[d[pk.alias]] && gb[d[pk.alias]][0];
             }
           }
           break;
@@ -364,7 +364,7 @@ class BaseModelSqlv2 {
         case 'Formula':
           break;
         default:
-          qb.select(this.dbDriver.raw(`?? as ??`, [col.cn, col._cn]));
+          qb.select(this.dbDriver.raw(`?? as ??`, [col.cn, col.alias]));
           break;
       }
     }
@@ -382,7 +382,7 @@ class BaseModelSqlv2 {
         columns.reduce(
           (obj, o) => ({
             ...obj,
-            [o._cn]: 1
+            [o.alias]: 1
           }),
           {}
         )
@@ -421,7 +421,7 @@ class BaseModelSqlv2 {
 
       fields = fields
         .split(',')
-        .map(c => `${chilCol.cn}.${c}`)
+        .map(c => `${chilCol.title}.${c}`)
         .join(',');
 
       const qb = this.dbDriver(childTable.title);
@@ -431,7 +431,7 @@ class BaseModelSqlv2 {
         this.dbDriver
           .union(
             ids.map(p => {
-              const query = qb.clone().where({ [chilCol.cn]: p });
+              const query = qb.clone().where({ [chilCol.title]: p });
               // .select(...fields.split(','));;
 
               return this.isSqlite()
@@ -456,7 +456,7 @@ class BaseModelSqlv2 {
           c.__proto__ = proto;
           return c;
         }),
-        chilCol._cn
+        chilCol.alias
       );
     } catch (e) {
       console.log(e);
@@ -477,8 +477,8 @@ class BaseModelSqlv2 {
       const childs = await this.dbDriver.unionAll(
         ids.map(p => {
           const query = this.dbDriver(chilMod.title)
-            .count(`${chilCol?.cn} as count`)
-            .where({ [chilCol?.cn]: p })
+            .count(`${chilCol?.title} as count`)
+            .where({ [chilCol?.title]: p })
             .first();
           return this.isSqlite() ? this.dbDriver.select().from(query) : query;
         }),
@@ -507,11 +507,11 @@ class BaseModelSqlv2 {
     const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
 
     const tn = this.model.title;
-    // const cn = (await relColOptions.getChildColumn()).cn;
+    // const cn = (await relColOptions.getChildColumn()).title;
     const vtn = (await relColOptions.getMMModel()).title;
-    const vcn = (await relColOptions.getMMChildColumn()).cn;
-    const vrcn = (await relColOptions.getMMParentColumn()).cn;
-    const rcn = (await relColOptions.getParentColumn()).cn;
+    const vcn = (await relColOptions.getMMChildColumn()).title;
+    const vrcn = (await relColOptions.getMMParentColumn()).title;
+    const rcn = (await relColOptions.getParentColumn()).title;
     const childTable = await (await relColOptions.getParentColumn()).getModel();
     const childModel = await Model.getBaseModelSQL({
       dbDriver: this.dbDriver,
@@ -521,7 +521,7 @@ class BaseModelSqlv2 {
 
     // const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
     // @ts-ignore
-    // const _cn = this.dbModels[tn].columnToAlias?.[cn];
+    // const alias = this.dbModels[tn].columnToAlias?.[cn];
 
     // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
     //   fields += ',' + cn;
@@ -533,7 +533,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(rtn)
       .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
-      // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
+      // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].title])
       // .xwhere(where, this.dbModels[child].selectQuery(''))
       .select({
         [`${tn}_${vcn}`]: `${vtn}.${vcn}`
@@ -545,7 +545,7 @@ class BaseModelSqlv2 {
       parentIds.map(id => {
         // const query = this.dbDriver(rtn)
         //   .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
-        //   .where(`${vtn}.${vcn}`, id) // p[this.columnToAlias?.[this.pks[0].cn] || this.pks[0].cn])
+        //   .where(`${vtn}.${vcn}`, id) // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].title])
         //   // .xwhere(where, this.dbModels[child].selectQuery(''))
         //   .select(colSelect)
         //   .select({
@@ -580,7 +580,7 @@ class BaseModelSqlv2 {
     const proto: any = { __columnAliases: {} };
     const columns = await this.model.getColumns();
     for (const column of columns) {
-      switch (column.uidt) {
+      switch (column.ui_data_type) {
         case UITypes.Rollup:
           {
             // @ts-ignore
@@ -591,19 +591,19 @@ class BaseModelSqlv2 {
           {
             // @ts-ignore
             const colOptions: LookupColumn = await column.getColOptions();
-            proto.__columnAliases[column._cn] = {
+            proto.__columnAliases[column.alias] = {
               path: [
                 (await Column.get({ colId: colOptions.fk_relation_column_id }))
-                  ?._cn,
+                  ?.alias,
                 (await Column.get({ colId: colOptions.fk_lookup_column_id }))
-                  ?._cn
+                  ?.alias
               ]
             };
           }
           break;
         case UITypes.LinkToAnotherRecord:
           {
-            this._columns[column._cn] = column;
+            this._columns[column.alias] = column;
             const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
 
             if (colOptions?.type === 'hm') {
@@ -619,16 +619,16 @@ class BaseModelSqlv2 {
                   return [];
                 }
               });
-              const self: any = this;
+              const self: BaseModelSqlv2 = this;
 
-              proto[column._cn] = async function(): Promise<any> {
-                return listLoader.load(this[self?.model?.pk?._cn]);
+              proto[column.alias] = async function(): Promise<any> {
+                return listLoader.load(this[self?.model?.primaryKey?.alias]);
               };
 
               // defining HasMany count method within GQL Type class
-              // Object.defineProperty(type.prototype, column._cn, {
+              // Object.defineProperty(type.prototype, column.alias, {
               //   async value(): Promise<any> {
-              //     return listLoader.load(this[model.pk._cn]);
+              //     return listLoader.load(this[model.pk.alias]);
               //   },
               //   configurable: true
               // });
@@ -647,10 +647,10 @@ class BaseModelSqlv2 {
                 }
               });
 
-              const self = this;
+              const self: BaseModelSqlv2 = this;
 
-              proto[column._cn] = async function(): Promise<any> {
-                return await listLoader.load(this[self.model.pk._cn]);
+              proto[column.alias] = async function(): Promise<any> {
+                return await listLoader.load(this[self.model.primaryKey.alias]);
               };
             } else if (colOptions.type === 'bt') {
               // @ts-ignore
@@ -671,11 +671,11 @@ class BaseModelSqlv2 {
                   ).list(
                     {
                       // limit: ids.length,
-                      where: `(${pCol.cn},in,${ids.join(',')})`
+                      where: `(${pCol.title},in,${ids.join(',')})`
                     },
                     true
                   );
-                  const gs = _.groupBy(data, pCol._cn);
+                  const gs = _.groupBy(data, pCol.alias);
                   return ids.map(async (id: string) => gs?.[id]?.[0]);
                 } catch (e) {
                   console.log(e);
@@ -684,11 +684,11 @@ class BaseModelSqlv2 {
               });
 
               // defining HasMany count method within GQL Type class
-              proto[column._cn] = async function() {
+              proto[column.alias] = async function() {
                 return (
-                  this?.[cCol?._cn] !== null &&
-                  this?.[cCol?._cn] != undefined &&
-                  (await readLoader.load(this?.[cCol?._cn]))
+                  this?.[cCol?.alias] !== null &&
+                  this?.[cCol?.alias] != undefined &&
+                  (await readLoader.load(this?.[cCol?.alias]))
                 );
               };
               // todo : handle mm
@@ -720,7 +720,7 @@ class BaseModelSqlv2 {
     );
     obj.offset = Math.max(+(args.offset || args.o) || 0, 0);
     obj.fields = args.fields || args.f || '*';
-    obj.sort = args.sort || args.s || this.model.pk?.[0]?.cn;
+    obj.sort = args.sort || args.s || this.model.primaryKey?.[0]?.title;
     return obj;
   }
 
@@ -737,7 +737,7 @@ class BaseModelSqlv2 {
     if (!ignoreLimit) query.limit(limit);
 
     // if (!table && !sort && this.db === 'mssql' && !isUnion) {
-    //   sort =         this.model.pk?._cn;
+    //   sort =         this.model.pk?.alias;
     // }
 
     /*    if (sort) {
@@ -763,7 +763,7 @@ class BaseModelSqlv2 {
   //         arr.push(
   //           formulaQueryBuilder(
   //             v.formula?.tree,
-  //             v._cn,
+  //             v.alias,
   //             this.dbDriver,
   //             this.aliasToColumn
   //           )
@@ -780,7 +780,7 @@ class BaseModelSqlv2 {
   //     this._selectFormulasObj = (this.virtualColumns || [])?.reduce(
   //       (obj, v) => {
   //         if (v.formula?.value && !v.formula?.error?.length) {
-  //           obj[v._cn] = formulaQueryBuilder(
+  //           obj[v.alias] = formulaQueryBuilder(
   //             v.formula?.tree,
   //             null,
   //             this.dbDriver,
@@ -806,7 +806,7 @@ class BaseModelSqlv2 {
   //           rollup: v.rl,
   //           hasMany: this.hasManyRelations,
   //           manyToMany: this.manyToManyRelations
-  //         }).as(v._cn)
+  //         }).as(v.alias)
   //       );
   //     }
   //     return arr;
@@ -817,7 +817,7 @@ class BaseModelSqlv2 {
     const res = {};
     const columns = await this.model.getColumns();
     for (const column of columns) {
-      switch (column.uidt) {
+      switch (column.ui_data_type) {
         case 'LinkToAnotherRecord':
         case 'Lookup':
           break;
@@ -833,7 +833,7 @@ class BaseModelSqlv2 {
             );
             // todo:  verify syntax of as ? / ??
             qb.select(
-              this.dbDriver.raw(`?? as ??`, [selectQb.builder, column._cn])
+              this.dbDriver.raw(`?? as ??`, [selectQb.builder, column.alias])
             );
           }
           break;
@@ -846,11 +846,11 @@ class BaseModelSqlv2 {
                 // column,
                 columnOptions: (await column.getColOptions()) as RollupColumn
               })
-            ).builder.as(column._cn)
+            ).builder.as(column.alias)
           );
           break;
         default:
-          res[column._cn] = `${this.model.title}.${column.cn}`;
+          res[column.alias] = `${this.model.title}.${column.title}`;
           break;
       }
     }

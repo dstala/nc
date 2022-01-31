@@ -451,6 +451,31 @@ export const actions = {
     return await dispatch('ActUpload', { args, op, opArgs, file, cusHeaders, cusAxiosOptions, formData })
   },
 
+  async ActTable({
+    commit,
+    state,
+    rootState,
+    dispatch
+  }, body) {
+    const params = {}
+    if (this.$router.currentRoute && this.$router.currentRoute.params && this.$router.currentRoute.params.project_id) {
+      params.project_id = this.$router.currentRoute.params.project_id
+    }
+
+    if (this.$router.currentRoute && this.$router.currentRoute.params && this.$router.currentRoute.params.project_id) {
+      params.project_id = this.$router.currentRoute.params.project_id
+    }
+    const headers = { 'xc-auth': rootState.users.token }
+
+    return (await this.$axios({
+      url: `projects/${params.project_id}/tables/${body.id}`,
+      baseURL: `${this.$axios.defaults.baseURL}/dashboard`,
+      data: body, // {api: op, ...args, args: opArgs},
+      headers,
+      method: 'post'
+    })).data
+  },
+
   async ActUpload({ commit, state, rootState }, {
     args = {},
     op,

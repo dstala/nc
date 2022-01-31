@@ -609,10 +609,10 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
 
               const rel_column_id = (
                 await this.models2?.[rel.tn]?.getColumns()
-              )?.find(c => c.cn === rel.cn)?.id;
+              )?.find(c => c.title === rel.cn)?.id;
               const ref_rel_column_id = (
                 await this.models2?.[rel.rtn]?.getColumns()
-              )?.find(c => c.cn === rel.rcn)?.id;
+              )?.find(c => c.title === rel.rcn)?.id;
 
               let fk_mm_model_id;
               let fk_mm_child_column_id;
@@ -622,10 +622,10 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
                 fk_mm_model_id = this.models2?.[rel.vtn]?.id;
                 fk_mm_child_column_id = (
                   await this.models2?.[rel.vtn]?.getColumns()
-                )?.find(c => c.cn === rel.vcn)?.id;
+                )?.find(c => c.title === rel.vcn)?.id;
                 fk_mm_parent_column_id = (
                   await this.models2?.[rel.vtn]?.getColumns()
-                )?.find(c => c.cn === rel.vrcn)?.id;
+                )?.find(c => c.title === rel.vrcn)?.id;
               }
               try {
                 await Column.insert({

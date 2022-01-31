@@ -1233,7 +1233,7 @@ const parseConditionv2 = (obj: FilterObject, qb: QueryBuilder) => {
     });
   } else {
     const col = obj.column;
-    const fieldName = col.cn;
+    const fieldName = col.title;
     const val = obj.value;
     switch (obj.comparison_op) {
       case 'eq':

@@ -53,7 +53,7 @@ const parseConditionV2 = async (
   } else {
     const column = await filter.getColumn();
 
-    if (column.uidt === UITypes.LinkToAnotherRecord) {
+    if (column.ui_data_type === UITypes.LinkToAnotherRecord) {
       const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
       const childColumn = await colOptions.getChildColumn();
       const parentColumn = await colOptions.getParentColumn();
@@ -62,7 +62,7 @@ const parseConditionV2 = async (
       const parentModel = await parentColumn.getModel();
       await parentModel.getColumns();
       if (colOptions.type === 'hm') {
-        const selectQb = knex(childModel.title).select(childColumn.cn);
+        const selectQb = knex(childModel.title).select(childColumn.title);
         (
           await parseConditionV2(
             new Filter({
@@ -71,7 +71,7 @@ const parseConditionV2 = async (
                 ? negatedMapping[filter.comparison_op]
                 : {}),
               fk_model_id: childModel.id,
-              fk_column_id: childModel?.pv?.id
+              fk_column_id: childModel?.primaryValue?.id
             }),
             knex,
             aliasCount
@@ -80,11 +80,11 @@ const parseConditionV2 = async (
 
         return (qbP: QueryBuilder) => {
           if (filter.comparison_op in negatedMapping)
-            qbP.whereNotIn(parentColumn.cn, selectQb);
-          else qbP.whereIn(parentColumn.cn, selectQb);
+            qbP.whereNotIn(parentColumn.title, selectQb);
+          else qbP.whereIn(parentColumn.title, selectQb);
         };
       } else if (colOptions.type === 'bt') {
-        const selectQb = knex(parentModel.title).select(childColumn.cn);
+        const selectQb = knex(parentModel.title).select(childColumn.title);
         (
           await parseConditionV2(
             new Filter({
@@ -93,7 +93,7 @@ const parseConditionV2 = async (
                 ? negatedMapping[filter.comparison_op]
                 : {}),
               fk_model_id: parentModel.id,
-              fk_column_id: parentModel?.pv?.id
+              fk_column_id: parentModel?.primaryValue?.id
             }),
             knex,
             aliasCount
@@ -102,8 +102,8 @@ const parseConditionV2 = async (
 
         return (qbP: QueryBuilder) => {
           if (filter.comparison_op in negatedMapping)
-            qbP.whereNotIn(childColumn.cn, selectQb);
-          else qbP.whereIn(childColumn.cn, selectQb);
+            qbP.whereNotIn(childColumn.title, selectQb);
+          else qbP.whereIn(childColumn.title, selectQb);
         };
       } else if (colOptions.type === 'mm') {
         const mmModel = await colOptions.getMMModel();
@@ -111,11 +111,11 @@ const parseConditionV2 = async (
         const mmChildColumn = await colOptions.getMMChildColumn();
 
         const selectQb = knex(mmModel.title)
-          .select(mmChildColumn.cn)
+          .select(mmChildColumn.title)
           .join(
             parentModel.title,
-            `${mmModel.title}.${mmParentColumn.cn}`,
-            `${parentModel.title}.${parentColumn.cn}`
+            `${mmModel.title}.${mmParentColumn.title}`,
+            `${parentModel.title}.${parentColumn.title}`
           );
         (
           await parseConditionV2(
@@ -125,7 +125,7 @@ const parseConditionV2 = async (
                 ? negatedMapping[filter.comparison_op]
                 : {}),
               fk_model_id: parentModel.id,
-              fk_column_id: parentModel?.pv?.id
+              fk_column_id: parentModel?.primaryValue?.id
             }),
             knex,
             aliasCount
@@ -134,15 +134,15 @@ const parseConditionV2 = async (
 
         return (qbP: QueryBuilder) => {
           if (filter.comparison_op in negatedMapping)
-            qbP.whereNotIn(childColumn.cn, selectQb);
-          else qbP.whereIn(childColumn.cn, selectQb);
+            qbP.whereNotIn(childColumn.title, selectQb);
+          else qbP.whereIn(childColumn.title, selectQb);
         };
       }
 
       return _qb => {};
-    } else if (column.uidt === UITypes.Lookup) {
+    } else if (column.ui_data_type === UITypes.Lookup) {
       return await generateLookupCondition(column, filter, knex, aliasCount);
-    } else if (column.uidt === UITypes.Rollup && !customWhereClause) {
+    } else if (column.ui_data_type === UITypes.Rollup && !customWhereClause) {
       const builder = (
         await genRollupSelectv2({
           knex,
@@ -157,7 +157,7 @@ const parseConditionV2 = async (
         alias,
         builder
       );
-    } else if (column.uidt === UITypes.Formula && !customWhereClause) {
+    } else if (column.ui_data_type === UITypes.Formula && !customWhereClause) {
       const model = await column.getModel();
       const builder = (
         await formulaQueryBuilderv2(
@@ -178,8 +178,8 @@ const parseConditionV2 = async (
       const field = customWhereClause
         ? filter.value
         : alias
-        ? `${alias}.${column.cn}`
-        : column.cn;
+        ? `${alias}.${column.title}`
+        : column.title;
       const val = customWhereClause ? customWhereClause : filter.value;
       return qb => {
         switch (filter.comparison_op) {
@@ -263,7 +263,7 @@ async function generateLookupCondition(
     if (relationColumnOptions.type === 'hm') {
       qb = knex(`${childModel.title} as ${alias}`);
 
-      qb.select(`${alias}.${childColumn.cn}`);
+      qb.select(`${alias}.${childColumn.title}`);
 
       await nestedConditionJoin(
         {
@@ -281,12 +281,12 @@ async function generateLookupCondition(
 
       return (qbP: QueryBuilder) => {
         if (filter.comparison_op in negatedMapping)
-          qbP.whereNotIn(parentColumn.cn, qb);
-        else qbP.whereIn(parentColumn.cn, qb);
+          qbP.whereNotIn(parentColumn.title, qb);
+        else qbP.whereIn(parentColumn.title, qb);
       };
     } else if (relationColumnOptions.type === 'bt') {
       qb = knex(`${parentModel.title} as ${alias}`);
-      qb.select(`${alias}.${childColumn.cn}`);
+      qb.select(`${alias}.${childColumn.title}`);
 
       await nestedConditionJoin(
         {
@@ -304,8 +304,8 @@ async function generateLookupCondition(
 
       return (qbP: QueryBuilder) => {
         if (filter.comparison_op in negatedMapping)
-          qbP.whereNotIn(childColumn.cn, qb);
-        else qbP.whereIn(childColumn.cn, qb);
+          qbP.whereNotIn(childColumn.title, qb);
+        else qbP.whereIn(childColumn.title, qb);
       };
     } else if (relationColumnOptions.type === 'mm') {
       const mmModel = await relationColumnOptions.getMMModel();
@@ -315,11 +315,11 @@ async function generateLookupCondition(
       const childAlias = `__nc${aliasCount.count++}`;
 
       qb = knex(`${mmModel.title} as ${alias}`)
-        .select(`${alias}.${mmChildColumn.cn}`)
+        .select(`${alias}.${mmChildColumn.title}`)
         .join(
           `${parentModel.title} as ${childAlias}`,
-          `${alias}.${mmParentColumn.cn}`,
-          `${childAlias}.${parentColumn.cn}`
+          `${alias}.${mmParentColumn.title}`,
+          `${childAlias}.${parentColumn.title}`
         );
 
       await nestedConditionJoin(
@@ -338,8 +338,8 @@ async function generateLookupCondition(
 
       return (qbP: QueryBuilder) => {
         if (filter.comparison_op in negatedMapping)
-          qbP.whereNotIn(childColumn.cn, qb);
-        else qbP.whereIn(childColumn.cn, qb);
+          qbP.whereNotIn(childColumn.title, qb);
+        else qbP.whereIn(childColumn.title, qb);
       };
     }
   }
@@ -354,11 +354,11 @@ async function nestedConditionJoin(
   aliasCount: { count: number }
 ) {
   if (
-    lookupColumn.uidt === UITypes.Lookup ||
-    lookupColumn.uidt === UITypes.LinkToAnotherRecord
+    lookupColumn.ui_data_type === UITypes.Lookup ||
+    lookupColumn.ui_data_type === UITypes.LinkToAnotherRecord
   ) {
     const relationColumn =
-      lookupColumn.uidt === UITypes.Lookup
+      lookupColumn.ui_data_type === UITypes.Lookup
         ? await (
             await lookupColumn.getColOptions<LookupColumn>()
           ).getRelationColumn()
@@ -380,8 +380,8 @@ async function nestedConditionJoin(
           {
             qb.join(
               `${childModel.title} as ${relAlias}`,
-              `${alias}.${parentColumn.cn}`,
-              `${relAlias}.${childColumn.cn}`
+              `${alias}.${parentColumn.title}`,
+              `${relAlias}.${childColumn.title}`
             );
           }
           break;
@@ -389,8 +389,8 @@ async function nestedConditionJoin(
           {
             qb.join(
               `${parentModel.title} as ${relAlias}`,
-              `${alias}.${childColumn.cn}`,
-              `${relAlias}.${parentColumn.cn}`
+              `${alias}.${childColumn.title}`,
+              `${relAlias}.${parentColumn.title}`
             );
           }
           break;
@@ -404,19 +404,19 @@ async function nestedConditionJoin(
 
             qb.join(
               `${mmModel.title} as ${assocAlias}`,
-              `${assocAlias}.${mmChildColumn.cn}`,
-              `${alias}.${childColumn.cn}`
+              `${assocAlias}.${mmChildColumn.title}`,
+              `${alias}.${childColumn.title}`
             ).join(
               `${parentModel.title} as ${relAlias}`,
-              `${relAlias}.${parentColumn.cn}`,
-              `${assocAlias}.${mmParentColumn.cn}`
+              `${relAlias}.${parentColumn.title}`,
+              `${assocAlias}.${mmParentColumn.title}`
             );
           }
           break;
       }
     }
 
-    if (lookupColumn.uidt === UITypes.Lookup) {
+    if (lookupColumn.ui_data_type === UITypes.Lookup) {
       await nestedConditionJoin(
         filter,
         await (
@@ -436,7 +436,7 @@ async function nestedConditionJoin(
                 new Filter({
                   ...filter,
                   fk_model_id: childModel.id,
-                  fk_column_id: childModel.pv?.id
+                  fk_column_id: childModel.primaryValue?.id
                 }),
                 knex,
                 aliasCount,
@@ -452,7 +452,7 @@ async function nestedConditionJoin(
                 new Filter({
                   ...filter,
                   fk_model_id: parentModel.id,
-                  fk_column_id: parentModel?.pv?.id
+                  fk_column_id: parentModel?.primaryValue?.id
                 }),
                 knex,
                 aliasCount,
@@ -468,7 +468,7 @@ async function nestedConditionJoin(
                 new Filter({
                   ...filter,
                   fk_model_id: parentModel.id,
-                  fk_column_id: parentModel.pv?.id
+                  fk_column_id: parentModel.primaryValue?.id
                 }),
                 knex,
                 aliasCount,

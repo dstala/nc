@@ -56,7 +56,7 @@ export default async function formulaQueryBuilderv2(
   // todo: improve - implement a common solution for filter, sort, formula, etc
   for (const col of await model.getColumns()) {
     if (col.id in aliasToColumn) continue;
-    switch (col.uidt) {
+    switch (col.ui_data_type) {
       case UITypes.Formula:
         {
           aliasToColumn[col.id] = null;
@@ -94,15 +94,15 @@ export default async function formulaQueryBuilderv2(
             switch (relation.type) {
               case 'bt':
                 selectQb = knex(`${parentModel.title} as ${alias}`).where(
-                  `${alias}.${parentColumn.cn}`,
-                  knex.raw(`??`, [`${childModel.title}.${childColumn.cn}`])
+                  `${alias}.${parentColumn.title}`,
+                  knex.raw(`??`, [`${childModel.title}.${childColumn.title}`])
                 );
                 break;
               case 'hm':
                 isMany = true;
                 selectQb = knex(`${childModel.title} as ${alias}`).where(
-                  `${alias}.${childColumn.cn}`,
-                  knex.raw(`??`, [`${parentModel.title}.${parentColumn.cn}`])
+                  `${alias}.${childColumn.title}`,
+                  knex.raw(`??`, [`${parentModel.title}.${parentColumn.title}`])
                 );
                 break;
               case 'mm':
@@ -116,12 +116,14 @@ export default async function formulaQueryBuilderv2(
                   selectQb = knex(`${parentModel.title} as ${alias}`)
                     .join(
                       `${mmModel.title} as ${assocAlias}`,
-                      `${assocAlias}.${mmParentColumn.cn}`,
-                      `${alias}.${parentColumn.cn}`
+                      `${assocAlias}.${mmParentColumn.title}`,
+                      `${alias}.${parentColumn.title}`
                     )
                     .where(
-                      `${assocAlias}.${mmChildColumn.cn}`,
-                      knex.raw(`??`, [`${childModel.title}.${childColumn.cn}`])
+                      `${assocAlias}.${mmChildColumn.title}`,
+                      knex.raw(`??`, [
+                        `${childModel.title}.${childColumn.title}`
+                      ])
                     );
                 }
                 break;
@@ -129,7 +131,7 @@ export default async function formulaQueryBuilderv2(
 
             let lookupColumn = await lookup.getLookupColumn();
             let prevAlias = alias;
-            while (lookupColumn.uidt === UITypes.Lookup) {
+            while (lookupColumn.ui_data_type === UITypes.Lookup) {
               const nestedAlias = `__nc_formula${aliasCount++}`;
               const nestedLookup = await lookupColumn.getColOptions<
                 LookupColumn
@@ -154,8 +156,8 @@ export default async function formulaQueryBuilderv2(
                   {
                     selectQb.join(
                       `${parentModel.title} as ${nestedAlias}`,
-                      `${prevAlias}.${childColumn.cn}`,
-                      `${nestedAlias}.${parentColumn.cn}`
+                      `${prevAlias}.${childColumn.title}`,
+                      `${nestedAlias}.${parentColumn.title}`
                     );
                   }
                   break;
@@ -164,8 +166,8 @@ export default async function formulaQueryBuilderv2(
                     isMany = true;
                     selectQb.join(
                       `${childModel.title} as ${nestedAlias}`,
-                      `${prevAlias}.${parentColumn.cn}`,
-                      `${nestedAlias}.${childColumn.cn}`
+                      `${prevAlias}.${parentColumn.title}`,
+                      `${nestedAlias}.${childColumn.title}`
                     );
                   }
                   break;
@@ -180,28 +182,28 @@ export default async function formulaQueryBuilderv2(
                   selectQb
                     .join(
                       `${mmModel.title} as ${assocAlias}`,
-                      `${assocAlias}.${mmChildColumn.cn}`,
-                      `${prevAlias}.${childColumn.cn}`
+                      `${assocAlias}.${mmChildColumn.title}`,
+                      `${prevAlias}.${childColumn.title}`
                     )
                     .join(
                       `${parentModel.title} as ${nestedAlias}`,
-                      `${nestedAlias}.${parentColumn.cn}`,
-                      `${assocAlias}.${mmParentColumn.cn}`
+                      `${nestedAlias}.${parentColumn.title}`,
+                      `${assocAlias}.${mmParentColumn.title}`
                     );
                 }
               }
 
               /*selectQb.join(
 `${parentModel.title} as ${nestedAlias}`,
-`${nestedAlias}.${parentColumn.cn}`,
-`${prevAlias}.${childColumn.cn}`
+`${nestedAlias}.${parentColumn.title}`,
+`${prevAlias}.${childColumn.title}`
 );*/
 
               lookupColumn = await nestedLookup.getLookupColumn();
               prevAlias = nestedAlias;
             }
 
-            switch (lookupColumn.uidt) {
+            switch (lookupColumn.ui_data_type) {
               case UITypes.Rollup:
                 {
                   const builder = (
@@ -251,12 +253,12 @@ export default async function formulaQueryBuilderv2(
                       {
                         selectQb.join(
                           `${parentModel.title} as ${nestedAlias}`,
-                          `${alias}.${childColumn.cn}`,
-                          `${nestedAlias}.${parentColumn.cn}`
+                          `${alias}.${childColumn.title}`,
+                          `${nestedAlias}.${parentColumn.title}`
                         );
                         cn = knex.raw('??.??', [
                           nestedAlias,
-                          parentModel?.pv?.cn
+                          parentModel?.primaryValue?.title
                         ]);
                       }
                       break;
@@ -265,12 +267,12 @@ export default async function formulaQueryBuilderv2(
                         isMany = true;
                         selectQb.join(
                           `${childModel.title} as ${nestedAlias}`,
-                          `${alias}.${parentColumn.cn}`,
-                          `${nestedAlias}.${childColumn.cn}`
+                          `${alias}.${parentColumn.title}`,
+                          `${nestedAlias}.${childColumn.title}`
                         );
                         cn = knex.raw('??.??', [
                           nestedAlias,
-                          childModel?.pv?.cn
+                          childModel?.primaryValue?.title
                         ]);
                       }
                       break;
@@ -286,25 +288,25 @@ export default async function formulaQueryBuilderv2(
                         selectQb
                           .join(
                             `${mmModel.title} as ${assocAlias}`,
-                            `${assocAlias}.${mmChildColumn.cn}`,
-                            `${alias}.${childColumn.cn}`
+                            `${assocAlias}.${mmChildColumn.title}`,
+                            `${alias}.${childColumn.title}`
                           )
                           .join(
                             `${parentModel.title} as ${nestedAlias}`,
-                            `${nestedAlias}.${parentColumn.cn}`,
-                            `${assocAlias}.${mmParentColumn.cn}`
+                            `${nestedAlias}.${parentColumn.title}`,
+                            `${assocAlias}.${mmParentColumn.title}`
                           );
                       }
                       cn = knex.raw('??.??', [
                         nestedAlias,
-                        parentModel?.pv?.cn
+                        parentModel?.primaryValue?.title
                       ]);
                   }
 
                   selectQb.join(
                     `${parentModel.title} as ${nestedAlias}`,
-                    `${nestedAlias}.${parentColumn.cn}`,
-                    `${prevAlias}.${childColumn.cn}`
+                    `${nestedAlias}.${parentColumn.title}`,
+                    `${prevAlias}.${childColumn.title}`
                   );
 
                   if (isMany) {
@@ -315,7 +317,7 @@ export default async function formulaQueryBuilderv2(
                           getAggregateFn(fn)({
                             qb,
                             knex,
-                            cn: lookupColumn.cn
+                            cn: lookupColumn.title
                           })
                         )
                         .wrap('(', ')');
@@ -364,12 +366,12 @@ export default async function formulaQueryBuilderv2(
                           getAggregateFn(fn)({
                             qb,
                             knex,
-                            cn: `${prevAlias}.${lookupColumn.cn}`
+                            cn: `${prevAlias}.${lookupColumn.title}`
                           })
                         )
                         .wrap('(', ')');
                   } else {
-                    selectQb.select(`${prevAlias}.${lookupColumn.cn}`);
+                    selectQb.select(`${prevAlias}.${lookupColumn.title}`);
                   }
                 }
 
@@ -413,17 +415,17 @@ export default async function formulaQueryBuilderv2(
           let selectQb;
           if (relation.type === 'bt') {
             selectQb = knex(parentModel.title)
-              .select(parentModel?.pv?.cn)
+              .select(parentModel?.primaryValue?.title)
               .where(
-                `${parentModel.title}.${parentColumn.cn}`,
-                knex.raw(`??`, [`${childModel.title}.${childColumn.cn}`])
+                `${parentModel.title}.${parentColumn.title}`,
+                knex.raw(`??`, [`${childModel.title}.${childColumn.title}`])
               );
           } else if (relation.type == 'hm') {
             const qb = knex(childModel.title)
-              // .select(knex.raw(`GROUP_CONCAT(??)`, [childModel?.pv?.cn]))
+              // .select(knex.raw(`GROUP_CONCAT(??)`, [childModel?.pv?.title]))
               .where(
-                `${childModel.title}.${childColumn.cn}`,
-                knex.raw(`??`, [`${parentModel.title}.${parentColumn.cn}`])
+                `${childModel.title}.${childColumn.title}`,
+                knex.raw(`??`, [`${parentModel.title}.${parentColumn.title}`])
               );
 
             selectQb = fn =>
@@ -432,7 +434,7 @@ export default async function formulaQueryBuilderv2(
                   getAggregateFn(fn)({
                     qb,
                     knex,
-                    cn: childModel?.pv?.cn
+                    cn: childModel?.primaryValue?.title
                   })
                 )
                 .wrap('(', ')');
@@ -441,10 +443,10 @@ export default async function formulaQueryBuilderv2(
           } else if (relation.type == 'mm') {
             // todo:
             // const qb = knex(childModel.title)
-            //   // .select(knex.raw(`GROUP_CONCAT(??)`, [childModel?.pv?.cn]))
+            //   // .select(knex.raw(`GROUP_CONCAT(??)`, [childModel?.pv?.title]))
             //   .where(
-            //     `${childModel.title}.${childColumn.cn}`,
-            //     knex.raw(`??`, [`${parentModel.title}.${parentColumn.cn}`])
+            //     `${childModel.title}.${childColumn.title}`,
+            //     knex.raw(`??`, [`${parentModel.title}.${parentColumn.title}`])
             //   );
             //
             // selectQb = fn =>
@@ -453,7 +455,7 @@ export default async function formulaQueryBuilderv2(
             //       getAggregateFn(fn)({
             //         qb,
             //         knex,
-            //         cn: childModel?.pv?.cn
+            //         cn: childModel?.pv?.title
             //       })
             //     )
             //     .wrap('(', ')');
@@ -467,12 +469,12 @@ export default async function formulaQueryBuilderv2(
             const qb = knex(`${parentModel.title} as ${alias}`)
               .join(
                 `${mmModel.title}`,
-                `${mmModel.title}.${mmParentColumn.cn}`,
-                `${alias}.${parentColumn.cn}`
+                `${mmModel.title}.${mmParentColumn.title}`,
+                `${alias}.${parentColumn.title}`
               )
               .where(
-                `${alias}.${parentColumn.cn}`,
-                knex.raw(`??`, [`${childModel.title}.${childColumn.cn}`])
+                `${alias}.${parentColumn.title}`,
+                knex.raw(`??`, [`${childModel.title}.${childColumn.title}`])
               );
             selectQb = fn =>
               knex
@@ -480,7 +482,7 @@ export default async function formulaQueryBuilderv2(
                   getAggregateFn(fn)({
                     qb,
                     knex,
-                    cn: parentModel?.pv?.cn
+                    cn: parentModel?.primaryValue?.title
                   })
                 )
                 .wrap('(', ')');
@@ -493,7 +495,7 @@ export default async function formulaQueryBuilderv2(
         }
         break;
       default:
-        aliasToColumn[col.id] = col.cn;
+        aliasToColumn[col.id] = col.title;
         break;
     }
   }

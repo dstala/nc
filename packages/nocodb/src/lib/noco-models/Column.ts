@@ -10,38 +10,65 @@ import MultiSelectColumn from './MultiSelectColumn';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
 
-export default class Column implements NcColumn {
-  public _cn: string;
-  public ai: boolean;
-  public au: boolean;
-  public cc: string;
-  public clen: number | string;
-  public cn: string;
-  public cop: number | string;
-  public created_at: Date | number | string;
-  public csn: string;
-  public ct: string;
-  public ctf: any;
-  public base_id: string;
-  public db_alias: 'db' | string;
-  public deleted: boolean;
-  public dt: string;
-  public dtx: string;
-  public dtxp: string | number;
-  public dtxs: string | number;
-  public model_id: string;
-  public np: number | string;
-  public ns: number | string;
-  public order: number;
-  public pk: boolean;
-  public pv: boolean;
-  public project_id: string;
-  public rqd: boolean;
-  public uidt: UITypes;
-  public un: boolean;
-  public unique: boolean;
-  public updated_at: Date | number | string;
+export default class Column {
+  // public _cn: string;
+  // public ai: boolean;
+  // public au: boolean;
+  // public cc: string;
+  // public clen: number | string;
+  // public cn: string;
+  // public cop: number | string;
+  // public created_at: Date | number | string;
+  // public csn: string;
+  // public ct: string;
+  // public ctf: any;
+  // public base_id: string;
+  // public db_alias: 'db' | string;
+  // public deleted: boolean;
+  // public dt: string;
+  // public dtx: string;
+  // public dtxp: string | number;
+  // public dtxs: string | number;
+  // public model_id: string;
+  // public np: number | string;
+  // public ns: number | string;
+  // public order: number;
+  // public pk: boolean;
+  // public pv: boolean;
+  // public project_id: string;
+  // public rqd: boolean;
+  // public uidt: UITypes;
+  // public un: boolean;
+  // public unique: boolean;
+  // public updated_at: Date | number | string;
+
   public fk_model_id: string;
+  public project_id: string;
+  public db_alias: string;
+
+  public title: string;
+  public alias: string;
+
+  public ui_data_type: UITypes;
+  public data_type: string;
+  public numeric_precision: string;
+  public numeric_scale: string;
+  public character_maximum_length: string;
+  public column_ordinal_position: string;
+  public primary_key: boolean;
+  public primary_value: boolean;
+  public not_null: boolean;
+  public unsigned: string;
+  public column_type: string;
+  public auto_increment: boolean;
+  public unique: boolean;
+  public column_default: string;
+  public column_comment: string;
+  public character_set_name: string;
+  public data_type_x: string;
+  public data_type_x_precision: string;
+  public data_type_x_scale: string;
+  public auto_update_timestamp: string;
 
   public colOptions: any;
   public model: Model;
@@ -57,115 +84,116 @@ export default class Column implements NcColumn {
   }
 
   public static async insert<T>(
-    model: Partial<T> & { base_id?: string; [key: string]: any }
+    column: Partial<T> & { base_id?: string; [key: string]: any }
   ) {
     const row = await Noco.ncMeta.metaInsert2(
-      model.project_id || model.base_id,
-      model.db_alias,
+      column.project_id || column.base_id,
+      column.db_alias,
       'nc_columns_v2',
       {
-        fk_model_id: model.fk_model_id,
-        cn: model.cn,
-        _cn: model._cn,
+        fk_model_id: column.fk_model_id,
+        title: column.cn || column.title,
+        alias: column._cn || column.alias,
 
-        uidt: model.uidt,
-        dt: model.dt,
-        np: model.np,
-        ns: model.ns,
-        clen: model.clen,
-        cop: model.cop,
-        pk: model.pk,
-        rqd: model.rqd,
-        un: model.un,
-        ct: model.ct,
-        ai: model.ai,
-        unique: model.unique,
-        ctf: model.ctf,
-        cc: model.cc,
-        csn: model.csn,
-        dtx: model.dtx,
-        dtxp: model.dtxp,
-        dtxs: model.dtxs,
-        au: model.au,
-        pv: model.pv
+        ui_data_type: column.uidt || column.ui_data_type,
+        data_type: column.dt || column.data_type,
+        numeric_precision: column.np || column.numeric_precision,
+        numeric_scale: column.ns || column.numeric_scale,
+        character_maximum_length:
+          column.clen || column.character_maximum_length,
+        column_ordinal_position: column.cop || column.column_ordinal_position,
+        primary_key: column.pk || column.primary_key,
+        not_null: column.rqd || column.not_null,
+        unsigned: column.un || column.unsigned,
+        column_type: column.column_type || column.ct,
+        auto_increment: column.auto_increment || column.ai,
+        unique: column.unique,
+        column_default: column.column_default || column.cdf,
+        column_comment: column.column_comment || column.cc,
+        character_set_name: column.character_set_name || column.csn,
+        data_type_x: column.data_type_x || column.dtx,
+        data_type_x_precision: column.data_type_x_precision || column.dtxp,
+        data_type_x_scale: column.data_type_x_scale || column.dtxs,
+        auto_update_timestamp: column.auto_update_timestamp || column.au,
+        primary_value: column.primary_value || column.pv
       }
     );
 
-    switch (model.uidt) {
+    switch (column.uidt || column.ui_data_type) {
       case UITypes.Lookup:
         // LookupColumn.insert()
 
         await Noco.ncMeta.metaInsert2(
-          model.project_id,
-          model.db_alias,
+          column.project_id,
+          column.db_alias,
           'nc_col_lookup_v2',
           {
             fk_column_id: row.id,
 
-            fk_relation_column_id: model.fk_relation_column_id,
+            fk_relation_column_id: column.fk_relation_column_id,
 
-            fk_lookup_column_id: model.fk_lookup_column_id
+            fk_lookup_column_id: column.fk_lookup_column_id
           }
         );
         break;
       case UITypes.Rollup:
         await Noco.ncMeta.metaInsert2(
-          model.project_id,
-          model.db_alias,
+          column.project_id,
+          column.db_alias,
           'nc_col_rollup_v2',
           {
             fk_column_id: row.id,
-            fk_relation_column_id: model.fk_relation_column_id,
+            fk_relation_column_id: column.fk_relation_column_id,
 
-            fk_rollup_column_id: model.fk_rollup_column_id,
-            rollup_function: model.rollup_function
+            fk_rollup_column_id: column.fk_rollup_column_id,
+            rollup_function: column.rollup_function
           }
         );
         break;
       case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord:
         await Noco.ncMeta.metaInsert2(
-          model.project_id,
-          model.db_alias,
+          column.project_id,
+          column.db_alias,
           'nc_col_relations_v2',
           {
             fk_column_id: row.id,
 
             // ref_db_alias
-            type: model.type,
+            type: column.type,
             // db_type:
 
-            fk_child_column_id: model.fk_child_column_id,
-            fk_parent_column_id: model.fk_parent_column_id,
+            fk_child_column_id: column.fk_child_column_id,
+            fk_parent_column_id: column.fk_parent_column_id,
 
-            fk_mm_model_id: model.fk_mm_model_id,
-            fk_mm_child_column_id: model.fk_mm_child_column_id,
-            fk_mm_parent_column_id: model.fk_mm_parent_column_id,
+            fk_mm_model_id: column.fk_mm_model_id,
+            fk_mm_child_column_id: column.fk_mm_child_column_id,
+            fk_mm_parent_column_id: column.fk_mm_parent_column_id,
 
-            ur: model.ur,
-            dr: model.dr,
+            ur: column.ur,
+            dr: column.dr,
 
-            fk_index_name: model.fk_index_name
+            fk_index_name: column.fk_index_name
           }
         );
         break;
       case UITypes.Formula:
         await Noco.ncMeta.metaInsert2(
-          model.project_id,
-          model.db_alias,
+          column.project_id,
+          column.db_alias,
           'nc_col_formula_v2',
           {
             fk_column_id: row.id,
-            formula: model.formula
+            formula: column.formula
           }
         );
         break;
       case UITypes.MultiSelect:
       case UITypes.SingleSelect:
-        for (const option of model.dtxp?.split(',') || [])
+        for (const option of column.dtxp?.split(',') || [])
           await Noco.ncMeta.metaInsert2(
-            model.project_id,
-            model.db_alias,
+            column.project_id,
+            column.db_alias,
             'nc_col_select_options_v2',
             {
               fk_column_id: row.id,
@@ -229,7 +257,7 @@ export default class Column implements NcColumn {
   public async getColOptions<T>(): Promise<T> {
     let res: any;
 
-    switch (this.uidt) {
+    switch (this.ui_data_type) {
       case UITypes.Lookup:
         res = await LookupColumn.read(this.id);
         break;
@@ -262,7 +290,7 @@ export default class Column implements NcColumn {
   async loadModel(force = false): Promise<Model> {
     if (!this.model || force) {
       this.model = await Model.get({
-        base_id: this.base_id,
+        base_id: this.project_id,
         db_alias: this.db_alias,
         id: this.fk_model_id
       });

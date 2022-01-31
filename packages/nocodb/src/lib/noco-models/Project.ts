@@ -53,12 +53,12 @@ export default class Model implements NcModel {
     return this.columns;
   }
 
-  public get primaryKey(): Column {
-    return this.columns?.find(c => c.primary_key);
+  public get pk(): Column {
+    return this.columns?.find(c => c.pk);
   }
 
-  public get primaryValue(): Column {
-    return this.columns?.find(c => c.primary_value);
+  public get pv(): Column {
+    return this.columns?.find(c => c.pv);
   }
 
   public static async insert(model: NcModel) {

@@ -179,7 +179,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
   }
 
   public async metaGet2(
-    base_id: string,
+    project_id: string,
     dbAlias: string,
     target: string,
     idOrCondition: string | { [p: string]: any },
@@ -196,8 +196,8 @@ export default class NcMetaIOImpl extends NcMetaIO {
       query.select(...fields);
     }
 
-    if (base_id !== null && base_id !== undefined) {
-      query.where('base_id', base_id);
+    if (project_id !== null && project_id !== undefined) {
+      query.where('project_id', project_id);
     }
     if (dbAlias !== null && dbAlias !== undefined) {
       query.where('db_alias', dbAlias);
@@ -234,7 +234,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
   }
 
   public async metaInsert2(
-    base_id: string,
+    project_id: string,
     db_alias: string,
     target: string,
     data: any
@@ -243,7 +243,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
     await this.knexConnection(target).insert({
       id,
       db_alias,
-      base_id,
+      project_id,
       created_at: this.knexConnection?.fn?.now(),
       updated_at: this.knexConnection?.fn?.now(),
       ...data
@@ -294,7 +294,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
   }
 
   public async metaList2(
-    base_id: string,
+    project_id: string,
     dbAlias: string,
     target: string,
     args?: {
@@ -308,8 +308,8 @@ export default class NcMetaIOImpl extends NcMetaIO {
   ): Promise<any[]> {
     const query = this.knexConnection(target);
 
-    if (base_id !== null && base_id !== undefined) {
-      query.where('base_id', base_id);
+    if (project_id !== null && project_id !== undefined) {
+      query.where('project_id', project_id);
     }
     if (dbAlias !== null && dbAlias !== undefined) {
       query.where('db_alias', dbAlias);
@@ -481,7 +481,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
       });
 
       // todo
-      await this.knexConnection('nc_bases_v2').insert({
+      await this.knexConnection('nc_projects_v2').insert({
         id,
         title: projectName
       });
@@ -723,7 +723,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
   private genNanoid(target: string) {
     let prefix;
     switch (target) {
-      case 'nc_bases_v2':
+      case 'nc_projects_v2':
         prefix = 'bs_';
         break;
       case 'nc_data_src_v2':
