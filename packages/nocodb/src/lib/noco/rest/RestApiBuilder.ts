@@ -8,6 +8,7 @@ import { Router } from 'express';
 import { glob } from 'glob';
 import mkdirp from 'mkdirp';
 
+import { URL } from 'url';
 import { DbConfig, NcConfig } from '../../../interface/config';
 import ModelXcMetaFactory from '../../sqlMgr/code/models/xc/ModelXcMetaFactory';
 import SwaggerXc from '../../sqlMgr/code/routers/xc-ts/SwaggerXc';

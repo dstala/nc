@@ -4,6 +4,8 @@ import NcModel from '../../types/NcModel';
 import NocoCache from '../noco-cache/NocoCache';
 import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
+import Filter from './Filter';
+import Sort from './Sort';
 
 export default class Model implements NcModel {
   copy_enabled: boolean;
@@ -93,6 +95,32 @@ export default class Model implements NcModel {
     return modelList.map(m => new Model(m));
   }
 
+  public static async listWithInfo({
+    project_id,
+    db_alias
+  }: {
+    project_id: string;
+    db_alias: string;
+  }): Promise<Model[]> {
+    let modelList = await NocoCache.getv2(project_id);
+    if (!modelList.length) {
+      modelList = await Noco.ncMeta.metaList2(
+        project_id,
+        db_alias,
+        'nc_models_v2'
+      );
+
+      for (const model of modelList) {
+        model.filters = await Filter.getFilterObject({ modelId: model.id });
+        model.sorts = await Sort.list({ modelId: model.id });
+
+        await NocoCache.setv2(model.id, project_id, model);
+      }
+    }
+
+    return modelList.map(m => new Model(m));
+  }
+
   public static async clear({ id }: { id: string }): Promise<void> {
     await NocoCache.delAll(`*_${id}`);
     await Column.clearList({ fk_model_id: id });
@@ -138,6 +166,39 @@ export default class Model implements NcModel {
       //     modelData.id
       //   ];
       // }
+    }
+    if (modelData) {
+      return new Model(modelData);
+    }
+    return null;
+  }
+
+  public static async getWithInfo({
+    base_id,
+    db_alias,
+    tn,
+    id
+  }: {
+    base_id?: string;
+    db_alias?: string;
+    tn?: string;
+    id?: string;
+  }): Promise<Model> {
+    let modelData = null; //id && (await NocoCache.get(id));
+    if (!modelData) {
+      modelData = await Noco.ncMeta.metaGet2(
+        base_id,
+        db_alias,
+        'nc_models_v2',
+        id || {
+          title: tn
+        }
+      );
+      await NocoCache.setv2(id, modelData?.base_id, modelData);
+      modelData.filters = await Filter.getFilterObject({
+        modelId: modelData.id
+      });
+      modelData.sorts = await Sort.list({ modelId: modelData.id });
     }
     if (modelData) {
       return new Model(modelData);

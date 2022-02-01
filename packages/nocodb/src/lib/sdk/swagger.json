@@ -1,0 +1,3251 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "nocodb",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/auth/user/signup": {
+      "post": {
+        "summary": "Signup",
+        "operationId": "signup",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "password"
+                  ]
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "AUTH"
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Signup"
+        }
+      }
+    },
+    "/auth/user/me": {
+      "parameters": [],
+      "get": {
+        "summary": "User Info",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "AUTH"
+        ]
+      }
+    },
+    "/auth/user/signin": {
+      "post": {
+        "summary": "Signin",
+        "operationId": "signin",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "AUTH"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/auth/password/forgot": {
+      "post": {
+        "summary": "Password Forgot",
+        "operationId": "password-forgot",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/auth/password/change": {
+      "post": {
+        "summary": "Password Change",
+        "operationId": "password-change",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "old_password": {
+                    "type": "string"
+                  },
+                  "new_password": {
+                    "type": "string"
+                  },
+                  "new_password_repeat": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/auth/password/reset": {
+      "post": {
+        "summary": "Password Reset",
+        "operationId": "password-reset",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reset_token": {
+                    "type": "string"
+                  },
+                  "new_password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/auth/token/verify": {
+      "post": {
+        "summary": "Password Verify",
+        "operationId": "token-verify",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": []
+    },
+    "/auth/token/refresh": {
+      "post": {
+        "summary": "Password Refresh",
+        "operationId": "token-refresh",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ]
+      },
+      "parameters": []
+    },
+    "/projects/": {
+      "parameters": [],
+      "get": {
+        "summary": "",
+        "operationId": "project-list",
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ProjectList"
+          }
+        },
+        "description": "Read project details",
+        "tags": [
+          "Project"
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ProjectCreate"
+        }
+      },
+      "post": {
+        "summary": "",
+        "operationId": "project-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Project"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/{db}/tables/{tableId}/column": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "db",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Column List",
+        "operationId": "column-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ColumnList"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Column"
+                }
+              }
+            }
+          }
+        },
+        "description": "Read project details",
+        "tags": [
+          "Column"
+        ]
+      },
+      "post": {
+        "summary": "Column create",
+        "operationId": "column-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Column"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Column"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/{db}/tables/{tableId}/column/{columnId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "columnId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "db",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Column Read",
+        "operationId": "column-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Column"
+                }
+              }
+            }
+          }
+        },
+        "description": "Read project details",
+        "tags": [
+          "Column"
+        ]
+      },
+      "put": {
+        "summary": "Column Update",
+        "operationId": "column-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Column"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Column"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Column"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "column-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/tables": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "table-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Table"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Table"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Table"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "table-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TableList"
+          }
+        },
+        "tags": [
+          "Table"
+        ]
+      }
+    },
+    "/projects/{projectId}/tables/{tableId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "table-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": ""
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Table"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": []
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "",
+        "operationId": "table-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Table"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "table-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Table"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/views/{viewId}/filters": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "filter-read",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FilterList"
+          }
+        },
+        "tags": [
+          "Filter"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "filter-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Filter"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/views/{viewId}/sorts": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "sort-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SortList"
+          }
+        },
+        "tags": [
+          "Sort"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "sort-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Filter"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/views/{viewsId}/filters/{filterId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "filterId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewsId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "filter-get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Filter"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "filter-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Table"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "filter-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Table"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/views/{viewId}/sorts/{sortId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "sortId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "sort-get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Filter"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "sort-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Table"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "sort-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Table"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks/{webhookId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "webhookId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "webhook-get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Webhook"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "webhook-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Webhook"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "webhook-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Webhook"
+        ],
+        "description": ""
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "webhook-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HookList"
+          }
+        },
+        "tags": [
+          "Webhook"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "webhook-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Webhook"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/grids": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "grid-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/grids/{gridId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "gridId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "grid-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "grid-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "grid-read",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/forms": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "form-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/forms/{formId} ": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "formId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "grid-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "grid-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "grid-read",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/galleries": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "gallery-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/galleries/{galleryId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "galleryId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "gallery-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "gallery-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "gallery-read",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/kanbans": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "kanban-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/kanbans/{kanbanId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "kanbanId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "kanban-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "kanban-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "kanban-read",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}/views": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "views-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ViewList"
+          }
+        },
+        "tags": [
+          "View"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "title": "User",
+        "type": "object",
+        "description": "",
+        "examples": [
+          {
+            "id": 142,
+            "firstName": "Alice",
+            "lastName": "Smith",
+            "email": "alice.smith@gmail.com",
+            "dateOfBirth": "1997-10-31",
+            "emailVerified": true,
+            "signUpDate": "2019-08-24"
+          }
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the given user."
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "example": "1997-10-31"
+          },
+          "emailVerified": {
+            "type": "boolean",
+            "description": "Set to true if the user's email has been verified."
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date",
+            "description": "The date that the user was created."
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "emailVerified"
+        ],
+        "x-internal": false
+      },
+      "Project": {
+        "title": "Project",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "meta": {
+            "type": [
+              "string",
+              "object"
+            ]
+          },
+          "color": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": [
+              "string",
+              "boolean"
+            ]
+          },
+          "order": {
+            "type": "number"
+          },
+          "bases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Base"
+            }
+          }
+        }
+      },
+      "ProjectReq": {
+        "title": "Project",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "bases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BaseReq"
+            }
+          }
+        }
+      },
+      "Base": {
+        "title": "Base",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "database": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "params": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "ssl": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseReq": {
+        "title": "Base",
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "database": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "params": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "ssl": {
+            "type": "string"
+          }
+        }
+      },
+      "Table": {
+        "title": "Table",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_project_id": {
+            "type": "string"
+          },
+          "fk_base_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "string"
+          },
+          "show_as": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "pinned": {
+            "type": "boolean"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "order": {
+            "type": "number"
+          },
+          "column": {
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Column"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "alias"
+        ]
+      },
+      "Filter": {
+        "title": "Filter",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_model_id": {
+            "type": "string"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "logical_op": {
+            "type": "string"
+          },
+          "comparison_op": {
+            "type": "string"
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "null"
+            ]
+          },
+          "is_group": {
+            "type": "boolean"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            }
+          }
+        }
+      },
+      "Sort": {
+        "title": "Sort",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_model_id": {
+            "type": "string"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          }
+        }
+      },
+      "Column": {
+        "title": "Column",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "base_id": {
+            "type": "string"
+          },
+          "fk_model_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "ui_data_type": {
+            "type": "string"
+          },
+          "data_type": {
+            "type": "string"
+          },
+          "numeric_precision": {
+            "type": "string"
+          },
+          "numeric_scale": {
+            "type": "string"
+          },
+          "character_maximum_length": {
+            "type": "string"
+          },
+          "column_ordinal_position": {
+            "type": "string"
+          },
+          "primary_key": {
+            "type": "string"
+          },
+          "primary_value": {
+            "type": "string"
+          },
+          "rqd": {
+            "type": "string"
+          },
+          "un": {
+            "type": "string"
+          },
+          "column_type": {
+            "type": "string"
+          },
+          "auto_increment": {
+            "type": "string"
+          },
+          "unique": {
+            "type": "string"
+          },
+          "column_default": {
+            "type": "string"
+          },
+          "column_comment": {
+            "type": "string"
+          },
+          "character_set_name": {
+            "type": "string"
+          },
+          "data_type_x": {
+            "type": "string"
+          },
+          "data_type_x_precision": {
+            "type": "string"
+          },
+          "data_type_x_scale": {
+            "type": "string"
+          },
+          "auto_update_timestamp": {
+            "type": "boolean"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "visible": {
+            "type": "boolean"
+          },
+          "order": {
+            "type": "number"
+          },
+          "colOptions": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LinkToAnotherRecord"
+              },
+              {
+                "$ref": "#/components/schemas/Formula"
+              },
+              {
+                "$ref": "#/components/schemas/Rollup"
+              },
+              {
+                "$ref": "#/components/schemas/Lookup"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SelectOptions"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "LinkToAnotherRecord": {
+        "title": "LinkToAnotherRecord",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "virtual": {
+            "type": "boolean"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "fk_child_column_id": {
+            "type": "string"
+          },
+          "fk_parent_column_id": {
+            "type": "string"
+          },
+          "fk_mm_model_id": {
+            "type": "string"
+          },
+          "fk_mm_child_column_id": {
+            "type": "string"
+          },
+          "fk_mm_parent_column_id": {
+            "type": "string"
+          },
+          "ur": {
+            "type": "string"
+          },
+          "dr": {
+            "type": "string"
+          },
+          "fk_index_name": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          }
+        }
+      },
+      "Lookup": {
+        "title": "Lookup",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "virtual": {
+            "type": "boolean"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "fk_relation_column_id": {
+            "type": "string"
+          },
+          "fk_lookup_column_id": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          }
+        }
+      },
+      "Rollup": {
+        "title": "Rollup",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "virtual": {
+            "type": "boolean"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "fk_relation_column_id": {
+            "type": "string"
+          },
+          "fk_rollup_column_id": {
+            "type": "string"
+          },
+          "rollup_function": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          }
+        }
+      },
+      "Formula": {
+        "title": "Lookup",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "virtual": {
+            "type": "boolean"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "formula": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          }
+        }
+      },
+      "SelectOptions": {
+        "title": "SelectOptions",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "virtual": {
+            "type": "boolean"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          }
+        }
+      },
+      "SharedView": {
+        "title": "SharedView",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_view_id": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "string"
+          }
+        }
+      },
+      "Grid": {
+        "title": "Grid",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "order": {
+            "type": "number"
+          }
+        }
+      },
+      "Gallery": {
+        "title": "Gallery",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "order": {
+            "type": "number"
+          },
+          "next_enabled": {
+            "type": "boolean"
+          },
+          "prev_enabled": {
+            "type": "boolean"
+          },
+          "cover_image_idx": {
+            "type": "integer"
+          },
+          " cover_image": {
+            "type": "string"
+          },
+          "restrict_types": {
+            "type": "string"
+          },
+          "restrict_size": {
+            "type": "string"
+          },
+          "restrict_number": {
+            "type": "string"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string"
+          },
+          "show_all_fields": {
+            "type": "boolean"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GalleryColumn"
+            }
+          },
+          "fk_model_id": {
+            "type": "string"
+          }
+        }
+      },
+      "GalleryColumn": {
+        "title": "GalleryColumn",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "help": {
+            "type": "string"
+          },
+          "fk_col_id": {
+            "type": "string"
+          },
+          "fk_gallery_id": {
+            "type": "string"
+          }
+        }
+      },
+      "Kanban": {
+        "title": "Kanban",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KanbanColumn"
+            }
+          },
+          "fk_model_id": {
+            "type": "string"
+          }
+        }
+      },
+      "KanbanColumn": {
+        "title": "KanbanColumn",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "help": {
+            "type": "string"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "fk_kanban_id": {
+            "type": "string"
+          }
+        }
+      },
+      "Form": {
+        "title": "Form",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormColumn"
+            }
+          },
+          "fk_model_id": {
+            "type": "string"
+          }
+        }
+      },
+      "FormColumn": {
+        "title": "FormColumn",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string"
+          },
+          "fk_column_id": {
+            "type": "string"
+          },
+          "fk_form_id": {
+            "type": "string"
+          }
+        }
+      },
+      "Paginated": {
+        "title": "Paginated",
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer"
+          },
+          "totalRows": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Sort"
+            }
+          },
+          "isFirstPage": {
+            "type": "boolean"
+          },
+          "isLastPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProjectList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "projects": {
+            "type": "object",
+            "required": [
+              "list",
+              "pageInfo"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              },
+              "pageInfo": {
+                "$ref": "#/components/schemas/Paginated"
+              }
+            }
+          }
+        },
+        "required": [
+          "projects"
+        ]
+      },
+      "TableList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "tables": {
+            "type": "object",
+            "required": [
+              "list",
+              "pageInfo"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/Table"
+                }
+              },
+              "pageInfo": {
+                "$ref": "#/components/schemas/Paginated"
+              }
+            }
+          }
+        },
+        "required": [
+          "tables"
+        ]
+      },
+      "BaseList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "bases": {
+            "type": "object",
+            "required": [
+              "list",
+              "pageInfo"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/Base"
+                }
+              },
+              "pageInfo": {
+                "$ref": "#/components/schemas/Paginated"
+              }
+            }
+          }
+        },
+        "required": [
+          "bases"
+        ]
+      },
+      "ColumnList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "columns": {
+            "type": "object",
+            "required": [
+              "list"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/Column"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "columns"
+        ]
+      },
+      "FilterList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "filters": {
+            "type": "object",
+            "required": [
+              "list"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/Filter"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "filters"
+        ]
+      },
+      "HookList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "hooks": {
+            "type": "object",
+            "required": [
+              "list",
+              "pageInfo"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "type": "object"
+                }
+              },
+              "pageInfo": {
+                "$ref": "#/components/schemas/Paginated"
+              }
+            }
+          }
+        },
+        "required": [
+          "hooks"
+        ]
+      },
+      "SharedViewList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "sharedViews": {
+            "type": "object",
+            "required": [
+              "list",
+              "pageInfo"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/SharedView"
+                }
+              },
+              "pageInfo": {
+                "$ref": "#/components/schemas/Paginated"
+              }
+            }
+          }
+        },
+        "required": [
+          "sharedViews"
+        ]
+      },
+      "SortList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "sorts": {
+            "type": "object",
+            "required": [
+              "list"
+            ],
+            "properties": {
+              "list": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/SharedView"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "sorts"
+        ]
+      },
+      "ViewList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "sharedViews": {
+            "type": "object",
+            "required": [
+              "list",
+              "pageInfo"
+            ],
+            "properties": {
+              "list": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Grid"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Form"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Kanban"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Gallery"
+                  }
+                ]
+              },
+              "pageInfo": {
+                "$ref": "#/components/schemas/Paginated"
+              }
+            }
+          }
+        },
+        "required": [
+          "sharedViews"
+        ]
+      },
+      "UserList": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "bases": {
+              "list": [
+                {
+                  "id": "string",
+                  "project_id": "string",
+                  "alias": "string",
+                  "host": "string",
+                  "port": 0,
+                  "username": "string",
+                  "password": "string",
+                  "database": "string",
+                  "url": "string",
+                  "params": "string",
+                  "type": "string",
+                  "ssl": "string"
+                }
+              ],
+              "pageInfo": {
+                "pageSize": 0,
+                "totalRows": 0,
+                "sort": "string",
+                "isFirstPage": true,
+                "isLastPage": true
+              }
+            }
+          }
+        },
+        "properties": {
+          "users": {
+            "type": "object",
+            "required": [
+              "list",
+              "pageInfo"
+            ],
+            "properties": {
+              "list": {
+                "$ref": "#/components/schemas/User"
+              },
+              "pageInfo": {
+                "$ref": "#/components/schemas/Paginated"
+              }
+            }
+          }
+        },
+        "required": [
+          "users"
+        ]
+      }
+    },
+    "requestBodies": {
+      "Signup": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "",
+              "type": "object",
+              "x-examples": {
+                "example-1": {
+                  "email": true
+                }
+              },
+              "properties": {
+                "email": {
+                  "type": "boolean"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      },
+      "ProjectCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ProjectReq"
+                }
+              ]
+            },
+            "examples": {
+              "example-1": {
+                "value": {
+                  "id": "string",
+                  "title": "string",
+                  "status": "string",
+                  "description": "string",
+                  "meta": "string",
+                  "color": "string",
+                  "deleted": "string",
+                  "order": 0,
+                  "bases": [
+                    {
+                      "id": "string",
+                      "project_id": "string",
+                      "alias": "string",
+                      "host": "string",
+                      "port": 0,
+                      "username": "string",
+                      "password": "string",
+                      "database": "string",
+                      "url": "string",
+                      "params": "string",
+                      "type": "string",
+                      "ssl": "string"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "BaseCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "TableCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ColumnCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ViewCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SortCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SharedViewCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "HookCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ProjectUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProjectReq"
+            }
+          }
+        }
+      },
+      "BaseUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ColumnUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "TableUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ViewUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ViewColumnUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SortUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "FilterUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "FilterCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "HookUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SharedViewUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "ProjectList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProjectList"
+            },
+            "examples": {
+              "example-1": {
+                "value": {
+                  "projects": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BaseList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/BaseList"
+            },
+            "examples": {
+              "example-1": {
+                "value": {
+                  "bases": {
+                    "list": [
+                      {
+                        "id": "string",
+                        "project_id": "string",
+                        "alias": "string",
+                        "host": "string",
+                        "port": 0,
+                        "username": "string",
+                        "password": "string",
+                        "database": "string",
+                        "url": "string",
+                        "params": "string",
+                        "type": "string",
+                        "ssl": "string"
+                      }
+                    ],
+                    "pageInfo": {
+                      "pageSize": 0,
+                      "totalRows": 0,
+                      "sort": "string",
+                      "isFirstPage": true,
+                      "isLastPage": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TableList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TableList"
+            }
+          }
+        }
+      },
+      "ColumnList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ColumnList"
+            }
+          }
+        }
+      },
+      "FilterList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FilterList"
+            }
+          }
+        }
+      },
+      "SortList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SortList"
+            }
+          }
+        }
+      },
+      "ViewList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ViewList"
+            },
+            "examples": {
+              "example-1": {
+                "value": {
+                  "views": {
+                    "list": [
+                      {
+                        "id": "string",
+                        "title": "string",
+                        "alias": "string",
+                        "deleted": true,
+                        "order": 0
+                      }
+                    ],
+                    "pageInfo": {
+                      "pageSize": 0,
+                      "totalRows": 0,
+                      "sort": "string",
+                      "isFirstPage": true,
+                      "isLastPage": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "SharedViewList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SharedViewList"
+            }
+          }
+        }
+      },
+      "HookList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/HookList"
+            }
+          }
+        }
+      },
+      "UserList": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UserList"
+            }
+          }
+        }
+      }
+    }
+  }
+}

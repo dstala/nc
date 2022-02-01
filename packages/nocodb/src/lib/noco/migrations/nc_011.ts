@@ -2,16 +2,18 @@ const up = async knex => {
   await knex.schema.createTable('nc_projects_v2', table => {
     table.string('id', 128).primary();
     table.string('title');
+    table.string('prefix');
     table.string('status');
     table.text('description');
     table.text('meta');
     table.string('color');
     table.boolean('deleted');
+    table.boolean('is_meta');
     table.integer('order');
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable('nc_data_src_v2', table => {
+  await knex.schema.createTable('nc_bases_v2', table => {
     table
       .string('id', 20)
       .primary()
@@ -19,22 +21,22 @@ const up = async knex => {
 
     // todo: foreign key
     // table.string('project_id', 128);
-    // table.string('project_id', 128)
-    // table.foreign('project_id').references('nc_projects_v2.id');
+    table.string('project_id', 128);
+    table.foreign('project_id').references('nc_projects_v2.id');
 
     table.string('alias');
-    table.string('hist');
+    table.string('host');
     table.integer('port');
     table.string('username');
     table.string('password');
     table.string('database');
     table.text('url');
     table.text('params');
-    table.string('token');
+
     table.string('type');
 
     // todo: type
-    table.string('ssl');
+    table.text('ssl');
 
     table.timestamps(true, true);
   });

@@ -1,6 +1,7 @@
 import { SqlClientFactory } from 'nc-help';
 import fs from 'fs';
 import parseDbUrl from 'parse-database-url';
+import { URL } from 'url';
 
 import {
   AuthConfig,

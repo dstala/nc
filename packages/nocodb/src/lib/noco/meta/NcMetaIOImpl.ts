@@ -240,14 +240,15 @@ export default class NcMetaIOImpl extends NcMetaIO {
     data: any
   ): Promise<any> {
     const id = this.genNanoid(target);
-    await this.knexConnection(target).insert({
+    const insertObj = {
       id,
-      db_alias,
-      project_id,
       created_at: this.knexConnection?.fn?.now(),
       updated_at: this.knexConnection?.fn?.now(),
       ...data
-    });
+    };
+    if (db_alias !== null) insertObj.db_alias = db_alias;
+    if (project_id !== null) insertObj.project_id = project_id;
+    await this.knexConnection(target).insert(insertObj);
     return { ...data, id };
   }
 
@@ -726,8 +727,8 @@ export default class NcMetaIOImpl extends NcMetaIO {
       case 'nc_projects_v2':
         prefix = 'bs_';
         break;
-      case 'nc_data_src_v2':
-        prefix = 'ds_';
+      case 'nc_bases_v2':
+        prefix = 'bs_';
         break;
       case 'nc_models_v2':
         prefix = 'md_';
