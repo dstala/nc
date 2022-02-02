@@ -6,7 +6,7 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
-import { Table } from '../noco-client/data-contracts';
+import { Table } from '../noco-client/Api';
 
 export default class Model implements Table {
   copy_enabled: boolean;

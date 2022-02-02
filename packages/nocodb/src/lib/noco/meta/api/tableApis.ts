@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from './PagedResponse';
-import { Table, TableList } from '../../../noco-client/data-contracts';
+import { Table, TableList, TableListParams } from '../../../noco-client/Api';
 
 export default function() {
   const router = Router({ mergeParams: true });
@@ -13,21 +13,27 @@ export default function() {
     });
     res.json(table);
   });
-  router.get('/', async (req: Request<>, res: Response<TableList>) => {
-    const tables = await Model.list({
-      project_id: req.params.projectId,
-      db_alias: null
-    });
+  router.get(
+    '/',
+    async (
+      req: Request<any, any, any, TableListParams>,
+      res: Response<TableList>
+    ) => {
+      const tables = await Model.list({
+        project_id: req.params.projectId,
+        db_alias: null
+      });
 
-    // todo: pagination
-    res.json({
-      tables: new PagedResponseImpl(tables, {
-        totalRows: tables.length,
-        pageSize: 20,
-        page: 1
-      })
-    });
-  });
+      res // todo: pagination
+        .json({
+          tables: new PagedResponseImpl(tables, {
+            totalRows: tables.length,
+            pageSize: 20,
+            page: 1
+          })
+        });
+    }
+  );
   router.post('/', (req, res) => {
     console.log(req.params);
 

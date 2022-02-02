@@ -6,6 +6,7 @@ import request from 'supertest';
 import { Noco } from '../lib';
 import NcConfigFactory from '../lib/utils/NcConfigFactory';
 import { ProjectBody } from '../lib/noco-models/Project';
+import { Api } from '../lib/noco-client/Api';
 
 const knex = require('knex');
 
@@ -84,6 +85,9 @@ const projectCreateReqBody = {
 // process.exit();
 describe('Noco v2 Tests', () => {
   let app;
+  const api = new Api({
+    baseURL: 'http://localhost:8080'
+  });
 
   // Called once before any of the tests in this block begin.
   before(function(done) {
@@ -97,6 +101,7 @@ describe('Noco v2 Tests', () => {
       const server = express();
 
       server.use(await Noco.init());
+      server.listen('8080');
       app = server;
       // await knex(config.envs[process.env.NODE_ENV || 'dev'].db[0])('xc_users').del();
     })()
@@ -271,6 +276,33 @@ describe('Noco v2 Tests', () => {
               expect(res1.body.columnsById).to.be.an('Object');
               done();
             });
+        });
+    });
+
+    it('Get Table - sdk', function(done) {
+      request(app)
+        .get(`/projects/${projectId}/tables/`)
+        .set('xc-auth', token)
+        .expect(200, (err, res) => {
+          if (err) return done(err);
+
+          api.meta
+            .tableRead(projectId, res.body.tables.list[0].id)
+            .then(res => {
+              console.log(res);
+            })
+            .catch(e => done(e));
+          // request(app)
+          //   .get(`/projects/${projectId}/tables/${res.body.tables.list[0].id}`)
+          //   .set('xc-auth', token)
+          //   .expect(200, (err, res1) => {
+          //     if (err) return done(err);
+          //     expect(res1.body).to.be.a('Object');
+          //     expect(res1.body.sorts).to.be.an('Array');
+          //     expect(res1.body.columns).to.be.a('Array');
+          //     expect(res1.body.columnsById).to.be.an('Object');
+          //     done();
+          //   });
         });
     });
 

@@ -1,6 +1,6 @@
 import Base, { BaseBody } from '../noco-models/Base';
 import Noco from '../noco/Noco';
-import { Project as ProjectType } from '../noco-client/data-contracts';
+import { Project as ProjectType } from '../noco-client/Api';
 
 export default class Project implements ProjectType {
   public id: string;
@@ -18,25 +18,40 @@ export default class Project implements ProjectType {
     Object.assign(this, project);
   }
 
-  public static async createProject(project: ProjectBody) {
+  public static async createProject(projectBody: ProjectBody) {
     const { id: projectId } = await Noco.ncMeta.metaInsert2(
       null,
       null,
       'nc_projects_v2',
       {
-        title: project.title,
-        prefix: project.prefix,
-        description: project.description,
-        is_meta: project.is_meta
+        title: projectBody.title,
+        prefix: projectBody.prefix,
+        description: projectBody.description,
+        is_meta: projectBody.is_meta
       }
     );
 
-    for (const base of project.bases) {
+    for (const base of projectBody.bases) {
       await Base.createBase({
         ...base,
         projectId
       });
     }
+  }
+
+  // @ts-ignore
+  static async list(param): Promise<Project[]> {
+    //
+  }
+  // @ts-ignore
+  static async get(projectId: string): Promise<Project[]> {
+    const projectData = await Noco.ncMeta.metaGet2(
+      null,
+      null,
+      'nc_projects_v2',
+      projectId
+    );
+    if(pro)
   }
 }
 

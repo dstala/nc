@@ -270,9 +270,6 @@
           }
         },
         "description": "Read project details",
-        "tags": [
-          "Project"
-        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/ProjectCreate"
         },
@@ -306,6 +303,9 @@
             "name": "xc-auth",
             "description": "Auth token"
           }
+        ],
+        "tags": [
+          "Meta"
         ]
       },
       "post": {
@@ -331,7 +331,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       }
     },
     "/projects/{projectId}/{db}/tables/{tableId}/column": {
@@ -381,7 +384,7 @@
         },
         "description": "Read project details",
         "tags": [
-          "Column"
+          "Meta"
         ]
       },
       "post": {
@@ -392,9 +395,6 @@
             "description": "OK"
           }
         },
-        "tags": [
-          "Column"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -403,7 +403,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       }
     },
     "/projects/{projectId}/{db}/tables/{tableId}/column/{columnId}": {
@@ -458,7 +461,7 @@
         },
         "description": "Read project details",
         "tags": [
-          "Column"
+          "Meta"
         ]
       },
       "put": {
@@ -476,9 +479,6 @@
             }
           }
         },
-        "tags": [
-          "Column"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -487,7 +487,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "delete": {
         "summary": "",
@@ -496,7 +499,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       }
     },
     "/projects/{projectId}/tables": {
@@ -525,9 +531,6 @@
             }
           }
         },
-        "tags": [
-          "Table"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -536,7 +539,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "get": {
         "summary": "",
@@ -546,9 +552,6 @@
             "$ref": "#/components/responses/TableList"
           }
         },
-        "tags": [
-          "Table"
-        ],
         "parameters": [
           {
             "schema": {
@@ -578,6 +581,9 @@
             "in": "query",
             "name": "sort"
           }
+        ],
+        "tags": [
+          "Meta"
         ]
       }
     },
@@ -706,17 +712,8 @@
           }
         },
         "tags": [
-          "Table"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": []
-              }
-            }
-          }
-        }
+          "Meta"
+        ]
       },
       "put": {
         "summary": "",
@@ -727,7 +724,7 @@
           }
         },
         "tags": [
-          "Table"
+          "Meta"
         ]
       },
       "delete": {
@@ -739,8 +736,9 @@
           }
         },
         "tags": [
-          "Table"
-        ]
+          "Meta"
+        ],
+        "description": ""
       }
     },
     "/projects/{projectId}/{dbAlias}/views/{viewId}/filters": {
@@ -779,7 +777,7 @@
           }
         },
         "tags": [
-          "Filter"
+          "Meta"
         ]
       },
       "post": {
@@ -791,7 +789,7 @@
           }
         },
         "tags": [
-          "Filter"
+          "Meta"
         ]
       }
     },
@@ -831,7 +829,7 @@
           }
         },
         "tags": [
-          "Sort"
+          "Meta"
         ]
       },
       "post": {
@@ -843,7 +841,7 @@
           }
         },
         "tags": [
-          "Filter"
+          "Meta"
         ]
       }
     },
@@ -891,7 +889,7 @@
           }
         },
         "tags": [
-          "Filter"
+          "Meta"
         ]
       },
       "put": {
@@ -903,7 +901,7 @@
           }
         },
         "tags": [
-          "Table"
+          "Meta"
         ]
       },
       "delete": {
@@ -915,7 +913,7 @@
           }
         },
         "tags": [
-          "Table"
+          "Meta"
         ]
       }
     },
@@ -963,7 +961,7 @@
           }
         },
         "tags": [
-          "Filter"
+          "Meta"
         ]
       },
       "put": {
@@ -975,7 +973,7 @@
           }
         },
         "tags": [
-          "Table"
+          "Meta"
         ]
       },
       "delete": {
@@ -987,7 +985,7 @@
           }
         },
         "tags": [
-          "Table"
+          "Meta"
         ]
       }
     },
@@ -1035,7 +1033,7 @@
           }
         },
         "tags": [
-          "Webhook"
+          "Meta"
         ]
       },
       "put": {
@@ -1047,7 +1045,7 @@
           }
         },
         "tags": [
-          "Webhook"
+          "Meta"
         ]
       },
       "delete": {
@@ -1058,10 +1056,10 @@
             "description": "OK"
           }
         },
+        "description": "",
         "tags": [
-          "Webhook"
-        ],
-        "description": ""
+          "Meta"
+        ]
       }
     },
     "/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks": {
@@ -1100,7 +1098,7 @@
           }
         },
         "tags": [
-          "Webhook"
+          "Meta"
         ]
       },
       "post": {
@@ -1112,7 +1110,7 @@
           }
         },
         "tags": [
-          "Webhook"
+          "Meta"
         ]
       }
     },
@@ -1152,7 +1150,7 @@
           }
         },
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1198,7 +1196,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "delete": {
         "summary": "",
@@ -1207,7 +1208,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "get": {
         "summary": "",
@@ -1218,7 +1222,7 @@
           }
         },
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1259,7 +1263,7 @@
         },
         "description": "",
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1305,7 +1309,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "delete": {
         "summary": "",
@@ -1314,7 +1321,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "get": {
         "summary": "",
@@ -1325,7 +1335,7 @@
           }
         },
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1365,7 +1375,7 @@
           }
         },
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1411,7 +1421,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "delete": {
         "summary": "",
@@ -1420,7 +1433,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "get": {
         "summary": "",
@@ -1431,7 +1447,7 @@
           }
         },
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1471,7 +1487,7 @@
           }
         },
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1517,7 +1533,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "delete": {
         "summary": "",
@@ -1526,7 +1545,10 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "Meta"
+        ]
       },
       "get": {
         "summary": "",
@@ -1537,7 +1559,7 @@
           }
         },
         "tags": [
-          "View"
+          "Meta"
         ]
       }
     },
@@ -1577,8 +1599,9 @@
           }
         },
         "tags": [
-          "View"
-        ]
+          "Meta"
+        ],
+        "description": ""
       }
     }
   },
@@ -1951,60 +1974,6 @@
       "Table": {
         "title": "Table",
         "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "fk_project_id": {
-            "type": "string"
-          },
-          "fk_base_id": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "parent_id": {
-            "type": "string"
-          },
-          "show_as": {
-            "type": "string"
-          },
-          "tags": {
-            "type": "string"
-          },
-          "pinned": {
-            "type": "boolean"
-          },
-          "deleted": {
-            "type": "boolean"
-          },
-          "order": {
-            "type": "number"
-          },
-          "column": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Column"
-            }
-          },
-          "columnByIds": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "title",
-          "alias"
-        ],
         "examples": [
           {
             "id": "string",
@@ -2070,6 +2039,60 @@
             ],
             "columnByIds": {}
           }
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_project_id": {
+            "type": "string"
+          },
+          "fk_base_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "parent_id": {
+            "type": "string"
+          },
+          "show_as": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "pinned": {
+            "type": "boolean"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "order": {
+            "type": "number"
+          },
+          "column": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Column"
+            }
+          },
+          "columnsById": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "title",
+          "alias"
         ]
       },
       "TableInfo": {
