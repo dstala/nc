@@ -16,10 +16,13 @@ import {
   HookList,
   Project,
   ProjectList,
+  ProjectListParams,
   ProjectReq,
   SortList,
   Table,
+  TableInfo,
   TableList,
+  TableListParams,
   ViewList,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
@@ -32,10 +35,11 @@ export class Projects<SecurityDataType = unknown> extends HttpClient<SecurityDat
    * @name ProjectList
    * @request GET:/projects/
    */
-  projectList = (data: ProjectReq, params: RequestParams = {}) =>
+  projectList = (query: ProjectListParams, data: ProjectReq, params: RequestParams = {}) =>
     this.request<ProjectList, any>({
       path: `/projects/`,
       method: "GET",
+      query: query,
       body: data,
       ...params,
     });
@@ -158,10 +162,11 @@ export class Projects<SecurityDataType = unknown> extends HttpClient<SecurityDat
    * @name TableList
    * @request GET:/projects/{projectId}/tables
    */
-  tableList = (projectId: string, params: RequestParams = {}) =>
+  tableList = ({ projectId, ...query }: TableListParams, params: RequestParams = {}) =>
     this.request<TableList, any>({
       path: `/projects/${projectId}/tables`,
       method: "GET",
+      query: query,
       ...params,
     });
   /**
@@ -172,7 +177,7 @@ export class Projects<SecurityDataType = unknown> extends HttpClient<SecurityDat
    * @request GET:/projects/{projectId}/tables/{tableId}
    */
   tableRead = (projectId: string, tableId: string, data: any, params: RequestParams = {}) =>
-    this.request<any, any>({
+    this.request<TableInfo, any>({
       path: `/projects/${projectId}/tables/${tableId}`,
       method: "GET",
       body: data,

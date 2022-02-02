@@ -35,7 +35,7 @@ import MetaAPILogger from './meta/MetaAPILogger';
 import NcUpgrader from './upgrader/NcUpgrader';
 import NcMetaMgrv2 from './meta/NcMetaMgrv2';
 import NocoCache from '../noco-cache/NocoCache';
-import registerMetaApis from './meta/registerMetaApis';
+import registerMetaApis from './meta/api/registerMetaApis';
 
 const log = debug('nc:app');
 require('dotenv').config();

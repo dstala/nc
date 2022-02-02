@@ -6,8 +6,9 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
+import { Table } from '../noco-client/data-contracts';
 
-export default class Model implements NcModel {
+export default class Model implements Table {
   copy_enabled: boolean;
   created_at: Date | number | string;
   db_alias: 'db' | string;
@@ -31,7 +32,8 @@ export default class Model implements NcModel {
 
   uuid: string;
 
-  columns: Column[];
+  columns?: Column[];
+  columnsById?: { [id: string]: Column };
 
   // private static baseModels: {
   //   [baseId: string]: {
@@ -201,7 +203,10 @@ export default class Model implements NcModel {
       modelData.sorts = await Sort.list({ modelId: modelData.id });
     }
     if (modelData) {
-      return new Model(modelData);
+      const m = new Model(modelData);
+      const columns = await m.getColumns();
+      m.columnsById = columns.reduce((agg, c) => ({ ...agg, [c.id]: c }), {});
+      return m;
     }
     return null;
   }

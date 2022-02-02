@@ -261,11 +261,14 @@ describe('Noco v2 Tests', () => {
           if (err) return done(err);
 
           request(app)
-            .get(`/projects/${projectId}/tables/${res.body.content[0].id}`)
+            .get(`/projects/${projectId}/tables/${res.body.tables.list[0].id}`)
             .set('xc-auth', token)
             .expect(200, (err, res1) => {
               if (err) return done(err);
               expect(res1.body).to.be.a('Object');
+              expect(res1.body.sorts).to.be.an('Array');
+              expect(res1.body.columns).to.be.a('Array');
+              expect(res1.body.columnsById).to.be.an('Object');
               done();
             });
         });

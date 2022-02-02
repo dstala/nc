@@ -1,7 +1,8 @@
 import Base, { BaseBody } from '../noco-models/Base';
 import Noco from '../noco/Noco';
+import { Project as ProjectType } from '../noco-client/data-contracts';
 
-export default class Project {
+export default class Project implements ProjectType {
   public id: string;
   public title: string;
   public prefix: string;
@@ -10,7 +11,7 @@ export default class Project {
   public meta: string;
   public color: string;
   public deleted: string;
-  public order: string;
+  public order: number;
   public is_meta = false;
 
   constructor(project: Partial<Project>) {

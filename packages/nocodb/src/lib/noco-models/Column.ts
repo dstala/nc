@@ -9,39 +9,9 @@ import SingleSelectColumn from './SingleSelectColumn';
 import MultiSelectColumn from './MultiSelectColumn';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
+import { Column as ColumnType } from '../noco-client/data-contracts';
 
-export default class Column {
-  // public _cn: string;
-  // public ai: boolean;
-  // public au: boolean;
-  // public cc: string;
-  // public clen: number | string;
-  // public cn: string;
-  // public cop: number | string;
-  // public created_at: Date | number | string;
-  // public csn: string;
-  // public ct: string;
-  // public ctf: any;
-  // public base_id: string;
-  // public db_alias: 'db' | string;
-  // public deleted: boolean;
-  // public dt: string;
-  // public dtx: string;
-  // public dtxp: string | number;
-  // public dtxs: string | number;
-  // public model_id: string;
-  // public np: number | string;
-  // public ns: number | string;
-  // public order: number;
-  // public pk: boolean;
-  // public pv: boolean;
-  // public project_id: string;
-  // public rqd: boolean;
-  // public uidt: UITypes;
-  // public un: boolean;
-  // public unique: boolean;
-  // public updated_at: Date | number | string;
-
+export default class Column implements ColumnType {
   public fk_model_id: string;
   public project_id: string;
   public db_alias: string;
@@ -68,7 +38,7 @@ export default class Column {
   public data_type_x: string;
   public data_type_x_precision: string;
   public data_type_x_scale: string;
-  public auto_update_timestamp: string;
+  public auto_update_timestamp: boolean;
 
   public colOptions: any;
   public model: Model;

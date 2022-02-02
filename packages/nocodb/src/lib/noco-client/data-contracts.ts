@@ -34,6 +34,10 @@ export interface User {
   createDate?: string;
 }
 
+export interface UserList {
+  users: { list: User; pageInfo: Paginated };
+}
+
 export interface Project {
   id?: string;
   title?: string;
@@ -51,6 +55,10 @@ export interface ProjectReq {
   description?: string;
   color?: string;
   bases?: BaseReq[];
+}
+
+export interface ProjectList {
+  projects: { list: Project[]; pageInfo: Paginated };
 }
 
 export interface Base {
@@ -81,7 +89,48 @@ export interface BaseReq {
   ssl?: string;
 }
 
+export interface BaseList {
+  bases: { list: Base[]; pageInfo: Paginated };
+}
+
 export interface Table {
+  id?: string;
+  fk_project_id?: string;
+  fk_base_id?: string;
+  title: string;
+  alias: string;
+  type?: string;
+  enabled?: boolean;
+  parent_id?: string;
+  show_as?: string;
+  tags?: string;
+  pinned?: boolean;
+  deleted?: boolean;
+  order?: number;
+  column?: Column[];
+  columnsById?: object;
+}
+
+export interface TableInfo {
+  id?: string;
+  fk_project_id?: string;
+  fk_base_id?: string;
+  title: string;
+  alias: string;
+  type?: string;
+  enabled?: string;
+  parent_id?: string;
+  show_as?: string;
+  tags?: string;
+  pinned?: boolean;
+  deleted?: boolean;
+  order?: number;
+  column?: Column[];
+  filters?: Filter[];
+  sort?: Sort[];
+}
+
+export interface TableReq {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
@@ -98,6 +147,10 @@ export interface Table {
   column?: string | any[];
 }
 
+export interface TableList {
+  tables: { list: Table[]; pageInfo: Paginated };
+}
+
 export interface Filter {
   id?: string;
   fk_model_id?: string;
@@ -109,12 +162,20 @@ export interface Filter {
   children?: Filter[];
 }
 
+export interface FilterList {
+  filters: { list: Filter[] };
+}
+
 export interface Sort {
   id?: string;
   fk_model_id?: string;
   fk_column_id?: string;
   direction?: string;
   order?: number;
+}
+
+export interface SortList {
+  sorts: { list: SharedView[] };
 }
 
 export interface Column {
@@ -129,13 +190,13 @@ export interface Column {
   numeric_scale?: string;
   character_maximum_length?: string;
   column_ordinal_position?: string;
-  primary_key?: string;
-  primary_value?: string;
+  primary_key?: boolean;
+  primary_value?: boolean;
   rqd?: string;
   un?: string;
   column_type?: string;
-  auto_increment?: string;
-  unique?: string;
+  auto_increment?: boolean;
+  unique?: boolean;
   column_default?: string;
   column_comment?: string;
   character_set_name?: string;
@@ -147,6 +208,10 @@ export interface Column {
   visible?: boolean;
   order?: number;
   colOptions?: LinkToAnotherRecord | Formula | Rollup | Lookup | SelectOptions[];
+}
+
+export interface ColumnList {
+  columns: { list: Column[] };
 }
 
 export interface LinkToAnotherRecord {
@@ -209,13 +274,6 @@ export interface SelectOptions {
   order?: number;
 }
 
-export interface SharedView {
-  id?: string;
-  fk_view_id?: string;
-  password?: string;
-  deleted?: string;
-}
-
 export interface Grid {
   id?: string;
   title?: string;
@@ -252,6 +310,14 @@ export interface GalleryColumn {
   fk_gallery_id?: string;
 }
 
+export interface KanbanColumn {
+  id?: string;
+  label?: string;
+  help?: string;
+  fk_column_id?: string;
+  fk_kanban_id?: string;
+}
+
 export interface Kanban {
   id?: string;
   title?: string;
@@ -260,14 +326,6 @@ export interface Kanban {
   password?: string;
   columns?: KanbanColumn[];
   fk_model_id?: string;
-}
-
-export interface KanbanColumn {
-  id?: string;
-  label?: string;
-  help?: string;
-  fk_column_id?: string;
-  fk_kanban_id?: string;
 }
 
 export interface Form {
@@ -293,44 +351,37 @@ export interface Paginated {
   sort?: string | any[];
   isFirstPage?: boolean;
   isLastPage?: boolean;
-}
-
-export interface ProjectList {
-  projects: { list: Project[]; pageInfo: Paginated };
-}
-
-export interface TableList {
-  tables: { list: Table[]; pageInfo: Paginated };
-}
-
-export interface BaseList {
-  bases: { list: Base[]; pageInfo: Paginated };
-}
-
-export interface ColumnList {
-  columns: { list: Column[] };
-}
-
-export interface FilterList {
-  filters: { list: Filter[] };
+  page?: number;
 }
 
 export interface HookList {
   hooks: { list: object[]; pageInfo: Paginated };
 }
 
-export interface SharedViewList {
-  sharedViews: { list: SharedView[]; pageInfo: Paginated };
+export interface SharedView {
+  id?: string;
+  fk_view_id?: string;
+  password?: string;
+  deleted?: string;
 }
 
-export interface SortList {
-  sorts: { list: SharedView[] };
+export interface SharedViewList {
+  sharedViews: { list: SharedView[]; pageInfo: Paginated };
 }
 
 export interface ViewList {
   sharedViews: { list: Grid | Form | Kanban | Gallery; pageInfo: Paginated };
 }
 
-export interface UserList {
-  users: { list: User; pageInfo: Paginated };
+export interface ProjectListParams {
+  page?: number;
+  pageSize?: number;
+  sort?: string;
+}
+
+export interface TableListParams {
+  page?: number;
+  pageSize?: number;
+  sort?: string;
+  projectId: string;
 }

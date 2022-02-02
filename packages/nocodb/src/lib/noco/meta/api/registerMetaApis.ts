@@ -1,12 +1,14 @@
 import { Router } from 'express';
-import table from './api/table';
-import Project from '../../noco-models/Project';
+import table from './tableApis';
+import Project from '../../../noco-models/Project';
 
 export default function(router: Router) {
   // // Project CRUD
-  // router.get('/project/:projectId', (req, res) => {
-  //   res.
-  // })
+  router.get('/project/:projectId', (req, res) => {
+    console.log(req.params);
+
+    res.json({ msg: 'success' });
+  });
   //
   //
 
