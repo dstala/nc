@@ -12,7 +12,7 @@ export default async function syncMigration(project: Project): Promise<void> {
       /* migrator : sync & up */
       await migrator.sync(base);
 
-      // await migrator.migrationsUp(base);
+      await migrator.migrationsUp({ base });
     } catch (e) {
       console.log(e);
       // throw e;

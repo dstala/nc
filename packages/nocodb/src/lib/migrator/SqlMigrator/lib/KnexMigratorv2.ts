@@ -1057,10 +1057,10 @@ export default class KnexMigratorv2 {
    * @returns {String} files.down
    * @memberof KnexMigrator
    */
-  async migrationsCreate(args: any = {}) {
+  async migrationsCreate(base: Base) {
     const func = this.migrationsCreate.name;
     // const result = new Result();
-    log.api(`${func}:args:`, args);
+    log.api(`${func}:args:`, base);
 
     try {
       // if (!this.project) {
@@ -1074,28 +1074,29 @@ export default class KnexMigratorv2 {
       const prefix = `${fileHelp.getUniqFilenamePrefix()}${this.suffix}`;
       const upFileName = fileHelp.getFilenameForUp(prefix);
       const downFileName = fileHelp.getFilenameForDown(prefix);
-      if (this.metaDb) {
-        await this.metaDb(NC_MIGRATION).insert({
-          project_id: this.projectId,
-          db_alias: args.dbAlias,
-          up: '',
-          down: '',
-          title: upFileName,
-          title_down: downFileName
-        });
-      } else {
-        // create files
-        await promisify(fs.writeFile)(
-          path.join(this._getWorkingEnvDir(args), upFileName),
-          '',
-          'utf-8'
-        );
-        await promisify(fs.writeFile)(
-          path.join(this._getWorkingEnvDir(args), downFileName),
-          '',
-          'utf-8'
-        );
-      }
+      // if (this.metaDb) {
+      await this.metaDb(NC_MIGRATION).insert({
+        project_id: base.project_id,
+        db_alias: base.id,
+        up: '',
+        down: '',
+        title: upFileName,
+        title_down: downFileName
+      });
+
+      // } else {
+      //   // create files
+      //   await promisify(fs.writeFile)(
+      //     path.join(this._getWorkingEnvDir(args), upFileName),
+      //     '',
+      //     'utf-8'
+      //   );
+      //   await promisify(fs.writeFile)(
+      //     path.join(this._getWorkingEnvDir(args), downFileName),
+      //     '',
+      //     'utf-8'
+      //   );
+      // }
 
       this.emit(
         `Migration files created successfully : '${upFileName}' and '${downFileName}'`

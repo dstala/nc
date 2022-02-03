@@ -7,6 +7,7 @@ import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
 import { Table, TableReq } from '../noco-client/Api';
+import UITypes from '../sqlUi/UITypes';
 
 export default class Model implements Table {
   copy_enabled: boolean;
@@ -254,9 +255,45 @@ export default class Model implements Table {
 
   async delete(): Promise<boolean> {
     // todo: delete
-    //  sort, filters
-    //  lookup, relations
-    //  columns
+    //  sort, filters - done
+    //  views
+    //    views col
+    //    views filter & sort
+    //    shared view url
+    //  lookup, relations, virtual cols - done
+    //  columns - done
+    //  table - done
+
+    await Sort.deleteAll(this.id);
+    await Filter.deleteAll(this.id);
+
+    for (const col of await this.getColumns()) {
+      let colOptionTableName = null;
+      switch (col.uidt) {
+        case UITypes.Rollup:
+          colOptionTableName = 'nc_col_rollup_v2';
+          break;
+        case UITypes.Lookup:
+          colOptionTableName = 'nc_col_lookup_v2';
+          break;
+        case UITypes.ForeignKey:
+        case UITypes.LinkToAnotherRecord:
+          colOptionTableName = 'nc_col_relations_v2';
+          break;
+        case UITypes.MultiSelect:
+        case UITypes.SingleSelect:
+          colOptionTableName = 'nc_col_select_options_v2';
+          break;
+        case UITypes.Formula:
+          colOptionTableName = 'nc_col_formula_v2';
+          break;
+      }
+      if (colOptionTableName) {
+        await Noco.ncMeta.metaDelete(null, null, colOptionTableName, {
+          fk_column_id: col.id
+        });
+      }
+    }
 
     await Noco.ncMeta.metaDelete(null, null, 'nc_columns_v2', {
       fk_model_id: this.id
