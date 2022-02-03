@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
-import { PagedResponseImpl } from './PagedResponse';
+import { PagedResponseImpl } from './helpers/PagedResponse';
 import {
   Table,
   TableList,
@@ -46,7 +46,7 @@ export default function() {
       console.log(req.params);
 
       const project = await Project.getWithInfo(req.params.projectId);
-      const base = project.bases?.[0];
+      const base = project.bases.find(b => b.id === req.params.baseId);
       const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
 
       await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
@@ -62,10 +62,23 @@ export default function() {
 
     res.json({ msg: 'success' });
   });
-  router.delete('/:tableId', (req, res) => {
-    console.log(req.params);
+  router.delete('/:tableId', async (req: Request, res: Response, next) => {
+    try {
+      console.log(req.params);
 
-    res.json({ msg: 'success' });
+      const project = await Project.getWithInfo(req.params.projectId);
+      const base = project.bases.find(b => b.id === req.params.baseId);
+      const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
+
+      const table = await Model.get({ id: req.params.tableId });
+
+      await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
+
+      res.json(table.delete());
+    } catch (e) {
+      console.log(e);
+      next(e);
+    }
   });
   return router;
 }

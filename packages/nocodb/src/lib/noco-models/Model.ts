@@ -251,4 +251,19 @@ export default class Model implements Table {
       model
     });
   }
+
+  async delete(): Promise<boolean> {
+    // todo: delete
+    //  sort, filters
+    //  lookup, relations
+    //  columns
+
+    await Noco.ncMeta.metaDelete(null, null, 'nc_columns_v2', {
+      fk_model_id: this.id
+    });
+
+    await Noco.ncMeta.metaDelete(null, null, 'nc_models_v2', this.id);
+
+    return true;
+  }
 }

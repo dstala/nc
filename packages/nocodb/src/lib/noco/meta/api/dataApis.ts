@@ -7,15 +7,16 @@ import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 export default function() {
   const router = Router({ mergeParams: true });
 
-  router.get('/:modelId', async (req: Request, res: Response) => {
+  router.get('/:modelId', async (req: Request, res: Response, next) => {
     try {
       console.time('Model.get');
       const model = await Model.get({
         base_id: req.params.projectId,
-        db_alias: req.params.dbAlias,
-        id: req.params.model_id,
-        tn: req.params.model_name
+        db_alias: req.params.baseId,
+        id: req.params.modelId
       });
+      if (!model) return next(new Error('Table not found'));
+
       console.timeEnd('Model.get');
       const base = await Base.get(req.params.dbAlias);
       console.time('BaseModel.get');

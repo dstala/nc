@@ -21,6 +21,7 @@ import NcConnectionMgrv2 from '../../../noco/common/NcConnectionMgrv2';
 
 const evt = new Emit();
 const log = new Debug('KnexMigrator');
+const NC_MIGRATION = 'nc_migrations';
 /**
  * Class to create an instance of KnexMigrator
  *
@@ -29,7 +30,7 @@ const log = new Debug('KnexMigrator');
  */
 export default class KnexMigratorv2 {
   //extends SqlMigrator {
-  private project: Project;
+  private projectId: string;
   private toolDir = process.cwd();
 
   /**
@@ -37,12 +38,15 @@ export default class KnexMigratorv2 {
    * @memberof KnexMigrator
    */
   constructor(project: Project) {
-    // super();
-    this.project = project;
+    this.projectId = project.id;
   }
 
   get metaDb(): XKnex {
     return Noco.ncMeta.knex;
+  }
+
+  private async getProject(): Promise<Project> {
+    return Project.getWithInfo(this.projectId);
   }
 
   emit(data, _args?) {
@@ -80,7 +84,7 @@ export default class KnexMigratorv2 {
     return path.join(
       this.toolDir,
       'nc',
-      this.project.id,
+      this.projectId,
       args.dbAlias,
       'migrations'
     );
@@ -92,7 +96,7 @@ export default class KnexMigratorv2 {
     // // working env will have all databases
     // const { workingEnv } = this.project;
 
-    for (const base of this.project.bases) {
+    for (const base of (await this.getProject()).bases) {
       await this._initDbOnFs(base);
     }
   }
@@ -116,7 +120,7 @@ export default class KnexMigratorv2 {
   async _initDbOnFs(base: Base) {
     // this.emit(
     //   'Creating folder: ',
-    //   path.join(this.toolDir, 'nc', this.project.id, args.dbAlias, 'migrations')
+    //   path.join(this.toolDir, 'nc', this.projectId, args.dbAlias, 'migrations')
     // );
     // try {
     //   // @ts-ignore
@@ -125,7 +129,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       'migrations'
     //     )
@@ -135,7 +139,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       'migrations'
     //     )
@@ -146,7 +150,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       this.project.meta.metaFolder || 'meta'
     //     )
@@ -157,7 +161,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       this.project.meta.seedsFolder
     //     )
@@ -168,7 +172,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       this.project.meta.seedsFolder
     //     )
@@ -178,7 +182,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       this.project.meta.queriesFolder
     //     )
@@ -189,7 +193,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       this.project.meta.queriesFolder
     //     )
@@ -199,7 +203,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       this.project.meta.apisFolder
     //     )
     //   );
@@ -209,7 +213,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       this.project.meta.apisFolder
     //     )
     //   );
@@ -219,7 +223,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       this.project.meta.metaFolder || 'meta'
     //     )
@@ -230,7 +234,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       this.project.meta.metaFolder || 'meta'
     //     )
@@ -241,7 +245,7 @@ export default class KnexMigratorv2 {
     //     path.join(
     //       this.toolDir,
     //       'nc',
-    //       this.project.id,
+    //       this.projectId,
     //       args.dbAlias,
     //       'migrations'
     //     )
@@ -252,17 +256,17 @@ export default class KnexMigratorv2 {
   // async _cleanFs(args) {
   //   this.emit(
   //     'Removing folder: ',
-  //     path.join(this.toolDir, 'nc', this.project.id, args.dbAlias)
+  //     path.join(this.toolDir, 'nc', this.projectId, args.dbAlias)
   //   );
   //
   //   try {
   //     await promisify(rmdir)(
-  //       path.join(this.toolDir, 'nc', this.project.id, args.dbAlias)
+  //       path.join(this.toolDir, 'nc', this.projectId, args.dbAlias)
   //     );
   //   } catch (e) {
   //     log.debug(
   //       'Error removing folder:',
-  //       path.join(this.toolDir, 'nc', this.project.id, args.dbAlias),
+  //       path.join(this.toolDir, 'nc', this.projectId, args.dbAlias),
   //       e
   //     );
   //   }
@@ -516,7 +520,20 @@ export default class KnexMigratorv2 {
   //   }
   // }
 
-  async _migrationsUp(args): Promise<any> {
+  async _migrationsUp({
+    base,
+    ...args
+  }: {
+    base: Base;
+    file: string;
+    migrationSteps: number;
+    onlyList: any;
+    title: string;
+    upFilesPattern?: string;
+    downFilesPattern?: string;
+    sqlContentMigrate: any;
+    sqlClient?: any;
+  }): Promise<any> {
     const result = new Result();
 
     result.data.object = {};
@@ -547,10 +564,10 @@ export default class KnexMigratorv2 {
       let filesDown;
 
       if (this.metaDb) {
-        filesDown = files = await this.metaDb('nc_migrations')
+        filesDown = files = await this.metaDb(NC_MIGRATION)
           .where({
-            project_id: this.project.id,
-            db_alias: args.dbAlias
+            project_id: this.projectId,
+            db_alias: base.id
           })
           .orderBy('id', 'asc');
       } else {
@@ -563,7 +580,7 @@ export default class KnexMigratorv2 {
       //   args.dbAlias,
       //   args.env
       // );
-      const sqlClient = NcConnectionMgrv2.getSqlClient(args.base);
+      const sqlClient = NcConnectionMgrv2.getSqlClient(base);
 
       let migrations = await sqlClient.selectAll(
         // todo: replace
@@ -571,18 +588,16 @@ export default class KnexMigratorv2 {
       );
 
       if (this.suffix) {
-        migrations = migrations.filter(m => m.tn.includes(this.suffix));
+        migrations = migrations.filter(m => m.title.includes(this.suffix));
       }
 
       /** ************** END : get files and migrations *************** */
 
       if (files.length === migrations.length) {
-        this.emit(
-          `Evolutions are upto date for ' ${args.env} : ${args.dbAlias} '`
-        );
+        this.emit(`Evolutions are upto date for ' ${'env'} : ${base.alias} '`);
         for (let i = 0; i < migrations.length; ++i) {
           result.data.object.list.push({
-            title: migrations[i].tn,
+            title: migrations[i].title,
             titleDown: migrations[i].titleDown,
             status: false
           });
@@ -591,8 +606,8 @@ export default class KnexMigratorv2 {
         result.data.object.pending = files.length - migrations.length;
       } else if (files.length > migrations.length || onlyList) {
         this.emit(
-          `Number of evolutions pending for '${args.env}:${
-            args.dbAlias
+          `Number of evolutions pending for '${'env'}:${
+            base.alias
           }': '${files.length - migrations.length}'`
         );
         result.data.object.pending = files.length - migrations.length;
@@ -607,12 +622,12 @@ export default class KnexMigratorv2 {
           // find the index of the last evolution in evolution list of files
           for (; i < files.length; ++i) {
             if (this.metaDb) {
-              if (files[i].tn.indexOf(lastEvolution.tn) !== -1) {
+              if (files[i].title.indexOf(lastEvolution.title) !== -1) {
                 i++;
                 break;
               }
             } else {
-              if (files[i].indexOf(lastEvolution.tn) !== -1) {
+              if (files[i].indexOf(lastEvolution.title) !== -1) {
                 i++;
                 break;
               }
@@ -630,7 +645,7 @@ export default class KnexMigratorv2 {
             for (let i = fileIndex; i < files.length; ++i) {
               migrationSteps++;
               if (this.metaDb) {
-                if (files[i].tn.includes(args.file)) {
+                if (files[i].title.includes(args.file)) {
                   fileFound = 1;
                   break;
                 }
@@ -654,7 +669,7 @@ export default class KnexMigratorv2 {
             if (this.metaDb) {
               for (let i = 0; i < fileIndex; ++i) {
                 result.data.object.list.push({
-                  title: files[i].tn,
+                  title: files[i].title,
                   titleDown: filesDown[i].title_down,
                   status: false
                 });
@@ -685,7 +700,7 @@ export default class KnexMigratorv2 {
             let fileNameDown;
 
             if (this.metaDb) {
-              fileName = files[i].tn;
+              fileName = files[i].title;
               fileNameDown = files[i].title_down;
             } else {
               const splits = files[i].split('/');
@@ -742,7 +757,7 @@ export default class KnexMigratorv2 {
               for (const data of metaTableInserts) {
                 await trx(sqlClient.getTnPath('nc_evolutions')).insert(data);
                 vm.emit(
-                  `'${data.tn}' : Updating bookkeeping of SQL UP migration - done`
+                  `'${data.title}' : Updating bookkeeping of SQL UP migration - done`
                 );
               }
               await trx.commit();
@@ -778,7 +793,20 @@ export default class KnexMigratorv2 {
     return result;
   }
 
-  async _migrationsDown(args) {
+  async _migrationsDown({
+    base,
+    ...args
+  }: {
+    base: Base;
+    file: string;
+    migrationSteps: number;
+    onlyList: any;
+    title: string;
+    upFilesPattern?: string;
+    downFilesPattern?: string;
+    sqlContentMigrate: any;
+    sqlClient?: any;
+  }) {
     if (process.env.NC_MIGRATIONS_DISABLED) {
       return;
     }
@@ -802,10 +830,10 @@ export default class KnexMigratorv2 {
     try {
       let files;
       if (this.metaDb) {
-        files = await this.metaDb('nc_migrations')
+        files = await this.metaDb(NC_MIGRATION)
           .where({
-            project_id: this.project.id,
-            db_alias: args.dbAlias
+            project_id: this.projectId,
+            db_alias: base.id
           })
           .orderBy('title', 'asc');
       } else {
@@ -817,7 +845,7 @@ export default class KnexMigratorv2 {
       //   args.dbAlias,
       //   args.env
       // );
-      const sqlClient = NcConnectionMgrv2.getSqlClient(args.base); // SqlClientFactory.create(connection);
+      const sqlClient = NcConnectionMgrv2.getSqlClient(base); // SqlClientFactory.create(connection);
       const migrations = await sqlClient.selectAll(
         sqlClient.getTnPath('nc_evolutions')
       );
@@ -973,7 +1001,7 @@ export default class KnexMigratorv2 {
       /* if no env - init all envs */
       if (!base) {
         /* happens when creating the project */
-        for (const base of this.project.bases) {
+        for (const base of (await this.getProject()).bases) {
           await this._initEnvDbsWithSql(base);
         }
       } else {
@@ -1047,8 +1075,8 @@ export default class KnexMigratorv2 {
       const upFileName = fileHelp.getFilenameForUp(prefix);
       const downFileName = fileHelp.getFilenameForDown(prefix);
       if (this.metaDb) {
-        await this.metaDb('nc_migrations').insert({
-          project_id: this.project.id,
+        await this.metaDb(NC_MIGRATION).insert({
+          project_id: this.projectId,
           db_alias: args.dbAlias,
           up: '',
           down: '',
@@ -1135,7 +1163,17 @@ export default class KnexMigratorv2 {
    *                  and only filenames are migrated to _evolution table
    * @memberof KnexMigrator
    */
-  async migrationsUp(args: any = {}) {
+  async migrationsUp({
+    base,
+    ...args
+  }: {
+    base: Base;
+    migrationSteps?: number;
+    file?: string;
+    onlyList?: any;
+    sqlContentMigrate?: any;
+    sqlClient?: any;
+  }) {
     const func = this.migrationsUp.name;
     // const result = new Result();
     log.api(`${func}:args:`, args);
@@ -1149,28 +1187,29 @@ export default class KnexMigratorv2 {
     // console.log(this.project);
 
     return await this._migrationsUp({
-      env: args.env,
-      dbAlias: args.dbAlias,
+      base: base,
+      // env: args.env,
+      // dbAlias: base.id,
       migrationSteps: args.migrationSteps,
       file: args.file,
       onlyList: args.onlyList,
-      upFilesPattern: path.join(
-        this.toolDir,
-        'nc',
-        this.project.id,
-        args.dbAlias,
-        'migrations',
-        '*.up.sql'
-      ),
-      downFilesPattern: path.join(
-        this.toolDir,
-        'nc',
-        this.project.id,
-        args.dbAlias,
-        'migrations',
-        '*.down.sql'
-      ),
-      tn: `${this.toolDir}`,
+      // upFilesPattern: path.join(
+      //   this.toolDir,
+      //   'nc',
+      //   this.projectId,
+      //   args.dbAlias,
+      //   'migrations',
+      //   '*.up.sql'
+      // ),
+      // downFilesPattern: path.join(
+      //   this.toolDir,
+      //   'nc',
+      //   this.projectId,
+      //   args.dbAlias,
+      //   'migrations',
+      //   '*.down.sql'
+      // ),
+      title: `${this.toolDir}`,
       sqlContentMigrate: args.sqlContentMigrate,
       sqlClient: args.sqlClient
     });
@@ -1190,7 +1229,17 @@ export default class KnexMigratorv2 {
    *                  and only filenames are migrated to _evolution table
    * @memberof KnexMigrator
    */
-  async migrationsDown(args) {
+  async migrationsDown({
+    base,
+    ...args
+  }: {
+    base: Base;
+    migrationSteps?: number;
+    file?: string;
+    onlyList?: any;
+    sqlContentMigrate?: any;
+    sqlClient?: any;
+  }) {
     const func = this.migrationsDown.name;
     // const result = new Result();
     log.api(`${func}:args:`, args);
@@ -1204,28 +1253,29 @@ export default class KnexMigratorv2 {
     // }
 
     await this._migrationsDown({
-      env: args.env,
-      dbAlias: args.dbAlias,
+      base,
+      // env: args.env,
+      // dbAlias: args.dbAlias,
       migrationSteps: args.migrationSteps,
       onlyList: args.onlyList,
       file: args.file,
-      upFilesPattern: path.join(
-        this.toolDir,
-        'nc',
-        this.project.id,
-        args.dbAlias,
-        'migrations',
-        '*.up.sql'
-      ),
-      downFilesPattern: path.join(
-        this.toolDir,
-        'nc',
-        this.project.id,
-        args.dbAlias,
-        'migrations',
-        '*.down.sql'
-      ),
-      tn: `_evolutions`,
+      // upFilesPattern: path.join(
+      //   this.toolDir,
+      //   'nc',
+      //   this.projectId,
+      //   args.dbAlias,
+      //   'migrations',
+      //   '*.up.sql'
+      // ),
+      // downFilesPattern: path.join(
+      //   this.toolDir,
+      //   'nc',
+      //   this.projectId,
+      //   args.dbAlias,
+      //   'migrations',
+      //   '*.down.sql'
+      // ),
+      title: `nc_evolutions`,
       sqlContentMigrate: args.sqlContentMigrate
     });
   }
@@ -1245,7 +1295,16 @@ export default class KnexMigratorv2 {
    * @param {String} args.down - down filename - down filename (only name not entire path)
    * @memberof KnexMigrator
    */
-  async migrationsWrite(args) {
+  async migrationsWrite({
+    base,
+    ...args
+  }: {
+    base: Base;
+    upStatement: Array<{ sql: string }>;
+    downStatement: Array<{ sql: string }>;
+    up: string;
+    down: string;
+  }) {
     const func = this.migrationsWrite.name;
     // const result = new Result();
     log.api(`${func}:args:`, args);
@@ -1273,28 +1332,28 @@ export default class KnexMigratorv2 {
       log.debug('migrationsWrite: created downStatement', downStatement);
       if (this.metaDb) {
         if (
-          await this.metaDb('nc_migrations')
+          await this.metaDb(NC_MIGRATION)
             .where({
-              project_id: this.project.id,
-              db_alias: args.dbAlias,
+              project_id: base.project_id,
+              db_alias: base.id,
               title: args.up
             })
             .first()
         ) {
-          await this.metaDb('nc_migrations')
+          await this.metaDb(NC_MIGRATION)
             .update({
               up: upStatement,
               down: downStatement
             })
             .where({
-              project_id: this.project.id,
-              db_alias: args.dbAlias,
+              project_id: this.projectId,
+              db_alias: base.id,
               title: args.up
             });
         } else {
-          await this.metaDb('nc_migrations').insert({
-            project_id: this.project.id,
-            db_alias: args.dbAlias,
+          await this.metaDb(NC_MIGRATION).insert({
+            project_id: this.projectId,
+            db_alias: base.id,
             up: upStatement,
             down: downStatement,
             title: args.up,
@@ -1372,11 +1431,11 @@ export default class KnexMigratorv2 {
       //   this.project = NcConfigFactory.make();
       // }
       if (this.metaDb) {
-        const migration = await this.metaDb('nc_migrations')
+        const migration = await this.metaDb(NC_MIGRATION)
           .where({
             db_alias: args.dbAlias,
-            project_id: this.project.id,
-            title: args.tn
+            project_id: this.projectId,
+            title: args.title
           })
           .first();
 
@@ -1386,15 +1445,15 @@ export default class KnexMigratorv2 {
         const upFilePath = path.join(
           this.toolDir,
           'nc',
-          this.project.id,
+          this.projectId,
           args.dbAlias,
           'migrations',
-          args.tn
+          args.title
         );
         const downFilePath = path.join(
           this.toolDir,
           'nc',
-          this.project.id,
+          this.projectId,
           args.dbAlias,
           'migrations',
           args.titleDown
@@ -1724,7 +1783,7 @@ export default class KnexMigratorv2 {
   // }
 
   private get suffix(): string {
-    if (this.project?.prefix) return `_${this.project?.prefix.slice(3, 7)}`;
+    // if (this.project?.prefix) return `_${this.project?.prefix.slice(3, 7)}`;
     return '';
   }
 }

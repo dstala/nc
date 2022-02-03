@@ -2,9 +2,9 @@ import { Request, Response, Router } from 'express';
 import table from './tableApis';
 import Project from '../../../noco-models/Project';
 import { ProjectList, ProjectListParams } from '../../../noco-client/Api';
-import { PagedResponseImpl } from './PagedResponse';
-import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
-import syncMigration from './syncMigration';
+import { PagedResponseImpl } from './helpers/PagedResponse';
+// import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
+import syncMigration from './helpers/syncMigration';
 import dataApis from './dataApis';
 
 export default function(router: Router) {
@@ -37,7 +37,7 @@ export default function(router: Router) {
     try {
       const project = await Project.createProject(req.body);
 
-      await ProjectMgrv2.getSqlMgr(project).projectOpenByWeb();
+      // await ProjectMgrv2.getSqlMgr(project).projectOpenByWeb();
       await syncMigration(project);
       res.json(project);
     } catch (e) {
@@ -48,5 +48,5 @@ export default function(router: Router) {
 
   // Table CRUD
   router.use('/projects/:projectId/:baseId/tables', table());
-  router.use('/data/projects/:projectId/:baseId/data', dataApis());
+  router.use('/data/projects/:projectId/:baseId/tables', dataApis());
 }

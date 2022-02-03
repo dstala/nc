@@ -1712,7 +1712,7 @@
         "description": ""
       }
     },
-    "/data/projects/{projectId}/{dbAlias}/data/{tableId}": {
+    "/data/projects/{projectId}/{dbAlias}/tables/{tableId}": {
       "parameters": [
         {
           "schema": {
@@ -1765,7 +1765,7 @@
         ]
       }
     },
-    "/data/projects/{projectId}/{dbAlias}/data/{tableId}/{rowId}": {
+    "/data/projects/{projectId}/{dbAlias}/tables/{tableId}/{rowId}": {
       "parameters": [
         {
           "schema": {

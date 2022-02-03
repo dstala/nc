@@ -1,5 +1,5 @@
-import Migrator from '../../../migrator/SqlMigrator/lib/KnexMigratorv2';
-import Project from '../../../noco-models/Project';
+import Migrator from '../../../../migrator/SqlMigrator/lib/KnexMigratorv2';
+import Project from '../../../../noco-models/Project';
 
 export default async function syncMigration(project: Project): Promise<void> {
   for (const base of await project.getBases()) {

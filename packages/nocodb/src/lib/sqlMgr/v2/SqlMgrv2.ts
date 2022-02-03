@@ -16,6 +16,7 @@ import { customAlphabet } from 'nanoid';
 import Project from '../../noco-models/Project';
 import NcConnectionMgrv2 from '../../noco/common/NcConnectionMgrv2';
 import KnexMigratorv2 from '../../migrator/SqlMigrator/lib/KnexMigratorv2';
+import Base from '../../noco-models/Base';
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 20);
 
 const ToolOps = {
@@ -94,11 +95,10 @@ const ToolOps = {
 
 export default class SqlMgrv2 {
   // @ts-ignore
-  private project: Project;
   // @ts-ignore
   // private metaDb: any;
   // @ts-ignore
-  private project_id: any;
+  private projectId: any;
   private _project: any;
   // @ts-ignore
   private _migrator: KnexMigratorv2;
@@ -106,7 +106,7 @@ export default class SqlMgrv2 {
   private logsRef: any;
   private currentProjectJson: any;
   private currentProjectConnections: any;
-  private currentProjectServers: any;
+  // private currentProjectServers: any;
   private currentProjectFolder: any;
   // @ts-ignore
   private projectRow: any;
@@ -124,19 +124,22 @@ export default class SqlMgrv2 {
   constructor(args: Project) {
     const func = 'constructor';
     log.api(`${func}:args:`, args);
-    this.project = args;
     // this.metaDb = args.metaDb;
-    this.project_id = args.id;
+    this.projectId = args.id;
     this._migrator = new KnexMigratorv2(args);
 
-    this.currentProjectJson = {};
-    this.currentProjectConnections = {};
-    this.currentProjectServers = {};
-    this.currentProjectFolder = {};
-    this.projectRow = {};
-    this.id = null;
+    // this.currentProjectJson = {};
+    // this.currentProjectConnections = {};
+    // this.currentProjectServers = {};
+    // this.currentProjectFolder = {};
+    // this.projectRow = {};
+    // this.id = null;
     // }
     return this;
+  }
+
+  private async getProject(): Promise<Project> {
+    return Project.getWithInfo(this.projectId);
   }
 
   public migrator() {
@@ -279,23 +282,22 @@ export default class SqlMgrv2 {
       const data = new Result();
       data.data.list = [];
 
-      // create connections for each db connection
-      for (const base of await this.project.getBases()) {
-        const connectionConfig = base.getConnectionConfig();
+      // // create connections for each db connection
+      // for (const base of await (await this.getProject()).getBases()) {
+      //   // const connectionConfig = base.getConnectionConfig();
+      //   // this.currentProjectConnections[base.id] = SqlClientFactory.create({
+      //   //   ...connectionConfig,
+      //   //   knex: NcConnectionMgrv2.get(base)
+      //   // });
+      //   //
+      //   // this.currentProjectServers[base.id] = {
+      //   //   xserver: null,
+      //   //   input: {},
+      //   //   output: {}
+      //   // };
+      // }
 
-        this.currentProjectConnections[base.id] = SqlClientFactory.create({
-          ...connectionConfig,
-          knex: NcConnectionMgrv2.get(base)
-        });
-
-        this.currentProjectServers[base.id] = {
-          xserver: null,
-          input: {},
-          output: {}
-        };
-      }
-
-      return this.project;
+      return await this.getProject();
     } catch (e) {
       console.log('projectOpen::error', e);
       throw e;
@@ -738,21 +740,21 @@ export default class SqlMgrv2 {
   /**
    *
    *
-   * @param {*} args
-   * @param {String} args.env
-   * @param {dbAlias} args.dbAlias
+   * @param {*} base
+   * @param {String} base.env
+   * @param {dbAlias} base.dbAlias
    * @param {String} op - sqlClient function to call
    * @param {*} opArgs - sqlClient function arguments
    * @memberof SqlMgr
    */
-  public async sqlOpPlus(args, op, opArgs) {
+  public async sqlOpPlus(base: Base, op, opArgs) {
     const func = this.sqlOpPlus.name;
-    log.api(`${func}:args:`, args, op, opArgs);
+    log.api(`${func}:args:`, base, op, opArgs);
 
-    console.log(args);
+    console.log(base);
 
     // create sql client for this operation
-    const sqlClient = NcConnectionMgrv2.getSqlClient(args); //await this.projectGetSqlClient(args);
+    const sqlClient = NcConnectionMgrv2.getSqlClient(base); //await this.projectGetSqlClient(args);
 
     // do sql operation
     const sqlMigrationStatements = await sqlClient[op](opArgs);
@@ -761,42 +763,42 @@ export default class SqlMgrv2 {
       sqlMigrationStatements.data.object
     );
 
-    args.folder = this.currentProjectFolder;
+    // args.folder = this.currentProjectFolder;
 
-    if (this.isProjectDbConnection()) {
-    } else {
-      // create sql migration files
-      const sqlMigrationFiles = await this.migrator().migrationsCreate(args);
-      console.log(`Sql Migration Files for '${op}'`, sqlMigrationFiles);
+    // if (this.isProjectDbConnection()) {
+    // } else {
+    // create sql migration files
+    const sqlMigrationFiles = await this.migrator().migrationsCreate(base);
+    console.log(`Sql Migration Files for '${op}'`, sqlMigrationFiles);
 
-      // write sql statements to migration files
-      console.log(
-        `Write sql migration files for '${op}' with`,
-        sqlMigrationStatements
-      );
-      await this.migrator().migrationsWrite({
-        ...args,
-        ...sqlMigrationStatements.data.object,
-        folder: this.currentProjectFolder,
-        up: sqlMigrationFiles.up,
-        down: sqlMigrationFiles.down
-      });
+    // write sql statements to migration files
+    console.log(
+      `Write sql migration files for '${op}' with`,
+      sqlMigrationStatements
+    );
+    await this.migrator().migrationsWrite({
+      base,
+      ...sqlMigrationStatements.data.object,
+      folder: this.currentProjectFolder,
+      up: sqlMigrationFiles.up,
+      down: sqlMigrationFiles.down
+    });
 
-      // mark as migration done in nc_evolutions table
-      console.log(
-        `TODO: write sql migration files for '${op}' with`,
-        sqlMigrationStatements
-      );
-      const migrationArgs = {
-        ...args,
-        sqlContentMigrate: 0,
-        migrationSteps: 9999,
-        folder: this.currentProjectFolder,
-        sqlClient
-      };
-      // console.log(`Migration up args for '${op}'`, migrationArgs);
-      await this.migrator().migrationsUp(migrationArgs);
-    }
+    // mark as migration done in nc_evolutions table
+    console.log(
+      `TODO: write sql migration files for '${op}' with`,
+      sqlMigrationStatements
+    );
+    const migrationArgs = {
+      base: base,
+      sqlContentMigrate: 0,
+      migrationSteps: 9999,
+      folder: this.currentProjectFolder,
+      sqlClient
+    };
+    // console.log(`Migration up args for '${op}'`, migrationArgs);
+    await this.migrator().migrationsUp(migrationArgs);
+    // }
 
     return sqlMigrationStatements;
   }

@@ -1,4 +1,8 @@
-import { expect } from 'chai';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+const expect = chai.expect;
+
+chai.use(chaiAsPromised);
 import 'mocha';
 import express from 'express';
 import request from 'supertest';
@@ -233,10 +237,26 @@ describe('Noco v2 Tests', function() {
 
       const data = await api.data.list(
         projectRes.data.id,
-        tableRes.data.id,
+        projectRes.data.bases[0].id,
         tableRes.data.id
       );
       console.log(data.data);
+
+      const tableDelRes = await api.meta.tableDelete(
+        projectRes.data.id,
+        projectRes.data.bases[0].id,
+        tableRes.data.id
+      );
+      await expect(
+        api.data.list(
+          projectRes.data.id,
+          projectRes.data.bases[0].id,
+          tableRes.data.id
+        )
+        // @ts-ignore
+      ).to.be.rejectedWith(Error);
+
+      console.log(tableDelRes.data);
       // const data = await request(app)
       //   .get(`/nc/${projectId}/api/v2/abc`)
       //   .set('xc-auth', token)
