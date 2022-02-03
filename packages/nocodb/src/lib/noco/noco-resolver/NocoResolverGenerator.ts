@@ -23,17 +23,17 @@ export default class NocoTypeGenerator {
     const rootResolver = {};
 
     for (const model of models) {
-      rootResolver[`${model.alias}List`] = async () => {
+      rootResolver[`${model._tn}List`] = async () => {
         // return (await ctx.models[model.title].list()).map(
         //   m => new ctx.types[model.title](m)
         // );x
-        return await ctx.baseModels2[model.title].list();
+        return await ctx.baseModels2[model.tn].list();
         //   .map(
         //   m => new ctx.types[model.title](m)
         // );
       };
-      rootResolver[`${model.alias}Read`] = async id => {
-        return await ctx.baseModels2[model.title].readByPk(id);
+      rootResolver[`${model._tn}Read`] = async id => {
+        return await ctx.baseModels2[model.tn].readByPk(id);
         // return row ? new ctx.types[model.title](row) : null;
       };
     }

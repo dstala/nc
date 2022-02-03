@@ -16,29 +16,29 @@ export default class Column implements ColumnType {
   public project_id: string;
   public db_alias: string;
 
-  public title: string;
-  public alias: string;
+  public cn: string;
+  public _cn: string;
 
-  public ui_data_type: UITypes;
-  public data_type: string;
-  public numeric_precision: string;
-  public numeric_scale: string;
-  public character_maximum_length: string;
-  public column_ordinal_position: string;
-  public primary_key: boolean;
-  public primary_value: boolean;
-  public not_null: boolean;
-  public unsigned: string;
-  public column_type: string;
-  public auto_increment: boolean;
+  public uidt: UITypes;
+  public dt: string;
+  public np: string;
+  public ns: string;
+  public clen: string;
+  public cop: string;
+  public pk: boolean;
+  public pv: boolean;
+  public rqd: boolean;
+  public un: boolean;
+  public ct: string;
+  public ai: boolean;
   public unique: boolean;
-  public column_default: string;
-  public column_comment: string;
-  public character_set_name: string;
-  public data_type_x: string;
-  public data_type_x_precision: string;
-  public data_type_x_scale: string;
-  public auto_update_timestamp: boolean;
+  public cdf: string;
+  public cc: string;
+  public csn: string;
+  public dtx: string;
+  public dtxp: string;
+  public dtxs: string;
+  public au: boolean;
 
   public colOptions: any;
   public model: Model;
@@ -57,35 +57,34 @@ export default class Column implements ColumnType {
     column: Partial<T> & { base_id?: string; [key: string]: any }
   ) {
     const row = await Noco.ncMeta.metaInsert2(
-      column.project_id || column.base_id,
-      column.db_alias,
+      null, //column.project_id || column.base_id,
+      null, //column.db_alias,
       'nc_columns_v2',
       {
         fk_model_id: column.fk_model_id,
-        title: column.cn || column.title,
-        alias: column._cn || column.alias,
+        cn: column.cn,
+        _cn: column._cn,
 
-        ui_data_type: column.uidt || column.ui_data_type,
-        data_type: column.dt || column.data_type,
-        numeric_precision: column.np || column.numeric_precision,
-        numeric_scale: column.ns || column.numeric_scale,
-        character_maximum_length:
-          column.clen || column.character_maximum_length,
-        column_ordinal_position: column.cop || column.column_ordinal_position,
-        primary_key: column.pk || column.primary_key,
-        not_null: column.rqd || column.not_null,
-        unsigned: column.un || column.unsigned,
-        column_type: column.column_type || column.ct,
-        auto_increment: column.auto_increment || column.ai,
+        uidt: column.uidt,
+        dt: column.dt,
+        np: column.np,
+        ns: column.ns,
+        clen: column.clen,
+        cop: column.cop,
+        pk: column.pk,
+        rqd: column.rqd,
+        un: column.un,
+        ct: column.ct,
+        ai: column.ai,
         unique: column.unique,
-        column_default: column.column_default || column.cdf,
-        column_comment: column.column_comment || column.cc,
-        character_set_name: column.character_set_name || column.csn,
-        data_type_x: column.data_type_x || column.dtx,
-        data_type_x_precision: column.data_type_x_precision || column.dtxp,
-        data_type_x_scale: column.data_type_x_scale || column.dtxs,
-        auto_update_timestamp: column.auto_update_timestamp || column.au,
-        primary_value: column.primary_value || column.pv
+        cdf: column.cdf,
+        cc: column.cc,
+        csn: column.csn,
+        dtx: column.dtx,
+        dtxp: column.dtxp,
+        dtxs: column.dtxs,
+        au: column.au,
+        pv: column.pv
       }
     );
 
@@ -227,7 +226,7 @@ export default class Column implements ColumnType {
   public async getColOptions<T>(): Promise<T> {
     let res: any;
 
-    switch (this.ui_data_type) {
+    switch (this.uidt) {
       case UITypes.Lookup:
         res = await LookupColumn.read(this.id);
         break;
@@ -284,26 +283,17 @@ export default class Column implements ColumnType {
   }
 
   public static async list({
-    base_id,
-    db_alias,
     fk_model_id
   }: {
-    base_id: string;
-    db_alias: string;
     fk_model_id: string;
   }): Promise<Column[]> {
     let columnsList = null; // await NocoCache.getv2(fk_model_id);
     if (!columnsList?.length) {
-      columnsList = await Noco.ncMeta.metaList2(
-        base_id,
-        db_alias,
-        'nc_columns_v2',
-        {
-          condition: {
-            fk_model_id
-          }
+      columnsList = await Noco.ncMeta.metaList2(null, null, 'nc_columns_v2', {
+        condition: {
+          fk_model_id
         }
-      );
+      });
       for (const column of columnsList) {
         await NocoCache.setv2(column?.id, fk_model_id, column);
       }

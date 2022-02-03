@@ -83,7 +83,7 @@ const projectCreateReqBody = {
 
 // console.log(JSON.stringify(dbConfig, null, 2));
 // process.exit();
-describe('Noco v2 Tests', () => {
+describe('Noco v2 Tests', function() {
   let app;
   const api = new Api({
     baseURL: 'http://localhost:8080'
@@ -96,6 +96,7 @@ describe('Noco v2 Tests', () => {
     (async () => {
       try {
         await knex(dbConfig).raw(`DROP DATABASE ${dbName}`);
+        await knex(dbConfig).raw(`DROP DATABASE test_db_12345`);
       } catch {}
 
       const server = express();
@@ -151,6 +152,104 @@ describe('Noco v2 Tests', () => {
                 });
             });
         });
+    });
+
+    it('Project create & table create - v2', async function() {
+      this.timeout(120000);
+      // const projectBody: ProjectBody = {
+      //   title: 'restv2',
+      //   bases: [{ ...dbConfig, alias: 'db' }]
+      // };
+
+      const projectRes = await api.meta.projectCreate({
+        title: 'test',
+        bases: [
+          {
+            host: 'localhost',
+            port: 3306,
+            username: 'root',
+            password: 'password',
+            database: 'test_db_12345'
+          }
+        ]
+      });
+
+      const tableRes = await api.meta.tableCreate(
+        projectRes.data.id,
+        projectRes.data.bases[0].id,
+        {
+          tn: 'abc',
+          _tn: 'Abc',
+          columns: [
+            {
+              cn: 'id',
+              dt: 'int',
+              dtx: 'integer',
+              ct: 'int(11)',
+              nrqd: false,
+              rqd: true,
+              ck: false,
+              pk: true,
+              un: false,
+              ai: true,
+              cdf: null,
+              clen: null,
+              np: null,
+              ns: 0,
+              dtxp: '',
+              dtxs: '',
+              altered: 1,
+              uidt: 'ID',
+              uip: '',
+              uicn: ''
+            },
+            {
+              cn: 'title',
+              dt: 'varchar',
+              dtx: 'specificType',
+              ct: 'varchar(45)',
+              nrqd: true,
+              rqd: false,
+              ck: false,
+              pk: false,
+              un: false,
+              ai: false,
+              cdf: null,
+              clen: 45,
+              np: null,
+              ns: null,
+              dtxp: '45',
+              dtxs: '',
+              altered: 1,
+              uidt: 'SingleLineText',
+              uip: '',
+              uicn: ''
+            }
+          ]
+        }
+      );
+
+      console.log(projectRes.data, tableRes.data);
+
+      const data = await api.data.list(
+        projectRes.data.id,
+        tableRes.data.id,
+        tableRes.data.id
+      );
+      console.log(data.data);
+      // const data = await request(app)
+      //   .get(`/nc/${projectId}/api/v2/abc`)
+      //   .set('xc-auth', token)
+      //   .expect(200);
+      // console.log(data);
+      // , (err, res) => {
+      //   if (err) done(err);
+      //   expect(res.body?.AddressLisat?.[0]?.['cityName']).to.be.a(
+      //     'String'
+      //   );
+      //
+      //   done();
+      // });
     });
 
     it('Tables list', function(done) {
@@ -287,7 +386,7 @@ describe('Noco v2 Tests', () => {
           if (err) return done(err);
 
           api.meta
-            .tableRead(projectId, res.body.tables.list[0].id)
+            .tableRead(projectId, '1', res.body.tables.list[0].id)
             .then(res => {
               console.log(res);
             })

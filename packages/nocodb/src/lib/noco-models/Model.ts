@@ -6,7 +6,7 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
-import { Table } from '../noco-client/Api';
+import { Table, TableReq } from '../noco-client/Api';
 
 export default class Model implements Table {
   copy_enabled: boolean;
@@ -25,10 +25,11 @@ export default class Model implements Table {
   schema: any;
   show_all_fields: boolean;
   tags: string;
-  title: string;
   type: 'table' | 'view' | 'grid' | 'form' | 'kanban' | 'calendar' | 'gantt';
   updated_at: Date | number | string;
-  alias: string;
+
+  tn: string;
+  _tn: string;
 
   uuid: string;
 
@@ -50,28 +51,34 @@ export default class Model implements Table {
   // @ts-ignore
   public async getColumns(force = false): Promise<Column[]> {
     this.columns = await Column.list({
-      base_id: this.base_id,
-      db_alias: this.db_alias,
       fk_model_id: this.id
     });
     return this.columns;
   }
 
   public get primaryKey(): Column {
-    return this.columns?.find(c => c.primary_key);
+    return this.columns?.find(c => c.pk);
   }
 
   public get primaryValue(): Column {
-    return this.columns?.find(c => c.primary_value);
+    return this.columns?.find(c => c.pv);
   }
 
-  public static async insert(model: NcModel) {
-    await Noco.ncMeta.metaInsert2(
-      model.base_id,
-      model.db_alias,
+  public static async insert(projectId, dbAlias, model: TableReq) {
+    const { id } = await Noco.ncMeta.metaInsert2(
+      projectId,
+      dbAlias,
       'nc_models_v2',
-      model
+      {
+        tn: model.tn,
+        _tn: model._tn
+      }
     );
+    for (const column of model.columns) {
+      await Column.insert({ ...column, fk_model_id: id });
+    }
+
+    return this.getWithInfo({ id });
   }
 
   public static async list({
@@ -146,7 +153,7 @@ export default class Model implements Table {
         db_alias,
         'nc_models_v2',
         id || {
-          title: tn
+          tn
         }
       );
       await NocoCache.setv2(id, modelData?.base_id, modelData);
@@ -193,7 +200,7 @@ export default class Model implements Table {
         db_alias,
         'nc_models_v2',
         id || {
-          title: tn
+          tn
         }
       );
       await NocoCache.setv2(id, modelData?.base_id, modelData);

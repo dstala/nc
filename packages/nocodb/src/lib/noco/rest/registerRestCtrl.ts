@@ -44,7 +44,7 @@ export default function registerRestCtrl(ctx: {
 
       console.time('BaseModel.defaultResolverReq');
       const requestObj = {
-        [`${model.alias}List`]: await baseModel.defaultResolverReq(req.query)
+        [`${model._tn}List`]: await baseModel.defaultResolverReq(req.query)
       };
       console.timeEnd('BaseModel.defaultResolverReq');
 
@@ -52,7 +52,7 @@ export default function registerRestCtrl(ctx: {
       const data = await nocoExecute(
         requestObj,
         {
-          [`${model.alias}List`]: async args => {
+          [`${model._tn}List`]: async args => {
             // console.log(
             //   JSON.stringify(
             //     await Filter.getFilterObject({ modelId: model.id }),
@@ -92,12 +92,10 @@ export default function registerRestCtrl(ctx: {
       res.json(
         await nocoExecute(
           {
-            [`${model.alias}Read`]: await baseModel.defaultResolverReq(
-              req?.query
-            )
+            [`${model._tn}Read`]: await baseModel.defaultResolverReq(req?.query)
           },
           {
-            [`${model.alias}Read`]: async id => {
+            [`${model._tn}Read`]: async id => {
               return await baseModel.readByPk(id);
               // return row ? new ctx.types[model.title](row) : null;
             }
@@ -132,10 +130,10 @@ export default function registerRestCtrl(ctx: {
         fk_model_id: country.id,
         ui_data_type: UITypes.Lookup,
         fk_lookup_column_id: (await city.getColumns()).find(
-          c => c.alias === 'City => Address'
+          c => c._cn === 'City => Address'
         )?.id,
         fk_relation_column_id: (await country.getColumns()).find(
-          c => c.ui_data_type === UITypes.LinkToAnotherRecord
+          c => c.uidt === UITypes.LinkToAnotherRecord
         )?.id
       });
 
@@ -146,10 +144,10 @@ export default function registerRestCtrl(ctx: {
         fk_model_id: country.id,
         ui_data_type: UITypes.Lookup,
         fk_lookup_column_id: (await city.getColumns()).find(
-          c => c.title === 'city'
+          c => c.cn === 'city'
         )?.id,
         fk_relation_column_id: (await country.getColumns()).find(
-          c => c.ui_data_type === UITypes.LinkToAnotherRecord
+          c => c.uidt === UITypes.LinkToAnotherRecord
         )?.id
       });
 
@@ -160,10 +158,10 @@ export default function registerRestCtrl(ctx: {
         ui_data_type: UITypes.Lookup,
         _cn: 'Country Name',
         fk_lookup_column_id: (await country.getColumns()).find(
-          c => c.alias === 'Country'
+          c => c._cn === 'Country'
         )?.id,
         fk_relation_column_id: (await city.getColumns()).find(
-          c => c.alias === 'Country <= City'
+          c => c._cn === 'Country <= City'
         )?.id
       });
 
@@ -194,10 +192,10 @@ export default function registerRestCtrl(ctx: {
         ui_data_type: UITypes.Lookup,
         _cn: 'Country Name',
         fk_lookup_column_id: (await city.getColumns()).find(
-          c => c.alias === 'Country Name'
+          c => c._cn === 'Country Name'
         )?.id,
         fk_relation_column_id: (await address.getColumns()).find(
-          c => c.alias === 'City <= Address'
+          c => c._cn === 'City <= Address'
         )?.id
       });
 
@@ -209,10 +207,10 @@ export default function registerRestCtrl(ctx: {
         ui_data_type: UITypes.Rollup,
         _cn: 'CityCount',
         fk_rollup_column_id: (await city.getColumns()).find(
-          c => c.alias === 'CityId'
+          c => c._cn === 'CityId'
         )?.id,
         fk_relation_column_id: (await country.getColumns()).find(
-          c => c.alias === 'Country => City'
+          c => c._cn === 'Country => City'
         )?.id,
         rollup_function: 'count'
       });
@@ -240,7 +238,7 @@ export default function registerRestCtrl(ctx: {
           {
             fk_model_id: country.id,
             fk_column_id: (await country.getColumns())?.find(
-              c => c.alias === 'CityCount'
+              c => c._cn === 'CityCount'
             )?.id,
             comparison_op: 'eq',
             value: '1'
@@ -327,10 +325,10 @@ export default function registerRestCtrl(ctx: {
         ui_data_type: UITypes.Lookup,
         _cn: 'CategoryNames',
         fk_lookup_column_id: (await category.getColumns()).find(
-          c => c.alias === 'Name'
+          c => c._cn === 'Name'
         )?.id,
         fk_relation_column_id: (await film.getColumns()).find(
-          c => c.alias === 'Film <=> Category'
+          c => c._cn === 'Film <=> Category'
         )?.id
       });
       film = await Model.get({
@@ -345,10 +343,10 @@ export default function registerRestCtrl(ctx: {
         ui_data_type: UITypes.Lookup,
         _cn: 'CategoryNames',
         fk_lookup_column_id: (await film.getColumns()).find(
-          c => c.alias === 'CategoryNames'
+          c => c._cn === 'CategoryNames'
         )?.id,
         fk_relation_column_id: (await actor.getColumns()).find(
-          c => c.alias === 'Actor <=> Film'
+          c => c._cn === 'Actor <=> Film'
         )?.id
       });
       actor = await Model.get({
@@ -365,7 +363,7 @@ export default function registerRestCtrl(ctx: {
           {
             fk_model_id: actor.id,
             fk_column_id: (await actor.getColumns())?.find(
-              c => c.alias === 'CategoryNames'
+              c => c._cn === 'CategoryNames'
             )?.id,
             comparison_op: 'eq',
             value: 'Travel'
@@ -377,7 +375,7 @@ export default function registerRestCtrl(ctx: {
         direction: 'desc',
         fk_model_id: country.id,
         fk_column_id: (await country.getColumns())?.find(
-          c => c.alias === 'CityCount'
+          c => c._cn === 'CityCount'
         )?.id
       });
 
@@ -385,7 +383,7 @@ export default function registerRestCtrl(ctx: {
         direction: 'desc',
         fk_model_id: city.id,
         fk_column_id: (await city.getColumns())?.find(
-          c => c.alias === 'Country <= City'
+          c => c._cn === 'Country <= City'
         )?.id
       });
 
@@ -398,7 +396,7 @@ export default function registerRestCtrl(ctx: {
         direction: 'desc',
         fk_model_id: address.id,
         fk_column_id: (await address.getColumns())?.find(
-          c => c.alias === 'Country Name'
+          c => c._cn === 'Country Name'
         )?.id
       });
 
@@ -430,9 +428,9 @@ export default function registerRestCtrl(ctx: {
 
               const relationColumn = (await model.getColumns()).find(
                 c =>
-                  (c.alias === body.relationColumn ||
-                    c.title === body.relationColumn) &&
-                  c.ui_data_type === UITypes.LinkToAnotherRecord
+                  (c._cn === body.relationColumn ||
+                    c.cn === body.relationColumn) &&
+                  c.uidt === UITypes.LinkToAnotherRecord
               );
 
               if (!relationColumn)
@@ -449,13 +447,13 @@ export default function registerRestCtrl(ctx: {
               ).getModel();
 
               const lookupColumn = (await relatedModel.getColumns()).find(
-                c => c.alias === body.lookupColumn
+                c => c._cn === body.lookupColumn
               );
 
               await Column.insert<LookupColumn>({
                 base_id: ctx.baseId,
                 db_alias: 'db',
-                _cn: body.alias,
+                _cn: body._tn,
                 fk_model_id: model.id,
                 ui_data_type: UITypes.Lookup,
                 fk_lookup_column_id: lookupColumn?.id,
@@ -484,9 +482,9 @@ export default function registerRestCtrl(ctx: {
 
               const relationColumn = (await model.getColumns()).find(
                 c =>
-                  (c.alias === body.relationColumn ||
-                    c.title === body.relationColumn) &&
-                  c.ui_data_type === UITypes.LinkToAnotherRecord
+                  (c._cn === body.relationColumn ||
+                    c.cn === body.relationColumn) &&
+                  c.uidt === UITypes.LinkToAnotherRecord
               );
 
               if (!relationColumn)
@@ -506,13 +504,13 @@ export default function registerRestCtrl(ctx: {
               ).getModel();
 
               const rollupColumn = (await relatedModel.getColumns()).find(
-                c => c.alias === body.rollupColumn
+                c => c._cn === body.rollupColumn
               );
 
               await Column.insert<RollupColumn>({
                 base_id: ctx.baseId,
                 db_alias: 'db',
-                _cn: body.alias,
+                _cn: body._tn,
                 fk_model_id: model.id,
                 ui_data_type: UITypes.Rollup,
                 fk_relation_column_id: relationColumn.id,
@@ -543,8 +541,8 @@ export default function registerRestCtrl(ctx: {
                   const column = columns.find(
                     c =>
                       c.id === colNameOrId ||
-                      c.title === colNameOrId ||
-                      c.alias === colNameOrId
+                      c.cn === colNameOrId ||
+                      c._cn === colNameOrId
                   );
                   pt.name = column.id;
                 } else if (pt.type === 'BinaryExpression') {
@@ -561,7 +559,7 @@ export default function registerRestCtrl(ctx: {
               await Column.insert<FormulaColumn>({
                 base_id: ctx.baseId,
                 db_alias: 'db',
-                _cn: body.alias,
+                _cn: body._tn,
                 fk_model_id: model.id,
                 ui_data_type: UITypes.Formula,
                 formula
@@ -599,7 +597,7 @@ export default function registerRestCtrl(ctx: {
               const columns = await model.getColumns();
 
               const column = columns.find(
-                c => c.alias === body.column || c.title === body.column
+                c => c._cn === body.column || c.cn === body.column
               );
               if (!model) {
                 throw new Error(`Column not found - ${body.column}`);
@@ -661,9 +659,7 @@ export default function registerRestCtrl(ctx: {
                   }
                 } else {
                   const column = columns.find(
-                    c =>
-                      c.title === condition.column ||
-                      c.alias === condition.column
+                    c => c.cn === condition.column || c._cn === condition.column
                   );
                   if (!column)
                     throw new Error(

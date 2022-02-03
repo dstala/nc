@@ -3,8 +3,9 @@ import table from './tableApis';
 import Project from '../../../noco-models/Project';
 import { ProjectList, ProjectListParams } from '../../../noco-client/Api';
 import { PagedResponseImpl } from './PagedResponse';
-import ProjectMgr from '../../../sqlMgr/ProjectMgr';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
+import syncMigration from './syncMigration';
+import dataApis from './dataApis';
 
 export default function(router: Router) {
   // // Project CRUD
@@ -31,22 +32,21 @@ export default function(router: Router) {
   //
 
   // project create api
-  router.post('/projects', async (req, res) => {
+  router.post('/projects', async (req, res, next) => {
     console.log(req.body);
     try {
       const project = await Project.createProject(req.body);
 
-      await ProjectMgrv2.make()
-        .getSqlMgr(project)
-        .projectOpenByWeb(args.args.projectJson);
-
+      await ProjectMgrv2.getSqlMgr(project).projectOpenByWeb();
+      await syncMigration(project);
       res.json(project);
     } catch (e) {
       console.log(e);
-      res.status(500).json({ err: e.message });
+      next(e);
     }
   });
 
   // Table CRUD
-  router.use('/projects/:projectId/tables', table());
+  router.use('/projects/:projectId/:baseId/tables', table());
+  router.use('/data/projects/:projectId/:baseId/data', dataApis());
 }

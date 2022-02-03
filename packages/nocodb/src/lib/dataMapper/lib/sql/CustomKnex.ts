@@ -666,7 +666,7 @@ Knex.QueryBuilder.extend('conditionGraph', function(args: {
 
 // @ts-ignore
 function parseNestedConditionAndJoin(obj, qb, pKey?, table?, tableAlias?) {
-  this.alias = this.alias || {};
+  this._tn = this._tn || {};
   const self = this;
   let conditions = Object.entries(obj);
   let tn = table || qb._single.table;
@@ -693,18 +693,18 @@ function parseNestedConditionAndJoin(obj, qb, pKey?, table?, tableAlias?) {
           //   console.log(model)
           // }
           if (relation) {
-            this.alias[relation.tn] = (this.alias[relation.tn] || 0) + 1;
+            this._tn[relation.tn] = (this._tn[relation.tn] || 0) + 1;
 
             obj.relationType = {
               alias: `${
-                this.alias[relation.tn] ? this.alias[relation.tn] + '___' : ''
+                this._tn[relation.tn] ? this._tn[relation.tn] + '___' : ''
               }${relation.tn}`,
               type: obj.relationType
             };
 
             qb = qb.join(
-              `${relation.tn} as ${obj.relationType.alias}`,
-              `${obj.relationType.alias}.${relation.cn}`,
+              `${relation.tn} as ${obj.relationType._tn}`,
+              `${obj.relationType._tn}.${relation.cn}`,
               '=',
               `${tableAlias}.${relation.rcn}`
             );
@@ -713,7 +713,7 @@ function parseNestedConditionAndJoin(obj, qb, pKey?, table?, tableAlias?) {
             tn = relation.tn;
             conditions = conditions.filter(c => c[0] !== 'relationType');
 
-            tableAlias = obj.relationType.alias;
+            tableAlias = obj.relationType._tn;
           }
         }
         break;
@@ -730,22 +730,22 @@ function parseNestedConditionAndJoin(obj, qb, pKey?, table?, tableAlias?) {
           //   console.log(model)
           // }
           if (relation) {
-            this.alias[relation.rtn] = (this.alias[relation.rtn] || 0) + 1;
+            this._tn[relation.rtn] = (this._tn[relation.rtn] || 0) + 1;
             obj.relationType = {
-              alias: `${this.alias[relation.rtn]}___${relation.rtn}`,
+              alias: `${this._tn[relation.rtn]}___${relation.rtn}`,
               type: obj.relationType
             };
             qb = qb.join(
-              `${relation.rtn} as ${obj.relationType.alias}`,
+              `${relation.rtn} as ${obj.relationType._tn}`,
               `${tableAlias}.${relation.cn}`,
               '=',
-              `${obj.relationType.alias}.${relation.rcn}`
+              `${obj.relationType._tn}.${relation.rcn}`
             );
             // delete obj.relationType;
             // return parseNestedConditionAndJoin.call(self, Object.entries(obj).find(([k]) => k !== 'relationType')?.[1], qb, Object.keys(obj).find(k => k !== 'relationType'), relation.rtn)
             tn = relation.rtn;
             conditions = conditions.filter(c => c[0] !== 'relationType');
-            tableAlias = obj.relationType.alias;
+            tableAlias = obj.relationType._tn;
           }
         }
         break;
@@ -832,7 +832,7 @@ function parseNestedCondition(obj, qb, pKey?, table?, tableAlias?) {
             // delete obj.relationType;
             // return parseNestedCondition.call(this, Object.values(obj)[0], qb, Object.keys(obj)[0],
             tn = relation.tn;
-            tableAlias = obj.relationType.alias;
+            tableAlias = obj.relationType._tn;
           }
         }
         break;
@@ -854,7 +854,7 @@ function parseNestedCondition(obj, qb, pKey?, table?, tableAlias?) {
             // delete obj.relationType;
             // return parseNestedCondition.call(self, Object.values(obj)[0], qb, Object.keys(obj)[0],
             tn = relation.rtn;
-            tableAlias = obj.relationType.alias;
+            tableAlias = obj.relationType._tn;
           }
         }
         break;
@@ -1071,7 +1071,7 @@ function parseNestedConditionv2(obj, qb, pKey?, table?, tableAlias?) {
             // delete obj.relationType;
             // return parseNestedCondition.call(this, Object.values(obj)[0], qb, Object.keys(obj)[0],
             tn = relation.tn;
-            tableAlias = obj.relationType.alias;
+            tableAlias = obj.relationType._tn;
           }
         }
         break;
@@ -1093,7 +1093,7 @@ function parseNestedConditionv2(obj, qb, pKey?, table?, tableAlias?) {
             // delete obj.relationType;
             // return parseNestedCondition.call(self, Object.values(obj)[0], qb, Object.keys(obj)[0],
             tn = relation.rtn;
-            tableAlias = obj.relationType.alias;
+            tableAlias = obj.relationType._tn;
           }
         }
         break;
@@ -1233,7 +1233,7 @@ const parseConditionv2 = (obj: FilterObject, qb: QueryBuilder) => {
     });
   } else {
     const col = obj.column;
-    const fieldName = col.title;
+    const fieldName = col.cn;
     const val = obj.value;
     switch (obj.comparison_op) {
       case 'eq':

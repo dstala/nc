@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
+      "url": "http://localhost:8080"
     }
   ],
   "paths": {
@@ -53,6 +53,28 @@
       }
     },
     "/auth/user/me": {
+      "parameters": [],
+      "get": {
+        "summary": "User Info",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "AUTH"
+        ]
+      }
+    },
+    "/auth/user/me - copy": {
       "parameters": [],
       "get": {
         "summary": "User Info",
@@ -337,6 +359,328 @@
         ]
       }
     },
+    "/projects/{projectId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "project-read",
+        "description": "Read project details",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "xc-auth",
+            "description": "Auth token"
+          }
+        ],
+        "tags": [
+          "Meta"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "",
+        "operationId": "put-projects---copy",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "delete-projects---copy",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "table-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Table"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TableReq"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "get": {
+        "summary": "",
+        "operationId": "table-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TableList"
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "xc-auth"
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "page"
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "sort"
+          }
+        ],
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/projects/{projectId}/{dbAlias}/tables/{tableId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "table-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableInfo"
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "id": "string",
+                      "fk_project_id": "string",
+                      "fk_base_id": "string",
+                      "title": "string",
+                      "alias": "string",
+                      "type": "string",
+                      "enabled": "string",
+                      "parent_id": "string",
+                      "show_as": "string",
+                      "tags": "string",
+                      "pinned": true,
+                      "deleted": true,
+                      "order": 0,
+                      "column": [
+                        {
+                          "id": "string",
+                          "base_id": "string",
+                          "fk_model_id": "string",
+                          "title": "string",
+                          "alias": "string",
+                          "ui_data_type": "string",
+                          "data_type": "string",
+                          "numeric_precision": "string",
+                          "numeric_scale": "string",
+                          "character_maximum_length": "string",
+                          "column_ordinal_position": "string",
+                          "primary_key": "string",
+                          "primary_value": "string",
+                          "rqd": "string",
+                          "un": "string",
+                          "column_type": "string",
+                          "auto_increment": "string",
+                          "unique": "string",
+                          "column_default": "string",
+                          "column_comment": "string",
+                          "character_set_name": "string",
+                          "data_type_x": "string",
+                          "data_type_x_precision": "string",
+                          "data_type_x_scale": "string",
+                          "auto_update_timestamp": true,
+                          "deleted": true,
+                          "visible": true,
+                          "order": 0,
+                          "colOptions": {
+                            "id": "string",
+                            "type": "string",
+                            "virtual": true,
+                            "fk_column_id": "string",
+                            "fk_child_column_id": "string",
+                            "fk_parent_column_id": "string",
+                            "fk_mm_model_id": "string",
+                            "fk_mm_child_column_id": "string",
+                            "fk_mm_parent_column_id": "string",
+                            "ur": "string",
+                            "dr": "string",
+                            "fk_index_name": "string",
+                            "deleted": "string",
+                            "order": "string"
+                          }
+                        }
+                      ],
+                      "filters": [
+                        {
+                          "id": "string",
+                          "fk_model_id": "string",
+                          "fk_column_id": "string",
+                          "logical_op": "string",
+                          "comparison_op": "string",
+                          "value": "string",
+                          "is_group": true,
+                          "children": [
+                            {}
+                          ]
+                        }
+                      ],
+                      "sort": [
+                        {
+                          "id": "string",
+                          "fk_model_id": "string",
+                          "fk_column_id": "string",
+                          "direction": "string",
+                          "order": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "table-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "table-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "description": ""
+      }
+    },
     "/projects/{projectId}/{db}/tables/{tableId}/column": {
       "parameters": [
         {
@@ -503,242 +847,6 @@
         "tags": [
           "Meta"
         ]
-      }
-    },
-    "/projects/{projectId}/tables": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "",
-        "operationId": "table-create",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Table"
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Table"
-              }
-            }
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "get": {
-        "summary": "",
-        "operationId": "table-list",
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TableList"
-          }
-        },
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "header",
-            "name": "xc-auth"
-          },
-          {
-            "schema": {
-              "type": "number"
-            },
-            "in": "query",
-            "name": "page"
-          },
-          {
-            "schema": {
-              "type": "number"
-            },
-            "in": "query",
-            "name": "pageSize"
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "sort"
-          }
-        ],
-        "tags": [
-          "Meta"
-        ]
-      }
-    },
-    "/projects/{projectId}/tables/{tableId}": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "tableId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "get": {
-        "summary": "",
-        "operationId": "table-read",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TableInfo"
-                },
-                "examples": {
-                  "example-1": {
-                    "value": {
-                      "id": "string",
-                      "fk_project_id": "string",
-                      "fk_base_id": "string",
-                      "title": "string",
-                      "alias": "string",
-                      "type": "string",
-                      "enabled": "string",
-                      "parent_id": "string",
-                      "show_as": "string",
-                      "tags": "string",
-                      "pinned": true,
-                      "deleted": true,
-                      "order": 0,
-                      "column": [
-                        {
-                          "id": "string",
-                          "base_id": "string",
-                          "fk_model_id": "string",
-                          "title": "string",
-                          "alias": "string",
-                          "ui_data_type": "string",
-                          "data_type": "string",
-                          "numeric_precision": "string",
-                          "numeric_scale": "string",
-                          "character_maximum_length": "string",
-                          "column_ordinal_position": "string",
-                          "primary_key": "string",
-                          "primary_value": "string",
-                          "rqd": "string",
-                          "un": "string",
-                          "column_type": "string",
-                          "auto_increment": "string",
-                          "unique": "string",
-                          "column_default": "string",
-                          "column_comment": "string",
-                          "character_set_name": "string",
-                          "data_type_x": "string",
-                          "data_type_x_precision": "string",
-                          "data_type_x_scale": "string",
-                          "auto_update_timestamp": true,
-                          "deleted": true,
-                          "visible": true,
-                          "order": 0,
-                          "colOptions": {
-                            "id": "string",
-                            "type": "string",
-                            "virtual": true,
-                            "fk_column_id": "string",
-                            "fk_child_column_id": "string",
-                            "fk_parent_column_id": "string",
-                            "fk_mm_model_id": "string",
-                            "fk_mm_child_column_id": "string",
-                            "fk_mm_parent_column_id": "string",
-                            "ur": "string",
-                            "dr": "string",
-                            "fk_index_name": "string",
-                            "deleted": "string",
-                            "order": "string"
-                          }
-                        }
-                      ],
-                      "filters": [
-                        {
-                          "id": "string",
-                          "fk_model_id": "string",
-                          "fk_column_id": "string",
-                          "logical_op": "string",
-                          "comparison_op": "string",
-                          "value": "string",
-                          "is_group": true,
-                          "children": [
-                            {}
-                          ]
-                        }
-                      ],
-                      "sort": [
-                        {
-                          "id": "string",
-                          "fk_model_id": "string",
-                          "fk_column_id": "string",
-                          "direction": "string",
-                          "order": 0
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "put": {
-        "summary": "",
-        "operationId": "table-update",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "delete": {
-        "summary": "",
-        "operationId": "table-delete",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ],
-        "description": ""
       }
     },
     "/projects/{projectId}/{dbAlias}/views/{viewId}/filters": {
@@ -1603,6 +1711,132 @@
         ],
         "description": ""
       }
+    },
+    "/data/projects/{projectId}/{dbAlias}/data/{tableId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ViewList"
+          }
+        },
+        "description": "",
+        "tags": [
+          "Data"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Data"
+        ]
+      }
+    },
+    "/data/projects/{projectId}/{dbAlias}/data/{tableId}/{rowId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "dbAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "rowId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "read",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ViewList"
+          }
+        },
+        "description": "",
+        "tags": [
+          "Data"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Data"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Data"
+        ]
+      }
     }
   },
   "components": {
@@ -2050,10 +2284,10 @@
           "fk_base_id": {
             "type": "string"
           },
-          "title": {
+          "tn": {
             "type": "string"
           },
-          "alias": {
+          "_tn": {
             "type": "string"
           },
           "type": {
@@ -2080,7 +2314,7 @@
           "order": {
             "type": "number"
           },
-          "column": {
+          "columns": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Column"
@@ -2091,8 +2325,8 @@
           }
         },
         "required": [
-          "title",
-          "alias"
+          "tn",
+          "_tn"
         ]
       },
       "TableInfo": {
@@ -2263,10 +2497,10 @@
           "fk_base_id": {
             "type": "string"
           },
-          "title": {
+          "tn": {
             "type": "string"
           },
-          "alias": {
+          "_tn": {
             "type": "string"
           },
           "type": {
@@ -2293,7 +2527,7 @@
           "order": {
             "type": "number"
           },
-          "column": {
+          "columns": {
             "type": [
               "string",
               "array"
@@ -2304,8 +2538,8 @@
           }
         },
         "required": [
-          "title",
-          "alias"
+          "tn",
+          "_tn"
         ]
       },
       "TableList": {
@@ -2553,64 +2787,67 @@
           "alias": {
             "type": "string"
           },
-          "ui_data_type": {
+          "uidt": {
             "type": "string"
           },
-          "data_type": {
+          "dt": {
             "type": "string"
           },
-          "numeric_precision": {
+          "np": {
             "type": "string"
           },
-          "numeric_scale": {
+          "ns": {
             "type": "string"
           },
-          "character_maximum_length": {
+          "clen": {
+            "type": [
+              "string",
+              "integer"
+            ]
+          },
+          "cop": {
             "type": "string"
           },
-          "column_ordinal_position": {
-            "type": "string"
-          },
-          "primary_key": {
+          "pk": {
             "type": "boolean"
           },
-          "primary_value": {
+          "pv": {
             "type": "boolean"
           },
           "rqd": {
-            "type": "string"
+            "type": "boolean"
           },
           "un": {
+            "type": "boolean"
+          },
+          "ct": {
             "type": "string"
           },
-          "column_type": {
-            "type": "string"
-          },
-          "auto_increment": {
+          "ai": {
             "type": "boolean"
           },
           "unique": {
             "type": "boolean"
           },
-          "column_default": {
+          "cdf": {
             "type": "string"
           },
-          "column_comment": {
+          "cc": {
             "type": "string"
           },
-          "character_set_name": {
+          "csn": {
             "type": "string"
           },
-          "data_type_x": {
+          "dtx": {
             "type": "string"
           },
-          "data_type_x_precision": {
+          "dtxp": {
             "type": "string"
           },
-          "data_type_x_scale": {
+          "dtxs": {
             "type": "string"
           },
-          "auto_update_timestamp": {
+          "au": {
             "type": "boolean"
           },
           "deleted": {

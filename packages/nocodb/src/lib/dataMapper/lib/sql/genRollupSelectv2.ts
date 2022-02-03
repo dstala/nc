@@ -28,14 +28,14 @@ export default async function({
       //   rollup = { ...rollup, ...hasMany.find(hm => hm.tn === rollup.rltn) };
       // }
       return {
-        builder: knex(childModel?.title)
+        builder: knex(childModel?.tn)
           [columnOptions.rollup_function]?.(
-            knex.ref(`${childModel?.title}.${rollupColumn.title}`)
+            knex.ref(`${childModel?.tn}.${rollupColumn.cn}`)
           )
           .where(
-            knex.ref(`${alias || parentModel.title}.${parentCol.title}`),
+            knex.ref(`${alias || parentModel.tn}.${parentCol.cn}`),
             '=',
-            knex.ref(`${childModel.title}.${childCol.title}`)
+            knex.ref(`${childModel.tn}.${childCol.cn}`)
           )
       };
     case 'mm': {
@@ -44,20 +44,20 @@ export default async function({
       const mmParentCol = await relationColumnOption.getMMParentColumn();
 
       return {
-        builder: knex(parentModel.title)
+        builder: knex(parentModel.tn)
           [columnOptions.rollup_function]?.(
-            knex.ref(`${parentModel.title}.${rollupColumn.title}`)
+            knex.ref(`${parentModel.tn}.${rollupColumn.cn}`)
           )
           .innerJoin(
-            mmModel.title,
-            knex.ref(`${mmModel.title}.${mmParentCol.title}`),
+            mmModel.tn,
+            knex.ref(`${mmModel.tn}.${mmParentCol.cn}`),
             '=',
-            knex.ref(`${parentModel.title}.${parentCol.title}`)
+            knex.ref(`${parentModel.tn}.${parentCol.cn}`)
           )
           .where(
-            knex.ref(`${mmModel.title}.${mmChildCol.title}`),
+            knex.ref(`${mmModel.tn}.${mmChildCol.cn}`),
             '=',
-            knex.ref(`${alias || childModel.title}.${childCol.title}`)
+            knex.ref(`${alias || childModel.tn}.${childCol.cn}`)
           )
       };
     }

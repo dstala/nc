@@ -1,7 +1,14 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from './PagedResponse';
-import { Table, TableList, TableListParams } from '../../../noco-client/Api';
+import {
+  Table,
+  TableList,
+  TableListParams,
+  TableReq
+} from '../../../noco-client/Api';
+import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
+import Project from '../../../noco-models/Project';
 
 export default function() {
   const router = Router({ mergeParams: true });
@@ -34,10 +41,21 @@ export default function() {
         });
     }
   );
-  router.post('/', (req, res) => {
-    console.log(req.params);
+  router.post('/', async (req: Request<any, any, TableReq>, res, next) => {
+    try {
+      console.log(req.params);
 
-    res.json({ msg: 'success' });
+      const project = await Project.getWithInfo(req.params.projectId);
+      const base = project.bases?.[0];
+      const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
+
+      await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
+
+      res.json(await Model.insert(project.id, base.id, req.body));
+    } catch (e) {
+      console.log(e);
+      next(e);
+    }
   });
   router.put('/:tableId', (req, res) => {
     console.log(req.params);

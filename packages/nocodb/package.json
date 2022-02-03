@@ -72,7 +72,7 @@
     "run": "ts-node src/example/docker",
     "watch:try": "nodemon -e ts,js -w ./src -x \"ts-node src/example/try --log-error --project tsconfig.json\"",
     "example:docker": "ts-node ./src/example/docker.ts",
-    "generate:sdk": "npx swagger-typescript-api -p ./swagger.json -o ./sdk  --axios  --modular --clean-output --extract-request-params "
+    "generate:sdk": "npx swagger-typescript-api -p ./swagger.json -o ./sdk  --axios --clean-output --extract-request-params --module-name-first-tag"
   },
   "scripts-info": {
     "info": "Display information about the package scripts",

@@ -11,11 +11,11 @@ import slash from 'slash';
 // import debug from 'debug';
 
 const log = new Debug('SqlMgr');
-import KnexMigrator from '../../migrator/SqlMigrator/lib/KnexMigrator';
 // import {XKnex} from "../dataMapper";
-import NcConnectionMgr from '../../noco/common/NcConnectionMgr';
 import { customAlphabet } from 'nanoid';
 import Project from '../../noco-models/Project';
+import NcConnectionMgrv2 from '../../noco/common/NcConnectionMgrv2';
+import KnexMigratorv2 from '../../migrator/SqlMigrator/lib/KnexMigratorv2';
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 20);
 
 const ToolOps = {
@@ -94,14 +94,14 @@ const ToolOps = {
 
 export default class SqlMgrv2 {
   // @ts-ignore
-  private project: any;
+  private project: Project;
   // @ts-ignore
   // private metaDb: any;
   // @ts-ignore
   private project_id: any;
   private _project: any;
   // @ts-ignore
-  private _migrator: KnexMigrator;
+  private _migrator: KnexMigratorv2;
   // @ts-ignore
   private logsRef: any;
   private currentProjectJson: any;
@@ -127,7 +127,7 @@ export default class SqlMgrv2 {
     this.project = args;
     // this.metaDb = args.metaDb;
     this.project_id = args.id;
-    this._migrator = new KnexMigrator(args);
+    this._migrator = new KnexMigratorv2(args);
 
     this.currentProjectJson = {};
     this.currentProjectConnections = {};
@@ -270,7 +270,7 @@ export default class SqlMgrv2 {
     );
   }
 
-  public async projectOpenByWeb(args) {
+  public async projectOpenByWeb() {
     try {
       this.currentProjectConnections = {};
       this.currentProjectJson = {};
@@ -279,48 +279,23 @@ export default class SqlMgrv2 {
       const data = new Result();
       data.data.list = [];
 
-      // todo: read it from config or env
-      this.currentProjectFolder = args.toolDir || process.cwd();
-
-      this.currentProjectJson = args;
-
-      args.folder = slash(this.currentProjectFolder);
-
       // create connections for each db connection
-      for (const env in this.currentProjectJson.envs) {
-        for (let i = 0; i < this.currentProjectJson.envs[env].db.length; i++) {
-          const connectionConfig = JSON.parse(
-            JSON.stringify(this.currentProjectJson.envs[env].db[i])
-          );
+      for (const base of await this.project.getBases()) {
+        const connectionConfig = base.getConnectionConfig();
 
-          const connectionKey = `${env}_${this.currentProjectJson.envs[env].db[i].meta.dbAlias}`;
+        this.currentProjectConnections[base.id] = SqlClientFactory.create({
+          ...connectionConfig,
+          knex: NcConnectionMgrv2.get(base)
+        });
 
-          this.currentProjectConnections[
-            connectionKey
-          ] = SqlClientFactory.create({
-            ...connectionConfig,
-            knex: NcConnectionMgr.get({
-              dbAlias: this.currentProjectJson.envs[env].db[i].meta.dbAlias,
-              env: env,
-              config: args,
-              projectId: args.id
-            })
-          });
-
-          this.currentProjectServers[connectionKey] = {
-            xserver: null,
-            input: {},
-            output: {}
-          };
-        }
+        this.currentProjectServers[base.id] = {
+          xserver: null,
+          input: {},
+          output: {}
+        };
       }
 
-      // args.projectJson = JSON.parse(JSON.stringify(this.currentProjectJson));
-      data.data.list[0] = args;
-
-      this.projectOpenData = args;
-
-      return data;
+      return this.project;
     } catch (e) {
       console.log('projectOpen::error', e);
       throw e;
@@ -422,7 +397,7 @@ export default class SqlMgrv2 {
         await this.migrator().sync(args);
       }
 
-      this.projectOpenByWeb(args.projectJson);
+      this.projectOpenByWeb();
     } catch (error) {
       log.ppe(error, func);
     }
@@ -452,7 +427,7 @@ export default class SqlMgrv2 {
         await this.migrator().sync(args);
       }
 
-      this.projectOpenByWeb(args.projectJson);
+      this.projectOpenByWeb();
     } catch (error) {
       log.ppe(error, func);
     }
@@ -477,7 +452,7 @@ export default class SqlMgrv2 {
         await this.migrator().sync(args);
       }
 
-      this.projectOpenByWeb(args.project);
+      this.projectOpenByWeb();
     } catch (error) {
       log.ppe(error, func);
     }
@@ -777,7 +752,7 @@ export default class SqlMgrv2 {
     console.log(args);
 
     // create sql client for this operation
-    const sqlClient = await this.projectGetSqlClient(args);
+    const sqlClient = NcConnectionMgrv2.getSqlClient(args); //await this.projectGetSqlClient(args);
 
     // do sql operation
     const sqlMigrationStatements = await sqlClient[op](opArgs);
@@ -963,7 +938,7 @@ export default class SqlMgrv2 {
   }
 
   public isProjectDbConnection() {
-    return this.currentProjectJson.projectType.toLowerCase() === 'dbconnection';
+    return true; //this.currentProjectJson.projectType.toLowerCase() === 'dbconnection';
   }
 
   public isProjectNoApis() {

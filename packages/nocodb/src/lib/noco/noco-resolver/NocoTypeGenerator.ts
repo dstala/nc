@@ -52,7 +52,7 @@ export default class NocoTypeGenerator {
       const type = class extends NocoType {
         public static __columnAliases = {};
       };
-      types[model.title] = type;
+      types[model.tn] = type;
       generateColRefCallback.push(async function() {
         for (const column of await model.getColumns()) {
           columnsRef[column.id] = column;
@@ -99,7 +99,7 @@ export default class NocoTypeGenerator {
                     //   }
                     // );
                     const data = await ctx.baseModels2[
-                      model.title
+                      model.tn
                     ].hasManyListCount({
                       colId: column.id,
                       ids
@@ -113,7 +113,7 @@ export default class NocoTypeGenerator {
                     `${
                       modelsRef[
                         columnsRef[colOptions.fk_child_column_id]?.fk_model_id
-                      ]?.title
+                      ]?.tn
                     }Count`,
                     // column._cn,
                     {
@@ -139,7 +139,7 @@ export default class NocoTypeGenerator {
                       // );
                       //
                       const data = await ctx.baseModels2[
-                        model.title
+                        model.tn
                       ].hasManyListGQL({
                         colId: column.id,
                         ids
@@ -153,7 +153,7 @@ export default class NocoTypeGenerator {
                                     columnsRef[
                                       colOptions.fk_child_column_id
                                     ].fk_model_id
-                                  ].title
+                                  ].tn
                                 ](c)
                             )
                           : []
@@ -190,7 +190,7 @@ export default class NocoTypeGenerator {
                       });*/
 
                       const data = await ctx.baseModels2[
-                        model.title
+                        model.tn
                       ]._getGroupedManyToManyList({
                         parentIds: ids,
                         colId: column.id
@@ -203,7 +203,7 @@ export default class NocoTypeGenerator {
                                 columnsRef[
                                   colOptions.fk_parent_column_id
                                 ].fk_model_id
-                              ].title
+                              ].tn
                             ](c)
                         )
                       );
@@ -241,7 +241,7 @@ export default class NocoTypeGenerator {
                       const data = await ctx.baseModels2[
                         modelsRef[
                           columnsRef[colOptions.fk_parent_column_id].fk_model_id
-                        ].title
+                        ].tn
                       ].list({
                         // limit: ids.length,
                         where: `(${
@@ -260,7 +260,7 @@ export default class NocoTypeGenerator {
                               columnsRef[
                                 colOptions.fk_parent_column_id
                               ].fk_model_id
-                            ].title
+                            ].tn
                           ](gs[id][0])
                       );
                     } catch (e) {

@@ -9,10 +9,10 @@ export default class Base {
   public database?: string;
   public url?: string;
   public params?: string;
-  public token?: string;
   public type?: string;
 
   public project_id: string;
+  public id: string;
 
   constructor(base: Partial<Base>) {
     Object.assign(this, base);
@@ -28,9 +28,35 @@ export default class Base {
       database: base.database,
       url: base.url,
       params: base.params,
-      token: base.token,
       type: base.type
     });
+  }
+
+  static async list(args: { projectId: string }): Promise<Base[]> {
+    const baseDataList = await Noco.ncMeta.metaList2(
+      args.projectId,
+      null,
+      'nc_bases_v2'
+    );
+    return baseDataList?.map(baseData => new Base(baseData));
+  }
+  static async get(id: string): Promise<Base> {
+    const baseData = await Noco.ncMeta.metaGet2(null, null, 'nc_bases_v2', id);
+    return baseData && new Base(baseData);
+  }
+
+  public getConnectionConfig(): any {
+    // todo: construct with props
+    return {
+      client: 'mysql2',
+      connection: {
+        host: this.host ?? 'localhost',
+        port: this.port ?? 3303,
+        user: this.username ?? 'root',
+        password: this.password ?? 'password',
+        database: this.database ?? 'dummy_db'
+      }
+    };
   }
 }
 

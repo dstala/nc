@@ -97,8 +97,8 @@ export interface Table {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
-  title: string;
-  alias: string;
+  tn: string;
+  _tn: string;
   type?: string;
   enabled?: boolean;
   parent_id?: string;
@@ -107,7 +107,7 @@ export interface Table {
   pinned?: boolean;
   deleted?: boolean;
   order?: number;
-  column?: Column[];
+  columns?: Column[];
   columnsById?: object;
 }
 
@@ -134,8 +134,8 @@ export interface TableReq {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
-  title: string;
-  alias: string;
+  tn: string;
+  _tn: string;
   type?: string;
   enabled?: string;
   parent_id?: string;
@@ -144,7 +144,7 @@ export interface TableReq {
   pinned?: boolean;
   deleted?: boolean;
   order?: number;
-  column?: string | any[];
+  columns?: string | any[];
 }
 
 export interface TableList {
@@ -184,26 +184,26 @@ export interface Column {
   fk_model_id?: string;
   title?: string;
   alias?: string;
-  ui_data_type?: string;
-  data_type?: string;
-  numeric_precision?: string;
-  numeric_scale?: string;
-  character_maximum_length?: string;
-  column_ordinal_position?: string;
-  primary_key?: boolean;
-  primary_value?: boolean;
-  rqd?: string;
-  un?: string;
-  column_type?: string;
-  auto_increment?: boolean;
+  uidt?: string;
+  dt?: string;
+  np?: string;
+  ns?: string;
+  clen?: string | number;
+  cop?: string;
+  pk?: boolean;
+  pv?: boolean;
+  rqd?: boolean;
+  un?: boolean;
+  ct?: string;
+  ai?: boolean;
   unique?: boolean;
-  column_default?: string;
-  column_comment?: string;
-  character_set_name?: string;
-  data_type_x?: string;
-  data_type_x_precision?: string;
-  data_type_x_scale?: string;
-  auto_update_timestamp?: boolean;
+  cdf?: string;
+  cc?: string;
+  csn?: string;
+  dtx?: string;
+  dtxp?: string;
+  dtxs?: string;
+  au?: boolean;
   deleted?: boolean;
   visible?: boolean;
   order?: number;
@@ -384,9 +384,10 @@ export interface TableListParams {
   pageSize?: number;
   sort?: string;
   projectId: string;
+  dbAlias: string;
 }
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, ResponseType } from  "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, ResponseType } from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -429,7 +430,7 @@ export class HttpClient<SecurityDataType = unknown> {
   private format?: ResponseType;
 
   constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:3000" });
+    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8080" });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -509,7 +510,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title nocodb
  * @version 1.0
- * @baseUrl http://localhost:3000
+ * @baseUrl http://localhost:8080
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   auth = {
@@ -541,6 +542,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     me: (params: RequestParams = {}) =>
       this.request<User, any>({
         path: `/auth/user/me`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags AUTH
+     * @name Me2
+     * @summary User Info
+     * @request GET:/auth/user/me - copy
+     * @originalName me
+     * @duplicate
+     */
+    me2: (params: RequestParams = {}) =>
+      this.request<User, any>({
+        path: `/auth/user/me - copy`,
         method: "GET",
         format: "json",
         ...params,
@@ -687,6 +706,96 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Read project details
      *
      * @tags Meta
+     * @name ProjectRead
+     * @request GET:/projects/{projectId}
+     */
+    projectRead: (projectId: string, params: RequestParams = {}) =>
+      this.request<object, Project>({
+        path: `/projects/${projectId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name TableCreate
+     * @request POST:/projects/{projectId}/{dbAlias}/tables
+     */
+    tableCreate: (projectId: string, dbAlias: string, data: TableReq, params: RequestParams = {}) =>
+      this.request<Table, any>({
+        path: `/projects/${projectId}/${dbAlias}/tables`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name TableList
+     * @request GET:/projects/{projectId}/{dbAlias}/tables
+     */
+    tableList: ({ projectId, dbAlias, ...query }: TableListParams, params: RequestParams = {}) =>
+      this.request<TableList, any>({
+        path: `/projects/${projectId}/${dbAlias}/tables`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name TableRead
+     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}
+     */
+    tableRead: (projectId: string, tableId: string, dbAlias: string, params: RequestParams = {}) =>
+      this.request<TableInfo, any>({
+        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name TableUpdate
+     * @request PUT:/projects/{projectId}/{dbAlias}/tables/{tableId}
+     */
+    tableUpdate: (projectId: string, tableId: string, dbAlias: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}`,
+        method: "PUT",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name TableDelete
+     * @request DELETE:/projects/{projectId}/{dbAlias}/tables/{tableId}
+     */
+    tableDelete: (projectId: string, tableId: string, dbAlias: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * @description Read project details
+     *
+     * @tags Meta
      * @name ColumnList
      * @summary Column List
      * @request GET:/projects/{projectId}/{db}/tables/{tableId}/column
@@ -766,81 +875,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     columnDelete: (projectId: string, tableId: string, columnId: string, db: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/projects/${projectId}/${db}/tables/${tableId}/column/${columnId}`,
-        method: "DELETE",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableCreate
-     * @request POST:/projects/{projectId}/tables
-     */
-    tableCreate: (projectId: string, data: Table, params: RequestParams = {}) =>
-      this.request<Table, any>({
-        path: `/projects/${projectId}/tables`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableList
-     * @request GET:/projects/{projectId}/tables
-     */
-    tableList: ({ projectId, ...query }: TableListParams, params: RequestParams = {}) =>
-      this.request<TableList, any>({
-        path: `/projects/${projectId}/tables`,
-        method: "GET",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableRead
-     * @request GET:/projects/{projectId}/tables/{tableId}
-     */
-    tableRead: (projectId: string, tableId: string, params: RequestParams = {}) =>
-      this.request<TableInfo, any>({
-        path: `/projects/${projectId}/tables/${tableId}`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableUpdate
-     * @request PUT:/projects/{projectId}/tables/{tableId}
-     */
-    tableUpdate: (projectId: string, tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/tables/${tableId}`,
-        method: "PUT",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableDelete
-     * @request DELETE:/projects/{projectId}/tables/{tableId}
-     */
-    tableDelete: (projectId: string, tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/tables/${tableId}`,
         method: "DELETE",
         ...params,
       }),
@@ -1320,6 +1354,104 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<ViewList, any>({
         path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/views`,
         method: "GET",
+        ...params,
+      }),
+  };
+  projects = {
+    /**
+     * No description
+     *
+     * @name PutProjectsCopy
+     * @request PUT:/projects/{projectId}
+     */
+    putProjectsCopy: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}`,
+        method: "PUT",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name DeleteProjectsCopy
+     * @request DELETE:/projects/{projectId}
+     */
+    deleteProjectsCopy: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}`,
+        method: "DELETE",
+        ...params,
+      }),
+  };
+  data = {
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name List
+     * @request GET:/data/projects/{projectId}/{dbAlias}/data/{tableId}
+     */
+    list: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+      this.request<ViewList, any>({
+        path: `/data/projects/${projectId}/${dbAlias}/data/${tableId}`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name Create
+     * @request POST:/data/projects/{projectId}/{dbAlias}/data/{tableId}
+     */
+    create: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/data/projects/${projectId}/${dbAlias}/data/${tableId}`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name Read
+     * @request GET:/data/projects/{projectId}/{dbAlias}/data/{tableId}/{rowId}
+     */
+    read: (projectId: string, dbAlias: string, tableId: string, rowId: string, params: RequestParams = {}) =>
+      this.request<ViewList, any>({
+        path: `/data/projects/${projectId}/${dbAlias}/data/${tableId}/${rowId}`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name Update
+     * @request PUT:/data/projects/{projectId}/{dbAlias}/data/{tableId}/{rowId}
+     */
+    update: (projectId: string, dbAlias: string, tableId: string, rowId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/data/projects/${projectId}/${dbAlias}/data/${tableId}/${rowId}`,
+        method: "PUT",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name Delete
+     * @request DELETE:/data/projects/{projectId}/{dbAlias}/data/{tableId}/{rowId}
+     */
+    delete: (projectId: string, dbAlias: string, tableId: string, rowId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/data/projects/${projectId}/${dbAlias}/data/${tableId}/${rowId}`,
+        method: "DELETE",
         ...params,
       }),
   };

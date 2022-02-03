@@ -54,8 +54,8 @@ const up = async knex => {
     table.foreign('project_id').references('nc_projects_v2.id');
     // table.foreign('data_src_id').references('nc_data_src.id');
 
-    table.string('title');
-    table.string('alias');
+    table.string('tn');
+    table.string('_tn');
     table.string('type').defaultTo('table');
 
     table.text('meta', 'mediumtext');
@@ -78,7 +78,7 @@ const up = async knex => {
     table.boolean('deleted');
     table.integer('order');
     table.timestamps(true, true);
-    table.index(['db_alias', 'title']);
+    table.index(['db_alias', 'tn']);
   });
 
   await knex.schema.createTable('nc_columns_v2', table => {
@@ -101,30 +101,30 @@ const up = async knex => {
     // table.string('tn');
     // table.string('_tn');
 
-    table.string('title');
-    table.string('alias');
+    table.string('_cn');
+    table.string('cn');
 
     // todo: decide type
-    table.string('ui_data_type');
-    table.string('data_type');
-    table.string('numeric_scale');
-    table.string('numeric_precision');
-    table.string('character_maximum_length');
-    table.string('column_ordinal_position');
-    table.boolean('primary_key');
-    table.boolean('primary_value');
-    table.boolean('not_null');
-    table.boolean('unsigned');
-    table.string('column_type');
-    table.boolean('auto_increment');
+    table.string('uidt');
+    table.string('dt');
+    table.string('np');
+    table.string('ns');
+    table.string('clen');
+    table.string('cop');
+    table.boolean('pk');
+    table.boolean('pv');
+    table.boolean('rqd');
+    table.boolean('un');
+    table.string('ct');
+    table.boolean('ai');
     table.boolean('unique');
-    table.string('column_default');
-    table.string('column_comment');
-    table.string('character_set_name');
-    table.string('data_type_x');
-    table.string('data_type_x_precision');
-    table.string('data_type_x_scale');
-    table.boolean('auto_update_timestamp');
+    table.string('cdf');
+    table.string('cc');
+    table.string('csn');
+    table.string('dtx');
+    table.string('dtxp');
+    table.string('dtxs');
+    table.boolean('au');
 
     //todo: virtual, real, etc
     table.string('type');
