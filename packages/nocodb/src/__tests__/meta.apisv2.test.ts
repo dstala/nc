@@ -4,12 +4,10 @@ const expect = chai.expect;
 
 chai.use(chaiAsPromised);
 import 'mocha';
-import express from 'express';
-import request from 'supertest';
-
-import { Noco } from '../lib';
 import NcConfigFactory from '../lib/utils/NcConfigFactory';
-import { ProjectBody } from '../lib/noco-models/Project';
+import express from 'express';
+import Noco from '../lib';
+import UITypes from '../lib/sqlUi/UITypes';
 import { Api } from '../lib/noco-client/Api';
 
 const knex = require('knex');
@@ -23,97 +21,31 @@ process.env[`DATABASE_URL`] = `mysql2://root:password@localhost:3306/${dbName}`;
 //   `DATABASE_URL`
 // ] = `mssql://sa:Password123.@localhost:1433/${dbName}`;
 
-let projectId;
-let token;
 const dbConfig = NcConfigFactory.urlToDbConfig(
   NcConfigFactory.extractXcUrlFromJdbc(
     // 'sqlite:////Users/pranavc/xgene/nc/packages/nocodb/tests/sqlite-dump/sakila.db')
     process.env[`DATABASE_URL`]
   )
 );
-dbConfig.connection.database = 'sakila';
-dbConfig.meta = {
-  tn: 'nc_evolutions',
-  dbAlias: 'db',
-  api: {
-    type: 'rest',
-    prefix: '',
-    graphqlDepthLimit: 10
-  },
-  inflection: {
-    tn: 'camelize',
-    cn: 'camelize'
-  }
-} as any;
 
-const projectCreateReqBody = {
-  api: 'projectCreateByWeb',
-  query: { skipProjectHasDb: 1 },
-  args: {
-    project: { title: 'restv2', folder: 'config.xc.json', type: 'pg' },
-    projectJson: {
-      title: 'restv2',
-      version: '0.6',
-      envs: {
-        _noco: {
-          db: [dbConfig],
-          apiClient: { data: [] }
-        }
-      },
-      workingEnv: '_noco',
-      meta: {
-        version: '0.6',
-        seedsFolder: 'seeds',
-        queriesFolder: 'queries',
-        apisFolder: 'apis',
-        projectType: 'rest',
-        type: 'mvc',
-        language: 'ts',
-        db: { client: 'sqlite3', connection: { filename: 'noco.db' } }
-      },
-      seedsFolder: 'seeds',
-      queriesFolder: 'queries',
-      apisFolder: 'apis',
-      projectType: 'rest',
-      type: 'docker',
-      language: 'ts',
-      apiClient: { data: [] },
-      auth: {
-        jwt: { secret: 'b8ed266d-4475-4028-8c3d-590f58bee867', dbAlias: 'db' }
-      }
-    }
-  }
-};
-
-// console.log(JSON.stringify(dbConfig, null, 2));
-// process.exit();
 describe('Noco v2 Tests', function() {
-  let app;
   const api = new Api({
     baseURL: 'http://localhost:8080'
   });
 
   // Called once before any of the tests in this block begin.
-  before(function(done) {
+  before(async function() {
     this.timeout(200000);
+    try {
+      await knex(dbConfig).raw(`DROP DATABASE test_db_12345`);
+    } catch {}
+    try {
+      await knex(dbConfig).raw(`DROP DATABASE test_meta`);
+    } catch {}
 
-    (async () => {
-      try {
-        await knex(dbConfig).raw(`DROP DATABASE ${dbName}`);
-        await knex(dbConfig).raw(`DROP DATABASE test_db_12345`);
-      } catch {}
-
-      const server = express();
-
-      server.use(await Noco.init());
-      server.listen('8080');
-      app = server;
-      // await knex(config.envs[process.env.NODE_ENV || 'dev'].db[0])('xc_users').del();
-    })()
-      .then(done)
-      .catch(e => {
-        done(e);
-      });
+    const server = express();
+    server.use(await Noco.init());
+    server.listen('8080');
   });
 
   after(done => {
@@ -123,52 +55,60 @@ describe('Noco v2 Tests', function() {
 
   describe('Meta API Tests', function() {
     this.timeout(10000);
-    const EMAIL_ID = 'abc@g.com';
-    const VALID_PASSWORD = '1234566778';
 
-    before(function(done) {
+    it('Project create - existing external DB', async function() {
       this.timeout(120000);
-      request(app)
-        .post('/auth/signup')
-        .send({ email: EMAIL_ID, password: VALID_PASSWORD })
-        .expect(200, (err, res) => {
-          if (err) {
-            expect(res.status).to.equal(400);
-          } else {
-            const token = res.body.token;
-            expect(token).to.be.a('string');
+
+      const { data: project } = await api.meta.projectCreate({
+        title: 'test',
+        bases: [
+          {
+            type: 'mysql2',
+            host: 'localhost',
+            port: 3306,
+            username: 'root',
+            password: 'password',
+            database: 'sakila'
           }
-          request(app)
-            .post('/auth/signin')
-            .send({ email: EMAIL_ID, password: VALID_PASSWORD })
-            .expect(200, async function(_err, res) {
-              token = res.body.token;
-              request(app)
-                .post('/dashboard')
-                .set('xc-auth', token)
-                .send(projectCreateReqBody)
-                .expect(200, (err, res) => {
-                  if (err) {
-                    return done(err);
-                  }
-                  projectId = res.body.id;
-                  done();
-                });
-            });
-        });
+        ]
+      });
+
+      const {
+        data: {
+          tables: { list: tablesList }
+        }
+      } = await api.meta.tableList({
+        projectId: project.id,
+        baseId: project.bases[0].id
+      });
+      const filmTableId = tablesList.find(t => t.tn === 'film')?.id;
+      const countryTableId = tablesList.find(t => t.tn === 'country')?.id;
+
+      const { data: filmData } = await api.data.list(
+        project.id,
+        project.bases[0].id,
+        filmTableId
+      );
+
+      expect(filmData).length.gt(0);
+
+      const { data: countryData } = await api.data.list(
+        project.id,
+        project.bases[0].id,
+        countryTableId
+      );
+
+      expect(countryData).length.gt(0);
     });
 
     it('Project create & table create - v2', async function() {
       this.timeout(120000);
-      // const projectBody: ProjectBody = {
-      //   title: 'restv2',
-      //   bases: [{ ...dbConfig, alias: 'db' }]
-      // };
 
       const projectRes = await api.meta.projectCreate({
         title: 'test',
         bases: [
           {
+            type: 'mysql2',
             host: 'localhost',
             port: 3306,
             username: 'root',
@@ -177,6 +117,9 @@ describe('Noco v2 Tests', function() {
           }
         ]
       });
+
+      const projectId = projectRes.data.id;
+      const baseId = projectRes.data.bases[0].id;
 
       const tableRes = await api.meta.tableCreate(
         projectRes.data.id,
@@ -187,6 +130,7 @@ describe('Noco v2 Tests', function() {
           columns: [
             {
               cn: 'id',
+              _cn: 'Id',
               dt: 'int',
               dtx: 'integer',
               ct: 'int(11)',
@@ -209,6 +153,7 @@ describe('Noco v2 Tests', function() {
             },
             {
               cn: 'title',
+              _cn: 'Title',
               dt: 'varchar',
               dtx: 'specificType',
               ct: 'varchar(45)',
@@ -235,229 +180,134 @@ describe('Noco v2 Tests', function() {
 
       console.log(projectRes.data, tableRes.data);
 
-      const data = await api.data.list(
-        projectRes.data.id,
-        projectRes.data.bases[0].id,
-        tableRes.data.id
-      );
-      console.log(data.data);
+      const tableId = tableRes.data.id;
 
+      const data = await api.data.list(projectId, baseId, tableId);
+      console.log(data.data);
+      expect(data.data).to.have.length(0);
+
+      const createData = await api.data.create(projectId, baseId, tableId, {
+        Title: 'test'
+      });
+
+      console.log(createData.data);
+      const listData = await api.data.list(projectId, baseId, tableId);
+      expect(listData.data).to.have.length(1);
+
+      const readData = await api.data.read(
+        projectId,
+        baseId,
+        tableId,
+        createData.data.Id
+      );
+
+      console.log(readData.data);
+
+      await api.data.update(projectId, baseId, tableId, createData.data.Id, {
+        Title: 'new val'
+      });
+
+      const updatedData = await api.data.read(
+        projectId,
+        baseId,
+        tableId,
+        createData.data.Id
+      );
+
+      console.log(updatedData.data);
+
+      expect(updatedData.data);
+
+      await api.data.delete(projectId, baseId, tableId, createData.data.Id);
+
+      const listData1 = await api.data.list(projectId, baseId, tableId);
+      expect(listData1.data).to.have.length(0);
       const tableDelRes = await api.meta.tableDelete(
-        projectRes.data.id,
-        projectRes.data.bases[0].id,
-        tableRes.data.id
+        projectId,
+        baseId,
+        tableId
       );
       await expect(
-        api.data.list(
-          projectRes.data.id,
-          projectRes.data.bases[0].id,
-          tableRes.data.id
-        )
+        api.data.list(projectId, baseId, tableId)
         // @ts-ignore
       ).to.be.rejectedWith(Error);
 
       console.log(tableDelRes.data);
-      // const data = await request(app)
-      //   .get(`/nc/${projectId}/api/v2/abc`)
-      //   .set('xc-auth', token)
-      //   .expect(200);
-      // console.log(data);
-      // , (err, res) => {
-      //   if (err) done(err);
-      //   expect(res.body?.AddressLisat?.[0]?.['cityName']).to.be.a(
-      //     'String'
-      //   );
-      //
-      //   done();
-      // });
     });
 
-    it('Tables list', function(done) {
-      request(app)
-        .get(`/projects/${projectId}/tables/`)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
+    it('Table update - column add', async function() {
+      this.timeout(120000);
 
-          expect(res.body).to.have.all.keys(
-            'page',
-            'count',
-            'size',
-            'content',
-            'firstPage',
-            'lastPage'
-          );
-          expect(res.body.size).to.be.a('Number');
-          expect(res.body.count).to.be.a('Number');
-          expect(res.body.page).to.be.a('Number');
-          expect(res.body.firstPage).to.be.a('Boolean');
-          expect(res.body.lastPage).to.be.a('Boolean');
-          expect(res.body.content).to.be.a('Array');
-          done();
-        });
-    });
-    it('Project create', function(done) {
-      const projectBody: ProjectBody = {
-        title: 'restv2',
-        bases: [{ ...dbConfig, alias: 'db' }]
-      };
+      const projectRes = await api.meta.projectCreate({
+        title: 'test',
+        bases: [
+          {
+            type: 'mysql2',
+            host: 'localhost',
+            port: 3306,
+            username: 'root',
+            password: 'password',
+            database: 'test_db_12345'
+          }
+        ]
+      });
 
-      request(app)
-        .post(`/projects`)
-        .send(projectBody)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
+      const projectId = projectRes.data.id;
+      const baseId = projectRes.data.bases[0].id;
 
-          expect(res.body).to.have.all.keys(
-            'page',
-            'count',
-            'size',
-            'content',
-            'firstPage',
-            'lastPage'
-          );
-          expect(res.body.size).to.be.a('Number');
-          expect(res.body.count).to.be.a('Number');
-          expect(res.body.page).to.be.a('Number');
-          expect(res.body.firstPage).to.be.a('Boolean');
-          expect(res.body.lastPage).to.be.a('Boolean');
-          expect(res.body.content).to.be.a('Array');
-          done();
-        });
-    });
+      const { data: table } = await api.meta.tableCreate(projectId, baseId, {
+        tn: 'abc',
+        _tn: 'Abc',
+        columns: [
+          {
+            cn: 'id',
+            _cn: 'Id',
+            dt: 'int',
+            dtx: 'integer',
+            ct: 'int(11)',
+            nrqd: false,
+            rqd: true,
+            ck: false,
+            pk: true,
+            un: false,
+            ai: true,
+            cdf: null,
+            clen: null,
+            np: null,
+            ns: 0,
+            dtxp: '',
+            dtxs: '',
+            altered: 1,
+            uidt: 'ID',
+            uip: '',
+            uicn: ''
+          }
+        ]
+      });
 
-    it('Project list', function(done) {
-      request(app)
-        .get(`/projects`)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
+      const { data: tableMeta }: any = await api.meta.columnCreate(
+        projectId,
+        baseId,
+        table.id,
+        {
+          cn: 'title1',
+          _cn: 'Title1',
+          dt: 'varchar',
+          dtxp: '45',
+          uidt: UITypes.SingleLineText
+        }
+      );
 
-          expect(res.body).to.have.all.keys(
-            'page',
-            'count',
-            'size',
-            'content',
-            'firstPage',
-            'lastPage'
-          );
-          expect(res.body.size).to.be.a('Number');
-          expect(res.body.count).to.be.a('Number');
-          expect(res.body.page).to.be.a('Number');
-          expect(res.body.firstPage).to.be.a('Boolean');
-          expect(res.body.lastPage).to.be.a('Boolean');
-          expect(res.body.content).to.be.a('Array');
-          done();
-        });
-    });
+      console.log(tableMeta);
 
-    it('New Table', function(done) {
-      request(app)
-        .get(`/projects/${projectId}/tables/`)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
+      const { data: tableMetaAfterDel } = await api.meta.columnDelete(
+        projectId,
+        baseId,
+        table.id,
+        tableMeta.columns.find(c => c.cn === 'title1')?.id
+      );
 
-          expect(res.body).to.have.all.keys(
-            'page',
-            'count',
-            'size',
-            'content',
-            'firstPage',
-            'lastPage'
-          );
-          expect(res.body.size).to.be.a('Number');
-          expect(res.body.count).to.be.a('Number');
-          expect(res.body.page).to.be.a('Number');
-          expect(res.body.firstPage).to.be.a('Boolean');
-          expect(res.body.lastPage).to.be.a('Boolean');
-          expect(res.body.content).to.be.an('Array');
-          done();
-        });
-    });
-
-    it('Get Table', function(done) {
-      request(app)
-        .get(`/projects/${projectId}/tables/`)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
-
-          request(app)
-            .get(`/projects/${projectId}/tables/${res.body.tables.list[0].id}`)
-            .set('xc-auth', token)
-            .expect(200, (err, res1) => {
-              if (err) return done(err);
-              expect(res1.body).to.be.a('Object');
-              expect(res1.body.sorts).to.be.an('Array');
-              expect(res1.body.columns).to.be.a('Array');
-              expect(res1.body.columnsById).to.be.an('Object');
-              done();
-            });
-        });
-    });
-
-    it('Get Table - sdk', function(done) {
-      request(app)
-        .get(`/projects/${projectId}/tables/`)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
-
-          api.meta
-            .tableRead(projectId, '1', res.body.tables.list[0].id)
-            .then(res => {
-              console.log(res);
-            })
-            .catch(e => done(e));
-          // request(app)
-          //   .get(`/projects/${projectId}/tables/${res.body.tables.list[0].id}`)
-          //   .set('xc-auth', token)
-          //   .expect(200, (err, res1) => {
-          //     if (err) return done(err);
-          //     expect(res1.body).to.be.a('Object');
-          //     expect(res1.body.sorts).to.be.an('Array');
-          //     expect(res1.body.columns).to.be.a('Array');
-          //     expect(res1.body.columnsById).to.be.an('Object');
-          //     done();
-          //   });
-        });
-    });
-
-    it('Delete Table', function(done) {
-      request(app)
-        .get(`/projects/${projectId}/tables/`)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
-
-          request(app)
-            .get(`/projects/${projectId}/tables/${res.body.content[0].id}`)
-            .set('xc-auth', token)
-            .expect(200, (err, res1) => {
-              if (err) return done(err);
-              expect(res1.body).to.be.a('Object');
-              done();
-            });
-        });
-    });
-    it('Update Table', function(done) {
-      request(app)
-        .get(`/projects/${projectId}/tables/`)
-        .set('xc-auth', token)
-        .expect(200, (err, res) => {
-          if (err) return done(err);
-
-          request(app)
-            .get(`/projects/${projectId}/tables/${res.body.content[0].id}`)
-            .set('xc-auth', token)
-            .expect(200, (err, res1) => {
-              if (err) return done(err);
-              expect(res1.body).to.be.a('Object');
-              done();
-            });
-        });
+      console.log(tableMetaAfterDel);
     });
   });
 });

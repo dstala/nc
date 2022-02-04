@@ -1,5 +1,6 @@
 import Noco from '../noco/Noco';
 
+// todo: hide credentials
 export default class Base {
   public alias?: string;
   public host?: string;

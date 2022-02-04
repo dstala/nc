@@ -434,11 +434,9 @@ class BaseModelSqlv2 {
               const query = qb.clone().where({ [chilCol.cn]: p });
               // .select(...fields.split(','));;
 
-              return this.isSqlite()
-                ? this.dbDriver.select().from(query)
-                : query;
+              return this.isSqlite ? this.dbDriver.select().from(query) : query;
             }),
-            !this.isSqlite()
+            !this.isSqlite
           )
           .as('list')
       );
@@ -480,9 +478,9 @@ class BaseModelSqlv2 {
             .count(`${chilCol?.cn} as count`)
             .where({ [chilCol?.cn]: p })
             .first();
-          return this.isSqlite() ? this.dbDriver.select().from(query) : query;
+          return this.isSqlite ? this.dbDriver.select().from(query) : query;
         }),
-        !this.isSqlite()
+        !this.isSqlite
       );
 
       return childs.map(({ count }) => count);
@@ -554,9 +552,9 @@ class BaseModelSqlv2 {
         //   }); // ...fields.split(','));
         const query = qb.clone().where(`${vtn}.${vcn}`, id);
         // this._paginateAndSort(query, { sort, limit, offset }, null, true);
-        return this.isSqlite() ? this.dbDriver.select().from(query) : query;
+        return this.isSqlite ? this.dbDriver.select().from(query) : query;
       }),
-      !this.isSqlite()
+      !this.isSqlite
     );
 
     const proto = await (
@@ -699,10 +697,6 @@ class BaseModelSqlv2 {
     }
     this._proto = proto;
     return proto;
-  }
-
-  isSqlite() {
-    return this.dbDriver.clientType() === 'sqlite3';
   }
 
   _getListArgs(args: XcFilterWithAlias): XcFilter {
@@ -850,11 +844,143 @@ class BaseModelSqlv2 {
           );
           break;
         default:
-          res[column._cn] = `${this.model.tn}.${column.cn}`;
+          res[column._cn || column.cn] = `${this.model.tn}.${column.cn}`;
           break;
       }
     }
     qb.select(res);
+  }
+
+  async insert(data) {
+    try {
+      const insertObj = await this.model.mapAliasToColumn(data);
+
+      // if ('beforeInsert' in this) {
+      //   await this.beforeInsert(insertObj, trx, cookie);
+      // }
+      await this.model.getColumns();
+      let response;
+      // const driver = trx ? trx : this.dbDriver;
+
+      // await this.validate(insertObj);
+
+      const query = this.dbDriver(this.tnPath).insert(insertObj);
+
+      if (this.isPg || this.isMssql) {
+        query.returning(
+          `${this.model.primaryKey.cn} as ${this.model.primaryKey._cn}`
+        );
+        response = await query;
+      }
+
+      const ai = this.model.columns.find(c => c.ai);
+      if (
+        !response ||
+        (typeof response?.[0] !== 'object' && response?.[0] !== null)
+      ) {
+        let id;
+        if (response?.length) {
+          id = response[0];
+        } else {
+          id = (await query)[0];
+        }
+
+        if (ai) {
+          // response = await this.readByPk(id)
+          response = await this.readByPk(id);
+        } else {
+          response = data;
+        }
+      } else if (ai) {
+        response = await this.readByPk(
+          Array.isArray(response) ? response?.[0]?.[ai._cn] : response?.[ai._cn]
+        );
+      }
+
+      // await this.afterInsert(response, trx, cookie);
+      return Array.isArray(response) ? response[0] : response;
+    } catch (e) {
+      console.log(e);
+      // await this.errorInsert(e, data, trx, cookie);
+      throw e;
+    }
+  }
+
+  async delByPk(id) {
+    try {
+      // await this.beforeDelete(id, trx, cookie);
+
+      const response = await this.dbDriver(this.tnPath)
+        .del()
+        .where(await this._wherePk(id));
+      // await this.afterDelete(response, trx, cookie);
+      return response;
+    } catch (e) {
+      console.log(e);
+      // await this.errorDelete(e, id, trx, cookie);
+      throw e;
+    }
+  }
+
+  async updateByPk(id, data) {
+    try {
+      const updateObj = await this.model.mapAliasToColumn(data);
+
+      // await this.validate(data);
+
+      // await this.beforeUpdate(data, trx, cookie);
+
+      // const driver = trx ? trx : this.dbDriver;
+
+      // this.validate(data);
+      // await this._run(
+      await this.dbDriver(this.tnPath)
+        .update(updateObj)
+        .where(await this._wherePk(id));
+      // );
+
+      const response = await this.readByPk(id);
+      // await this.afterUpdate(response, trx, cookie);
+      return response;
+    } catch (e) {
+      console.log(e);
+      // await this.errorUpdate(e, data, trx, cookie);
+      throw e;
+    }
+  }
+
+  async _wherePk(id) {
+    await this.model.getColumns();
+    // const ids = (id + '').split('___');
+    // const where = {};
+    // // for (let i = 0; i < this.model.length; ++i) {
+    //   where[this.model?.[i]?.cn] = ids[i];
+    // }
+    return { [this.model.primaryKey.cn]: id };
+  }
+
+  public get tnPath() {
+    const schema = (this.dbDriver as any).searchPath?.();
+    const table =
+      this.isMssql && schema
+        ? this.dbDriver.raw('??.??', [schema, this.model.tn])
+        : this.model.tn;
+    return table;
+  }
+
+  get isSqlite() {
+    return this.clientType === 'sqlite3';
+  }
+
+  get isMssql() {
+    return this.clientType === 'mssql';
+  }
+  get isPg() {
+    return this.clientType === 'pg';
+  }
+
+  get clientType() {
+    return this.dbDriver.clientType();
   }
 }
 

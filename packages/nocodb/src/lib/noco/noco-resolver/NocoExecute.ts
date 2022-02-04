@@ -12,7 +12,7 @@ const nocoExecute = async (
   dataTree = {},
   args = null
 ): Promise<any> => {
-  const res = [];
+  const res = {};
   // extract nested(lookup) recursively
   const extractNested = (path, dataTreeObj: any, resolver = {}): any => {
     if (path.length) {
@@ -66,7 +66,11 @@ const nocoExecute = async (
         } else if (typeof resolverObj[key] === 'object') {
           res[key] = Promise.resolve(resolverObj[key]);
         } else {
-          res[key] = Promise.resolve(resolverObj[key]);
+          try {
+            res[key] = Promise.resolve(resolverObj[key]);
+          } catch (e) {
+            console.log(e);
+          }
         }
       }
 

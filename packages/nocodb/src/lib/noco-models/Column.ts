@@ -64,7 +64,6 @@ export default class Column implements ColumnType {
         fk_model_id: column.fk_model_id,
         cn: column.cn,
         _cn: column._cn,
-
         uidt: column.uidt,
         dt: column.dt,
         np: column.np,
@@ -371,4 +370,34 @@ export default class Column implements ColumnType {
   }
 
   id: string;
+
+  static async delete(id) {
+    const col = await this.get({ colId: id });
+    let colOptionTableName = null;
+    switch (col.uidt) {
+      case UITypes.Rollup:
+        colOptionTableName = 'nc_col_rollup_v2';
+        break;
+      case UITypes.Lookup:
+        colOptionTableName = 'nc_col_lookup_v2';
+        break;
+      case UITypes.ForeignKey:
+      case UITypes.LinkToAnotherRecord:
+        colOptionTableName = 'nc_col_relations_v2';
+        break;
+      case UITypes.MultiSelect:
+      case UITypes.SingleSelect:
+        colOptionTableName = 'nc_col_select_options_v2';
+        break;
+      case UITypes.Formula:
+        colOptionTableName = 'nc_col_formula_v2';
+        break;
+    }
+    if (colOptionTableName) {
+      await Noco.ncMeta.metaDelete(null, null, colOptionTableName, {
+        fk_column_id: col.id
+      });
+    }
+    await Noco.ncMeta.metaGet2(null, null, 'nc_columns_v2', col.id);
+  }
 }

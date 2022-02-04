@@ -63,6 +63,7 @@ export default class Project implements ProjectType {
     return (this.bases = await Base.list({ projectId: this.id }));
   }
 
+  // todo: hide credentials
   // @ts-ignore
   static async getWithInfo(projectId: string): Promise<Project> {
     const projectData = await Noco.ncMeta.metaGet2(

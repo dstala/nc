@@ -4,7 +4,6 @@ import { Debug, SqlClientFactory } from 'nc-help';
 
 const log = new Debug('SqlMgr');
 // import {XKnex} from "../dataMapper";
-import Project from '../../noco-models/Project';
 import NcConnectionMgrv2 from '../../noco/common/NcConnectionMgrv2';
 import KnexMigratorv2 from '../../migrator/SqlMigrator/lib/KnexMigratorv2';
 import Base from '../../noco-models/Base';
@@ -19,7 +18,7 @@ export default class SqlMgrv2 {
    * @param {String} args.toolDbPath - path to sqlite file that sql mgr will use
    * @memberof SqlMgr
    */
-  constructor(args: Project) {
+  constructor(args: { id: string }) {
     const func = 'constructor';
     log.api(`${func}:args:`, args);
     // this.metaDb = args.metaDb;

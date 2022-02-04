@@ -2058,7 +2058,7 @@ class BaseModelSql extends BaseModel {
   }
 
   isMssql() {
-    return this.clientType === 'mssql';
+    return this.dbDriver.clientType() === 'mssql';
   }
 
   /**
@@ -2157,7 +2157,7 @@ class BaseModelSql extends BaseModel {
    */
   async _run(query) {
     try {
-      if (this.config.log || true) {
+      if (this.config.log) {
         const q = query.toQuery();
         console.time(q);
         const data = await query;

@@ -207,7 +207,14 @@ export interface Column {
   deleted?: boolean;
   visible?: boolean;
   order?: number;
-  colOptions?: LinkToAnotherRecord | Formula | Rollup | Lookup | SelectOptions[];
+  colOptions?:
+    | LinkToAnotherRecord
+    | Formula
+    | Rollup
+    | Lookup
+    | SelectOptions[];
+  cn?: string;
+  _cn?: string;
 }
 
 export interface ColumnList {
@@ -291,7 +298,7 @@ export interface Gallery {
   next_enabled?: boolean;
   prev_enabled?: boolean;
   cover_image_idx?: number;
-  " cover_image"?: string;
+  ' cover_image'?: string;
   restrict_types?: string;
   restrict_size?: string;
   restrict_number?: string;
@@ -384,14 +391,20 @@ export interface TableListParams {
   pageSize?: number;
   sort?: string;
   projectId: string;
-  dbAlias: string;
+  baseId: string;
 }
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, ResponseType } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  ResponseType,
+} from 'axios';
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, 'data' | 'params' | 'url' | 'responseType'> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -406,31 +419,43 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  'body' | 'method' | 'query' | 'path'
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, 'data' | 'cancelToken'> {
   securityWorker?: (
-    securityData: SecurityDataType | null,
+    securityData: SecurityDataType | null
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
   secure?: boolean;
   format?: ResponseType;
 }
 
 export enum ContentType {
-  Json = "application/json",
-  FormData = "multipart/form-data",
-  UrlEncoded = "application/x-www-form-urlencoded",
+  Json = 'application/json',
+  FormData = 'multipart/form-data',
+  UrlEncoded = 'application/x-www-form-urlencoded',
 }
 
 export class HttpClient<SecurityDataType = unknown> {
   public instance: AxiosInstance;
   private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
+  private securityWorker?: ApiConfig<SecurityDataType>['securityWorker'];
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8080" });
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
+    this.instance = axios.create({
+      ...axiosConfig,
+      baseURL: axiosConfig.baseURL || 'http://localhost:8080',
+    });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -440,7 +465,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  private mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  private mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig
+  ): AxiosRequestConfig {
     return {
       ...this.instance.defaults,
       ...params1,
@@ -460,9 +488,9 @@ export class HttpClient<SecurityDataType = unknown> {
         key,
         property instanceof Blob
           ? property
-          : typeof property === "object" && property !== null
+          : typeof property === 'object' && property !== null
           ? JSON.stringify(property)
-          : `${property}`,
+          : `${property}`
       );
       return formData;
     }, new FormData());
@@ -478,15 +506,20 @@ export class HttpClient<SecurityDataType = unknown> {
     ...params
   }: FullRequestParams): Promise<AxiosResponse<T>> => {
     const secureParams =
-      ((typeof secure === "boolean" ? secure : this.secure) &&
+      ((typeof secure === 'boolean' ? secure : this.secure) &&
         this.securityWorker &&
         (await this.securityWorker(this.securityData))) ||
       {};
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = (format && this.format) || void 0;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
-      requestParams.headers.common = { Accept: "*/*" };
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === 'object'
+    ) {
+      requestParams.headers.common = { Accept: '*/*' };
       requestParams.headers.post = {};
       requestParams.headers.put = {};
 
@@ -496,7 +529,9 @@ export class HttpClient<SecurityDataType = unknown> {
     return this.instance.request({
       ...requestParams,
       headers: {
-        ...(type && type !== ContentType.FormData ? { "Content-Type": type } : {}),
+        ...(type && type !== ContentType.FormData
+          ? { 'Content-Type': type }
+          : {}),
         ...(requestParams.headers || {}),
       },
       params: query,
@@ -512,7 +547,9 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version 1.0
  * @baseUrl http://localhost:8080
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType extends unknown
+> extends HttpClient<SecurityDataType> {
   auth = {
     /**
      * No description
@@ -522,12 +559,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary Signup
      * @request POST:/auth/user/signup
      */
-    signup: (data: { email?: boolean; password?: string }, params: RequestParams = {}) =>
+    signup: (
+      data: { email?: boolean; password?: string },
+      params: RequestParams = {}
+    ) =>
       this.request<{ email: string; password: string }, any>({
         path: `/auth/user/signup`,
-        method: "POST",
+        method: 'POST',
         body: data,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -542,8 +582,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     me: (params: RequestParams = {}) =>
       this.request<User, any>({
         path: `/auth/user/me`,
-        method: "GET",
-        format: "json",
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -560,8 +600,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     me2: (params: RequestParams = {}) =>
       this.request<User, any>({
         path: `/auth/user/me - copy`,
-        method: "GET",
-        format: "json",
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -573,10 +613,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary Signin
      * @request POST:/auth/user/signin
      */
-    signin: (data: { email: string; password: string }, params: RequestParams = {}) =>
+    signin: (
+      data: { email: string; password: string },
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/auth/user/signin`,
-        method: "POST",
+        method: 'POST',
         body: data,
         type: ContentType.Json,
         ...params,
@@ -593,7 +636,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     passwordForgot: (data: { email?: string }, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/auth/password/forgot`,
-        method: "POST",
+        method: 'POST',
         body: data,
         type: ContentType.Json,
         ...params,
@@ -608,12 +651,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/auth/password/change
      */
     passwordChange: (
-      data: { old_password?: string; new_password?: string; new_password_repeat?: string },
-      params: RequestParams = {},
+      data: {
+        old_password?: string;
+        new_password?: string;
+        new_password_repeat?: string;
+      },
+      params: RequestParams = {}
     ) =>
       this.request<void, any>({
         path: `/auth/password/change`,
-        method: "POST",
+        method: 'POST',
         body: data,
         type: ContentType.Json,
         ...params,
@@ -627,10 +674,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary Password Reset
      * @request POST:/auth/password/reset
      */
-    passwordReset: (data: { reset_token?: string; new_password?: string }, params: RequestParams = {}) =>
+    passwordReset: (
+      data: { reset_token?: string; new_password?: string },
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/auth/password/reset`,
-        method: "POST",
+        method: 'POST',
         body: data,
         type: ContentType.Json,
         ...params,
@@ -644,10 +694,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary Password Verify
      * @request POST:/auth/token/verify
      */
-    tokenVerify: (data: { token?: string; email?: string }, params: RequestParams = {}) =>
+    tokenVerify: (
+      data: { token?: string; email?: string },
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/auth/token/verify`,
-        method: "POST",
+        method: 'POST',
         body: data,
         type: ContentType.Json,
         ...params,
@@ -664,7 +717,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     tokenRefresh: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/auth/token/refresh`,
-        method: "POST",
+        method: 'POST',
         ...params,
       }),
   };
@@ -676,10 +729,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name ProjectList
      * @request GET:/projects/
      */
-    projectList: (query: ProjectListParams, data: ProjectReq, params: RequestParams = {}) =>
+    projectList: (
+      query: ProjectListParams,
+      data: ProjectReq,
+      params: RequestParams = {}
+    ) =>
       this.request<ProjectList, any>({
         path: `/projects/`,
-        method: "GET",
+        method: 'GET',
         query: query,
         body: data,
         ...params,
@@ -695,10 +752,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     projectCreate: (data: Project, params: RequestParams = {}) =>
       this.request<Project, any>({
         path: `/projects/`,
-        method: "POST",
+        method: 'POST',
         body: data,
         type: ContentType.Json,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -712,8 +769,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     projectRead: (projectId: string, params: RequestParams = {}) =>
       this.request<object, Project>({
         path: `/projects/${projectId}`,
-        method: "GET",
-        format: "json",
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -722,15 +779,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name TableCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/tables
+     * @request POST:/projects/{projectId}/{baseId}/tables
      */
-    tableCreate: (projectId: string, dbAlias: string, data: TableReq, params: RequestParams = {}) =>
+    tableCreate: (
+      projectId: string,
+      baseId: string,
+      data: TableReq,
+      params: RequestParams = {}
+    ) =>
       this.request<Table, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/tables`,
+        method: 'POST',
         body: data,
         type: ContentType.Json,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -739,12 +801,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name TableList
-     * @request GET:/projects/{projectId}/{dbAlias}/tables
+     * @request GET:/projects/{projectId}/{baseId}/tables
      */
-    tableList: ({ projectId, dbAlias, ...query }: TableListParams, params: RequestParams = {}) =>
+    tableList: (
+      { projectId, baseId, ...query }: TableListParams,
+      params: RequestParams = {}
+    ) =>
       this.request<TableList, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables`,
+        method: 'GET',
         query: query,
         ...params,
       }),
@@ -754,13 +819,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name TableRead
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}
      */
-    tableRead: (projectId: string, tableId: string, dbAlias: string, params: RequestParams = {}) =>
+    tableRead: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<TableInfo, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}`,
-        method: "GET",
-        format: "json",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -769,12 +839,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name TableUpdate
-     * @request PUT:/projects/{projectId}/{dbAlias}/tables/{tableId}
+     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}
      */
-    tableUpdate: (projectId: string, tableId: string, dbAlias: string, params: RequestParams = {}) =>
+    tableUpdate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}`,
+        method: 'PUT',
         ...params,
       }),
 
@@ -783,12 +858,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name TableDelete
-     * @request DELETE:/projects/{projectId}/{dbAlias}/tables/{tableId}
+     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}
      */
-    tableDelete: (projectId: string,  dbAlias: string,tableId: string, params: RequestParams = {}) =>
+    tableDelete: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -798,12 +878,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Meta
      * @name ColumnList
      * @summary Column List
-     * @request GET:/projects/{projectId}/{db}/tables/{tableId}/column
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/columns
      */
-    columnList: (tableId: string, projectId: string, db: string, params: RequestParams = {}) =>
+    columnList: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<ColumnList, any>({
-        path: `/projects/${projectId}/${db}/tables/${tableId}/column`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns`,
+        method: 'GET',
         ...params,
       }),
 
@@ -813,12 +898,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Meta
      * @name ColumnCreate
      * @summary Column create
-     * @request POST:/projects/{projectId}/{db}/tables/{tableId}/column
+     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/columns
      */
-    columnCreate: (tableId: string, projectId: string, db: string, data: Column, params: RequestParams = {}) =>
+    columnCreate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      data: Column,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${db}/tables/${tableId}/column`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns`,
+        method: 'POST',
         body: data,
         type: ContentType.Json,
         ...params,
@@ -830,13 +921,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Meta
      * @name ColumnRead
      * @summary Column Read
-     * @request GET:/projects/{projectId}/{db}/tables/{tableId}/column/{columnId}
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/columns/{columnId}
      */
-    columnRead: (projectId: string, tableId: string, columnId: string, db: string, params: RequestParams = {}) =>
+    columnRead: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      columnId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<Column, any>({
-        path: `/projects/${projectId}/${db}/tables/${tableId}/column/${columnId}`,
-        method: "GET",
-        format: "json",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns/${columnId}`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -846,22 +943,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Meta
      * @name ColumnUpdate
      * @summary Column Update
-     * @request PUT:/projects/{projectId}/{db}/tables/{tableId}/column/{columnId}
+     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/columns/{columnId}
      */
     columnUpdate: (
       projectId: string,
+      baseId: string,
       tableId: string,
       columnId: string,
-      db: string,
       data: Column,
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<Column, any>({
-        path: `/projects/${projectId}/${db}/tables/${tableId}/column/${columnId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns/${columnId}`,
+        method: 'PUT',
         body: data,
         type: ContentType.Json,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -870,12 +967,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name ColumnDelete
-     * @request DELETE:/projects/{projectId}/{db}/tables/{tableId}/column/{columnId}
+     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/columns/{columnId}
      */
-    columnDelete: (projectId: string, tableId: string, columnId: string, db: string, params: RequestParams = {}) =>
+    columnDelete: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      columnId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${db}/tables/${tableId}/column/${columnId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns/${columnId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -884,12 +987,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name FilterRead
-     * @request GET:/projects/{projectId}/{dbAlias}/views/{viewId}/filters
+     * @request GET:/projects/{projectId}/{baseId}/views/{viewId}/filters
      */
-    filterRead: (projectId: string, dbAlias: string, viewId: string, params: RequestParams = {}) =>
+    filterRead: (
+      projectId: string,
+      baseId: string,
+      viewId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<FilterList, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewId}/filters`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/views/${viewId}/filters`,
+        method: 'GET',
         ...params,
       }),
 
@@ -898,12 +1006,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name FilterCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/views/{viewId}/filters
+     * @request POST:/projects/{projectId}/{baseId}/views/{viewId}/filters
      */
-    filterCreate: (projectId: string, dbAlias: string, viewId: string, params: RequestParams = {}) =>
+    filterCreate: (
+      projectId: string,
+      baseId: string,
+      viewId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewId}/filters`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/views/${viewId}/filters`,
+        method: 'POST',
         ...params,
       }),
 
@@ -912,12 +1025,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name SortList
-     * @request GET:/projects/{projectId}/{dbAlias}/views/{viewId}/sorts
+     * @request GET:/projects/{projectId}/{baseId}/views/{viewId}/sorts
      */
-    sortList: (projectId: string, dbAlias: string, viewId: string, params: RequestParams = {}) =>
+    sortList: (
+      projectId: string,
+      baseId: string,
+      viewId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<SortList, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewId}/sorts`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts`,
+        method: 'GET',
         ...params,
       }),
 
@@ -926,12 +1044,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name SortCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/views/{viewId}/sorts
+     * @request POST:/projects/{projectId}/{baseId}/views/{viewId}/sorts
      */
-    sortCreate: (projectId: string, dbAlias: string, viewId: string, params: RequestParams = {}) =>
+    sortCreate: (
+      projectId: string,
+      baseId: string,
+      viewId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewId}/sorts`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts`,
+        method: 'POST',
         ...params,
       }),
 
@@ -940,12 +1063,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name FilterGet
-     * @request GET:/projects/{projectId}/{dbAlias}/views/{viewsId}/filters/{filterId}
+     * @request GET:/projects/{projectId}/{baseId}/views/{viewsId}/filters/{filterId}
      */
-    filterGet: (projectId: string, dbAlias: string, filterId: string, viewsId: string, params: RequestParams = {}) =>
+    filterGet: (
+      projectId: string,
+      baseId: string,
+      filterId: string,
+      viewsId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewsId}/filters/${filterId}`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/views/${viewsId}/filters/${filterId}`,
+        method: 'GET',
         ...params,
       }),
 
@@ -954,12 +1083,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name FilterUpdate
-     * @request PUT:/projects/{projectId}/{dbAlias}/views/{viewsId}/filters/{filterId}
+     * @request PUT:/projects/{projectId}/{baseId}/views/{viewsId}/filters/{filterId}
      */
-    filterUpdate: (projectId: string, dbAlias: string, filterId: string, viewsId: string, params: RequestParams = {}) =>
+    filterUpdate: (
+      projectId: string,
+      baseId: string,
+      filterId: string,
+      viewsId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewsId}/filters/${filterId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/views/${viewsId}/filters/${filterId}`,
+        method: 'PUT',
         ...params,
       }),
 
@@ -968,12 +1103,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name FilterDelete
-     * @request DELETE:/projects/{projectId}/{dbAlias}/views/{viewsId}/filters/{filterId}
+     * @request DELETE:/projects/{projectId}/{baseId}/views/{viewsId}/filters/{filterId}
      */
-    filterDelete: (projectId: string, dbAlias: string, filterId: string, viewsId: string, params: RequestParams = {}) =>
+    filterDelete: (
+      projectId: string,
+      baseId: string,
+      filterId: string,
+      viewsId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewsId}/filters/${filterId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/views/${viewsId}/filters/${filterId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -982,12 +1123,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name SortGet
-     * @request GET:/projects/{projectId}/{dbAlias}/views/{viewId}/sorts/{sortId}
+     * @request GET:/projects/{projectId}/{baseId}/views/{viewId}/sorts/{sortId}
      */
-    sortGet: (projectId: string, dbAlias: string, sortId: string, viewId: string, params: RequestParams = {}) =>
+    sortGet: (
+      projectId: string,
+      baseId: string,
+      sortId: string,
+      viewId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewId}/sorts/${sortId}`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts/${sortId}`,
+        method: 'GET',
         ...params,
       }),
 
@@ -996,12 +1143,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name SortUpdate
-     * @request PUT:/projects/{projectId}/{dbAlias}/views/{viewId}/sorts/{sortId}
+     * @request PUT:/projects/{projectId}/{baseId}/views/{viewId}/sorts/{sortId}
      */
-    sortUpdate: (projectId: string, dbAlias: string, sortId: string, viewId: string, params: RequestParams = {}) =>
+    sortUpdate: (
+      projectId: string,
+      baseId: string,
+      sortId: string,
+      viewId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewId}/sorts/${sortId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts/${sortId}`,
+        method: 'PUT',
         ...params,
       }),
 
@@ -1010,12 +1163,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name SortDelete
-     * @request DELETE:/projects/{projectId}/{dbAlias}/views/{viewId}/sorts/{sortId}
+     * @request DELETE:/projects/{projectId}/{baseId}/views/{viewId}/sorts/{sortId}
      */
-    sortDelete: (projectId: string, dbAlias: string, sortId: string, viewId: string, params: RequestParams = {}) =>
+    sortDelete: (
+      projectId: string,
+      baseId: string,
+      sortId: string,
+      viewId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/views/${viewId}/sorts/${sortId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts/${sortId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1024,12 +1183,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name WebhookGet
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks/{webhookId}
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks/{webhookId}
      */
-    webhookGet: (projectId: string, dbAlias: string, tableId: string, webhookId: string, params: RequestParams = {}) =>
+    webhookGet: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      webhookId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/webhooks/${webhookId}`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks/${webhookId}`,
+        method: 'GET',
         ...params,
       }),
 
@@ -1038,18 +1203,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name WebhookUpdate
-     * @request PUT:/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks/{webhookId}
+     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks/{webhookId}
      */
     webhookUpdate: (
       projectId: string,
-      dbAlias: string,
+      baseId: string,
       tableId: string,
       webhookId: string,
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/webhooks/${webhookId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks/${webhookId}`,
+        method: 'PUT',
         ...params,
       }),
 
@@ -1058,18 +1223,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name WebhookDelete
-     * @request DELETE:/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks/{webhookId}
+     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks/{webhookId}
      */
     webhookDelete: (
       projectId: string,
-      dbAlias: string,
+      baseId: string,
       tableId: string,
       webhookId: string,
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/webhooks/${webhookId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks/${webhookId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1078,12 +1243,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name WebhookList
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks
      */
-    webhookList: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+    webhookList: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<HookList, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/webhooks`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks`,
+        method: 'GET',
         ...params,
       }),
 
@@ -1092,12 +1262,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name WebhookCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/tables/{tableId}/webhooks
+     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks
      */
-    webhookCreate: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+    webhookCreate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/webhooks`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks`,
+        method: 'POST',
         ...params,
       }),
 
@@ -1106,12 +1281,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GridCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/tables/{tableId}/grids
+     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/grids
      */
-    gridCreate: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+    gridCreate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/grids`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids`,
+        method: 'POST',
         ...params,
       }),
 
@@ -1120,12 +1300,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GridUpdate
-     * @request PUT:/projects/{projectId}/{dbAlias}/tables/{tableId}/grids/{gridId}
+     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/grids/{gridId}
      */
-    gridUpdate: (projectId: string, dbAlias: string, tableId: string, gridId: string, params: RequestParams = {}) =>
+    gridUpdate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      gridId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/grids/${gridId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids/${gridId}`,
+        method: 'PUT',
         ...params,
       }),
 
@@ -1134,12 +1320,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GridDelete
-     * @request DELETE:/projects/{projectId}/{dbAlias}/tables/{tableId}/grids/{gridId}
+     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/grids/{gridId}
      */
-    gridDelete: (projectId: string, dbAlias: string, tableId: string, gridId: string, params: RequestParams = {}) =>
+    gridDelete: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      gridId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/grids/${gridId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids/${gridId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1148,12 +1340,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GridRead
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}/grids/{gridId}
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/grids/{gridId}
      */
-    gridRead: (projectId: string, dbAlias: string, tableId: string, gridId: string, params: RequestParams = {}) =>
+    gridRead: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      gridId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/grids/${gridId}`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids/${gridId}`,
+        method: 'GET',
         ...params,
       }),
 
@@ -1162,12 +1360,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name FormCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/tables/{tableId}/forms
+     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/forms
      */
-    formCreate: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+    formCreate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/forms`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms`,
+        method: 'POST',
         ...params,
       }),
 
@@ -1176,14 +1379,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GridUpdate2
-     * @request PUT:/projects/{projectId}/{dbAlias}/tables/{tableId}/forms/{formId}
+     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/forms/{formId}
      * @originalName gridUpdate
      * @duplicate
      */
-    gridUpdate2: (projectId: string, dbAlias: string, tableId: string, formId: string, params: RequestParams = {}) =>
+    gridUpdate2: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      formId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/forms/${formId} `,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms/${formId} `,
+        method: 'PUT',
         ...params,
       }),
 
@@ -1192,14 +1401,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GridDelete2
-     * @request DELETE:/projects/{projectId}/{dbAlias}/tables/{tableId}/forms/{formId}
+     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/forms/{formId}
      * @originalName gridDelete
      * @duplicate
      */
-    gridDelete2: (projectId: string, dbAlias: string, tableId: string, formId: string, params: RequestParams = {}) =>
+    gridDelete2: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      formId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/forms/${formId} `,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms/${formId} `,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1208,14 +1423,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GridRead2
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}/forms/{formId}
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/forms/{formId}
      * @originalName gridRead
      * @duplicate
      */
-    gridRead2: (projectId: string, dbAlias: string, tableId: string, formId: string, params: RequestParams = {}) =>
+    gridRead2: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      formId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/forms/${formId} `,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms/${formId} `,
+        method: 'GET',
         ...params,
       }),
 
@@ -1224,12 +1445,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GalleryCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/tables/{tableId}/galleries
+     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/galleries
      */
-    galleryCreate: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+    galleryCreate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/galleries`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries`,
+        method: 'POST',
         ...params,
       }),
 
@@ -1238,18 +1464,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GalleryUpdate
-     * @request PUT:/projects/{projectId}/{dbAlias}/tables/{tableId}/galleries/{galleryId}
+     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/galleries/{galleryId}
      */
     galleryUpdate: (
       projectId: string,
-      dbAlias: string,
+      baseId: string,
       tableId: string,
       galleryId: string,
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/galleries/${galleryId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries/${galleryId}`,
+        method: 'PUT',
         ...params,
       }),
 
@@ -1258,18 +1484,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GalleryDelete
-     * @request DELETE:/projects/{projectId}/{dbAlias}/tables/{tableId}/galleries/{galleryId}
+     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/galleries/{galleryId}
      */
     galleryDelete: (
       projectId: string,
-      dbAlias: string,
+      baseId: string,
       tableId: string,
       galleryId: string,
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/galleries/${galleryId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries/${galleryId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1278,12 +1504,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name GalleryRead
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}/galleries/{galleryId}
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/galleries/{galleryId}
      */
-    galleryRead: (projectId: string, dbAlias: string, tableId: string, galleryId: string, params: RequestParams = {}) =>
+    galleryRead: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      galleryId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/galleries/${galleryId}`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries/${galleryId}`,
+        method: 'GET',
         ...params,
       }),
 
@@ -1292,12 +1524,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name KanbanCreate
-     * @request POST:/projects/{projectId}/{dbAlias}/tables/{tableId}/kanbans
+     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans
      */
-    kanbanCreate: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+    kanbanCreate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/kanbans`,
-        method: "POST",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans`,
+        method: 'POST',
         ...params,
       }),
 
@@ -1306,12 +1543,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name KanbanUpdate
-     * @request PUT:/projects/{projectId}/{dbAlias}/tables/{tableId}/kanbans/{kanbanId}
+     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans/{kanbanId}
      */
-    kanbanUpdate: (projectId: string, dbAlias: string, tableId: string, kanbanId: string, params: RequestParams = {}) =>
+    kanbanUpdate: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      kanbanId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/kanbans/${kanbanId}`,
-        method: "PUT",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans/${kanbanId}`,
+        method: 'PUT',
         ...params,
       }),
 
@@ -1320,12 +1563,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name KanbanDelete
-     * @request DELETE:/projects/{projectId}/{dbAlias}/tables/{tableId}/kanbans/{kanbanId}
+     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans/{kanbanId}
      */
-    kanbanDelete: (projectId: string, dbAlias: string, tableId: string, kanbanId: string, params: RequestParams = {}) =>
+    kanbanDelete: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      kanbanId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/kanbans/${kanbanId}`,
-        method: "DELETE",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans/${kanbanId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1334,12 +1583,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name KanbanRead
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}/kanbans/{kanbanId}
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans/{kanbanId}
      */
-    kanbanRead: (projectId: string, dbAlias: string, tableId: string, kanbanId: string, params: RequestParams = {}) =>
+    kanbanRead: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      kanbanId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/kanbans/${kanbanId}`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans/${kanbanId}`,
+        method: 'GET',
         ...params,
       }),
 
@@ -1348,12 +1603,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Meta
      * @name ViewsList
-     * @request GET:/projects/{projectId}/{dbAlias}/tables/{tableId}/views
+     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/views
      */
-    viewsList: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
+    viewsList: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<ViewList, any>({
-        path: `/projects/${projectId}/${dbAlias}/tables/${tableId}/views`,
-        method: "GET",
+        path: `/projects/${projectId}/${baseId}/tables/${tableId}/views`,
+        method: 'GET',
         ...params,
       }),
   };
@@ -1367,7 +1627,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     putProjectsCopy: (projectId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/projects/${projectId}`,
-        method: "PUT",
+        method: 'PUT',
         ...params,
       }),
 
@@ -1380,7 +1640,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     deleteProjectsCopy: (projectId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/projects/${projectId}`,
-        method: "DELETE",
+        method: 'DELETE',
         ...params,
       }),
   };
@@ -1390,12 +1650,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Data
      * @name List
-     * @request GET:/data/projects/{projectId}/{dbAlias}/tables/{tableId}
+     * @request GET:/data/projects/{projectId}/{baseId}/tables/{tableId}
      */
-    list: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
-      this.request<ViewList, any>({
-        path: `/data/projects/${projectId}/${dbAlias}/tables/${tableId}`,
-        method: "GET",
+    list: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -1404,12 +1670,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Data
      * @name Create
-     * @request POST:/data/projects/{projectId}/{dbAlias}/tables/{tableId}
+     * @request POST:/data/projects/{projectId}/{baseId}/tables/{tableId}
      */
-    create: (projectId: string, dbAlias: string, tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/data/projects/${projectId}/${dbAlias}/tables/${tableId}`,
-        method: "POST",
+    create: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      data: any,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
@@ -1418,12 +1693,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Data
      * @name Read
-     * @request GET:/data/projects/{projectId}/{dbAlias}/tables/{tableId}/{rowId}
+     * @request GET:/data/projects/{projectId}/{baseId}/tables/{tableId}/{rowId}
      */
-    read: (projectId: string, dbAlias: string, tableId: string, rowId: string, params: RequestParams = {}) =>
-      this.request<ViewList, any>({
-        path: `/data/projects/${projectId}/${dbAlias}/tables/${tableId}/${rowId}`,
-        method: "GET",
+    read: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      rowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}/${rowId}`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -1432,12 +1714,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Data
      * @name Update
-     * @request PUT:/data/projects/{projectId}/{dbAlias}/tables/{tableId}/{rowId}
+     * @request PUT:/data/projects/{projectId}/{baseId}/tables/{tableId}/{rowId}
      */
-    update: (projectId: string, dbAlias: string, tableId: string, rowId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/data/projects/${projectId}/${dbAlias}/tables/${tableId}/${rowId}`,
-        method: "PUT",
+    update: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      rowId: string,
+      data: any,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}/${rowId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
@@ -1446,12 +1738,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Data
      * @name Delete
-     * @request DELETE:/data/projects/{projectId}/{dbAlias}/tables/{tableId}/{rowId}
+     * @request DELETE:/data/projects/{projectId}/{baseId}/tables/{tableId}/{rowId}
      */
-    delete: (projectId: string, dbAlias: string, tableId: string, rowId: string, params: RequestParams = {}) =>
+    delete: (
+      projectId: string,
+      baseId: string,
+      tableId: string,
+      rowId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
-        path: `/data/projects/${projectId}/${dbAlias}/tables/${tableId}/${rowId}`,
-        method: "DELETE",
+        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}/${rowId}`,
+        method: 'DELETE',
         ...params,
       }),
   };

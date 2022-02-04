@@ -303,4 +303,13 @@ export default class Model implements Table {
 
     return true;
   }
+
+  async mapAliasToColumn(data) {
+    const insertObj = {};
+    for (const col of await this.getColumns()) {
+      const val = data?.[col.cn] ?? data?.[col._cn];
+      if (val !== undefined) insertObj[col.cn] = val;
+    }
+    return insertObj;
+  }
 }

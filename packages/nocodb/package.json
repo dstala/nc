@@ -72,7 +72,7 @@
     "run": "ts-node src/example/docker",
     "watch:try": "nodemon -e ts,js -w ./src -x \"ts-node src/example/try --log-error --project tsconfig.json\"",
     "example:docker": "ts-node ./src/example/docker.ts",
-    "generate:sdk": "npx swagger-typescript-api -p ./swagger.json -o ./sdk  --axios --clean-output --extract-request-params --module-name-first-tag"
+    "generate:sdk": "npx swagger-typescript-api -p ../../scripts/sdk/swagger.json -o ./src/lib/noco-client/  --axios --clean-output --extract-request-params --module-name-first-tag"
   },
   "scripts-info": {
     "info": "Display information about the package scripts",
@@ -150,7 +150,7 @@
     "mysql2": "^2.2.5",
     "nanoid": "^3.1.20",
     "nc-common": "0.0.6",
-    "nc-help": "^0.2.30",
+    "nc-help": "file:../../../xc-lib-private",
     "nc-lib-gui": "0.84.7",
     "nc-plugin": "^0.1.1",
     "ncp": "^2.0.0",

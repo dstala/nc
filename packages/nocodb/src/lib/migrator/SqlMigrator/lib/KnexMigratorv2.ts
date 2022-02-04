@@ -37,7 +37,7 @@ export default class KnexMigratorv2 {
    * Creates an instance of KnexMigrator.
    * @memberof KnexMigrator
    */
-  constructor(project: Project) {
+  constructor(project: { id: string }) {
     this.projectId = project.id;
   }
 
