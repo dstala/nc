@@ -87,6 +87,13 @@ export default class Column implements ColumnType {
       }
     );
 
+    await this.insertColOption(column, row.id);
+  }
+
+  private static async insertColOption<T>(
+    column: Partial<T> & { base_id?: string; [p: string]: any },
+    colId
+  ) {
     switch (column.uidt || column.ui_data_type) {
       case UITypes.Lookup:
         // LookupColumn.insert()
@@ -96,7 +103,7 @@ export default class Column implements ColumnType {
           column.db_alias,
           'nc_col_lookup_v2',
           {
-            fk_column_id: row.id,
+            fk_column_id: colId,
 
             fk_relation_column_id: column.fk_relation_column_id,
 
@@ -110,7 +117,7 @@ export default class Column implements ColumnType {
           column.db_alias,
           'nc_col_rollup_v2',
           {
-            fk_column_id: row.id,
+            fk_column_id: colId,
             fk_relation_column_id: column.fk_relation_column_id,
 
             fk_rollup_column_id: column.fk_rollup_column_id,
@@ -125,7 +132,7 @@ export default class Column implements ColumnType {
           column.db_alias,
           'nc_col_relations_v2',
           {
-            fk_column_id: row.id,
+            fk_column_id: colId,
 
             // ref_db_alias
             type: column.type,
@@ -151,7 +158,7 @@ export default class Column implements ColumnType {
           column.db_alias,
           'nc_col_formula_v2',
           {
-            fk_column_id: row.id,
+            fk_column_id: colId,
             formula: column.formula
           }
         );
@@ -164,7 +171,7 @@ export default class Column implements ColumnType {
             column.db_alias,
             'nc_col_select_options_v2',
             {
-              fk_column_id: row.id,
+              fk_column_id: colId,
               title: option
             }
           );
@@ -212,7 +219,7 @@ export default class Column implements ColumnType {
                 model.db_alias,
                 'nc_col_select_options_v2',
                 {
-                  column_id: row.id,
+                  column_id: colId,
                   name: option
                 }
               );
@@ -398,6 +405,154 @@ export default class Column implements ColumnType {
         fk_column_id: col.id
       });
     }
-    await Noco.ncMeta.metaGet2(null, null, 'nc_columns_v2', col.id);
+    await Noco.ncMeta.metaDelete(null, null, 'nc_columns_v2', col.id);
+  }
+
+  static async update(colId: string, column: any) {
+    const oldCol = await Column.get({ colId });
+
+    // const row = await Noco.ncMeta.metaInsert2(
+    //   null, //column.project_id || column.base_id,
+    //   null, //column.db_alias,
+    //   'nc_columns_v2',
+    //   {
+    //     fk_model_id: column.fk_model_id,
+    //     cn: column.cn,
+    //     _cn: column._cn,
+    //     uidt: column.uidt,
+    //     dt: column.dt,
+    //     np: column.np,
+    //     ns: column.ns,
+    //     clen: column.clen,
+    //     cop: column.cop,
+    //     pk: column.pk,
+    //     rqd: column.rqd,
+    //     un: column.un,
+    //     ct: column.ct,
+    //     ai: column.ai,
+    //     unique: column.unique,
+    //     cdf: column.cdf,
+    //     cc: column.cc,
+    //     csn: column.csn,
+    //     dtx: column.dtx,
+    //     dtxp: column.dtxp,
+    //     dtxs: column.dtxs,
+    //     au: column.au,
+    //     pv: column.pv
+    //   }
+    // );
+    // if (oldCol.uidt !== column.uidt)
+    switch (oldCol.uidt) {
+      case UITypes.Lookup:
+        // LookupColumn.insert()
+
+        await Noco.ncMeta.metaDelete(null, null, 'nc_col_lookup_v2', {
+          fk_column_id: colId
+        });
+        break;
+      case UITypes.Rollup:
+        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_rollup_v2', {
+          fk_column_id: colId
+        });
+        break;
+      case UITypes.ForeignKey:
+      case UITypes.LinkToAnotherRecord:
+        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_relations_v2', {
+          fk_column_id: colId
+        });
+        break;
+      case UITypes.Formula:
+        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_formula_v2', {
+          fk_column_id: colId
+        });
+        break;
+      case UITypes.MultiSelect:
+      case UITypes.SingleSelect:
+        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_select_options_v2', {
+          fk_column_id: colId
+        });
+        break;
+    }
+    /*  default:
+        {
+          await Noco.ncMeta.metaInsert2(
+            model.project_id,
+            model.db_alias,
+            'nc_col_props_v2',
+            {
+              column_id: model.column_id,
+
+              cn: model.cn,
+              // todo: decide type
+              uidt: model.uidt,
+              dt: model.dt,
+              np: model.np,
+              ns: model.ns,
+              clen: model.clen,
+              cop: model.cop,
+              pk: model.pk,
+              rqd: model.rqd,
+              un: model.un,
+              ct: model.ct,
+              ai: model.ai,
+              unique: model.unique,
+              ctf: model.ctf,
+              cc: model.cc,0
+              csn: model.csn,
+              dtx: model.dtx,
+              dtxp: model.dtxp,
+              dtxs: model.dtxs,
+              au: model.au
+            }
+          );
+          if (
+            model.uidt === UITypes.MultiSelect ||
+            model.uidt === UITypes.SingleSelect
+          ) {
+            for (const option of model.dtxp.split(','))
+              await Noco.ncMeta.metaInsert2(
+                model.project_id,
+                model.db_alias,
+                'nc_col_select_options_v2',
+                {
+                  column_id: colId,
+                  name: option
+                }
+              );
+          }
+        }
+        break;*/
+    // }
+    await Noco.ncMeta.metaUpdate(
+      null, //column.project_id || column.base_id,
+      null, //column.db_alias,
+      'nc_columns_v2',
+      {
+        cn: column.cn,
+        _cn: column._cn,
+        uidt: column.uidt,
+        dt: column.dt,
+        np: column.np,
+        ns: column.ns,
+        clen: column.clen,
+        cop: column.cop,
+        pk: column.pk,
+        rqd: column.rqd,
+        un: column.un,
+        ct: column.ct,
+        ai: column.ai,
+        unique: column.unique,
+        cdf: column.cdf,
+        cc: column.cc,
+        csn: column.csn,
+        dtx: column.dtx,
+        dtxp: column.dtxp,
+        dtxs: column.dtxs,
+        au: column.au,
+        pv: column.pv
+      },
+      colId
+    );
+    await this.insertColOption(column, colId);
   }
 }

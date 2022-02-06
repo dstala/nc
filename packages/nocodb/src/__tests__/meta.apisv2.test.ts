@@ -298,8 +298,53 @@ describe('Noco v2 Tests', function() {
         }
       );
 
+      await api.data.create(projectId, baseId, tableMeta.id, {
+        Title1: 'test'
+      });
+      await api.data.create(projectId, baseId, tableMeta.id, {
+        Title1: 'test1'
+      });
+
       console.log(tableMeta);
 
+      const { data: tableFormulaMeta }: any = await api.meta.columnCreate(
+        projectId,
+        baseId,
+        table.id,
+        {
+          _cn: 'formula',
+          uidt: UITypes.Formula,
+          formula: 'Id + 1'
+        } as any
+      );
+
+      console.log(tableFormulaMeta);
+
+      const { data: listData } = await api.data.list(
+        projectId,
+        baseId,
+        tableMeta.id
+      );
+
+      console.log(listData);
+
+      const { data: tableMetaAfterUpdate } = await api.meta.columnUpdate(
+        projectId,
+        baseId,
+        table.id,
+        tableMeta.columns.find(c => c.cn === 'title1')?.id,
+        {
+          cn: 'title1',
+          _cn: 'Title1',
+          dt: 'text',
+          dtxp: '',
+          uidt: UITypes.LongText
+        }
+      );
+
+      console.log(tableMetaAfterUpdate);
+
+      // delete column
       const { data: tableMetaAfterDel } = await api.meta.columnDelete(
         projectId,
         baseId,
