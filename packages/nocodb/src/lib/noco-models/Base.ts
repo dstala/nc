@@ -1,4 +1,5 @@
 import Noco from '../noco/Noco';
+import Project from './Project';
 
 // todo: hide credentials
 export default class Base {
@@ -58,6 +59,9 @@ export default class Base {
         database: this.database ?? 'dummy_db'
       }
     };
+  }
+  getProject(): Promise<Project> {
+    return Project.get(this.project_id);
   }
 }
 

@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
-import { Table } from '../../../noco-client/Api';
+import { LinkToAnotherRecord, Table } from '../../../noco-client/Api';
 import UITypes from '../../../sqlUi/UITypes';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Base from '../../../noco-models/Base';
@@ -8,15 +8,8 @@ import Column from '../../../noco-models/Column';
 import { substituteColumnNameWithIdInFormula } from './helpers/formulaHelpers';
 import validateParams from './helpers/validateParams';
 
-/***
- *
- *
- * altered
- *  1 - new column
- *  4 - deleted
- *  8 or 2 - column update
- *
- * */
+import { customAlphabet } from 'nanoid';
+const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
 export enum Altered {
   NEW_COLUMN = 1,
@@ -30,32 +23,303 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
       id: req.params.tableId
     });
     const base = await Base.get(table.base_id);
+    const project = await base.getProject();
 
     const colBody = req.body;
     switch (colBody.uidt) {
-      case UITypes.Lookup:
       case UITypes.Rollup:
-        return next(new Error('Not implemented'));
+        {
+          validateParams(
+            [
+              '_cn',
+              'fk_relation_column_id',
+              'fk_rollup_column_id',
+              'rollup_function'
+            ],
+            req.body
+          );
+
+          const relation = await (
+            await Column.get({
+              colId: req.body.fk_relation_column_id
+            })
+          ).getColOptions<LinkToAnotherRecord>();
+
+          if (!relation) {
+            throw new Error('Relation column not found');
+          }
+
+          let relatedColumn: Column;
+          switch (relation.type) {
+            case 'hm':
+              relatedColumn = await Column.get({
+                colId: relation.fk_child_column_id
+              });
+              break;
+            case 'mm':
+            case 'bt':
+              relatedColumn = await Column.get({
+                colId: relation.fk_parent_column_id
+              });
+              break;
+          }
+
+          const relatedTable = await relatedColumn.getModel();
+          if (
+            !(await relatedTable.getColumns()).find(
+              c => c.id === req.body.fk_rollup_column_id
+            )
+          )
+            throw new Error('Rollup column not found in related table');
+
+          await Column.insert({
+            ...colBody,
+            fk_model_id: table.id
+          });
+        }
+        break;
+      case UITypes.Lookup:
+        {
+          validateParams(
+            ['_cn', 'fk_relation_column_id', 'fk_lookup_column_id'],
+            req.body
+          );
+
+          const relation = await (
+            await Column.get({
+              colId: req.body.fk_relation_column_id
+            })
+          ).getColOptions<LinkToAnotherRecord>();
+
+          if (!relation) {
+            throw new Error('Relation column not found');
+          }
+
+          let relatedColumn: Column;
+          switch (relation.type) {
+            case 'hm':
+              relatedColumn = await Column.get({
+                colId: relation.fk_child_column_id
+              });
+              break;
+            case 'mm':
+            case 'bt':
+              relatedColumn = await Column.get({
+                colId: relation.fk_parent_column_id
+              });
+              break;
+          }
+
+          const relatedTable = await relatedColumn.getModel();
+          if (
+            !(await relatedTable.getColumns()).find(
+              c => c.id === req.body.fk_lookup_column_id
+            )
+          )
+            throw new Error('Lookup column not found in related table');
+
+          await Column.insert({
+            ...colBody,
+            fk_model_id: table.id
+          });
+        }
+        break;
 
       case UITypes.LinkToAnotherRecord:
       case UITypes.ForeignKey:
         {
           validateParams(['parentId', 'childId', 'type'], req.body);
-          const parent = await Model.get({ id: req.body.parentId });
-          const child = await Model.get({ id: req.body.childId });
+          const parent = await Model.getWithInfo({ id: req.body.parentId });
+          const child = await Model.getWithInfo({ id: req.body.childId });
+          let childColumn: Column;
 
+          const sqlMgr = await ProjectMgrv2.getSqlMgr({
+            id: base.project_id
+          });
           if (req.body.type === 'hm' || req.body.type === 'bt') {
             // populate fk column name
             let fkColName = `${parent.tn}_id`;
             let c = 0;
+
             while (child.columns.some(c => c.cn === `fkColName${c || ''}`)) {
               c++;
             }
+
             fkColName = `fkColName${c || ''}`;
 
-            console.log(fkColName);
+            {
+              // create foreign key
+              const newColumn = {
+                cn: fkColName,
+                _cn: fkColName,
+                rqd: false,
+                pk: false,
+                ai: false,
+                cdf: null,
+                dt: parent.primaryKey.dt,
+                dtxp: parent.primaryKey.dtxp,
+                dtxs: parent.primaryKey.dtxs,
+                un: parent.primaryKey.un,
+                altered: Altered.NEW_COLUMN
+              };
+              const tableUpdateBody = {
+                ...child,
+                originalColumns: child.columns,
+                columns: [...child.columns, newColumn]
+              };
+
+              await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+
+              const { id } = await Column.insert({
+                ...colBody,
+                fk_model_id: table.id
+              });
+
+              childColumn = await Column.get({ colId: id });
+
+              // create relation
+              await sqlMgr.sqlOpPlus(base, 'relationCreate', {
+                childColumn: fkColName,
+                childTable: child.tn,
+                parentTable: parent.tn,
+                onDelete: 'NO ACTION',
+                onUpdate: 'NO ACTION',
+                type: 'real',
+                parentColumn: parent.primaryKey.cn
+              });
+            }
+
+            await Column.insert({
+              _cn: `${parent._tn}Read`,
+
+              fk_model_id: child.id,
+              // ref_db_alias
+              uidt: UITypes.ForeignKey,
+              type: 'bt',
+              // db_type:
+
+              fk_child_column_id: childColumn.id,
+              fk_parent_column_id: parent.primaryKey.id
+            });
+            await Column.insert({
+              _cn: `${child._tn}List`,
+              fk_model_id: parent.id,
+              uidt: UITypes.LinkToAnotherRecord,
+              type: 'hm',
+              fk_child_column_id: childColumn.id,
+              fk_parent_column_id: parent.primaryKey.id
+            });
           } else if (req.body.type === 'mm') {
-            throw new Error('Not implemented');
+            const aTn = `${project?.prefix ?? ''}_nc_m2m_${randomID()}`;
+            const aTnAlias = aTn;
+
+            const parentPK = parent.primaryKey;
+            const childPK = child.primaryKey;
+
+            const associateTableCols = [];
+
+            const parentCn = 'table1_id';
+            const childCn = 'table2_id';
+
+            associateTableCols.push(
+              {
+                cn: childCn,
+                _cn: childCn,
+                rqd: true,
+                pk: true,
+                ai: false,
+                cdf: null,
+                dt: childPK.dt,
+                dtxp: childPK.dtxp,
+                dtxs: childPK.dtxs,
+                un: childPK.un,
+                altered: 1
+              },
+              {
+                cn: parentCn,
+                _cn: parentCn,
+                rqd: true,
+                pk: true,
+                ai: false,
+                cdf: null,
+                dt: parentPK.dt,
+                dtxp: parentPK.dtxp,
+                dtxs: parentPK.dtxs,
+                un: parentPK.un,
+                altered: 1
+              }
+            );
+
+            await sqlMgr.sqlOpPlus(base, 'tableCreate', {
+              tn: aTn,
+              _tn: aTnAlias,
+              columns: associateTableCols
+            });
+
+            const assocModel = await Model.insert(project.id, base.id, {
+              tn: aTn,
+              _tn: aTnAlias,
+              columns: associateTableCols
+            });
+
+            const rel1Args = {
+              ...req.body,
+              childTable: aTn,
+              childColumn: parentCn,
+              parentTable: parent.tn,
+              parentColumn: parentPK.cn,
+              type: 'real'
+            };
+            const rel2Args = {
+              ...req.body,
+              childTable: aTn,
+              childColumn: childCn,
+              parentTable: child.tn,
+              parentColumn: childPK.cn,
+              type: 'real'
+            };
+
+            await sqlMgr.sqlOpPlus(base, 'relationCreate', rel1Args);
+            await sqlMgr.sqlOpPlus(base, 'relationCreate', rel2Args);
+
+            const parentCol = (await assocModel.getColumns())?.find(
+              c => c.cn === parentCn
+            );
+            const childCol = (await assocModel.getColumns())?.find(
+              c => c.cn === childCn
+            );
+
+            await Column.insert({
+              _cn: `${child._tn}MMRead`,
+              uidt: UITypes.LinkToAnotherRecord,
+              type: 'mm',
+
+              // ref_db_alias
+              fk_model_id: child.id,
+              // db_type:
+
+              fk_child_column_id: childPK.id,
+              fk_parent_column_id: parentPK.id,
+
+              fk_mm_model_id: assocModel.id,
+              fk_mm_child_column_id: childCol.id,
+              fk_mm_parent_column_id: parentCol.id
+            });
+            await Column.insert({
+              _cn: `${parent._tn}MMList`,
+
+              uidt: UITypes.LinkToAnotherRecord,
+              type: 'mm',
+
+              fk_model_id: parent.id,
+
+              fk_child_column_id: parentPK.id,
+              fk_parent_column_id: childPK.id,
+
+              fk_mm_model_id: assocModel.id,
+              fk_mm_child_column_id: parentCol.id,
+              fk_mm_parent_column_id: childCol.id
+            });
           }
         }
         break;
@@ -65,6 +329,11 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
           colBody.formula,
           table.columns
         );
+        await Column.insert({
+          ...colBody,
+          fk_model_id: table.id
+        });
+
         break;
       default:
         {
@@ -82,14 +351,13 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
 
           const sqlMgr = await ProjectMgrv2.getSqlMgr({ id: base.project_id });
           await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+          await Column.insert({
+            ...colBody,
+            fk_model_id: table.id
+          });
         }
         break;
     }
-
-    await Column.insert({
-      ...colBody,
-      fk_model_id: table.id
-    });
 
     await table.getColumns(true);
 

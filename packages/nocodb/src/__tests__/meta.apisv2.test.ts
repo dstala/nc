@@ -355,6 +355,208 @@ describe('Noco v2 Tests', function() {
       console.log(tableMetaAfterDel);
     });
   });
+
+  it('Table relation create', async function() {
+    this.timeout(120000);
+
+    const projectRes = await api.meta.projectCreate({
+      title: 'test',
+      bases: [
+        {
+          type: 'mysql2',
+          host: 'localhost',
+          port: 3306,
+          username: 'root',
+          password: 'password',
+          database: 'test_db_12345'
+        }
+      ]
+    });
+
+    const projectId = projectRes.data.id;
+    const baseId = projectRes.data.bases[0].id;
+
+    const { data: table1 } = await api.meta.tableCreate(projectId, baseId, {
+      tn: 'abc',
+      _tn: 'Abc',
+      columns: [
+        {
+          cn: 'id',
+          _cn: 'Id',
+          dt: 'int',
+          dtx: 'integer',
+          ct: 'int(11)',
+          nrqd: false,
+          rqd: true,
+          ck: false,
+          pk: true,
+          un: false,
+          ai: true,
+          cdf: null,
+          clen: null,
+          np: null,
+          ns: 0,
+          dtxp: '',
+          dtxs: '',
+          altered: 1,
+          uidt: 'ID',
+          uip: '',
+          uicn: ''
+        }
+      ]
+    });
+    const { data: table2 } = await api.meta.tableCreate(projectId, baseId, {
+      tn: 'def',
+      _tn: 'Def',
+      columns: [
+        {
+          cn: 'id',
+          _cn: 'Id',
+          dt: 'int',
+          dtx: 'integer',
+          ct: 'int(11)',
+          nrqd: false,
+          rqd: true,
+          ck: false,
+          pk: true,
+          un: false,
+          ai: true,
+          cdf: null,
+          clen: null,
+          np: null,
+          ns: 0,
+          dtxp: '',
+          dtxs: '',
+          altered: 1,
+          uidt: 'ID',
+          uip: '',
+          uicn: ''
+        }
+      ]
+    });
+
+    const { data: res } = await api.meta.columnCreate(
+      projectId,
+      baseId,
+      table1.id,
+      {
+        uidt: UITypes.LinkToAnotherRecord,
+        parentId: table1.id,
+        childId: table2.id,
+        type: 'hm',
+        _cn: 'test'
+      } as any
+    );
+    console.log(res);
+  });
+
+  it('Table relation(mm) create', async function() {
+    this.timeout(120000);
+
+    const projectRes = await api.meta.projectCreate({
+      title: 'test',
+      bases: [
+        {
+          type: 'mysql2',
+          host: 'localhost',
+          port: 3306,
+          username: 'root',
+          password: 'password',
+          database: 'test_db_12345'
+        }
+      ]
+    });
+
+    const projectId = projectRes.data.id;
+    const baseId = projectRes.data.bases[0].id;
+
+    const { data: table1 } = await api.meta.tableCreate(projectId, baseId, {
+      tn: 'abc',
+      _tn: 'Abc',
+      columns: [
+        {
+          cn: 'id',
+          _cn: 'Id',
+          dt: 'int',
+          dtx: 'integer',
+          ct: 'int(11)',
+          nrqd: false,
+          rqd: true,
+          ck: false,
+          pk: true,
+          un: false,
+          ai: true,
+          cdf: null,
+          clen: null,
+          np: null,
+          ns: 0,
+          dtxp: '',
+          dtxs: '',
+          altered: 1,
+          uidt: 'ID',
+          uip: '',
+          uicn: ''
+        }
+      ]
+    });
+    const { data: table2 } = await api.meta.tableCreate(projectId, baseId, {
+      tn: 'def',
+      _tn: 'Def',
+      columns: [
+        {
+          cn: 'id',
+          _cn: 'Id',
+          dt: 'int',
+          dtx: 'integer',
+          ct: 'int(11)',
+          nrqd: false,
+          rqd: true,
+          ck: false,
+          pk: true,
+          un: false,
+          ai: true,
+          cdf: null,
+          clen: null,
+          np: null,
+          ns: 0,
+          dtxp: '',
+          dtxs: '',
+          altered: 1,
+          uidt: 'ID',
+          uip: '',
+          uicn: ''
+        }
+      ]
+    });
+
+    const { data: res } = await api.meta.columnCreate(
+      projectId,
+      baseId,
+      table1.id,
+      {
+        uidt: UITypes.LinkToAnotherRecord,
+        parentId: table1.id,
+        childId: table2.id,
+        type: 'mm',
+        _cn: 'test'
+      } as any
+    );
+
+    console.log(res);
+
+    await api.data.create(projectId, baseId, table1.id, {
+      Title1: 'test1'
+    });
+    await api.data.create(projectId, baseId, table1.id, {
+      Title1: 'test2'
+    });
+    await api.data.create(projectId, baseId, table2.id, {
+      Title1: 'test3'
+    });
+
+    const { data } = await api.data.list(projectId, baseId, table1.id);
+    console.log(data);
+  });
 });
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd

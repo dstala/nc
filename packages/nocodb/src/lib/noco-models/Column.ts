@@ -88,6 +88,7 @@ export default class Column implements ColumnType {
     );
 
     await this.insertColOption(column, row.id);
+    return row;
   }
 
   private static async insertColOption<T>(
