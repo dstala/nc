@@ -1060,14 +1060,16 @@ export default {
         this.loadingProjects = true
         // console.log('projects', projects)
         // this.projects = projectsData.data.list.reverse();
-        this.projects = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-          {
-            query: {
-              skipProjectHasDb: 1
-            }
-          },
-          'projectList'
-        ])
+        // this.projects = await this.$store.dispatch('sqlMgr/ActSqlOp', [
+        //   {
+        //     query: {
+        //       skipProjectHasDb: 1
+        //     }
+        //   },
+        //   'projectList'
+        // ])
+
+        this.projects = (await this.$api.meta.projectList()).data.projects.list
 
         // todo: multiplex
         const user = this.$store.state.users.user
@@ -1099,7 +1101,7 @@ export default {
       this.loaded = true
     },
     async projectRouteHandler(project) {
-      if (!project.allowed) {
+      /*      if (!project.allowed) {
         this.$toast.info(`Contact following owner email to get project access : ${project.owner}`).goAway(5000)
         return
       }
@@ -1112,7 +1114,7 @@ export default {
           .goAway(5000)
         return
       }
-      this.$set(project, 'loading', true)
+      this.$set(project, 'loading', true) */
       if (!this.deleteBtnClicked) {
         await this.$router.push({
           path: `/nc/${project.id}`
@@ -1166,6 +1168,7 @@ export default {
               .success('Successfully exported metadata')
               .goAway(3000)
           } catch (e) {
+            console.log(e)
             this.$toast.error(e.message).goAway(3000)
           }
           this.dialogShow = false
@@ -1192,6 +1195,7 @@ export default {
             ])
             this.$toast.success('Metadata cleared successfully').goAway(3000)
           } catch (e) {
+            console.log(e)
             this.$toast.error(e.message).goAway(3000)
           }
           this.dialogShow = false
@@ -1223,6 +1227,7 @@ export default {
           this.$toast.success('Successfully imported metadata').goAway(3000)
           await this.projectsLoad()
         } catch (e) {
+          console.log(e)
           this.$toast.error(e.message).goAway(3000)
         }
         this.dialogShow = false

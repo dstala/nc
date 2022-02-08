@@ -282,15 +282,15 @@ export const actions = {
           }
         })
       } else {
-        const nodes = rootState.project
-          .list[0] // project
-          .children[0] //  environment
-          .children[0] // db
-          .children.find(n => n.type === 'tableDir') // parent node
-          .children
-        if (nodes && nodes[0]) {
-          tabs.push(nodes[0])
-        }
+        // const nodes = rootState.project
+        //   .list[0] // project
+        //   .children[0] //  environment
+        //   .children[0] // db
+        //   .children.find(n => n.type === 'tableDir') // parent node
+        //   .children
+        // if (nodes && nodes[0]) {
+        //   tabs.push(nodes[0])
+        // }
       }
     }
     commit('list', tabs)

@@ -1778,7 +1778,7 @@ export default {
     }
     await this.loadProjectsData(_id);
     this.loadDefaultTabs(true);
-    this.loadRoles();
+    // this.loadRoles();
   },
   beforeCreate() {
   },

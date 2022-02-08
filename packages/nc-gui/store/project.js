@@ -21,7 +21,8 @@ export const state = () => ({
   projectInfo: null,
   activeEnv: null,
   authDbAlias: null,
-  projectId: null
+  projectId: null,
+  project: null
 });
 
 export const mutations = {
@@ -52,6 +53,41 @@ export const mutations = {
     state.activeEnv = projects[0].workingEnv;
 
   },
+
+  project(state, val) {
+
+    const formattedProj = {
+      ...val,
+      projectJson: {
+        ...val,
+        envs: {
+          _noco: {
+            db: [{
+              ...val.bases[0],
+              client:val.bases[0].type,
+              connection:{
+                database:val.bases[0].database
+              },
+              meta:{
+
+              }
+            }]
+          }
+        }
+      }
+    }
+
+
+    const projects = [formattedProj]
+
+
+    Vue.set(state, "unserializedList", projects);
+
+    Vue.set(state, "list", treeViewDataSerializer(projects));
+
+    state.project = val
+  },
+
   setProjectJson(state, projJson) {
     // setProp(state, ['unserializedList', 0, 'projectJson'], projJson)
     Vue.set(state.unserializedList, "0", {...state.unserializedList[0], projectJson: projJson});
@@ -109,7 +145,7 @@ export const getters = {
 
 
   list(state) {
-    return state.list;
+    return state.list ;
   },
   currentProjectFolder(state) {
     // unserializedList.o.folder
@@ -133,7 +169,8 @@ export const getters = {
     //   'server', 'tool', state.unserializedList[0].projectJson.apisFolder);
   },
   GtrProjectJson(state) {
-    return state.unserializedList && state.unserializedList[0] ? state.unserializedList[0].projectJson : null;
+    // return state.unserializedList && state.unserializedList[0] ? state.unserializedList[0].projectJson : null;
+    return state.project
   },
   GtrProjectJsonUnserialized(state) {
     let data = JSON.parse(JSON.stringify(state.unserializedList && state.unserializedList[0] ? state.unserializedList[0].projectJson : null));
@@ -150,10 +187,10 @@ export const getters = {
     return data;
   },
   GtrProjectName(state) {
-    return state.unserializedList && state.unserializedList[0] ? state.unserializedList[0].projectJson.title : "__project__";
+    return state.project && state.project.title// state.unserializedList && state.unserializedList[0] ? state.unserializedList[0].projectJson.title : "__project__";
   },
   GtrProjectPrefix(state) {
-    return state.unserializedList && state.unserializedList[0] ? state.unserializedList[0].projectJson.prefix : null;
+    return state.project && state.project.prefix//state.unserializedList && state.unserializedList[0] ? state.unserializedList[0].projectJson.prefix : null;
   },
 
   GtrApiEnvironment(state) {
@@ -265,29 +302,30 @@ export const actions = {
       }, 5000)
     });
     try {
-      let data,projectId;
+      let data, projectId;
       if (this.$router.currentRoute && this.$router.currentRoute.params && this.$router.currentRoute.params.project_id) {
         commit('MutProjectId', projectId = this.$router.currentRoute.params.project_id)
-        await dispatch('users/ActGetProjectUserDetails', this.$router.currentRoute.params.project_id, {root: true});
-        data = await this.dispatch('sqlMgr/ActSqlOp', [null, 'PROJECT_READ_BY_WEB']); // unsearialized data
+        // await dispatch('users/ActGetProjectUserDetails', this.$router.currentRoute.params.project_id, {root: true});
+        // data = await this.dispatch('sqlMgr/ActSqlOp', [null, 'PROJECT_READ_BY_WEB']); // unsearialized data
       } else if (this.$router.currentRoute && this.$router.currentRoute.params && this.$router.currentRoute.params.shared_base_id) {
         const baseData = await this.dispatch('sqlMgr/ActSqlOp', [null, 'sharedBaseGet', {shared_base_id: this.$router.currentRoute.params.shared_base_id}]); // unsearialized data
         commit('MutProjectId', projectId = baseData.project_id)
-        data = await this.dispatch('sqlMgr/ActSqlOp', [{project_id: baseData.project_id}, 'PROJECT_READ_BY_WEB']); // unsearialized data
-        await dispatch('users/ActGetBaseUserDetails', this.$router.currentRoute.params.shared_base_id, {root: true});
+        // data = await this.dispatch('sqlMgr/ActSqlOp', [{project_id: baseData.project_id}, 'PROJECT_READ_BY_WEB']); // unsearialized data
+        // await dispatch('users/ActGetBaseUserDetails', this.$router.currentRoute.params.shared_base_id, {root: true});
       } else {
-        commit('MutProjectId',  null)
+        commit('MutProjectId', null)
         return
       }
-
-      commit("list", data.data.list);
+      data = (await this.$api.meta.projectRead(projectId)).data
+      commit("project", data);
       commit("meta/MutClear", null, {root: true});
-      commit("tabs/MutClearTabState",null, {root: true});
+      commit("tabs/MutClearTabState", null, {root: true});
       if (this.$ncApis) {
         this.$ncApis.clear();
         this.$ncApis.setProjectId(projectId);
       }
     } catch (e) {
+      console.log(e)
       this.$toast.error(e).goAway(3000);
       this.$router.push('/projects')
     }
@@ -308,22 +346,28 @@ export const actions = {
       //   dbAlias: data._nodes.dbAlias
       // });
       // const result = await client.tableList();
-      const result = await dispatch('sqlMgr/ActSqlOpPlus', [
-        {
-          env: data._nodes.env,
-          dbAlias: data._nodes.dbAlias
-        },
-        "xcTableAndViewList", {includeM2M: rootState.windows.includeM2M}
-      ], {root: true});
+      // const result = await dispatch('sqlMgr/ActSqlOpPlus', [
+      //   {
+      //     env: data._nodes.env,
+      //     dbAlias: data._nodes.dbAlias
+      //   },
+      //   "xcTableAndViewList", {includeM2M: rootState.windows.includeM2M}
+      // ], {root: true});
 
 
-      if (!result.data.list.length) {
-        this.$toast.info('No tables in this schema').goAway(2000);
-      }
+      const tables = (await this.$api.meta.tableList({
+        projectId: state.projectId,
+        baseId: state.project.bases[0].id
+      })).data.tables.list
 
-      result.data.list = result.data.list.filter(t => rootState.windows.metatables || !isMetaTable(t.tn));
-      console.log("tablelist", result.data.list);
-      deepSet(state.unserializedList, result.data.list, `${key}`);
+
+      // if (!result.data.list.length) {
+      //   this.$toast.info('No tables in this schema').goAway(2000);
+      // }
+
+      // result.data.list = result.data.list.filter(t => rootState.windows.metatables || !isMetaTable(t.tn));
+      console.log("tablelist", tables);
+      deepSet(state.unserializedList, tables, `${key}`);
       commit("list", state.unserializedList);
     } else {
       console.error("DB Not found for tables load fn");

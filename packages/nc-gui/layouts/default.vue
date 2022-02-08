@@ -1054,6 +1054,7 @@ export default {
         copyTextToClipboard(Object.entries(data).map(([k, v]) => `${k}: **${v}**`).join('\n'))
         this.$toast.info('Copied project info to clipboard').goAway(3000)
       } catch (e) {
+        console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
     }

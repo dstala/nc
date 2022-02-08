@@ -130,7 +130,7 @@ import DlgLabelSubmitCancel from '@/components/utils/dlgLabelSubmitCancel'
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'
 import listChildItemsModal
-  from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
+from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
 import { parseIfInteger } from '@/helpers'
 import ItemChip from '~/components/project/spreadsheet/components/virtualCell/components/itemChip'
 
@@ -187,10 +187,10 @@ export default {
       }
     },
     childMeta() {
-      return this.metas ? this.metas[this.mm.rtn] : this.$store.state.meta.metas[this.mm.rtn]
+      // return this.metas ? this.metas[this.mm.rtn] : this.$store.state.meta.metas[this.mm.rtn]
     },
     assocMeta() {
-      return this.metas ? this.metas[this.mm.vtn] : this.$store.state.meta.metas[this.mm.vtn]
+      // return this.metas ? this.metas[this.mm.vtn] : this.$store.state.meta.metas[this.mm.vtn]
     },
     // todo : optimize
     childApi() {
@@ -228,13 +228,13 @@ export default {
       //   : null
     },
     childPrimaryCol() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {})._cn
+      // return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {})._cn
     },
     childPrimaryKey() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {})._cn
+      // return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {})._cn
     },
     parentPrimaryKey() {
-      return this.meta && (this.meta.columns.find(c => c.pk) || {})._cn
+      // return this.meta && (this.meta.columns.find(c => c.pk) || {})._cn
     },
     childQueryParams() {
       if (!this.childMeta) { return {} }
@@ -348,7 +348,9 @@ export default {
         await this.$store.dispatch('meta/ActLoadMeta', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          tn: this.mm.rtn
+          // tn: this.mm.rtn,
+          id: this.column
+            .colOptions
         })
         // const parentTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,
@@ -365,7 +367,8 @@ export default {
         await this.$store.dispatch('meta/ActLoadMeta', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          tn: this.mm.vtn
+          id: this.column
+            .colOptions.fk_mm_model_id
         })
         // const assocTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,

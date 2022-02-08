@@ -16,7 +16,7 @@ export const mutations = {
 }
 
 export const actions = {
-  async ActLoadMeta({ state, commit, dispatch }, { tn, env = '_noco', dbAlias = 'db', force, project_id }) {
+  async ActLoadMeta({ state, commit, dispatch, rootState }, { tn, env = '_noco', dbAlias = 'db', force, project_id, ...rest }) {
     if (!force && state.loading[tn]) {
       return await new Promise((resolve) => {
         const unsubscribe = this.app.store.subscribe((s) => {
@@ -34,17 +34,20 @@ export const actions = {
       key: tn,
       value: true
     })
-    const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tn }], { root: true })
-    const meta = JSON.parse(model.meta)
+
+    const model = await this.$api.meta.tableRead(rootState.project.projectId, rootState.project.project.bases[0].id, rootState.project.unserializedList[0].projectJson.envs._noco.db[0].tables.find(t => t._tn === tn || t.tn === tn).id)
+    // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tn }], { root: true })
+    // const meta = JSON.parse(model.meta)
+
     commit('MutMeta', {
       key: tn,
-      value: meta
+      value: model.data
     })
     commit('MutLoading', {
       key: tn,
       value: undefined
     })
-    return force ? model : meta
+    return force ? model : model
   }
 }
 

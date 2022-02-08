@@ -6,7 +6,7 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
-import { Table, TableReq } from '../noco-client/Api';
+import { Table, TableReq } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
 
 export default class Model implements Table {

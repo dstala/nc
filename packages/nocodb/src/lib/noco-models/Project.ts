@@ -1,6 +1,6 @@
 import Base, { BaseBody } from '../noco-models/Base';
 import Noco from '../noco/Noco';
-import { Project as ProjectType } from '../noco-client/Api';
+import { Project as ProjectType } from 'nc-common';
 
 export default class Project implements ProjectType {
   public id: string;
@@ -45,7 +45,13 @@ export default class Project implements ProjectType {
 
   // @ts-ignore
   static async list(param): Promise<Project[]> {
-    //
+    const projectList = await Noco.ncMeta.metaList2(
+      null,
+      null,
+      'nc_projects_v2'
+    );
+
+    return projectList.map(m => new Project(m));
   }
   // @ts-ignore
   static async get(projectId: string): Promise<Project> {

@@ -8,7 +8,7 @@ import NcConfigFactory from '../lib/utils/NcConfigFactory';
 import express from 'express';
 import Noco from '../lib';
 import UITypes from '../lib/sqlUi/UITypes';
-import { Api } from '../lib/noco-client/Api';
+import { Api } from 'nc-common';
 
 const knex = require('knex');
 

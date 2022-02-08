@@ -343,10 +343,10 @@ function tableParser(data = [], dbKey, env, dbAlias, dbConnection) {
     const tableKey = `${tableDirKey}.${i}`;
     let json;
     json= {
-      type: table.type,
+      type: table.type || 'table',
       name: table._tn,
       tn: table.tn,
-      _tn: table._tn,
+      _tn: table._tn || table.tn,
       order: table.order,
       key: tableDirKey + "." + i,
       children: [],
@@ -363,6 +363,8 @@ function tableParser(data = [], dbKey, env, dbAlias, dbConnection) {
     };
     tables.children.push(json);
   }
+
+
 
   return tables;
 }

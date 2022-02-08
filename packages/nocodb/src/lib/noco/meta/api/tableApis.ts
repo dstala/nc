@@ -1,12 +1,7 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import {
-  Table,
-  TableList,
-  TableListParams,
-  TableReq
-} from '../../../noco-client/Api';
+import { Table, TableList, TableListParams, TableReq } from 'nc-common';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 

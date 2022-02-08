@@ -1,4 +1,5 @@
 import { mapGetters } from 'vuex'
+import { Api } from 'nc-common'
 
 export default {
   data() {
@@ -9,6 +10,11 @@ export default {
     }
   },
   computed: {
+    $api() {
+      return new Api({
+        baseURL: 'http://localhost:8080'
+      })
+    },
     dashboardUrl() {
       return `${location.origin}${location.pathname || ''}`
     },

@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Project from '../../../noco-models/Project';
-import { ProjectList, ProjectListParams } from '../../../noco-client/Api';
+import { ProjectList, ProjectListParams } from 'nc-common';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 // import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import syncMigration from './helpers/syncMigration';
@@ -19,19 +19,34 @@ import Noco from '../../Noco';
 
 export async function projectGet(
   req: Request<any, any, any, ProjectListParams>,
-  res: Response<ProjectList>
+  res: Response<Project>
 ) {
   console.log(req.query.page);
-  const projects = await Project.list({});
+  const project = await Project.getWithInfo(req.params.projectId);
 
-  res // todo: pagination
-    .json({
-      projects: new PagedResponseImpl(projects, {
-        totalRows: projects.length,
-        pageSize: 20,
-        page: 1
-      })
-    });
+  res.json(project);
+}
+export async function projectList(
+  req: Request<any, any, any, ProjectListParams>,
+  res: Response<ProjectList>,
+  next
+) {
+  try {
+    console.log(req.query.page);
+    const projects = await Project.list({});
+
+    res // todo: pagination
+      .json({
+        projects: new PagedResponseImpl(projects, {
+          totalRows: projects.length,
+          pageSize: 20,
+          page: 1
+        })
+      });
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
 }
 
 //
@@ -89,6 +104,9 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
     r._tn = getTableNameAlias(r.tn, project.prefix);
     r._rtn = getTableNameAlias(r.rtn, project.prefix);
   });
+  tables.forEach(t => {
+    t._tn = getTableNameAlias(t.tn, project.prefix);
+  });
 
   // await this.syncRelations();
 
@@ -136,7 +154,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       ).getObject();
       metasArr.push(meta);
 
-      await Model.insert(project.id, base.id, meta);
+      // await Model.insert(project.id, base.id, meta);
 
       /* create nc_models and its rows if it doesn't exists  */
       const { id: modelId } = await Noco.ncMeta.metaInsert2(
@@ -157,7 +175,16 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         });
       }
       virtualColumnsInsert.push(async () => {
+        const columnNames = {};
         for (const column of meta.v) {
+          // generate unique name if there is any duplicate column name
+          let c = 0;
+          while (`${column._cn}${c || ''}` in columnNames) {
+            c++;
+          }
+          column._cn = `${column._cn}${c || ''}`;
+          columnNames[column._cn] = true;
+
           const rel = column.hm || column.bt || column.mm;
 
           const rel_column_id = (await models2?.[rel.tn]?.getColumns())?.find(
@@ -351,4 +378,5 @@ async function getManyToManyRelations(
 const router = Router({ mergeParams: true });
 router.get('/:projectId', projectGet);
 router.post('/', projectCreate);
+router.get('/', projectList);
 export default router;

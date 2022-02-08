@@ -1649,22 +1649,38 @@ export default {
 
       this.projectReloading = true
 
-      const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-        {
-          query: {
-            skipProjectHasDb: 1
-          }
-        },
-        this.edit ? 'projectUpdateByWeb' : 'projectCreateByWeb',
-        {
-          project: {
-            title: projectJson.title,
-            folder: 'config.xc.json',
-            type: 'pg'
-          },
-          projectJson
-        }
-      ])
+      // const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [
+      //   {
+      //     query: {
+      //       skipProjectHasDb: 1
+      //     }
+      //   },
+      //   this.edit ? 'projectUpdateByWeb' : 'projectCreateByWeb',
+      //   {
+      //     project: {
+      //       title: projectJson.title,
+      //       folder: 'config.xc.json',
+      //       type: 'pg'
+      //     },
+      //     projectJson
+      //   }
+      // ])
+
+      //
+
+      const con = projectJson.envs._noco.db[0]
+
+      const result = (await this.$api.meta.projectCreate({
+        title: projectJson.title,
+        bases: [{
+          type: con.client,
+          database: con.connection.database,
+          host: con.connection.host,
+          port: con.connection.port,
+          username: con.connection.user,
+          password: con.connection.password
+        }]
+      })).data
 
       clearInterval(interv)
       toast.goAway(100)

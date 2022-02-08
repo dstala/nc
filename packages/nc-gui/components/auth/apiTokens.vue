@@ -159,6 +159,7 @@ export default {
         this.tokenObj = {}
         await this.loadApiTokens()
       } catch (e) {
+        console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
     },
@@ -168,6 +169,7 @@ export default {
         this.$toast.success('Token deleted successfully').goAway(3000)
         await this.loadApiTokens()
       } catch (e) {
+        console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
     }

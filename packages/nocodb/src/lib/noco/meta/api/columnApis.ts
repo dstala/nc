@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
-import { LinkToAnotherRecord, Table } from '../../../noco-client/Api';
+import { LinkToAnotherRecord, Table } from 'nc-common';
 import UITypes from '../../../sqlUi/UITypes';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Base from '../../../noco-models/Base';

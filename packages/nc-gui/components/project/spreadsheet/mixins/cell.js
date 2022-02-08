@@ -14,7 +14,7 @@ export default {
       return ui && ui.icon
     },
     abstractType() {
-      return this.sqlUi && this.sqlUi.getAbstractType(this.column)
+      return this.sqlUi && this.column.dt && this.sqlUi.getAbstractType(this.column)
     },
     dataTypeLow() {
       return this.column && this.column.dt && this.column.dt.toLowerCase()

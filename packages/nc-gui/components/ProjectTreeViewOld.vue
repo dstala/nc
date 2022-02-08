@@ -1112,7 +1112,7 @@ export default {
     }
   },
   async created() {
-    this.loadDefaultTabs();
+    // this.loadDefaultTabs();
     // this.instantiateSqlMgr();
     const _id = this.$route.params.project;
 
@@ -1120,7 +1120,7 @@ export default {
 
     }
     await this.loadProjectsData(_id);
-    this.loadDefaultTabs();
+    // this.loadDefaultTabs();
   },
   beforeCreate() {
   },

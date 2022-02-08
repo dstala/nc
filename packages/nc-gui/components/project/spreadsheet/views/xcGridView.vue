@@ -87,10 +87,13 @@
               offset-y
               z-index="99"
               left
-              content-class=""
             >
-              <template #activator="{on}">
-                <v-icon small v-on="on">
+              <template #activator="{on , attrs}">
+                <v-icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                >
                   mdi-plus
                 </v-icon>
               </template>
@@ -181,7 +184,7 @@
             @contextmenu="showRowContextMenu($event,rowObj,rowMeta,row,col, columnObj)"
           >
             <virtual-cell
-              v-if="columnObj.virtual"
+              v-if="columnObj.uidt === 'LinkToAnotherRecord'"
               :password="password"
               :is-public="isPublicView"
               :metas="metas"
@@ -605,7 +608,7 @@ export default {
       if (this.selected.row > 0) {
         this.selected.row--
       }
-    },    
+    },
     addNewRelationTab(...args) {
       this.$emit('addNewRelationTab', ...args)
     },
@@ -640,7 +643,7 @@ export default {
         (column && column.uidt === UITypes.DateTime) ||
         (column && column.uidt === UITypes.Date) ||
         (column && column.uidt === UITypes.Time) ||
-        (this.sqlUi && this.sqlUi.getAbstractType(column) === 'boolean')
+        (this.sqlUi && column.dt && this.sqlUi.getAbstractType((column)) === 'boolean')
       )
     },
     insertNewRow(atEnd = false, expand = false) {

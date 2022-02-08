@@ -58,7 +58,8 @@ export default {
     '@/plugins/globalEventBus',
     '@/plugins/ncApis',
     '~/plugins/i18n.js',
-    { src: '~plugins/projectLoader.js', ssr: false }
+    { src: '~plugins/projectLoader.js', ssr: false },
+    { src: '~plugins/api.js' }
   ],
   /*
   ** Auto import components

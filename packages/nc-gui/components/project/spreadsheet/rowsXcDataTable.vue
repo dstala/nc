@@ -289,7 +289,7 @@
           style="overflow: auto;width:100%"
         >
           <v-skeleton-loader v-if="!dataLoaded && loadingData || !meta" type="table" />
-          <template v-else-if="selectedView && (selectedView.type === 'table' || selectedView.show_as === 'grid' )">
+          <template v-else-if="true || selectedView && (selectedView.type === 'table' || selectedView.show_as === 'grid' )">
             <xc-grid-view
               :key="key + selectedViewId"
               ref="ncgridview"
@@ -309,7 +309,7 @@
               :data="data"
               :visible-col-length="visibleColLength"
               :meta="meta"
-              :is-virtual="selectedView.type === 'vtable'"
+              :is-virtual="selectedView && selectedView.type === 'vtable'"
               :api="api"
               :is-pk-avail="isPkAvail"
               @drop="onFileDrop"
@@ -837,29 +837,29 @@ export default {
       this.loadingMeta = true
       await this.loadMeta(false)
       this.loadingMeta = false
-      if (this.relationType === 'hm') {
-        this.filters.push({
-          field: this.meta.columns.find(c => c.cn === this.relation.cn)._cn,
-          op: 'is equal',
-          value: this.relationIdValue,
-          readOnly: true
-        })
-      } else if (this.relationType === 'bt') {
-        this.filters.push({
-          // field: this.relation.rcn,
-          field: this.meta.columns.find(c => c.cn === this.relation.rcn)._cn,
-          op: 'is equal',
-          value: this.relationIdValue,
-          readOnly: true
-        })
-      } else {
-        // await this.$refs.drawer.loadViews();
-        if (this.selectedView && this.selectedView.show_as === 'kanban') {
-          await this.loadKanbanData()
-        } else {
-          await this.loadTableData()
-        }
-      }
+      // if (this.relationType === 'hm') {
+      //   this.filters.push({
+      //     field: this.meta.columns.find(c => c.cn === this.relation.cn)._cn,
+      //     op: 'is equal',
+      //     value: this.relationIdValue,
+      //     readOnly: true
+      //   })
+      // } else if (this.relationType === 'bt') {
+      //   this.filters.push({
+      //     // field: this.relation.rcn,
+      //     field: this.meta.columns.find(c => c.cn === this.relation.rcn)._cn,
+      //     op: 'is equal',
+      //     value: this.relationIdValue,
+      //     readOnly: true
+      //   })
+      // } else {
+      // await this.$refs.drawer.loadViews();
+      // if (this.selectedView && this.selectedView.show_as === 'kanban') {
+      //   await this.loadKanbanData()
+      // } else {
+      await this.loadTableData()
+      // }
+      // }
       // this.mapFieldsAndShowFields()
     } catch (e) {
       console.log(e)
@@ -1254,15 +1254,21 @@ export default {
     async loadTableDataFn() {
       this.loadingData = true
       try {
-        if (this.api) {
-          const { list, count } = await this.api.paginatedList(this.queryParams)
-          this.count = count
-          this.data = list.map(row => ({
-            row,
-            oldRow: { ...row },
-            rowMeta: {}
-          }))
-        }
+        // if (this.api) {
+        // const { list, count } = await this.api.paginatedList(this.queryParams)
+        const data = await this.$api.data.list(
+          this.$store.state.project.projectId,
+          this.$store.state.project.project.bases[0].id,
+          this.meta.id
+        )
+
+        this.count = 25// count
+        this.data = data.data.map(row => ({
+          row,
+          oldRow: { ...row },
+          rowMeta: {}
+        }))
+        // }
       } catch (e) {
         console.log(e)
       }

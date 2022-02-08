@@ -9,7 +9,7 @@ import SingleSelectColumn from './SingleSelectColumn';
 import MultiSelectColumn from './MultiSelectColumn';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
-import { Column as ColumnType } from '../noco-client/Api';
+import { Column as ColumnType } from 'nc-common';
 
 export default class Column implements ColumnType {
   public fk_model_id: string;

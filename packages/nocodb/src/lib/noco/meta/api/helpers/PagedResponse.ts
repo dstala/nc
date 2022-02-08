@@ -1,4 +1,4 @@
-import { Paginated } from '../../../../noco-client/Api';
+import { Paginated } from 'nc-common';
 
 export class PagedResponseImpl<T> {
   constructor(list: T[], pageInfo?: Paginated) {
