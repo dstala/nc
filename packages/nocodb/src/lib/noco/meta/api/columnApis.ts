@@ -9,6 +9,7 @@ import { substituteColumnNameWithIdInFormula } from './helpers/formulaHelpers';
 import validateParams from './helpers/validateParams';
 
 import { customAlphabet } from 'nanoid';
+import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
 export enum Altered {
@@ -189,7 +190,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               });
             }
 
-            await Column.insert({
+            await Column.insert<LinkToAnotherRecordColumn>({
               _cn: `${parent._tn}Read`,
 
               fk_model_id: child.id,
@@ -199,7 +200,8 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               // db_type:
 
               fk_child_column_id: childColumn.id,
-              fk_parent_column_id: parent.primaryKey.id
+              fk_parent_column_id: parent.primaryKey.id,
+              fk_related_table_id: parent.id
             });
             await Column.insert({
               _cn: `${child._tn}List`,
@@ -207,7 +209,8 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               uidt: UITypes.LinkToAnotherRecord,
               type: 'hm',
               fk_child_column_id: childColumn.id,
-              fk_parent_column_id: parent.primaryKey.id
+              fk_parent_column_id: parent.primaryKey.id,
+              fk_related_table_id: child.id
             });
           } else if (req.body.type === 'mm') {
             const aTn = `${project?.prefix ?? ''}_nc_m2m_${randomID()}`;
@@ -303,7 +306,8 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
 
               fk_mm_model_id: assocModel.id,
               fk_mm_child_column_id: childCol.id,
-              fk_mm_parent_column_id: parentCol.id
+              fk_mm_parent_column_id: parentCol.id,
+              fk_related_table_id: child.id
             });
             await Column.insert({
               _cn: `${parent._tn}MMList`,
@@ -318,7 +322,8 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
 
               fk_mm_model_id: assocModel.id,
               fk_mm_child_column_id: parentCol.id,
-              fk_mm_parent_column_id: childCol.id
+              fk_mm_parent_column_id: childCol.id,
+              fk_related_table_id: parent.id
             });
           }
         }

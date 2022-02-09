@@ -3,6 +3,7 @@ import Model from '../../../noco-models/Model';
 import { nocoExecute } from '../../noco-resolver/NocoExecute';
 import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
+import { PagedResponseImpl } from './helpers/PagedResponse';
 
 export async function dataList(req: Request, res: Response, next) {
   try {
@@ -42,9 +43,19 @@ export async function dataList(req: Request, res: Response, next) {
         req.query
       )
     )?.[key];
+
+    const count = await baseModel.count(req.query);
+
     console.timeEnd('nocoExecute');
 
-    res.json(data);
+    res.json({
+      data: new PagedResponseImpl(data, {
+        // todo:
+        totalRows: count,
+        pageSize: 25,
+        page: 1
+      })
+    });
   } catch (e) {
     console.log(e);
     res.status(500).json({ msg: e.message });

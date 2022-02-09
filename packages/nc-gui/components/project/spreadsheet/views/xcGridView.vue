@@ -82,36 +82,37 @@
             class="grey-border new-column-header pointer  nc-grid-header-cell"
             @click="addNewColMenu = true"
           >
-            <!--            <edit-column
+            <edit-column
               v-if="addNewColMenu"
               :meta="meta"
               :nodes="nodes"
               :sql-ui="sqlUi"
               @close="addNewColMenu = false"
               @saved="onNewColCreation"
-            />-->
+            />
             <v-icon
               small
+              @click="addNewColMenu = true"
             >
               mdi-plus
             </v-icon>
-            <v-menu
-              v-model="addNewColMenu"
-              offset-y
-              content-class=""
-              left
-            >
-              <template #activator="{on}">
-                <span v-on="on" />
-              </template>
-              <edit-column
-                :meta="meta"
-                :nodes="nodes"
-                :sql-ui="sqlUi"
-                @close="addNewColMenu = false"
-                @saved="onNewColCreation"
-              />
-            </v-menu>
+            <!--            <v-menu-->
+            <!--              v-model="addNewColMenu"-->
+            <!--              offset-y-->
+            <!--              content-class=""-->
+            <!--              left-->
+            <!--            >-->
+            <!--              <template #activator="{on}">-->
+            <!--                <span v-on="on" />-->
+            <!--              </template>-->
+            <!--              <edit-column-->
+            <!--                :meta="meta"-->
+            <!--                :nodes="nodes"-->
+            <!--                :sql-ui="sqlUi"-->
+            <!--                @close="addNewColMenu = false"-->
+            <!--                @saved="onNewColCreation"-->
+            <!--              />-->
+            <!--            </v-menu>-->
           </th>
         </tr>
       </thead>

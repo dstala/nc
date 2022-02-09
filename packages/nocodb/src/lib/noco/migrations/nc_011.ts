@@ -9,7 +9,7 @@ const up = async knex => {
     table.string('color');
     table.boolean('deleted');
     table.boolean('is_meta');
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
   });
 
@@ -76,7 +76,7 @@ const up = async knex => {
     table.boolean('pinned');
 
     table.boolean('deleted');
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
     table.index(['db_alias', 'tn']);
   });
@@ -131,7 +131,7 @@ const up = async knex => {
 
     table.boolean('deleted');
     table.boolean('visible').defaultTo(true);
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
   });
 
@@ -204,8 +204,15 @@ const up = async knex => {
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references('nc_columns_v2.id');
 
+    table.string('fk_related_table_id', 20);
+    table.foreign('fk_related_table_id').references('nc_models_v2.id');
+
+    // fk_rel_column_id
+    // fk_rel_ref_column_id
+
     table.string('fk_child_column_id', 20);
     table.foreign('fk_child_column_id').references('nc_columns_v2.id');
+
     table.string('fk_parent_column_id', 20);
     table.foreign('fk_parent_column_id').references('nc_columns_v2.id');
 
@@ -222,7 +229,7 @@ const up = async knex => {
     table.string('fk_index_name');
 
     table.boolean('deleted');
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
     // table.index(['db_alias', 'tn']);
   });
@@ -243,7 +250,7 @@ const up = async knex => {
     table.string('title');
     table.string('color');
 
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
     // table.index(['db_alias', 'tn']);
   });
@@ -274,7 +281,7 @@ const up = async knex => {
     table.foreign('fk_lookup_column_id').references('nc_columns_v2.id');
     table.boolean('deleted');
 
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
   });
   await knex.schema.createTable('nc_col_rollup_v2', table => {
@@ -302,7 +309,7 @@ const up = async knex => {
     table.foreign('fk_rollup_column_id').references('nc_columns_v2.id');
     table.string('rollup_function');
     table.boolean('deleted');
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
   });
   await knex.schema.createTable('nc_col_formula_v2', table => {
@@ -321,7 +328,7 @@ const up = async knex => {
     table.text('formula').notNullable();
 
     table.boolean('deleted');
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
   });
 
@@ -353,7 +360,7 @@ const up = async knex => {
     table.string('value');
     table.boolean('is_group');
 
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
     table.index(['db_alias', 'tn']);
   });
@@ -379,7 +386,7 @@ const up = async knex => {
     // table.string('_cn');
 
     table.string('direction').defaultTo(false);
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
     table.index(['db_alias']);
   });
@@ -405,7 +412,7 @@ const up = async knex => {
     table.string('password');
 
     table.boolean('deleted');
-    table.integer('order');
+    table.float('order');
     table.timestamps(true, true);
   });
 
@@ -476,7 +483,7 @@ const up = async knex => {
     table.string('label');
     table.string('help');
     table.boolean('required');
-    table.integer('order');
+    table.float('order');
 
     // todo : condition
 
@@ -797,7 +804,7 @@ const up = async knex => {
   //   table.string('type');
   //   table.text('handler', 'text');
   //   table.text('acl', 'text');
-  //   table.integer('order');
+  //   table.float('order');
   //   table.text('functions');
   //   table.integer('handler_type').defaultTo(1);
   //   table.boolean('is_custom');
@@ -844,7 +851,7 @@ const up = async knex => {
   //   table.string('tnp');
   //   table.string('tnc');
   //   table.string('relation_type');
-  //   table.integer('order');
+  //   table.float('order');
   //
   //   table.string('type');
   //   table.text('acl', 'text');

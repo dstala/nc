@@ -11,16 +11,19 @@ export default class LinkToAnotherRecordColumn {
   fk_mm_model_id?: string;
   fk_mm_child_column_id?: string;
   fk_mm_parent_column_id?: string;
+  fk_related_table_id?: string;
+
   type: 'hm' | 'bt' | 'mm';
   virtual = false;
 
-  mmModel: Model;
-  // childModel: Model;
-  // parentModel: Model;
-  mmChildColumn: Column;
-  mmParentColumn: Column;
-  childColumn: Column;
-  parentColumn: Column;
+  mmModel?: Model;
+  relatedTable?: Model;
+  // childModel?: Model;
+  // parentModel?: Model;
+  mmChildColumn?: Column;
+  mmParentColumn?: Column;
+  childColumn?: Column;
+  parentColumn?: Column;
 
   constructor(data: NcColumn) {
     Object.assign(this, data);
@@ -50,6 +53,11 @@ export default class LinkToAnotherRecordColumn {
   }
   public async getMMModel(): Promise<Model> {
     return (this.mmModel = await Model.get({ id: this.fk_mm_model_id }));
+  }
+  public async getRelatedTable(): Promise<Model> {
+    return (this.relatedTable = await Model.get({
+      id: this.fk_related_table_id
+    }));
   }
 
   public static async insert(model: NcColumn | any) {

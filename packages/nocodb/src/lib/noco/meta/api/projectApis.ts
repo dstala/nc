@@ -14,6 +14,7 @@ import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import getTableNameAlias from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import Noco from '../../Noco';
+import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 
 // // Project CRUD
 
@@ -164,14 +165,19 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         {
           tn: table.tn,
           _tn: meta._tn,
-          type: table.type || 'table'
+          type: table.type || 'table',
+          order: table.order
         }
       );
       models2[table.tn] = await Model.get({ id: modelId });
+
+      let colOrder = 1;
+
       for (const column of meta.columns) {
         await Column.insert({
           fk_model_id: modelId,
-          ...column
+          ...column,
+          order: colOrder++
         });
       }
       virtualColumnsInsert.push(async () => {
@@ -190,9 +196,14 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
           const rel_column_id = (await models2?.[rel.tn]?.getColumns())?.find(
             c => c.cn === rel.cn
           )?.id;
+
+          const tnId = models2?.[rel.tn]?.id;
+
           const ref_rel_column_id = (
             await models2?.[rel.rtn]?.getColumns()
           )?.find(c => c.cn === rel.rcn)?.id;
+
+          const rtnId = models2?.[rel.rtn]?.id;
 
           let fk_mm_model_id;
           let fk_mm_child_column_id;
@@ -208,7 +219,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
             )?.find(c => c.cn === rel.vrcn)?.id;
           }
           try {
-            await Column.insert({
+            await Column.insert<LinkToAnotherRecordColumn>({
               project_id: project.id,
               db_alias: base.id,
               fk_model_id: modelId,
@@ -224,7 +235,9 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
               dr: rel.dr,
               fk_mm_model_id,
               fk_mm_child_column_id,
-              fk_mm_parent_column_id
+              fk_mm_parent_column_id,
+              order: colOrder++,
+              fk_related_table_id: column.hm ? tnId : rtnId
             });
           } catch (e) {
             console.log(e);

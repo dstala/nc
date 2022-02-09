@@ -96,7 +96,12 @@ export default class Model implements Table {
       modelList = await Noco.ncMeta.metaList2(
         project_id,
         db_alias,
-        'nc_models_v2'
+        'nc_models_v2',
+        {
+          orderBy: {
+            order: 'asc'
+          }
+        }
       );
 
       for (const model of modelList) {

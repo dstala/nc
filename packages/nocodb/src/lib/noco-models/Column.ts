@@ -43,6 +43,8 @@ export default class Column implements ColumnType {
   public colOptions: any;
   public model: Model;
 
+  public order: number;
+
   constructor(data: NcColumn) {
     Object.assign(this, data);
   }
@@ -83,7 +85,8 @@ export default class Column implements ColumnType {
         dtxp: column.dtxp,
         dtxs: column.dtxs,
         au: column.au,
-        pv: column.pv
+        pv: column.pv,
+        order: column.order
       }
     );
 
@@ -149,7 +152,8 @@ export default class Column implements ColumnType {
             ur: column.ur,
             dr: column.dr,
 
-            fk_index_name: column.fk_index_name
+            fk_index_name: column.fk_index_name,
+            fk_related_table_id: column.fk_related_table_id
           }
         );
         break;
@@ -299,6 +303,9 @@ export default class Column implements ColumnType {
       columnsList = await Noco.ncMeta.metaList2(null, null, 'nc_columns_v2', {
         condition: {
           fk_model_id
+        },
+        orderBy: {
+          order: 'asc'
         }
       });
       for (const column of columnsList) {

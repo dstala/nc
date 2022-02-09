@@ -142,7 +142,7 @@ import Pagination from '@/components/project/spreadsheet/components/pagination'
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'
 import listChildItemsModal
-  from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
+from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
 import { parseIfInteger } from '@/helpers'
 import ItemChip from '~/components/project/spreadsheet/components/virtualCell/components/itemChip'
 
@@ -195,15 +195,15 @@ export default {
   }),
   computed: {
     childMeta() {
-      return this.metas ? this.metas[this.hm.tn] : this.$store.state.meta.metas[this.hm.tn]
+      return this.metas ? this.metas[this.hm.tn] : this.$store.state.meta.metas[this.column.colOptions.fk_related_table_id]
     },
     // todo : optimize
     childApi() {
-      return this.childMeta && this.$ncApis.get({
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias,
-        table: this.childMeta.tn
-      })
+      // return this.childMeta && this.$ncApis.get({
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias,
+      //   table: this.childMeta.tn
+      // })
       // return this.childMeta && this.childMeta._tn
       //   ? ApiFactory.create(this.$store.getters['project/GtrProjectType'],
       //     this.childMeta && this.childMeta._tn, this.childMeta && this.childMeta.columns, this, this.childMeta)
@@ -330,7 +330,7 @@ export default {
         await this.$store.dispatch('meta/ActLoadMeta', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          tn: this.hm.tn
+          id: this.column.colOptions.fk_related_table_id
         })
         // const childTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,

@@ -58,7 +58,7 @@ class BaseModelSqlv2 {
   }
 
   public async list(
-    args: { where?: string; limit? } = {},
+    args: { where?: string; limit?; offset? } = {},
     ignoreFilterSort = false
   ): Promise<any> {
     const { where, ...rest } = this._getListArgs(args);
@@ -354,6 +354,44 @@ class BaseModelSqlv2 {
           break;
       }
     }*/
+  }
+
+  public async count(
+    args: { where?: string; limit? } = {},
+    ignoreFilterSort = false
+  ): Promise<any> {
+    await this.model.getColumns();
+    const { where } = this._getListArgs(args);
+
+    const qb = this.dbDriver(this.model.tn);
+
+    qb.xwhere(where);
+
+    /*    await qb.conditionv2(
+          await Filter.getFilterObject({ modelId: this.model.id })
+        );*/
+    if (!ignoreFilterSort) {
+      await conditionV2(
+        await Filter.getFilter({ modelId: this.model.id }),
+        qb,
+        this.dbDriver
+      );
+
+      // await sortV2(
+      //   await Sort.list({ modelId: this.model.id }),
+      //   qb,
+      //   this.dbDriver
+      // );
+      // this._paginateAndSort(qb, rest);
+    }
+
+    qb.count(this.model.primaryKey.cn, {
+      as: 'count'
+    }).first();
+
+    console.log(qb.toQuery());
+
+    return ((await qb) as any).count;
   }
 
   /*  private async select(qb) {

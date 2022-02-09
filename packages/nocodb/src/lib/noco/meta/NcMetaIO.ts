@@ -149,6 +149,7 @@ export default abstract class NcMetaIO {
       offset?: number;
       xcCondition?: XcCondition;
       fields?: string[];
+      orderBy?: { [key: string]: 'asc' | 'desc' };
     }
   ): Promise<any[]>;
 

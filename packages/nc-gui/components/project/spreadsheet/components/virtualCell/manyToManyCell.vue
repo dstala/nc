@@ -187,18 +187,18 @@ export default {
       }
     },
     childMeta() {
-      // return this.metas ? this.metas[this.mm.rtn] : this.$store.state.meta.metas[this.mm.rtn]
+      return this.metas ? this.metas[this.column.colOptions.fk_related_table_id] : this.$store.state.meta.metas[this.column.colOptions.fk_related_table_id]
     },
     assocMeta() {
-      // return this.metas ? this.metas[this.mm.vtn] : this.$store.state.meta.metas[this.mm.vtn]
+      return this.metas ? this.metas[this.column.colOptions.fk_mm_model_id] : this.$store.state.meta.metas[this.column.colOptions.fk_mm_model_id]
     },
     // todo : optimize
     childApi() {
-      return this.childMeta && this.$ncApis.get({
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias,
-        table: this.childMeta.tn
-      })
+      // return this.childMeta && this.$ncApis.get({
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias,
+      //   id: this.column.colOptions.fk_related_table_id
+      // })
       //
       // return this.childMeta && this.childMeta._tn
       //   ? ApiFactory.create(
@@ -212,11 +212,11 @@ export default {
     },
     // todo : optimize
     assocApi() {
-      return this.childMeta && this.$ncApis.get({
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias,
-        table: this.assocMeta.tn
-      })
+      // return this.childMeta && this.$ncApis.get({
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias,
+      //   id: this.column.colOptions.fk_mm_model_id
+      // })
       // return this.assocMeta && this.assocMeta._tn
       //   ? ApiFactory.create(
       //     this.$store.getters['project/GtrProjectType'],
@@ -228,13 +228,13 @@ export default {
       //   : null
     },
     childPrimaryCol() {
-      // return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {})._cn
     },
     childPrimaryKey() {
-      // return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {})._cn
     },
     parentPrimaryKey() {
-      // return this.meta && (this.meta.columns.find(c => c.pk) || {})._cn
+      return this.meta && (this.meta.columns.find(c => c.pk) || {})._cn
     },
     childQueryParams() {
       if (!this.childMeta) { return {} }
@@ -349,8 +349,7 @@ export default {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
           // tn: this.mm.rtn,
-          id: this.column
-            .colOptions
+          id: this.column.colOptions.fk_related_table_id
         })
         // const parentTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,
@@ -367,8 +366,7 @@ export default {
         await this.$store.dispatch('meta/ActLoadMeta', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          id: this.column
-            .colOptions.fk_mm_model_id
+          id: this.column.colOptions.fk_mm_model_id
         })
         // const assocTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,

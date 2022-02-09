@@ -16,13 +16,21 @@ export const mutations = {
 }
 
 export const actions = {
-  async ActLoadMeta({ state, commit, dispatch, rootState }, { tn, env = '_noco', dbAlias = 'db', force, project_id, ...rest }) {
-    if (!force && state.loading[tn]) {
+  async ActLoadMeta({ state, commit, dispatch, rootState }, {
+    tn,
+    env = '_noco',
+    dbAlias = 'db',
+    force,
+    // eslint-disable-next-line camelcase
+    project_id,
+    id
+  }) {
+    if (!force && state.loading[tn || id]) {
       return await new Promise((resolve) => {
         const unsubscribe = this.app.store.subscribe((s) => {
-          if (s.type === 'meta/MutLoading' && s.payload.key === tn && !s.payload.value) {
+          if (s.type === 'meta/MutLoading' && s.payload.key === (id || tn) && !s.payload.value) {
             unsubscribe()
-            resolve(state.metas[tn])
+            resolve(state.metas[tn || id])
           }
         })
       })
@@ -30,21 +38,37 @@ export const actions = {
     if (!force && state.metas[tn]) {
       return state.metas[tn]
     }
+    if (!force && state.metas[id]) {
+      return state.metas[id]
+    }
     commit('MutLoading', {
-      key: tn,
+      key: tn || id,
       value: true
     })
 
-    const model = await this.$api.meta.tableRead(rootState.project.unserializedList[0].projectJson.envs._noco.db[0].tables.find(t => t._tn === tn || t.tn === tn).id)
+    const model = await this.$api.meta.tableRead(
+      id ||
+      rootState
+        .project
+        .unserializedList[0]
+        .projectJson
+        .envs
+        ._noco
+        .db[0]
+        .tables.find(t => t._tn === tn || t.tn === tn).id
+    )
     // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tn }], { root: true })
     // const meta = JSON.parse(model.meta)
-
     commit('MutMeta', {
-      key: tn,
+      key: model.data.tn,
+      value: model.data
+    })
+    commit('MutMeta', {
+      key: model.data.id,
       value: model.data
     })
     commit('MutLoading', {
-      key: tn,
+      key: tn || id,
       value: undefined
     })
     return force ? model : model

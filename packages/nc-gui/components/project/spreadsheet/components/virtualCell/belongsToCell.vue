@@ -131,7 +131,8 @@ export default {
     disabledColumns: Object,
     isPublic: Boolean,
     metas: Object,
-    password: String
+    password: String,
+    column: Object
   },
   data: () => ({
     newRecordModal: false,
@@ -150,15 +151,15 @@ export default {
   }),
   computed: {
     parentMeta() {
-      return this.metas ? this.metas[this.bt.rtn] : this.$store.state.meta.metas[this.bt.rtn]
+      return this.metas ? this.metas[this.column.colOptions.fk_related_table_id] : this.$store.state.meta.metas[this.column.colOptions.fk_related_table_id]
     },
     // todo : optimize
     parentApi() {
-      return this.parentMeta && this.$ncApis.get({
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias,
-        table: this.parentMeta.tn
-      })
+      // return this.parentMeta && this.$ncApis.get({
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias,
+      //   table: this.parentMeta.tn
+      // })
       // return this.parentMeta && this.parentMeta._tn
       //   ? ApiFactory.create(this.$store.getters['project/GtrProjectType'],
       //     this.parentMeta && this.parentMeta._tn, this.parentMeta && this.parentMeta.columns, this, this.parentMeta)
@@ -299,7 +300,7 @@ export default {
         await this.$store.dispatch('meta/ActLoadMeta', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          tn: this.bt.rtn
+          id: this.column.colOptions.fk_related_table_id
         })
         // const parentTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,
