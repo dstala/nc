@@ -35,7 +35,7 @@ export const actions = {
       value: true
     })
 
-    const model = await this.$api.meta.tableRead(rootState.project.projectId, rootState.project.project.bases[0].id, rootState.project.unserializedList[0].projectJson.envs._noco.db[0].tables.find(t => t._tn === tn || t.tn === tn).id)
+    const model = await this.$api.meta.tableRead(rootState.project.unserializedList[0].projectJson.envs._noco.db[0].tables.find(t => t._tn === tn || t.tn === tn).id)
     // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tn }], { root: true })
     // const meta = JSON.parse(model.meta)
 

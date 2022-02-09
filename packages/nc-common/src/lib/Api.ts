@@ -819,16 +819,11 @@ export class Api<
      *
      * @tags Meta
      * @name TableRead
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}
+     * @request GET:/tables/{tableId}
      */
-    tableRead: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    tableRead: (tableId: string, params: RequestParams = {}) =>
       this.request<TableInfo, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}`,
+        path: `/tables/${tableId}`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -839,16 +834,11 @@ export class Api<
      *
      * @tags Meta
      * @name TableUpdate
-     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}
+     * @request PUT:/tables/{tableId}
      */
-    tableUpdate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    tableUpdate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}`,
+        path: `/tables/${tableId}`,
         method: 'PUT',
         ...params,
       }),
@@ -858,16 +848,11 @@ export class Api<
      *
      * @tags Meta
      * @name TableDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}
+     * @request DELETE:/tables/{tableId}
      */
-    tableDelete: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    tableDelete: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}`,
+        path: `/tables/${tableId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -878,16 +863,11 @@ export class Api<
      * @tags Meta
      * @name ColumnList
      * @summary Column List
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/columns
+     * @request GET:/tables/{tableId}/columns
      */
-    columnList: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    columnList: (tableId: string, params: RequestParams = {}) =>
       this.request<ColumnList, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns`,
+        path: `/tables/${tableId}/columns`,
         method: 'GET',
         ...params,
       }),
@@ -898,17 +878,11 @@ export class Api<
      * @tags Meta
      * @name ColumnCreate
      * @summary Column create
-     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/columns
+     * @request POST:/tables/{tableId}/columns
      */
-    columnCreate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      data: Column,
-      params: RequestParams = {}
-    ) =>
+    columnCreate: (tableId: string, data: Column, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns`,
+        path: `/tables/${tableId}/columns`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -921,17 +895,15 @@ export class Api<
      * @tags Meta
      * @name ColumnRead
      * @summary Column Read
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/columns/{columnId}
+     * @request GET:/tables/{tableId}/columns/{columnId}
      */
     columnRead: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       columnId: string,
       params: RequestParams = {}
     ) =>
       this.request<Column, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns/${columnId}`,
+        path: `/tables/${tableId}/columns/${columnId}`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -943,18 +915,16 @@ export class Api<
      * @tags Meta
      * @name ColumnUpdate
      * @summary Column Update
-     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/columns/{columnId}
+     * @request PUT:/tables/{tableId}/columns/{columnId}
      */
     columnUpdate: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       columnId: string,
       data: Column,
       params: RequestParams = {}
     ) =>
       this.request<Column, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns/${columnId}`,
+        path: `/tables/${tableId}/columns/${columnId}`,
         method: 'PUT',
         body: data,
         type: ContentType.Json,
@@ -967,17 +937,15 @@ export class Api<
      *
      * @tags Meta
      * @name ColumnDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/columns/{columnId}
+     * @request DELETE:/tables/{tableId}/columns/{columnId}
      */
     columnDelete: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       columnId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/columns/${columnId}`,
+        path: `/tables/${tableId}/columns/${columnId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -987,16 +955,11 @@ export class Api<
      *
      * @tags Meta
      * @name FilterRead
-     * @request GET:/projects/{projectId}/{baseId}/views/{viewId}/filters
+     * @request GET:/views/{viewId}/filters
      */
-    filterRead: (
-      projectId: string,
-      baseId: string,
-      viewId: string,
-      params: RequestParams = {}
-    ) =>
+    filterRead: (viewId: string, params: RequestParams = {}) =>
       this.request<FilterList, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewId}/filters`,
+        path: `/views/${viewId}/filters`,
         method: 'GET',
         ...params,
       }),
@@ -1006,16 +969,11 @@ export class Api<
      *
      * @tags Meta
      * @name FilterCreate
-     * @request POST:/projects/{projectId}/{baseId}/views/{viewId}/filters
+     * @request POST:/views/{viewId}/filters
      */
-    filterCreate: (
-      projectId: string,
-      baseId: string,
-      viewId: string,
-      params: RequestParams = {}
-    ) =>
+    filterCreate: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewId}/filters`,
+        path: `/views/${viewId}/filters`,
         method: 'POST',
         ...params,
       }),
@@ -1025,16 +983,11 @@ export class Api<
      *
      * @tags Meta
      * @name SortList
-     * @request GET:/projects/{projectId}/{baseId}/views/{viewId}/sorts
+     * @request GET:/views/{viewId}/sorts
      */
-    sortList: (
-      projectId: string,
-      baseId: string,
-      viewId: string,
-      params: RequestParams = {}
-    ) =>
+    sortList: (viewId: string, params: RequestParams = {}) =>
       this.request<SortList, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts`,
+        path: `/views/${viewId}/sorts`,
         method: 'GET',
         ...params,
       }),
@@ -1044,16 +997,11 @@ export class Api<
      *
      * @tags Meta
      * @name SortCreate
-     * @request POST:/projects/{projectId}/{baseId}/views/{viewId}/sorts
+     * @request POST:/views/{viewId}/sorts
      */
-    sortCreate: (
-      projectId: string,
-      baseId: string,
-      viewId: string,
-      params: RequestParams = {}
-    ) =>
+    sortCreate: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts`,
+        path: `/views/${viewId}/sorts`,
         method: 'POST',
         ...params,
       }),
@@ -1063,17 +1011,15 @@ export class Api<
      *
      * @tags Meta
      * @name FilterGet
-     * @request GET:/projects/{projectId}/{baseId}/views/{viewsId}/filters/{filterId}
+     * @request GET:/views/{viewsId}/filters/{filterId}
      */
     filterGet: (
-      projectId: string,
-      baseId: string,
       filterId: string,
       viewsId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewsId}/filters/${filterId}`,
+        path: `/views/${viewsId}/filters/${filterId}`,
         method: 'GET',
         ...params,
       }),
@@ -1083,17 +1029,15 @@ export class Api<
      *
      * @tags Meta
      * @name FilterUpdate
-     * @request PUT:/projects/{projectId}/{baseId}/views/{viewsId}/filters/{filterId}
+     * @request PUT:/views/{viewsId}/filters/{filterId}
      */
     filterUpdate: (
-      projectId: string,
-      baseId: string,
       filterId: string,
       viewsId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewsId}/filters/${filterId}`,
+        path: `/views/${viewsId}/filters/${filterId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1103,17 +1047,15 @@ export class Api<
      *
      * @tags Meta
      * @name FilterDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/views/{viewsId}/filters/{filterId}
+     * @request DELETE:/views/{viewsId}/filters/{filterId}
      */
     filterDelete: (
-      projectId: string,
-      baseId: string,
       filterId: string,
       viewsId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewsId}/filters/${filterId}`,
+        path: `/views/${viewsId}/filters/${filterId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1123,17 +1065,11 @@ export class Api<
      *
      * @tags Meta
      * @name SortGet
-     * @request GET:/projects/{projectId}/{baseId}/views/{viewId}/sorts/{sortId}
+     * @request GET:/views/{viewId}/sorts/{sortId}
      */
-    sortGet: (
-      projectId: string,
-      baseId: string,
-      sortId: string,
-      viewId: string,
-      params: RequestParams = {}
-    ) =>
+    sortGet: (sortId: string, viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts/${sortId}`,
+        path: `/views/${viewId}/sorts/${sortId}`,
         method: 'GET',
         ...params,
       }),
@@ -1143,17 +1079,11 @@ export class Api<
      *
      * @tags Meta
      * @name SortUpdate
-     * @request PUT:/projects/{projectId}/{baseId}/views/{viewId}/sorts/{sortId}
+     * @request PUT:/views/{viewId}/sorts/{sortId}
      */
-    sortUpdate: (
-      projectId: string,
-      baseId: string,
-      sortId: string,
-      viewId: string,
-      params: RequestParams = {}
-    ) =>
+    sortUpdate: (sortId: string, viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts/${sortId}`,
+        path: `/views/${viewId}/sorts/${sortId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1163,17 +1093,11 @@ export class Api<
      *
      * @tags Meta
      * @name SortDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/views/{viewId}/sorts/{sortId}
+     * @request DELETE:/views/{viewId}/sorts/{sortId}
      */
-    sortDelete: (
-      projectId: string,
-      baseId: string,
-      sortId: string,
-      viewId: string,
-      params: RequestParams = {}
-    ) =>
+    sortDelete: (sortId: string, viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/views/${viewId}/sorts/${sortId}`,
+        path: `/views/${viewId}/sorts/${sortId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1183,17 +1107,15 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookGet
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks/{webhookId}
+     * @request GET:tables/{tableId}/webhooks/{webhookId}
      */
     webhookGet: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       webhookId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks/${webhookId}`,
+        path: `tables/${tableId}/webhooks/${webhookId}`,
         method: 'GET',
         ...params,
       }),
@@ -1203,17 +1125,15 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookUpdate
-     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks/{webhookId}
+     * @request PUT:tables/{tableId}/webhooks/{webhookId}
      */
     webhookUpdate: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       webhookId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks/${webhookId}`,
+        path: `tables/${tableId}/webhooks/${webhookId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1223,17 +1143,15 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks/{webhookId}
+     * @request DELETE:tables/{tableId}/webhooks/{webhookId}
      */
     webhookDelete: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       webhookId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks/${webhookId}`,
+        path: `tables/${tableId}/webhooks/${webhookId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1243,16 +1161,11 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookList
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks
+     * @request GET:/tables/{tableId}/webhooks
      */
-    webhookList: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    webhookList: (tableId: string, params: RequestParams = {}) =>
       this.request<HookList, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks`,
+        path: `/tables/${tableId}/webhooks`,
         method: 'GET',
         ...params,
       }),
@@ -1262,16 +1175,11 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookCreate
-     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/webhooks
+     * @request POST:/tables/{tableId}/webhooks
      */
-    webhookCreate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    webhookCreate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/webhooks`,
+        path: `/tables/${tableId}/webhooks`,
         method: 'POST',
         ...params,
       }),
@@ -1281,16 +1189,11 @@ export class Api<
      *
      * @tags Meta
      * @name GridCreate
-     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/grids
+     * @request POST:/tables/{tableId}/grids
      */
-    gridCreate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    gridCreate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids`,
+        path: `/tables/${tableId}/grids`,
         method: 'POST',
         ...params,
       }),
@@ -1300,17 +1203,11 @@ export class Api<
      *
      * @tags Meta
      * @name GridUpdate
-     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/grids/{gridId}
+     * @request PUT:/tables/{tableId}/grids/{gridId}
      */
-    gridUpdate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      gridId: string,
-      params: RequestParams = {}
-    ) =>
+    gridUpdate: (tableId: string, gridId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids/${gridId}`,
+        path: `/tables/${tableId}/grids/${gridId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1320,17 +1217,11 @@ export class Api<
      *
      * @tags Meta
      * @name GridDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/grids/{gridId}
+     * @request DELETE:/tables/{tableId}/grids/{gridId}
      */
-    gridDelete: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      gridId: string,
-      params: RequestParams = {}
-    ) =>
+    gridDelete: (tableId: string, gridId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids/${gridId}`,
+        path: `/tables/${tableId}/grids/${gridId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1340,17 +1231,11 @@ export class Api<
      *
      * @tags Meta
      * @name GridRead
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/grids/{gridId}
+     * @request GET:/tables/{tableId}/grids/{gridId}
      */
-    gridRead: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      gridId: string,
-      params: RequestParams = {}
-    ) =>
+    gridRead: (tableId: string, gridId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/grids/${gridId}`,
+        path: `/tables/${tableId}/grids/${gridId}`,
         method: 'GET',
         ...params,
       }),
@@ -1360,16 +1245,11 @@ export class Api<
      *
      * @tags Meta
      * @name FormCreate
-     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/forms
+     * @request POST:/tables/{tableId}/forms
      */
-    formCreate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    formCreate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms`,
+        path: `/tables/${tableId}/forms`,
         method: 'POST',
         ...params,
       }),
@@ -1379,19 +1259,17 @@ export class Api<
      *
      * @tags Meta
      * @name GridUpdate2
-     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/forms/{formId}
+     * @request PUT:/tables/{tableId}/forms/{formId}
      * @originalName gridUpdate
      * @duplicate
      */
     gridUpdate2: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       formId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms/${formId} `,
+        path: `/tables/${tableId}/forms/${formId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1401,19 +1279,17 @@ export class Api<
      *
      * @tags Meta
      * @name GridDelete2
-     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/forms/{formId}
+     * @request DELETE:/tables/{tableId}/forms/{formId}
      * @originalName gridDelete
      * @duplicate
      */
     gridDelete2: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       formId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms/${formId} `,
+        path: `/tables/${tableId}/forms/${formId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1423,19 +1299,13 @@ export class Api<
      *
      * @tags Meta
      * @name GridRead2
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/forms/{formId}
+     * @request GET:/tables/{tableId}/forms/{formId}
      * @originalName gridRead
      * @duplicate
      */
-    gridRead2: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      formId: string,
-      params: RequestParams = {}
-    ) =>
+    gridRead2: (tableId: string, formId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/forms/${formId} `,
+        path: `/tables/${tableId}/forms/${formId}`,
         method: 'GET',
         ...params,
       }),
@@ -1445,16 +1315,11 @@ export class Api<
      *
      * @tags Meta
      * @name GalleryCreate
-     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/galleries
+     * @request POST:/tables/{tableId}/galleries
      */
-    galleryCreate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    galleryCreate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries`,
+        path: `/tables/${tableId}/galleries`,
         method: 'POST',
         ...params,
       }),
@@ -1464,17 +1329,15 @@ export class Api<
      *
      * @tags Meta
      * @name GalleryUpdate
-     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/galleries/{galleryId}
+     * @request PUT:/tables/{tableId}/galleries/{galleryId}
      */
     galleryUpdate: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       galleryId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries/${galleryId}`,
+        path: `/tables/${tableId}/galleries/${galleryId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1484,17 +1347,15 @@ export class Api<
      *
      * @tags Meta
      * @name GalleryDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/galleries/{galleryId}
+     * @request DELETE:/tables/{tableId}/galleries/{galleryId}
      */
     galleryDelete: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       galleryId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries/${galleryId}`,
+        path: `/tables/${tableId}/galleries/${galleryId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1504,17 +1365,15 @@ export class Api<
      *
      * @tags Meta
      * @name GalleryRead
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/galleries/{galleryId}
+     * @request GET:/tables/{tableId}/galleries/{galleryId}
      */
     galleryRead: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       galleryId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/galleries/${galleryId}`,
+        path: `/tables/${tableId}/galleries/${galleryId}`,
         method: 'GET',
         ...params,
       }),
@@ -1524,16 +1383,11 @@ export class Api<
      *
      * @tags Meta
      * @name KanbanCreate
-     * @request POST:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans
+     * @request POST:/tables/{tableId}/kanbans
      */
-    kanbanCreate: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    kanbanCreate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans`,
+        path: `/tables/${tableId}/kanbans`,
         method: 'POST',
         ...params,
       }),
@@ -1543,17 +1397,15 @@ export class Api<
      *
      * @tags Meta
      * @name KanbanUpdate
-     * @request PUT:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans/{kanbanId}
+     * @request PUT:/tables/{tableId}/kanbans/{kanbanId}
      */
     kanbanUpdate: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       kanbanId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans/${kanbanId}`,
+        path: `/tables/${tableId}/kanbans/${kanbanId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1563,17 +1415,15 @@ export class Api<
      *
      * @tags Meta
      * @name KanbanDelete
-     * @request DELETE:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans/{kanbanId}
+     * @request DELETE:/tables/{tableId}/kanbans/{kanbanId}
      */
     kanbanDelete: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       kanbanId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans/${kanbanId}`,
+        path: `/tables/${tableId}/kanbans/${kanbanId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1583,17 +1433,15 @@ export class Api<
      *
      * @tags Meta
      * @name KanbanRead
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/kanbans/{kanbanId}
+     * @request GET:/tables/{tableId}/kanbans/{kanbanId}
      */
     kanbanRead: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       kanbanId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/kanbans/${kanbanId}`,
+        path: `/tables/${tableId}/kanbans/${kanbanId}`,
         method: 'GET',
         ...params,
       }),
@@ -1603,16 +1451,11 @@ export class Api<
      *
      * @tags Meta
      * @name ViewsList
-     * @request GET:/projects/{projectId}/{baseId}/tables/{tableId}/views
+     * @request GET:/tables/{tableId}/views
      */
-    viewsList: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    viewsList: (tableId: string, params: RequestParams = {}) =>
       this.request<ViewList, any>({
-        path: `/projects/${projectId}/${baseId}/tables/${tableId}/views`,
+        path: `/tables/${tableId}/views`,
         method: 'GET',
         ...params,
       }),
@@ -1650,16 +1493,11 @@ export class Api<
      *
      * @tags Data
      * @name List
-     * @request GET:/data/projects/{projectId}/{baseId}/tables/{tableId}
+     * @request GET:/data/{tableId}
      */
-    list: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      params: RequestParams = {}
-    ) =>
+    list: (tableId: string, params: RequestParams = {}) =>
       this.request<any, any>({
-        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}`,
+        path: `/data/${tableId}`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -1670,17 +1508,11 @@ export class Api<
      *
      * @tags Data
      * @name Create
-     * @request POST:/data/projects/{projectId}/{baseId}/tables/{tableId}
+     * @request POST:/data/{tableId}
      */
-    create: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      data: any,
-      params: RequestParams = {}
-    ) =>
+    create: (tableId: string, data: any, params: RequestParams = {}) =>
       this.request<any, any>({
-        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}`,
+        path: `/data/${tableId}`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -1693,17 +1525,11 @@ export class Api<
      *
      * @tags Data
      * @name Read
-     * @request GET:/data/projects/{projectId}/{baseId}/tables/{tableId}/{rowId}
+     * @request GET:/data/{tableId}/{rowId}
      */
-    read: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      rowId: string,
-      params: RequestParams = {}
-    ) =>
+    read: (tableId: string, rowId: string, params: RequestParams = {}) =>
       this.request<any, any>({
-        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}/${rowId}`,
+        path: `/data/${tableId}/${rowId}`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -1714,18 +1540,16 @@ export class Api<
      *
      * @tags Data
      * @name Update
-     * @request PUT:/data/projects/{projectId}/{baseId}/tables/{tableId}/{rowId}
+     * @request PUT:/data/{tableId}/{rowId}
      */
     update: (
-      projectId: string,
-      baseId: string,
       tableId: string,
       rowId: string,
       data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}/${rowId}`,
+        path: `/data/${tableId}/${rowId}`,
         method: 'PUT',
         body: data,
         type: ContentType.Json,
@@ -1738,17 +1562,11 @@ export class Api<
      *
      * @tags Data
      * @name Delete
-     * @request DELETE:/data/projects/{projectId}/{baseId}/tables/{tableId}/{rowId}
+     * @request DELETE:/data/{tableId}/{rowId}
      */
-    delete: (
-      projectId: string,
-      baseId: string,
-      tableId: string,
-      rowId: string,
-      params: RequestParams = {}
-    ) =>
+    delete: (tableId: string, rowId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/data/projects/${projectId}/${baseId}/tables/${tableId}/${rowId}`,
+        path: `/data/${tableId}/${rowId}`,
         method: 'DELETE',
         ...params,
       }),

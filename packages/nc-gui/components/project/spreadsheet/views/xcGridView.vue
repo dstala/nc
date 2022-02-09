@@ -82,23 +82,29 @@
             class="grey-border new-column-header pointer  nc-grid-header-cell"
             @click="addNewColMenu = true"
           >
+            <!--            <edit-column
+              v-if="addNewColMenu"
+              :meta="meta"
+              :nodes="nodes"
+              :sql-ui="sqlUi"
+              @close="addNewColMenu = false"
+              @saved="onNewColCreation"
+            />-->
+            <v-icon
+              small
+            >
+              mdi-plus
+            </v-icon>
             <v-menu
               v-model="addNewColMenu"
               offset-y
-              z-index="99"
+              content-class=""
               left
             >
-              <template #activator="{on , attrs}">
-                <v-icon
-                  small
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-plus
-                </v-icon>
+              <template #activator="{on}">
+                <span v-on="on" />
               </template>
               <edit-column
-                v-if="addNewColMenu"
                 :meta="meta"
                 :nodes="nodes"
                 :sql-ui="sqlUi"
@@ -445,19 +451,19 @@ export default {
         'LastModifiedTime'].includes(col.uidt)
     },
     async xcAuditModelCommentsCount() {
-      if (this.isPublicView || !this.data || !this.data.length) {
-        return
-      }
-      const aggCount = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        dbAlias: this.nodes.dbAlias
-      }, 'xcAuditModelCommentsCount', {
-        model_name: this.meta._tn,
-        ids: this.data.map(({ row: r }) => {
-          return this.meta.columns.filter(c => c.pk).map(c => r[c._cn]).join('___')
-        })
-      }])
-
-      this.aggCount = aggCount
+      // if (this.isPublicView || !this.data || !this.data.length) {
+      //   return
+      // }
+      // const aggCount = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   dbAlias: this.nodes.dbAlias
+      // }, 'xcAuditModelCommentsCount', {
+      //   model_name: this.meta._tn,
+      //   ids: this.data.map(({ row: r }) => {
+      //     return this.meta.columns.filter(c => c.pk).map(c => r[c._cn]).join('___')
+      //   })
+      // }])
+      //
+      // this.aggCount = aggCount
     },
 
     async onKeyDown(e) {

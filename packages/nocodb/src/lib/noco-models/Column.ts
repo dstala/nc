@@ -63,7 +63,7 @@ export default class Column implements ColumnType {
       {
         fk_model_id: column.fk_model_id,
         cn: column.cn,
-        _cn: column._cn,
+        _cn: column._cn || column.cn,
         uidt: column.uidt,
         dt: column.dt,
         np: column.np,

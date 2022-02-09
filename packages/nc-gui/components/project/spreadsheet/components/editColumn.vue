@@ -552,9 +552,9 @@ export default {
         return
       }
       try {
-        // if (this.newColumn.uidt === 'Formula') {
-        //   return this.$toast.info('Coming Soon...').goAway(3000)
-        // }
+        if (this.newColumn.uidt === 'Formula') {
+          return this.$toast.info('Coming Soon...').goAway(3000)
+        }
 
         if (this.isLinkToAnotherRecord && this.$refs.relation) {
           await this.$refs.relation.saveRelation()
@@ -573,31 +573,35 @@ export default {
         this.newColumn.tn = this.nodes.tn
         this.newColumn._cn = this.newColumn.cn
 
-        const columns = [...this.meta.columns]
-
-        if (columns.length) {
-          columns[0].tn = this.nodes.tn
-        }
-
         if (this.editColumn) {
-          columns[this.columnIndex] = this.newColumn
+          // columns[this.columnIndex] = this.newColumn
         } else {
-          columns.push(this.newColumn)
+          const col = await this.$api.meta.columnCreate(this.meta.id, this.newColumn)
+          console.log(col)
         }
 
-        await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'tableUpdate', {
-          tn: this.nodes.tn,
-          _tn: this.meta._tn,
-          originalColumns: this.meta.columns,
-          columns
-        }])
+        //
+        // const columns = [...this.meta.columns]
+        //
+        // if (columns.length) {
+        //   columns[0].tn = this.nodes.tn
+        // }
+        //
 
-        if (this.isRelation && this.$refs.relation) {
-          await this.$refs.relation.saveRelation()
-        }
+        //
+        // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'tableUpdate', {
+        //   tn: this.nodes.tn,
+        //   _tn: this.meta._tn,
+        //   originalColumns: this.meta.columns,
+        //   columns
+        // }])
+        //
+        // if (this.isRelation && this.$refs.relation) {
+        //   await this.$refs.relation.saveRelation()
+        // }
 
         this.$emit('saved', this.newColumn._cn, this.editColumn ? this.meta.columns[this.columnIndex]._cn : null)
       } catch (e) {

@@ -519,37 +519,13 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}": {
+    "/tables/{tableId}": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
           "name": "tableId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "",
           "in": "path",
           "required": true
         }
@@ -689,24 +665,8 @@
         "description": ""
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/columns": {
+    "/tables/{tableId}/columns": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -761,24 +721,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/columns/{columnId}": {
+    "/tables/{tableId}/columns/{columnId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -857,24 +801,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/views/{viewId}/filters": {
+    "/views/{viewId}/filters": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -909,24 +837,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/views/{viewId}/sorts": {
+    "/views/{viewId}/sorts": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -961,24 +873,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/views/{viewsId}/filters/{filterId}": {
+    "/views/{viewsId}/filters/{filterId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1033,24 +929,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/views/{viewId}/sorts/{sortId}": {
+    "/views/{viewId}/sorts/{sortId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1105,24 +985,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/webhooks/{webhookId}": {
+    "tables/{tableId}/webhooks/{webhookId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1178,24 +1042,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/webhooks": {
+    "/tables/{tableId}/webhooks": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1230,24 +1078,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/grids": {
+    "/tables/{tableId}/grids": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1270,24 +1102,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/grids/{gridId}": {
+    "/tables/{tableId}/grids/{gridId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1342,24 +1158,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/forms": {
+    "/tables/{tableId}/forms": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1383,24 +1183,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/forms/{formId} ": {
+    "/tables/{tableId}/forms/{formId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1455,24 +1239,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/galleries": {
+    "/tables/{tableId}/galleries": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1495,24 +1263,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/galleries/{galleryId}": {
+    "/tables/{tableId}/galleries/{galleryId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1567,24 +1319,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/kanbans": {
+    "/tables/{tableId}/kanbans": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1607,24 +1343,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/kanbans/{kanbanId}": {
+    "/tables/{tableId}/kanbans/{kanbanId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1679,24 +1399,8 @@
         ]
       }
     },
-    "/projects/{projectId}/{baseId}/tables/{tableId}/views": {
+    "/tables/{tableId}/views": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1720,24 +1424,8 @@
         "description": ""
       }
     },
-    "/data/projects/{projectId}/{baseId}/tables/{tableId}": {
+    "/data/{tableId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1790,24 +1478,8 @@
         }
       }
     },
-    "/data/projects/{projectId}/{baseId}/tables/{tableId}/{rowId}": {
+    "/data/{tableId}/{rowId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "baseId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"

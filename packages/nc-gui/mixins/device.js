@@ -13,6 +13,7 @@ export default {
     $api() {
       return new Api({
         baseURL: 'http://localhost:8080'
+
       })
     },
     dashboardUrl() {

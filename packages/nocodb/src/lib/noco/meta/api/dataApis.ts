@@ -8,14 +8,12 @@ export async function dataList(req: Request, res: Response, next) {
   try {
     console.time('Model.get');
     const model = await Model.get({
-      base_id: req.params.projectId,
-      db_alias: req.params.baseId,
       id: req.params.modelId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(req.params.dbAlias);
+    const base = await Base.get(model.db_alias);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -56,14 +54,12 @@ export async function dataList(req: Request, res: Response, next) {
 async function dataRead(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      base_id: req.params.projectId,
-      db_alias: req.params.baseId,
       id: req.params.modelId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(req.params.dbAlias);
+    const base = await Base.get(model.db_alias);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -97,14 +93,12 @@ async function dataRead(req: Request, res: Response, next) {
 async function dataInsert(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      base_id: req.params.projectId,
-      db_alias: req.params.baseId,
       id: req.params.modelId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(req.params.dbAlias);
+    const base = await Base.get(model.db_alias);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -122,14 +116,12 @@ async function dataInsert(req: Request, res: Response, next) {
 async function dataUpdate(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      base_id: req.params.projectId,
-      db_alias: req.params.baseId,
       id: req.params.modelId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(req.params.dbAlias);
+    const base = await Base.get(model.db_alias);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -147,14 +139,12 @@ async function dataUpdate(req: Request, res: Response, next) {
 async function dataDelete(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      base_id: req.params.projectId,
-      db_alias: req.params.baseId,
       id: req.params.modelId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(req.params.dbAlias);
+    const base = await Base.get(model.db_alias);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,

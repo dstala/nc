@@ -71,8 +71,7 @@
     "watch:run:mysql": "cross-env EE=true nodemon -e ts,js -w ./src -x \"ts-node src/example/dockerRunMysql --log-error --project tsconfig.json\"",
     "run": "ts-node src/example/docker",
     "watch:try": "nodemon -e ts,js -w ./src -x \"ts-node src/example/try --log-error --project tsconfig.json\"",
-    "example:docker": "ts-node ./src/example/docker.ts",
-    "generate:sdk": "npx swagger-typescript-api -p ../../scripts/sdk/swagger.json -o ./src/lib/noco-client/  --axios --clean-output --extract-request-params --module-name-first-tag"
+    "example:docker": "ts-node ./src/example/docker.ts"
   },
   "scripts-info": {
     "info": "Display information about the package scripts",

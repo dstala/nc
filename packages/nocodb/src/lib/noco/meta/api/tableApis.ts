@@ -58,12 +58,11 @@ export async function tableUpdate(req, res) {
 export async function tableDelete(req: Request, res: Response, next) {
   try {
     console.log(req.params);
-
-    const project = await Project.getWithInfo(req.params.projectId);
-    const base = project.bases.find(b => b.id === req.params.baseId);
-    const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
-
     const table = await Model.get({ id: req.params.tableId });
+
+    const project = await Project.getWithInfo(table.project_id);
+    const base = project.bases.find(b => b.id === table.db_alias);
+    const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
 
     await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
 
@@ -75,9 +74,9 @@ export async function tableDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', tableList);
-router.post('/', tableCreate);
-router.get('/:tableId', tableGet);
-router.put('/:tableId', tableUpdate);
-router.delete('/:tableId', tableDelete);
+router.get('/projects/:projectId/:baseId/tables', tableList);
+router.post('/projects/:projectId/:baseId/tables', tableCreate);
+router.get('/tables/:tableId', tableGet);
+router.put('/tables/:tableId', tableUpdate);
+router.delete('/tables/:tableId', tableDelete);
 export default router;

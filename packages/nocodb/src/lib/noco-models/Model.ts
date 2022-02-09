@@ -73,6 +73,8 @@ export default class Model implements Table {
       {
         tn: model.tn,
         _tn: model._tn
+        // base_id: dbAlias,
+        // project_id: projectId
       }
     );
     for (const column of model.columns) {
@@ -89,7 +91,7 @@ export default class Model implements Table {
     project_id: string;
     db_alias: string;
   }): Promise<Model[]> {
-    let modelList = await NocoCache.getv2(project_id);
+    let modelList = []; //await NocoCache.getv2(project_id);
     if (!modelList.length) {
       modelList = await Noco.ncMeta.metaList2(
         project_id,

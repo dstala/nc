@@ -24,7 +24,7 @@
         <v-col cols="12">
           <v-autocomplete
             ref="input"
-            v-model="relation.childTable"
+            v-model="relation.childId"
             outlined
             class="caption"
             hide-details="auto"
@@ -33,7 +33,7 @@
             :full-width="false"
             :items="refTables"
             item-text="_tn"
-            item-value="tn"
+            item-value="id"
             required
             dense
             :rules="tableRules"
@@ -107,6 +107,8 @@
 </template>
 
 <script>
+import { UITypes } from 'nc-common'
+
 export default {
   name: 'LinkedToAnotherOptions',
   props: ['nodes', 'column', 'meta', 'isSQLite', 'alias'],
@@ -133,25 +135,27 @@ export default {
     },
     tableRules() {
       return [
-        v => !!v || 'Required',
-        (v) => {
-          if (this.type === 'mm') {
-            return !(this.meta.manyToMany || [])
-              .some(mm => (mm.tn === v && mm.rtn === this.meta.tn) || (mm.rtn === v && mm.tn === this.meta.tn)) ||
-              'Duplicate many to many relation is not allowed at the moment'
-          }
-          if (this.type === 'hm') {
-            return !(this.meta.hasMany || [])
-              .some(hm => hm.tn === v) ||
-              'Duplicate has many relation is not allowed at the moment'
-          }
-        }
+        // v => !!v || 'Required',
+        // (v) => {
+        //   if (this.type === 'mm') {
+        //     return !(this.meta.manyToMany || [])
+        //       .some(mm => (mm.tn === v && mm.rtn === this.meta.tn) || (mm.rtn === v && mm.tn === this.meta.tn)) ||
+        //       'Duplicate many to many relation is not allowed at the moment'
+        //   }
+        //   if (this.type === 'hm') {
+        //     return !(this.meta.hasMany || [])
+        //       .some(hm => hm.tn === v) ||
+        //       'Duplicate has many relation is not allowed at the moment'
+        //   }
+        // }
       ]
     }
   },
   async created() {
     await this.loadTablesList()
     this.relation = {
+      parentId: null,
+      childID: null,
       childColumn: `${this.meta.tn}_id`,
       childTable: this.nodes.tn,
       parentTable: this.column.rtn || '',
@@ -159,7 +163,7 @@ export default {
       onDelete: 'NO ACTION',
       onUpdate: 'NO ACTION',
       updateRelation: !!this.column.rtn,
-      type: 'real'
+      relationType: 'real'
     }
   },
   methods: {
@@ -189,12 +193,12 @@ export default {
     async loadTablesList() {
       this.isRefTablesLoading = true
 
-      const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'tableList'])
+      const result = (await this.$api.meta.tableList({
+        projectId: this.$store.state.project.projectId,
+        baseId: this.$store.state.project.project.bases[0].id
+      })).data.tables.list
 
-      this.refTables = result.data.list.map(({ tn, _tn }) => ({ tn, _tn }))
+      this.refTables = result // .data.list.map(({ tn, _tn }) => ({ tn, _tn }))
       this.isRefTablesLoading = false
     },
     async saveManyToMany() {
@@ -220,68 +224,78 @@ export default {
       // }
     },
     async saveRelation() {
-      if (this.type === 'mm') {
-        await this.saveManyToMany()
-        return
-      }
-      // try {
-      const parentPK = this.meta.columns.find(c => c.pk)
-
-      const childTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'tableXcModelGet', {
-        tn: this.relation.childTable
-      }])
-
-      const childMeta = JSON.parse(childTableData.meta)
-
-      const newChildColumn = {}
-
-      Object.assign(newChildColumn, {
-        cn: this.relation.childColumn,
-        _cn: this.relation.childColumn,
-        rqd: false,
-        pk: false,
-        ai: false,
-        cdf: null,
-        dt: parentPK.dt,
-        dtxp: parentPK.dtxp,
-        dtxs: parentPK.dtxs,
-        un: parentPK.un,
-        altered: 1
+      const col = await this.$api.meta.columnCreate(this.meta.id, {
+        ...this.relation,
+        parentId: this.meta.id,
+        uidt: UITypes.LinkToAnotherRecord,
+        _cn: this.alias,
+        type: this.type
       })
 
-      const columns = [...childMeta.columns, newChildColumn]
+      console.log(col.data)
 
-      await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'tableUpdate', {
-        tn: childMeta.tn,
-        _tn: childMeta._tn,
-        originalColumns: childMeta.columns,
-        columns
-      }])
-
-      await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
-        {
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        },
-        this.relation.type === 'real' && !this.isSQLite ? 'relationCreate' : 'xcVirtualRelationCreate',
-        {
-          ...this.relation,
-          parentTable: this.meta.tn,
-          parentColumn: parentPK.cn,
-          updateRelation: !!this.column.rtn,
-          type: 'real',
-          alias: this.alias
-        }
-      ])
-      // } catch (e) {
-      //   throw e
+      // if (this.type === 'mm') {
+      //   await this.saveManyToMany()
+      //   return
       // }
+      // // try {
+      // const parentPK = this.meta.columns.find(c => c.pk)
+      //
+      // const childTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias
+      // }, 'tableXcModelGet', {
+      //   tn: this.relation.childTable
+      // }])
+      //
+      // const childMeta = JSON.parse(childTableData.meta)
+      //
+      // const newChildColumn = {}
+      //
+      // Object.assign(newChildColumn, {
+      //   cn: this.relation.childColumn,
+      //   _cn: this.relation.childColumn,
+      //   rqd: false,
+      //   pk: false,
+      //   ai: false,
+      //   cdf: null,
+      //   dt: parentPK.dt,
+      //   dtxp: parentPK.dtxp,
+      //   dtxs: parentPK.dtxs,
+      //   un: parentPK.un,
+      //   altered: 1
+      // })
+      //
+      // const columns = [...childMeta.columns, newChildColumn]
+      //
+      // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias
+      // }, 'tableUpdate', {
+      //   tn: childMeta.tn,
+      //   _tn: childMeta._tn,
+      //   originalColumns: childMeta.columns,
+      //   columns
+      // }])
+      //
+      // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
+      //   {
+      //     env: this.nodes.env,
+      //     dbAlias: this.nodes.dbAlias
+      //   },
+      //   this.relation.type === 'real' && !this.isSQLite ? 'relationCreate' : 'xcVirtualRelationCreate',
+      //   {
+      //     ...this.relation,
+      //     parentTable: this.meta.tn,
+      //     parentColumn: parentPK.cn,
+      //     updateRelation: !!this.column.rtn,
+      //     type: 'real',
+      //     alias: this.alias
+      //   }
+      // ])
+      // // } catch (e) {
+      // //   throw e
+      // // }
     },
     onColumnSelect() {
       const col = this.refColumns.find(c => this.relation.parentColumn === c.cn)

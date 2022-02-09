@@ -22,7 +22,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
     const table = await Model.getWithInfo({
       id: req.params.tableId
     });
-    const base = await Base.get(table.base_id);
+    const base = await Base.get(table.db_alias);
     const project = await base.getProject();
 
     const colBody = req.body;
@@ -145,7 +145,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               c++;
             }
 
-            fkColName = `fkColName${c || ''}`;
+            fkColName = `fk_col${c || ''}`;
 
             {
               // create foreign key
@@ -372,7 +372,7 @@ export async function columnUpdate(req: Request, res: Response<Table>, next) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
-  const base = await Base.get(table.base_id);
+  const base = await Base.get(table.db_alias);
 
   const column = table.columns.find(c => c.id === req.params.columnId);
 
@@ -422,7 +422,7 @@ export async function columnDelete(req: Request, res: Response<Table>, next) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
-  const base = await Base.get(table.base_id);
+  const base = await Base.get(table.db_alias);
 
   const colBody = req.body;
   switch (colBody.uidt) {

@@ -881,16 +881,20 @@ export default {
     loadPrev() {
       this.selectedExpandRowIndex = --this.selectedExpandRowIndex === -1 ? this.data.length - 1 : this.selectedExpandRowIndex
     },
-    checkAndDeleteTable() {
-      if (
-        !this.meta || (
-          (this.meta.hasMany && this.meta.hasMany.length) ||
-          (this.meta.manyToMany && this.meta.manyToMany.length) ||
-          (this.meta.belongsTo && this.meta.belongsTo.length))
-      ) {
-        return this.$toast.info('Please delete relations before deleting table.').goAway(3000)
+    async  checkAndDeleteTable() {
+      // if (
+      //   !this.meta || (
+      //     (this.meta.hasMany && this.meta.hasMany.length) ||
+      //     (this.meta.manyToMany && this.meta.manyToMany.length) ||
+      //     (this.meta.belongsTo && this.meta.belongsTo.length))
+      // ) {
+      //   return this.$toast.info('Please delete relations before deleting table.').goAway(3000)
+      // }
+      // this.deleteTable('showDialog')
+
+      if (confirm('Do you want to delete the table?')) {
+        await this.$api.meta.tableDelete(this.meta.id)
       }
-      this.deleteTable('showDialog')
     },
     async reload() {
       this.$store.dispatch('meta/ActLoadMeta', {
@@ -957,17 +961,28 @@ export default {
     async createTableIfNewTable() {
       if (this.nodes.newTable && !this.nodes.tableCreated) {
         const columns = this.sqlUi.getNewTableColumns().filter(col => this.nodes.newTable.columns.includes(col.cn))
-        await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
-          {
-            env: this.nodes.env,
-            dbAlias: this.nodes.dbAlias
-          },
-          'tableCreate',
+        // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
+        //   {
+        //     env: this.nodes.env,
+        //     dbAlias: this.nodes.dbAlias
+        //   },
+        //   'tableCreate',
+        //   {
+        //     tn: this.nodes.tn,
+        //     _tn: this.nodes._tn,
+        //     columns
+        //   }])
+
+        await this.$api.meta.tableCreate(
+          this.$store.state.project.projectId,
+          this.$store.state.project.project.bases[0].id,
           {
             tn: this.nodes.tn,
             _tn: this.nodes._tn,
             columns
-          }])
+          }
+        )
+
         await this.loadTablesFromChildTreeNode({
           _nodes: {
             ...this.nodes
@@ -1032,7 +1047,8 @@ export default {
               return o
             }, {})
 
-            const insertedData = await this.api.insert(insertObj)
+            // const insertedData = await this.api.insert(insertObj)
+            const insertedData = (await this.$api.data.create(this.meta.id, insertObj)).data
 
             this.data.splice(row, 1, {
               row: insertedData,
@@ -1075,9 +1091,9 @@ export default {
         await this.save()
       } else {
         try {
-          if (!this.api) {
-            return
-          }
+          // if (!this.api) {
+          //   return
+          // }
           // return if there is no change
           if (oldRow[column._cn] === rowObj[column._cn]) {
             return
@@ -1090,9 +1106,9 @@ export default {
           this.$set(this.data[row], 'saving', true)
 
           // eslint-disable-next-line promise/param-names
-          const newData = await this.api.update(id, {
+          const newData = (await this.$api.data.update(this.meta.id, id, {
             [column._cn]: rowObj[column._cn]
-          }, { [column._cn]: oldRow[column._cn] })
+          })).data// { [column._cn]: oldRow[column._cn] })
           this.$set(this.data[row], 'row', { ...rowObj, ...newData })
 
           this.$set(oldRow, column._cn, rowObj[column._cn])
@@ -1120,7 +1136,8 @@ export default {
             return this.$toast.info('Delete not allowed for table which doesn\'t have primary Key').goAway(3000)
           }
 
-          await this.api.delete(id)
+          // await this.api.delete(id)
+          await this.$api.data.delete(this.meta.id, id)
         }
         this.data.splice(this.rowContextMenu.index, 1)
         // this.$toast.success('Deleted row successfully').goAway(3000)
@@ -1144,7 +1161,8 @@ export default {
               return this.$toast.info('Delete not allowed for table which doesn\'t have primary Key').goAway(3000)
             }
 
-            await this.api.delete(id)
+            // await this.api.delete(id)
+            await this.$api.data.delete(this.meta.id, id)
           }
           this.data.splice(row, 1)
           // success++
@@ -1257,8 +1275,6 @@ export default {
         // if (this.api) {
         // const { list, count } = await this.api.paginatedList(this.queryParams)
         const data = await this.$api.data.list(
-          this.$store.state.project.projectId,
-          this.$store.state.project.project.bases[0].id,
           this.meta.id
         )
 
