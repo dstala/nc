@@ -48,7 +48,7 @@
 -->
 
             <virtual-header-cell
-              v-if="col.virtual"
+              v-if="isVirtualCol(col)"
               :column="col"
               :nodes="nodes"
               :meta="meta"
@@ -191,7 +191,7 @@
             @contextmenu="showRowContextMenu($event,rowObj,rowMeta,row,col, columnObj)"
           >
             <virtual-cell
-              v-if="columnObj.uidt === 'LinkToAnotherRecord'"
+              v-if="isVirtualCol(columnObj)"
               :password="password"
               :is-public="isPublicView"
               :metas="metas"
@@ -402,6 +402,14 @@ export default {
     document.removeEventListener('keydown', this.onKeyDown)
   },
   methods: {
+    isVirtualCol(col) {
+      return [
+        UITypes.LinkToAnotherRecord,
+        UITypes.Formula,
+        UITypes.Rollup,
+        UITypes.Lookup
+      ].includes(col.uidt)
+    },
     onFileDrop(event) {
       this.$emit('drop', event)
     },

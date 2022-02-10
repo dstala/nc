@@ -12,15 +12,15 @@
             label="Child Table"
             :full-width="false"
             :items="refTables"
-            item-text="_rltn"
+            item-text="_tn"
             :item-value="v => v"
             :rules="[v => !!v || 'Required']"
             dense
           >
             <template #item="{item}">
               <span class="caption"><span class="font-weight-bold"> {{
-                item._rltn
-              }}</span> <small>({{ relationNames[item.type] }})
+                item._tn
+              }}</span> <small>({{ relationNames[item.col.type] }})
               </small></span>
             </template>
           </v-autocomplete>
@@ -35,7 +35,7 @@
             label="Child column"
             :full-width="false"
             :items="columnList"
-            item-text="_rlcn"
+            item-text="_cn"
             dense
             :loading="loadingColumns"
             :item-value="v => v"
@@ -64,6 +64,8 @@
 
 <script>
 
+import { UITypes } from 'nc-common'
+
 export default {
   name: 'RollupOptions',
   props: ['nodes', 'column', 'meta', 'isSQLite', 'alias'],
@@ -90,62 +92,70 @@ export default {
   }),
   computed: {
     refTables() {
-      return (this.meta
-        ? [
-          // ...(this.meta.belongsTo || []).map(({ rtn, _rtn, rcn, tn, cn }) => ({
-          //   type: 'bt',
-          //   rtn,
-          //   _rtn,
-          //   rcn,
-          //   tn,
-          //   cn,
-          //   ltn: rtn,
-          //   _ltn: _rtn
-          // })),
-            ...(this.meta.hasMany || []).map(({
-              tn,
-              _tn,
-              cn,
-              rcn,
-              rtn
-            }) => ({
-              type: 'hm',
-              tn,
-              _tn,
-              cn,
-              rcn,
-              rtn,
-              rltn: tn,
-              _rltn: _tn
-            })),
-            ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, tn, cn }) => ({
-              type: 'mm',
-              tn,
-              cn,
-              vtn,
-              _vtn,
-              vrcn,
-              rcn,
-              rtn,
-              vcn,
-              _rtn,
-              rltn: rtn,
-              _rltn: _rtn
-            }))
-          ]
-        : []).filter(t => this.tables.includes(t.rltn))
+      if (!this.tables || !this.tables.length) { return [] }
+
+      const refTables = this.meta.columns.filter(c =>
+        c.uidt === UITypes.LinkToAnotherRecord && c.colOptions.type !== 'bt'
+      ).map(c => ({
+        col: c.colOptions,
+        ...this.tables.find(t => t.id === c.colOptions.fk_related_table_id)
+      }))
+
+      return refTables
+
+      // return (this.meta
+      //   ? [
+      //     // ...(this.meta.belongsTo || []).map(({ rtn, _rtn, rcn, tn, cn }) => ({
+      //     //   type: 'bt',
+      //     //   rtn,
+      //     //   _rtn,
+      //     //   rcn,
+      //     //   tn,
+      //     //   cn,
+      //     //   ltn: rtn,
+      //     //   _ltn: _rtn
+      //     // })),
+      //       ...(this.meta.hasMany || []).map(({
+      //         tn,
+      //         _tn,
+      //         cn,
+      //         rcn,
+      //         rtn
+      //       }) => ({
+      //         type: 'hm',
+      //         tn,
+      //         _tn,
+      //         cn,
+      //         rcn,
+      //         rtn,
+      //         rltn: tn,
+      //         _rltn: _tn
+      //       })),
+      //       ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, tn, cn }) => ({
+      //         type: 'mm',
+      //         tn,
+      //         cn,
+      //         vtn,
+      //         _vtn,
+      //         vrcn,
+      //         rcn,
+      //         rtn,
+      //         vcn,
+      //         _rtn,
+      //         rltn: rtn,
+      //         _rltn: _rtn
+      //       }))
+      //     ]
+      //   : []).filter(t => this.tables.includes(t.rltn))
     },
     columnList() {
       return ((
         this.rollup &&
         this.rollup.table &&
         this.$store.state.meta.metas &&
-        this.$store.state.meta.metas[this.rollup.table.rltn] &&
-        this.$store.state.meta.metas[this.rollup.table.rltn].columns
-      ) || []).map(({ cn, _cn }) => ({
-        rlcn: cn,
-        _rlcn: _cn
-      }))
+        this.$store.state.meta.metas[this.rollup.table.tn] &&
+        this.$store.state.meta.metas[this.rollup.table.tn].columns
+      ) || []).filter(col => ![UITypes.Lookup, UITypes.Rollup, UITypes.ForeignKey, UITypes.LinkToAnotherRecord].includes(col.uidt))
     }
   },
   async mounted() {
@@ -153,12 +163,17 @@ export default {
   },
   methods: {
     async loadTablesList() {
-      const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'tableList'])
+      const result = (await this.$api.meta.tableList({
+        projectId: this.$store.state.project.projectId,
+        baseId: this.$store.state.project.project.bases[0].id
+      })).data
 
-      this.tables = result.data.list.map(({ tn }) => tn)
+      //   await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias
+      // }, 'tableList'])
+
+      this.tables = result.tables.list
     },
     async onTableChange() {
       this.loadingColumns = true
@@ -167,7 +182,7 @@ export default {
           await this.$store.dispatch('meta/ActLoadMeta', {
             dbAlias: this.nodes.dbAlias,
             env: this.nodes.env,
-            tn: this.rollup.table.ltn
+            id: this.rollup.table.id
           })
         } catch (e) {
           // ignore
@@ -178,30 +193,44 @@ export default {
     },
     async save() {
       try {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          dbAlias: this.nodes.dbAlias,
-          env: this.nodes.env,
-          tn: this.meta.tn,
-          force: true
-        })
-        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        // await this.$store.dispatch('meta/ActLoadMeta', {
+        //   dbAlias: this.nodes.dbAlias,
+        //   env: this.nodes.env,
+        //   tn: this.meta.tn,
+        //   force: true
+        // })
+        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        //
+        // meta.v.push({
+        //   _cn: this.alias,
+        //   rl: {
+        //     ...this.rollup.table,
+        //     ...this.rollup.column,
+        //     fn: this.rollup.fn
+        //   }
+        // })
+        //
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'xcModelSet', {
+        //   tn: this.nodes.tn,
+        //   meta
+        // }])
 
-        meta.v.push({
+        console.log(this.rollup)
+
+        const rollupCol = {
           _cn: this.alias,
-          rl: {
-            ...this.rollup.table,
-            ...this.rollup.column,
-            fn: this.rollup.fn
-          }
-        })
+          fk_relation_column_id: this.rollup.table.col.fk_column_id,
+          fk_rollup_column_id: this.rollup.column.id,
+          uidt: UITypes.Rollup,
+          rollup_function: this.rollup.fn
+        }
 
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcModelSet', {
-          tn: this.nodes.tn,
-          meta
-        }])
+        const col = await this.$api.meta.columnCreate(this.meta.id, rollupCol)
+
+        console.log(col.data)
 
         return this.$emit('saved', this.alias)
       } catch (e) {

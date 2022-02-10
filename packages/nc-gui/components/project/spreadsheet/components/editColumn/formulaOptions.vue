@@ -60,11 +60,12 @@
 
 <script>
 
-import NcAutocompleteTree from '@/helpers/NcAutocompleteTree'
-import { getWordUntilCaret, insertAtCursor } from '@/helpers'
 import debounce from 'debounce'
 import jsep from 'jsep'
+import { UITypes } from 'nc-common'
 import formulaList, { validations } from '../../../../../helpers/formulaList'
+import { getWordUntilCaret, insertAtCursor } from '@/helpers'
+import NcAutocompleteTree from '@/helpers/NcAutocompleteTree'
 
 export default {
   name: 'FormulaOptions',
@@ -107,29 +108,39 @@ export default {
   methods: {
     async save() {
       try {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          dbAlias: this.nodes.dbAlias,
-          env: this.nodes.env,
-          tn: this.meta.tn,
-          force: true
-        })
-        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        // await this.$store.dispatch('meta/ActLoadMeta', {
+        //   dbAlias: this.nodes.dbAlias,
+        //   env: this.nodes.env,
+        //   tn: this.meta.tn,
+        //   force: true
+        // })
+        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        //
+        // meta.v.push({
+        //   _cn: this.alias,
+        //   formula: {
+        //     ...this.formula,
+        //     tree: jsep(this.formula.value)
+        //   }
+        // })
+        //
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'xcModelSet', {
+        //   tn: this.nodes.tn,
+        //   meta
+        // }])
 
-        meta.v.push({
+        const formulaCol = {
           _cn: this.alias,
-          formula: {
-            ...this.formula,
-            tree: jsep(this.formula.value)
-          }
-        })
+          uidt: UITypes.Formula,
+          formula: this.formula.value
+        }
 
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcModelSet', {
-          tn: this.nodes.tn,
-          meta
-        }])
+        const col = await this.$api.meta.columnCreate(this.meta.id, formulaCol)
+
+        console.log(col)
 
         this.$toast.success('Formula column saved successfully').goAway(3000)
         return this.$emit('saved', this.alias)

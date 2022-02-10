@@ -12,15 +12,15 @@
             label="Child Table"
             :full-width="false"
             :items="refTables"
-            item-text="_ltn"
+            item-text="_tn"
             :item-value="v => v"
             :rules="[v => !!v || 'Required']"
             dense
           >
             <template #item="{item}">
               <span class="caption"><span class="font-weight-bold"> {{
-                item._ltn
-              }}</span> <small>({{ relationNames[item.type] }})
+                item.tn
+              }}</span> <small>({{ relationNames[item.col.type] }})
               </small></span>
             </template>
           </v-autocomplete>
@@ -35,7 +35,7 @@
             label="Child column"
             :full-width="false"
             :items="columnList"
-            item-text="_lcn"
+            item-text="_cn"
             dense
             :loading="loadingColumns"
             :item-value="v => v"
@@ -48,6 +48,8 @@
 </template>
 
 <script>
+
+import { UITypes } from 'nc-common'
 
 export default {
   name: 'LookupOptions',
@@ -64,62 +66,70 @@ export default {
   }),
   computed: {
     refTables() {
-      return (this.meta
-        ? [
-            ...(this.meta.belongsTo || []).map(({ rtn, _rtn, rcn, tn, cn }) => ({
-              type: 'bt',
-              rtn,
-              _rtn,
-              rcn,
-              tn,
-              cn,
-              ltn: rtn,
-              _ltn: _rtn
-            })),
-            ...(this.meta.hasMany || []).map(({
-              tn,
-              _tn,
-              cn,
-              rcn,
-              rtn
-            }) => ({
-              type: 'hm',
-              tn,
-              _tn,
-              cn,
-              rcn,
-              rtn,
-              ltn: tn,
-              _ltn: _tn
-            })),
-            ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, tn, cn }) => ({
-              type: 'mm',
-              tn,
-              cn,
-              vtn,
-              _vtn,
-              vrcn,
-              rcn,
-              rtn,
-              vcn,
-              _rtn,
-              ltn: rtn,
-              _ltn: _rtn
-            }))
-          ]
-        : []).filter(t => this.tables.includes(t.ltn))
+      if (!this.tables || !this.tables.length) { return [] }
+
+      const refTables = this.meta.columns.filter(c =>
+        c.uidt === UITypes.LinkToAnotherRecord || c.uidt === UITypes.ForeignKey
+      ).map(c => ({
+        col: c.colOptions,
+        ...this.tables.find(t => t.id === c.colOptions.fk_related_table_id)
+      }))
+
+      return refTables
+
+      // return (this.meta
+      //   ? [
+      //       ...(this.meta.belongsTo || []).map(({ rtn, _rtn, rcn, tn, cn }) => ({
+      //         type: 'bt',
+      //         rtn,
+      //         _rtn,
+      //         rcn,
+      //         tn,
+      //         cn,
+      //         ltn: rtn,
+      //         _ltn: _rtn
+      //       })),
+      //       ...(this.meta.hasMany || []).map(({
+      //         tn,
+      //         _tn,
+      //         cn,
+      //         rcn,
+      //         rtn
+      //       }) => ({
+      //         type: 'hm',
+      //         tn,
+      //         _tn,
+      //         cn,
+      //         rcn,
+      //         rtn,
+      //         ltn: tn,
+      //         _ltn: _tn
+      //       })),
+      //       ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, tn, cn }) => ({
+      //         type: 'mm',
+      //         tn,
+      //         cn,
+      //         vtn,
+      //         _vtn,
+      //         vrcn,
+      //         rcn,
+      //         rtn,
+      //         vcn,
+      //         _rtn,
+      //         ltn: rtn,
+      //         _ltn: _rtn
+      //       }))
+      //     ]
+      //   : []).filter(t => this.tables.includes(t.ltn))
     },
     columnList() {
       return ((
         this.lookup &&
         this.lookup.table &&
         this.$store.state.meta.metas &&
-        this.$store.state.meta.metas[this.lookup.table.ltn] &&
-        this.$store.state.meta.metas[this.lookup.table.ltn].columns
-      ) || []).map(({ cn, _cn }) => ({
-        lcn: cn,
-        _lcn: _cn
-      }))
+        this.$store.state.meta.metas[this.lookup.table.id] &&
+        this.$store.state.meta.metas[this.lookup.table.id].columns
+      ) || [])
     }
   },
   async mounted() {
@@ -127,12 +137,17 @@ export default {
   },
   methods: {
     async loadTablesList() {
-      const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'tableList'])
+      const result = (await this.$api.meta.tableList({
+        projectId: this.$store.state.project.projectId,
+        baseId: this.$store.state.project.project.bases[0].id
+      })).data
 
-      this.tables = result.data.list.map(({ tn }) => tn)
+      //   await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias
+      // }, 'tableList'])
+
+      this.tables = result.tables.list
     },
     checkLookupExist(v) {
       return (this.lookup.table && (this.meta.v || []).every(c => !(
@@ -149,7 +164,7 @@ export default {
           await this.$store.dispatch('meta/ActLoadMeta', {
             dbAlias: this.nodes.dbAlias,
             env: this.nodes.env,
-            tn: this.lookup.table.ltn
+            id: this.lookup.table.id
           })
         } catch (e) {
           // ignore
@@ -160,32 +175,45 @@ export default {
     },
     async save() {
       try {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          dbAlias: this.nodes.dbAlias,
-          env: this.nodes.env,
-          tn: this.meta.tn,
-          force: true
-        })
-        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        // await this.$store.dispatch('meta/ActLoadMeta', {
+        //   dbAlias: this.nodes.dbAlias,
+        //   env: this.nodes.env,
+        //   tn: this.meta.tn,
+        //   force: true
+        // })
+        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
 
-        meta.v.push({
+        // meta.v.push({
+        //   _cn: this.alias,
+        //   lk: {
+        //     ...this.lookup.table,
+        //     ...this.lookup.column
+        //   }
+        // })
+
+        console.log(this.lookup)
+
+        const lookupCol = {
           _cn: this.alias,
-          lk: {
-            ...this.lookup.table,
-            ...this.lookup.column
-          }
-        })
+          fk_relation_column_id: this.lookup.table.col.fk_column_id,
+          fk_lookup_column_id: this.lookup.column.id,
+          uidt: UITypes.Lookup
+        }
 
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcModelSet', {
-          tn: this.nodes.tn,
-          meta
-        }])
+        const col = await this.$api.meta.columnCreate(this.meta.id, lookupCol)
+
+        console.log(col.data)
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'xcModelSet', {
+        //   tn: this.nodes.tn,
+        //   meta
+        // }])
 
         return this.$emit('saved', this.alias)
       } catch (e) {
+        console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
     }

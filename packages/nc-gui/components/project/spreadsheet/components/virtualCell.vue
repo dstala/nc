@@ -70,6 +70,7 @@
         :disabled-columns="disabledColumns"
         :active="active"
         :row="row"
+        :value="row[column._cn]"
         :meta="meta"
         :metas="metas"
         :nodes="nodes"
@@ -153,7 +154,7 @@ export default {
       return this.column && this.column.uidt === UITypes.LinkToAnotherRecord && this.column.colOptions.type === 'hm'
     },
     bt() {
-      return this.column && this.column.uidt === UITypes.LinkToAnotherRecord && this.column.colOptions.type === 'bt'
+      return this.column && (this.column.uidt === UITypes.ForeignKey || this.column.uidt === UITypes.LinkToAnotherRecord) && this.column.colOptions.type === 'bt'
     },
     mm() {
       return this.column && this.column.uidt === UITypes.LinkToAnotherRecord && this.column.colOptions.type === 'mm'

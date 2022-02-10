@@ -103,7 +103,8 @@
                         mdi-alert-outline
                       </v-icon>
                     </template>
-                    Changing MultiSelect to SingleSelect can lead to errors when there are multiple values associated with a cell
+                    Changing MultiSelect to SingleSelect can lead to errors when there are multiple values associated
+                    with a cell
                   </v-alert>
                 </v-col>
 
@@ -553,7 +554,9 @@ export default {
       }
       try {
         if (this.newColumn.uidt === 'Formula') {
-          return this.$toast.info('Coming Soon...').goAway(3000)
+          await this.$refs.formula.save()
+          return this.$emit('saved')
+          // return this.$toast.info('Coming Soon...').goAway(3000)
         }
 
         if (this.isLinkToAnotherRecord && this.$refs.relation) {
@@ -574,6 +577,15 @@ export default {
         this.newColumn._cn = this.newColumn.cn
 
         if (this.editColumn) {
+          const col = await this.$api.meta.columnUpdate(this.meta.id, this.column.id, this.newColumn)
+          console.log(col)
+
+          //   tn: this.nodes.tn,
+          //   _tn: this.meta._tn,
+          //   originalColumns: this.meta.columns,
+          //   columns
+          // }
+
           // columns[this.columnIndex] = this.newColumn
         } else {
           const col = await this.$api.meta.columnCreate(this.meta.id, this.newColumn)

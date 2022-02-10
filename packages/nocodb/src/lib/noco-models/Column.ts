@@ -58,6 +58,7 @@ export default class Column implements ColumnType {
   public static async insert<T>(
     column: Partial<T> & { base_id?: string; [key: string]: any }
   ) {
+    if (!column.uidt) throw new Error('UI Datatype not found');
     const row = await Noco.ncMeta.metaInsert2(
       null, //column.project_id || column.base_id,
       null, //column.db_alias,
@@ -129,7 +130,6 @@ export default class Column implements ColumnType {
           }
         );
         break;
-      case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord:
         await Noco.ncMeta.metaInsert2(
           column.project_id,

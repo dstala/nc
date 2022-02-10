@@ -49,9 +49,11 @@
 
     <v-menu
       v-if="!isLocked &&!isPublicView && _isUIAllowed('edit-column') && !isForm"
-      offset-y
       open-on-hover
+      offset-y
+      top
       left
+      z-index="999"
     >
       <template #activator="{on}">
         <v-icon v-if="!isLocked && !isVirtual" small v-on="on">
@@ -85,7 +87,7 @@
       </v-list>
     </v-menu>
 
-    <v-menu v-model="editColumnMenu" offset-y content-class="" left>
+    <v-menu v-model="editColumnMenu" z-index="999" offset-y content-class="" left>
       <template #activator="{on}">
         <span v-on="on" />
       </template>
@@ -155,15 +157,18 @@ export default {
         column.altered = 4
         const columns = this.meta.columns.slice()
         columns[this.columnIndex] = column
-        await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'tableUpdate', {
-          tn: this.nodes.tn,
-          _tn: this.meta._tn,
-          originalColumns: this.meta.columns,
-          columns
-        }])
+        // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'tableUpdate', {
+        //   tn: this.nodes.tn,
+        //   _tn: this.meta._tn,
+        //   originalColumns: this.meta.columns,
+        //   columns
+        // }])
+
+        await this.$api.meta.columnDelete(this.meta.id, column.id)
+
         this.$emit('saved')
         this.columnDeleteDialog = false
       } catch (e) {

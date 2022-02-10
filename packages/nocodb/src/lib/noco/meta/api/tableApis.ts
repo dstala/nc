@@ -42,7 +42,17 @@ export async function tableCreate(req: Request<any, any, TableReq>, res, next) {
 
     await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
 
-    res.json(await Model.insert(project.id, base.id, req.body));
+    const tables = await Model.list({
+      project_id: project.id,
+      db_alias: base.id
+    });
+
+    res.json(
+      await Model.insert(project.id, base.id, {
+        ...req.body,
+        order: +(tables?.pop()?.order ?? 0) + 1
+      })
+    );
   } catch (e) {
     console.log(e);
     next(e);

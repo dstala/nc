@@ -49,7 +49,7 @@
 import TableCell from '../cell'
 import ItemChip from '@/components/project/spreadsheet/components/virtualCell/components/itemChip'
 import ListChildItemsModal
-  from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
+from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
 
 export default {
   name: 'LookupCell',
@@ -64,7 +64,8 @@ export default {
     sqlUi: [Object, Function],
     active: Boolean,
     isNew: Boolean,
-    isForm: Boolean
+    isForm: Boolean,
+    value: [Object, Array, String, Number]
   },
   data: () => ({
     lookupListModal: false
@@ -72,17 +73,18 @@ export default {
   computed: {
     // todo : optimize
     lookupApi() {
-      return this.column && this.$ncApis.get({
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias,
-        table: this.column.lk.ltn
-      })
+      // return this.column && this.$ncApis.get({
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias,
+      //   table: this.column.lk.ltn
+      // })
     },
     lookUpMeta() {
-      return this.metas ? this.metas[this.column.lk.ltn] : this.$store.state.meta.metas[this.column.lk.ltn]
+      // return this.metas ? this.metas[this.column.lk.ltn] : this.$store.state.meta.metas[this.column.lk.ltn]
     },
+
     assocMeta() {
-      return this.column.lk.type === 'mm' && (this.metas ? this.metas[this.column.lk.vtn] : this.$store.state.meta.metas[this.column.lk.vtn])
+      // return this.column.lk.type === 'mm' && (this.metas ? this.metas[this.column.lk.vtn] : this.$store.state.meta.metas[this.column.lk.vtn])
     },
     lookUpColumnAlias() {
       if (!this.lookUpMeta || !this.column.lk.lcn) {
@@ -97,51 +99,52 @@ export default {
       return (this.lookUpMeta.columns.find(cl => cl.cn === this.column.lk.lcn) || {})
     },
     localValueObj() {
-      if (!this.column || !this.row) {
-        return null
-      }
-      switch (this.column.lk.type) {
-        case 'mm':
-          return this.row[`${this.column.lk._ltn}MMList`]
-        case 'hm':
-          return this.row[`${this.column.lk._ltn}List`]
-        case 'bt':
-          return this.row[`${this.column.lk._ltn}Read`]
-        default:
-          return null
-      }
+      // if (!this.column || !this.row) {
+      //   return null
+      // }
+      // switch (this.column.lk.type) {
+      //   case 'mm':
+      //     return this.row[`${this.column.lk._ltn}MMList`]
+      //   case 'hm':
+      //     return this.row[`${this.column.lk._ltn}List`]
+      //   case 'bt':
+      //     return this.row[`${this.column.lk._ltn}Read`]
+      //   default:
+      //     return null
+      // }
     },
     localValue() {
-      if (!this.localValueObj || !this.lookUpColumnAlias) {
-        return null
-      }
-      if (Array.isArray(this.localValueObj)) {
-        return this.localValueObj.map(o => o[this.lookUpColumnAlias])
-      }
-      return [this.localValueObj[this.lookUpColumnAlias]]
+      return this.value && (Array.isArray(this.value) ? this.value : [this.value])
+      // if (!this.localValueObj || !this.lookUpColumnAlias) {
+      //   return null
+      // }
+      // if (Array.isArray(this.localValueObj)) {
+      //   return this.localValueObj.map(o => o[this.lookUpColumnAlias])
+      // }
+      // return [this.localValueObj[this.lookUpColumnAlias]]
     },
     queryParams() {
-      switch (this.column.lk.type) {
-        case 'bt':
-          return { where: `(${this.lookUpMeta.columns.find(c => c.cn === this.column.lk.rcn)._cn},eq,${this.row[this.meta.columns.find(c => c.cn === this.column.lk.cn)._cn]})` }
-        case 'hm':
-          return { where: `(${this.lookUpMeta.columns.find(c => c.cn === this.column.lk.cn)._cn},eq,${this.row[this.meta.columns.find(c => c.cn === this.column.lk.rcn)._cn]})` }
-        case 'mm':
-          return this.assocMeta
-            ? {
-                conditionGraph: {
-                  [this.assocMeta.tn]: {
-                    relationType: 'hm',
-                    [this.assocMeta.columns.find(c => c.cn === this.column.lk.vcn).cn]: {
-                      eq: this.row[this.meta.columns.find(c => c.cn === this.column.lk.cn)._cn]
-                    }
-                  }
-                }
-              }
-            : {}
-        default:
-          return {}
-      }
+      // switch (this.column.lk.type) {
+      //   case 'bt':
+      //     return { where: `(${this.lookUpMeta.columns.find(c => c.cn === this.column.lk.rcn)._cn},eq,${this.row[this.meta.columns.find(c => c.cn === this.column.lk.cn)._cn]})` }
+      //   case 'hm':
+      //     return { where: `(${this.lookUpMeta.columns.find(c => c.cn === this.column.lk.cn)._cn},eq,${this.row[this.meta.columns.find(c => c.cn === this.column.lk.rcn)._cn]})` }
+      //   case 'mm':
+      //     return this.assocMeta
+      //       ? {
+      //           conditionGraph: {
+      //             [this.assocMeta.tn]: {
+      //               relationType: 'hm',
+      //               [this.assocMeta.columns.find(c => c.cn === this.column.lk.vcn).cn]: {
+      //                 eq: this.row[this.meta.columns.find(c => c.cn === this.column.lk.cn)._cn]
+      //               }
+      //             }
+      //           }
+      //         }
+      //       : {}
+      //   default:
+      //     return {}
+      // }
     }
   },
   created() {
@@ -149,20 +152,20 @@ export default {
   },
   methods: {
     async loadLookupMeta() {
-      if (!this.metas && !this.lookUpMeta) {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias,
-          tn: this.column.lk.ltn
-        })
-      }
-      if (!this.metas && this.column.lk.type === 'mm' && !this.assocMeta) {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias,
-          tn: this.column.lk.vtn
-        })
-      }
+      // if (!this.metas && !this.lookUpMeta) {
+      //   await this.$store.dispatch('meta/ActLoadMeta', {
+      //     env: this.nodes.env,
+      //     dbAlias: this.nodes.dbAlias,
+      //     tn: this.column.lk.ltn
+      //   })
+      // }
+      // if (!this.metas && this.column.lk.type === 'mm' && !this.assocMeta) {
+      //   await this.$store.dispatch('meta/ActLoadMeta', {
+      //     env: this.nodes.env,
+      //     dbAlias: this.nodes.dbAlias,
+      //     tn: this.column.lk.vtn
+      //   })
+      // }
     },
     showLookupListModal() {
       this.lookupListModal = true
