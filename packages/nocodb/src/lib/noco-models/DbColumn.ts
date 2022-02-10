@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import UITypes from '../sqlUi/UITypes';
+import { MetaTable } from '../utils/globals';
 
 export default class DbColumn {
   _cn: string;
@@ -40,7 +41,7 @@ export default class DbColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_col_props_v2',
+      MetaTable.COL_PROPS,
       {
         tn: model.tn,
         _tn: model._tn
@@ -52,7 +53,7 @@ export default class DbColumn {
     const column = await Noco.ncMeta.metaGet2(
       null, //,
       null, //model.db_alias,
-      'nc_col_props_v2',
+      MetaTable.COL_PROPS,
       { fk_column_id: columnId }
     );
 

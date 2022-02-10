@@ -22,6 +22,7 @@
           </span>
         </template>
       </div>
+
       <div
         v-if="!isLocked"
         class="actions align-center justify-center px-1 flex-shrink-1"
@@ -219,7 +220,7 @@ export default {
       return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {})._cn
     },
     childForeignKey() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.cn === this.hm.cn) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id) || {})._cn
     },
     disabledChildColumns() {
       return { [this.childForeignKey]: true }
@@ -359,11 +360,13 @@ export default {
       const _cn = this.childForeignKey
       this.newRecordModal = false
 
-      await this.childApi.update(id, {
-        [_cn]: parseIfInteger(this.parentId)
-      }, {
-        [_cn]: child[this.childForeignKey]
-      })
+      // await this.childApi.update(id, {
+      //   [_cn]: parseIfInteger(this.parentId)
+      // }, {
+      //   [_cn]: child[this.childForeignKey]
+      // })
+
+      await this.$api.data.update(this.childMeta.id, id, { [_cn]: parseIfInteger(this.parentId) })
 
       this.$emit('loadTableData')
       if ((this.childListModal || this.isForm) && this.$refs.childList) {

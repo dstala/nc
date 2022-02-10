@@ -3,6 +3,7 @@ import Model from './Model';
 import Column from './Column';
 import UITypes from '../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from './LinkToAnotherRecordColumn';
+import { MetaTable } from '../utils/globals';
 
 export default class Filter {
   id: string;
@@ -28,16 +29,21 @@ export default class Filter {
   }
 
   public static async insert(model: Partial<FilterObject>) {
-    const row = await Noco.ncMeta.metaInsert2(null, null, 'nc_filter_exp_v2', {
-      fk_model_id: model.fk_model_id,
-      fk_column_id: model.fk_column_id,
-      comparison_op: model.comparison_op,
-      value: model.value,
-      fk_parent_id: model.fk_parent_id,
+    const row = await Noco.ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.FILTER_EXP,
+      {
+        fk_model_id: model.fk_model_id,
+        fk_column_id: model.fk_column_id,
+        comparison_op: model.comparison_op,
+        value: model.value,
+        fk_parent_id: model.fk_parent_id,
 
-      is_group: model.is_group,
-      logical_op: model.logical_op
-    });
+        is_group: model.is_group,
+        logical_op: model.logical_op
+      }
+    );
     if (model?.children?.length) {
       await Promise.all(
         model.children.map(f => this.insert({ ...f, fk_parent_id: row.id }))
@@ -57,7 +63,7 @@ export default class Filter {
     const filterOdj = await Noco.ncMeta.metaGet2(
       null,
       null,
-      'nc_filter_exp_v2',
+      MetaTable.FILTER_EXP,
       {
         id: this.fk_parent_id
       }
@@ -70,7 +76,7 @@ export default class Filter {
     const childFilters = await Noco.ncMeta.metaList2(
       null,
       null,
-      'nc_filter_exp_v2',
+      MetaTable.FILTER_EXP,
       {
         condition: {
           fk_parent_id: this.id
@@ -92,7 +98,7 @@ export default class Filter {
     const filterObj = await Noco.ncMeta.metaGet2(
       base_id,
       db_alias,
-      'nc_filter_exp_v2',
+      MetaTable.FILTER_EXP,
       { fk_model_id: modelId, fk_parent_id: null }
     );
     return filterObj && new Filter(filterObj);
@@ -110,7 +116,7 @@ export default class Filter {
     const filters = await Noco.ncMeta.metaList2(
       base_id,
       db_alias,
-      'nc_filter_exp_v2',
+      MetaTable.FILTER_EXP,
       {
         condition: { fk_model_id: modelId }
       }
@@ -148,7 +154,7 @@ export default class Filter {
     const deleteRecursively = async filter => {
       if (!filter) return;
       for (const f of filter?.children || []) await deleteRecursively(f);
-      await Noco.ncMeta.metaDelete(null, null, 'nc_filter_exp_v2', filter.id);
+      await Noco.ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
     };
     await deleteRecursively(filter);
   }

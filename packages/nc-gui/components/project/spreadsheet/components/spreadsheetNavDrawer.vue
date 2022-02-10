@@ -744,16 +744,18 @@ export default {
       }
     },
     async loadViews() {
-      this.viewsList = await this.sqlOp(
-        {
-          dbAlias: this.nodes.dbAlias
-        },
-        'xcVirtualTableList',
-        {
-          tn: this.table
-        }
-      )
+      // this.viewsList = await this.sqlOp(
+      //   {
+      //     dbAlias: this.nodes.dbAlias
+      //   },
+      //   'xcVirtualTableList',
+      //   {
+      //     tn: this.table
+      //   }
+      // )
       // this.selectedViewIdLocal = this.viewsList && this.viewsList[0] && this.viewsList[0].id
+
+      this.viewsList = []
     },
     // async onViewChange() {
     //   let query_params = {}

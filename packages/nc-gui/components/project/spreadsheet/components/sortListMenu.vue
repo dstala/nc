@@ -80,7 +80,7 @@
 <script>
 export default {
   name: 'SortListMenu',
-  props: ['fieldList', 'value', 'isLocked'],
+  props: ['fieldList', 'value', 'isLocked', 'meta'],
   data: () => ({
     sortList: []
   }),
@@ -93,10 +93,12 @@ export default {
     },
     value(v) {
       this.sortList = v || []
+    },
+    async meta(v) {
+      this.sortList = v ? await this.$api.meta.sortList(v.id) : [] // this.value || []
     }
   },
-  created() {
-    this.sortList = this.value || []
+  async created() {
   },
   methods: {
     addSort() {

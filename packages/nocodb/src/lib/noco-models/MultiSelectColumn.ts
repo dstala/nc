@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import NocoCache from '../noco-cache/NocoCache';
+import { MetaTable } from '../utils/globals';
 
 export default class MultiSelectColumn {
   title: string;
@@ -13,7 +14,7 @@ export default class MultiSelectColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_columns_v2',
+      MetaTable.COLUMNS,
       {
         tn: model.tn,
         _tn: model._tn
@@ -28,7 +29,7 @@ export default class MultiSelectColumn {
       options = await Noco.ncMeta.metaList2(
         null, //,
         null, //model.db_alias,
-        'nc_col_select_options_v2',
+        MetaTable.COL_SELECT_OPTIONS,
         { condition: { fk_column_id: columnId } }
       );
       for (const option of options)

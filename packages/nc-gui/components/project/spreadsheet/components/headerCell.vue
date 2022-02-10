@@ -50,8 +50,6 @@
     <v-menu
       v-if="!isLocked &&!isPublicView && _isUIAllowed('edit-column') && !isForm"
       open-on-hover
-      offset-y
-      top
       left
       z-index="999"
     >

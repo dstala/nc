@@ -1,5 +1,6 @@
 import Noco from '../noco/Noco';
 import Project from './Project';
+import { MetaTable } from '../utils/globals';
 
 // todo: hide credentials
 export default class Base {
@@ -21,7 +22,7 @@ export default class Base {
   }
 
   public static async createBase(base: BaseBody & { projectId: string }) {
-    await Noco.ncMeta.metaInsert2(base.projectId, null, 'nc_bases_v2', {
+    await Noco.ncMeta.metaInsert2(base.projectId, null, MetaTable.BASES, {
       alias: base.alias,
       host: base.host,
       port: base.port,
@@ -38,12 +39,17 @@ export default class Base {
     const baseDataList = await Noco.ncMeta.metaList2(
       args.projectId,
       null,
-      'nc_bases_v2'
+      MetaTable.BASES
     );
     return baseDataList?.map(baseData => new Base(baseData));
   }
   static async get(id: string): Promise<Base> {
-    const baseData = await Noco.ncMeta.metaGet2(null, null, 'nc_bases_v2', id);
+    const baseData = await Noco.ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.BASES,
+      id
+    );
     return baseData && new Base(baseData);
   }
 

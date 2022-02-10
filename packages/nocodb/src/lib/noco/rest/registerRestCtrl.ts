@@ -12,6 +12,7 @@ import jsep from 'jsep';
 import jsepTreeToFormula from '../common/helpers/jsepTreeToFormula';
 import FormulaColumn from '../../noco-models/FormulaColumn';
 import Noco from '../Noco';
+import { MetaTable } from '../../utils/globals';
 
 export default function registerRestCtrl(ctx: {
   router: Router;
@@ -692,17 +693,38 @@ export default function registerRestCtrl(ctx: {
                   await Sort.deleteAll(model.id);
                 }
               }
-              await Noco.ncMeta.metaDelete(null, null, 'nc_col_lookup_v2', {});
-              await Noco.ncMeta.metaDelete(null, null, 'nc_col_rollup_v2', {});
-              await Noco.ncMeta.metaDelete(null, null, 'nc_col_formula_v2', {});
+              await Noco.ncMeta.metaDelete(
+                null,
+                null,
+                MetaTable.COL_LOOKUP,
+                {}
+              );
+              await Noco.ncMeta.metaDelete(
+                null,
+                null,
+                MetaTable.COL_ROLLUP,
+                {}
+              );
+              await Noco.ncMeta.metaDelete(
+                null,
+                null,
+                MetaTable.COL_FORMULA,
+                {}
+              );
 
-              await Noco.ncMeta.metaDelete(null, null, 'nc_columns_v2', null, {
-                _or: [
-                  { ui_data_type: { eq: UITypes.Lookup } },
-                  { ui_data_type: { eq: UITypes.Rollup } },
-                  { ui_data_type: { eq: UITypes.Formula } }
-                ]
-              });
+              await Noco.ncMeta.metaDelete(
+                null,
+                null,
+                MetaTable.COLUMNS,
+                null,
+                {
+                  _or: [
+                    { ui_data_type: { eq: UITypes.Lookup } },
+                    { ui_data_type: { eq: UITypes.Rollup } },
+                    { ui_data_type: { eq: UITypes.Formula } }
+                  ]
+                }
+              );
             }
             break;
           default:

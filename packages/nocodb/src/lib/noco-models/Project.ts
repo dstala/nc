@@ -1,6 +1,7 @@
 import Base, { BaseBody } from '../noco-models/Base';
 import Noco from '../noco/Noco';
 import { Project as ProjectType } from 'nc-common';
+import { MetaTable } from '../utils/globals';
 
 export default class Project implements ProjectType {
   public id: string;
@@ -25,7 +26,7 @@ export default class Project implements ProjectType {
     const { id: projectId } = await Noco.ncMeta.metaInsert2(
       null,
       null,
-      'nc_projects_v2',
+      MetaTable.PROJECT,
       {
         title: projectBody.title,
         prefix: projectBody.prefix,
@@ -48,7 +49,7 @@ export default class Project implements ProjectType {
     const projectList = await Noco.ncMeta.metaList2(
       null,
       null,
-      'nc_projects_v2'
+      MetaTable.PROJECT
     );
 
     return projectList.map(m => new Project(m));
@@ -58,7 +59,7 @@ export default class Project implements ProjectType {
     const projectData = await Noco.ncMeta.metaGet2(
       null,
       null,
-      'nc_projects_v2',
+      MetaTable.PROJECT,
       projectId
     );
     if (projectData) return new Project(projectData);
@@ -75,7 +76,7 @@ export default class Project implements ProjectType {
     const projectData = await Noco.ncMeta.metaGet2(
       null,
       null,
-      'nc_projects_v2',
+      MetaTable.PROJECT,
       projectId
     );
     if (projectData) {

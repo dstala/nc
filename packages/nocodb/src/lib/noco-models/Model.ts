@@ -8,6 +8,7 @@ import Filter from './Filter';
 import Sort from './Sort';
 import { Table, TableReq } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
+import { MetaTable } from '../utils/globals';
 
 export default class Model implements Table {
   copy_enabled: boolean;
@@ -69,7 +70,7 @@ export default class Model implements Table {
     const { id } = await Noco.ncMeta.metaInsert2(
       projectId,
       dbAlias,
-      'nc_models_v2',
+      MetaTable.MODELS,
       {
         tn: model.tn,
         _tn: model._tn
@@ -96,7 +97,7 @@ export default class Model implements Table {
       modelList = await Noco.ncMeta.metaList2(
         project_id,
         db_alias,
-        'nc_models_v2',
+        MetaTable.MODELS,
         {
           orderBy: {
             order: 'asc'
@@ -124,7 +125,7 @@ export default class Model implements Table {
       modelList = await Noco.ncMeta.metaList2(
         project_id,
         db_alias,
-        'nc_models_v2'
+        MetaTable.MODELS
       );
 
       for (const model of modelList) {
@@ -159,7 +160,7 @@ export default class Model implements Table {
       modelData = await Noco.ncMeta.metaGet2(
         base_id,
         db_alias,
-        'nc_models_v2',
+        MetaTable.MODELS,
         id || {
           tn
         }
@@ -206,7 +207,7 @@ export default class Model implements Table {
       modelData = await Noco.ncMeta.metaGet2(
         base_id,
         db_alias,
-        'nc_models_v2',
+        MetaTable.MODELS,
         id || {
           tn
         }
@@ -278,21 +279,21 @@ export default class Model implements Table {
       let colOptionTableName = null;
       switch (col.uidt) {
         case UITypes.Rollup:
-          colOptionTableName = 'nc_col_rollup_v2';
+          colOptionTableName = MetaTable.COL_ROLLUP;
           break;
         case UITypes.Lookup:
-          colOptionTableName = 'nc_col_lookup_v2';
+          colOptionTableName = MetaTable.COL_LOOKUP;
           break;
         case UITypes.ForeignKey:
         case UITypes.LinkToAnotherRecord:
-          colOptionTableName = 'nc_col_relations_v2';
+          colOptionTableName = MetaTable.COL_RELATIONS;
           break;
         case UITypes.MultiSelect:
         case UITypes.SingleSelect:
-          colOptionTableName = 'nc_col_select_options_v2';
+          colOptionTableName = MetaTable.COL_SELECT_OPTIONS;
           break;
         case UITypes.Formula:
-          colOptionTableName = 'nc_col_formula_v2';
+          colOptionTableName = MetaTable.COL_FORMULA;
           break;
       }
       if (colOptionTableName) {
@@ -302,11 +303,11 @@ export default class Model implements Table {
       }
     }
 
-    await Noco.ncMeta.metaDelete(null, null, 'nc_columns_v2', {
+    await Noco.ncMeta.metaDelete(null, null, MetaTable.COLUMNS, {
       fk_model_id: this.id
     });
 
-    await Noco.ncMeta.metaDelete(null, null, 'nc_models_v2', this.id);
+    await Noco.ncMeta.metaDelete(null, null, MetaTable.MODELS, this.id);
 
     return true;
   }

@@ -2,6 +2,7 @@ import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import NocoCache from '../noco-cache/NocoCache';
 import Column from './Column';
+import { MetaTable } from '../utils/globals';
 
 export default class LookupColumn {
   fk_relation_column_id: string;
@@ -27,7 +28,7 @@ export default class LookupColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_col_lookup_v2',
+      MetaTable.COL_LOOKUP,
       {
         tn: model.tn,
         _tn: model._tn
@@ -41,7 +42,7 @@ export default class LookupColumn {
       colData = await Noco.ncMeta.metaGet2(
         null, //,
         null, //model.db_alias,
-        'nc_col_lookup_v2',
+        MetaTable.COL_LOOKUP,
         { fk_column_id: columnId }
       );
       await NocoCache.setv2(colData.id, columnId, colData);

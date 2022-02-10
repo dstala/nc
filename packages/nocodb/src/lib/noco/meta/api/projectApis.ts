@@ -15,6 +15,7 @@ import getTableNameAlias from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import Noco from '../../Noco';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
+import { MetaTable } from '../../../utils/globals';
 
 // // Project CRUD
 
@@ -161,7 +162,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       const { id: modelId } = await Noco.ncMeta.metaInsert2(
         project.id,
         base.id,
-        'nc_models_v2',
+        MetaTable.MODELS,
         {
           tn: table.tn,
           _tn: meta._tn,

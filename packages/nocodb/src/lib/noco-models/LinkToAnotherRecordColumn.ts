@@ -3,6 +3,7 @@ import NcColumn from '../../types/NcColumn';
 import Column from './Column';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
+import { MetaTable } from '../utils/globals';
 
 export default class LinkToAnotherRecordColumn {
   fk_column_id?: string;
@@ -64,7 +65,7 @@ export default class LinkToAnotherRecordColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_col_relations_v2',
+      MetaTable.COL_RELATIONS,
       {
         tn: model.tn,
         _tn: model._tn
@@ -78,7 +79,7 @@ export default class LinkToAnotherRecordColumn {
       colData = await Noco.ncMeta.metaGet2(
         null, //,
         null, //model.db_alias,
-        'nc_col_relations_v2',
+        MetaTable.COL_RELATIONS,
         { fk_column_id: columnId }
       );
       await NocoCache.setv2(colData?.id, columnId, colData);

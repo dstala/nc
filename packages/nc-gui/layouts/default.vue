@@ -584,13 +584,13 @@ import { copyTextToClipboard } from '@/helpers/xutils'
 import Snackbar from '~/components/snackbar'
 import Language from '~/components/utils/language'
 import Loader from '~/components/loader'
-import TemplatesModal from '~/components/templates/templatesModal'
-import BetterUX from '~/components/utils/betterUX'
+// import TemplatesModal from '~/components/templates/templatesModal'
+// import BetterUX from '~/components/utils/betterUX'
 
 export default {
   components: {
-    BetterUX,
-    TemplatesModal,
+    // BetterUX,
+    // TemplatesModal,
     Loader,
     ReleaseInfo,
     Language,

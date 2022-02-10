@@ -49,7 +49,7 @@
               @click="$emit('add',ch)"
             >
               <v-card-text class="primary-value textColor--text text--lighten-2 d-flex">
-                <span class="font-weight-bold"> {{ ch[primaryCol] }}&nbsp;</span>
+                <span class="font-weight-bold"> {{ ch[primaryCol] || ch }}&nbsp;</span>
                 <span
                   v-if="primaryKey"
                   class="grey--text caption primary-key "
@@ -147,14 +147,14 @@ export default {
           query: this.query
         }])
       } else {
-        if (!this.api) {
-          return
-        }
+        // if (!this.api) {
+        //   return
+        // }
 
-        let where = this.queryParams.where || ''
-        if (this.query) {
-          where += (where ? '~and' : '') + `(${this.primaryCol},like,%${this.query}%)`
-        }
+        const where = this.queryParams.where || ''
+        // if (this.query) {
+        //   where += (where ? '~and' : '') + `(${this.primaryCol},like,%${this.query}%)`
+        // }
 
         if (this.mm) {
           this.data = await this.api.paginatedM2mNotChildrenList({
@@ -164,12 +164,22 @@ export default {
             where
           }, this.mm.vtn, this.parentId)
         } else {
-          this.data = await this.api.paginatedList({
-            limit: this.size,
-            offset: this.size * (this.page - 1),
-            ...this.queryParams,
-            where
-          })
+          this.data = (await this.$api.data.list(
+            this.meta.id, {
+              query: {
+                limit: this.size,
+                offset: this.size * (this.page - 1)
+                // ...this.queryParams,
+                // where
+              }
+            })).data.data
+
+          //   await this.api.paginatedList({
+          //   limit: this.size,
+          //   offset: this.size * (this.page - 1),
+          //   ...this.queryParams,
+          //   where
+          // })
         }
       }
     }

@@ -81,10 +81,11 @@
 
         <sort-list
           v-if="!isForm"
-          v-model="sortList"
           :is-locked="isLocked"
-          :field-list="[...realFieldList, ...formulaFieldList]"
+          :meta="meta"
         />
+        <!--        v-model="sortList"-->
+        <!--        :field-list="[...realFieldList, ...formulaFieldList]"-->
         <column-filter
           v-if="!isForm"
           v-model="filters"
@@ -288,10 +289,9 @@
           :style="{height:isForm ? '100%' : 'calc(100% - 36px)'}"
           style="overflow: auto;width:100%"
         >
-          <v-skeleton-loader v-if="!dataLoaded && loadingData || !meta" type="table" />
-          <template v-else-if="true || selectedView && (selectedView.type === 'table' || selectedView.show_as === 'grid' )">
+          <!--          <v-skeleton-loader v-if="!dataLoaded && loadingData || !meta" type="table" />-->
+          <template v-if="true || selectedView && (selectedView.type === 'table' || selectedView.show_as === 'grid' )">
             <xc-grid-view
-              :key="key + selectedViewId"
               ref="ncgridview"
               droppable
               :relation-type="relationType"

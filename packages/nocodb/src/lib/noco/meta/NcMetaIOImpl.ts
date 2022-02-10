@@ -8,6 +8,7 @@ import XcMigrationSource from '../common/XcMigrationSource';
 
 import NcMetaIO, { META_TABLES } from './NcMetaIO';
 import NcConnectionMgr from '../common/NcConnectionMgr';
+import { MetaTable } from '../../utils/globals';
 
 // import { nanoid } from 'nanoid';
 /*import { v4 as uuidv4 } from 'uuid';*/
@@ -482,7 +483,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
       });
 
       // todo
-      await this.knexConnection('nc_projects_v2').insert({
+      await this.knexConnection(MetaTable.PROJECT).insert({
         id,
         title: projectName
       });
@@ -724,70 +725,70 @@ export default class NcMetaIOImpl extends NcMetaIO {
   private genNanoid(target: string) {
     let prefix;
     switch (target) {
-      case 'nc_projects_v2':
+      case MetaTable.PROJECT:
         prefix = 'bs_';
         break;
-      case 'nc_bases_v2':
+      case MetaTable.BASES:
         prefix = 'bs_';
         break;
-      case 'nc_models_v2':
+      case MetaTable.MODELS:
         prefix = 'md_';
         break;
-      case 'nc_columns_v2':
+      case MetaTable.COLUMNS:
         prefix = 'cl_';
         break;
-      case 'nc_col_relations_v2':
+      case MetaTable.COL_RELATIONS:
         prefix = 'ln_';
         break;
-      case 'nc_col_select_options_v2':
+      case MetaTable.COL_SELECT_OPTIONS:
         prefix = 'sl_';
         break;
-      case 'nc_col_lookup_v2':
+      case MetaTable.COL_LOOKUP:
         prefix = 'lk_';
         break;
-      case 'nc_col_rollup_v2':
+      case MetaTable.COL_ROLLUP:
         prefix = 'rl_';
         break;
-      case 'nc_col_formula_v2':
+      case MetaTable.COL_FORMULA:
         prefix = 'fm_';
         break;
-      case 'nc_filter_exp_v2':
+      case MetaTable.FILTER_EXP:
         prefix = 'fi_';
         break;
-      case 'nc_sort_v2':
+      case MetaTable.SORT:
         prefix = 'so_';
         break;
-      case 'nc_shared_views_v2':
+      case MetaTable.SHARED_VIEWS:
         prefix = 'sv_';
         break;
-      case 'nc_acl_v2':
+      case MetaTable.ACL:
         prefix = 'ac_';
         break;
-      case 'nc_form_view_v2':
+      case MetaTable.FORM_VIEW:
         prefix = 'fv_';
         break;
-      case 'nc_form_view_columns_v2':
+      case MetaTable.FORM_VIEW_COLUMNS:
         prefix = 'fvc_';
         break;
-      case 'nc_gallery_view_v2':
+      case MetaTable.GALLERY_VIEW:
         prefix = 'gv_';
         break;
-      case 'nc_gallery_view_columns_v2':
+      case MetaTable.GALLERY_VIEW_COLUMNS:
         prefix = 'gvc_';
         break;
-      case 'nc_kanban_view_v2':
+      case MetaTable.KANBAN_VIEW:
         prefix = 'kv_';
         break;
-      case 'nc_kanban_view_columns_v2':
+      case MetaTable.KANBAN_VIEW_COLUMNS:
         prefix = 'kvc_';
         break;
-      case 'nc_users_v2':
+      case MetaTable.USERS:
         prefix = 'us_';
         break;
-      case 'nc_orgs_v2':
+      case MetaTable.ORGS:
         prefix = 'org_';
         break;
-      case 'nc_teams_v2':
+      case MetaTable.TEAMS:
         prefix = 'tm_';
         break;
     }

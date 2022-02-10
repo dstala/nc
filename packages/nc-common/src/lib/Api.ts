@@ -175,7 +175,7 @@ export interface Sort {
 }
 
 export interface SortList {
-  sorts: { list: SharedView[] };
+  sorts: { list: Sort[] };
 }
 
 export interface Column {

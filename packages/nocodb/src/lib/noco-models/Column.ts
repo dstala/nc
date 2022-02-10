@@ -10,6 +10,7 @@ import MultiSelectColumn from './MultiSelectColumn';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
 import { Column as ColumnType } from 'nc-common';
+import { MetaTable } from '../utils/globals';
 
 export default class Column implements ColumnType {
   public fk_model_id: string;
@@ -62,7 +63,7 @@ export default class Column implements ColumnType {
     const row = await Noco.ncMeta.metaInsert2(
       null, //column.project_id || column.base_id,
       null, //column.db_alias,
-      'nc_columns_v2',
+      MetaTable.COLUMNS,
       {
         fk_model_id: column.fk_model_id,
         cn: column.cn,
@@ -106,7 +107,7 @@ export default class Column implements ColumnType {
         await Noco.ncMeta.metaInsert2(
           column.project_id,
           column.db_alias,
-          'nc_col_lookup_v2',
+          MetaTable.COL_LOOKUP,
           {
             fk_column_id: colId,
 
@@ -120,7 +121,7 @@ export default class Column implements ColumnType {
         await Noco.ncMeta.metaInsert2(
           column.project_id,
           column.db_alias,
-          'nc_col_rollup_v2',
+          MetaTable.COL_ROLLUP,
           {
             fk_column_id: colId,
             fk_relation_column_id: column.fk_relation_column_id,
@@ -134,7 +135,7 @@ export default class Column implements ColumnType {
         await Noco.ncMeta.metaInsert2(
           column.project_id,
           column.db_alias,
-          'nc_col_relations_v2',
+          MetaTable.COL_RELATIONS,
           {
             fk_column_id: colId,
 
@@ -161,7 +162,7 @@ export default class Column implements ColumnType {
         await Noco.ncMeta.metaInsert2(
           column.project_id,
           column.db_alias,
-          'nc_col_formula_v2',
+          MetaTable.COL_FORMULA,
           {
             fk_column_id: colId,
             formula: column.formula
@@ -174,7 +175,7 @@ export default class Column implements ColumnType {
           await Noco.ncMeta.metaInsert2(
             column.project_id,
             column.db_alias,
-            'nc_col_select_options_v2',
+            MetaTable.COL_SELECT_OPTIONS,
             {
               fk_column_id: colId,
               title: option
@@ -222,7 +223,7 @@ export default class Column implements ColumnType {
               await Noco.ncMeta.metaInsert2(
                 model.project_id,
                 model.db_alias,
-                'nc_col_select_options_v2',
+                MetaTable.COL_SELECT_OPTIONS',
                 {
                   column_id: colId,
                   name: option
@@ -300,7 +301,7 @@ export default class Column implements ColumnType {
   }): Promise<Column[]> {
     let columnsList = null; // await NocoCache.getv2(fk_model_id);
     if (!columnsList?.length) {
-      columnsList = await Noco.ncMeta.metaList2(null, null, 'nc_columns_v2', {
+      columnsList = await Noco.ncMeta.metaList2(null, null, MetaTable.COLUMNS, {
         condition: {
           fk_model_id
         },
@@ -371,7 +372,7 @@ export default class Column implements ColumnType {
       colData = await Noco.ncMeta.metaGet2(
         base_id,
         db_alias,
-        'nc_columns_v2',
+        MetaTable.COLUMNS,
         colId
       );
       await NocoCache.set(colId, colData);
@@ -391,21 +392,21 @@ export default class Column implements ColumnType {
     let colOptionTableName = null;
     switch (col.uidt) {
       case UITypes.Rollup:
-        colOptionTableName = 'nc_col_rollup_v2';
+        colOptionTableName = MetaTable.COL_ROLLUP;
         break;
       case UITypes.Lookup:
-        colOptionTableName = 'nc_col_lookup_v2';
+        colOptionTableName = MetaTable.COL_LOOKUP;
         break;
       case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord:
-        colOptionTableName = 'nc_col_relations_v2';
+        colOptionTableName = MetaTable.COL_RELATIONS;
         break;
       case UITypes.MultiSelect:
       case UITypes.SingleSelect:
-        colOptionTableName = 'nc_col_select_options_v2';
+        colOptionTableName = MetaTable.COL_SELECT_OPTIONS;
         break;
       case UITypes.Formula:
-        colOptionTableName = 'nc_col_formula_v2';
+        colOptionTableName = MetaTable.COL_FORMULA;
         break;
     }
     if (colOptionTableName) {
@@ -413,7 +414,7 @@ export default class Column implements ColumnType {
         fk_column_id: col.id
       });
     }
-    await Noco.ncMeta.metaDelete(null, null, 'nc_columns_v2', col.id);
+    await Noco.ncMeta.metaDelete(null, null, MetaTable.COLUMNS, col.id);
   }
 
   static async update(colId: string, column: any) {
@@ -454,31 +455,36 @@ export default class Column implements ColumnType {
       case UITypes.Lookup:
         // LookupColumn.insert()
 
-        await Noco.ncMeta.metaDelete(null, null, 'nc_col_lookup_v2', {
+        await Noco.ncMeta.metaDelete(null, null, MetaTable.COL_LOOKUP, {
           fk_column_id: colId
         });
         break;
       case UITypes.Rollup:
-        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_rollup_v2', {
+        await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_ROLLUP, {
           fk_column_id: colId
         });
         break;
       case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord:
-        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_relations_v2', {
+        await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_RELATIONS, {
           fk_column_id: colId
         });
         break;
       case UITypes.Formula:
-        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_formula_v2', {
+        await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
           fk_column_id: colId
         });
         break;
       case UITypes.MultiSelect:
       case UITypes.SingleSelect:
-        await Noco.ncMeta.metaInsert2(null, null, 'nc_col_select_options_v2', {
-          fk_column_id: colId
-        });
+        await Noco.ncMeta.metaInsert2(
+          null,
+          null,
+          MetaTable.COL_SELECT_OPTIONS,
+          {
+            fk_column_id: colId
+          }
+        );
         break;
     }
     /*  default:
@@ -534,7 +540,7 @@ export default class Column implements ColumnType {
     await Noco.ncMeta.metaUpdate(
       null, //column.project_id || column.base_id,
       null, //column.db_alias,
-      'nc_columns_v2',
+      MetaTable.COLUMNS,
       {
         cn: column.cn,
         _cn: column._cn,

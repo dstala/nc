@@ -195,11 +195,15 @@ export default {
       }
 
       if (!this.api || this.isNew) { return }
-      this.data = await this.api.paginatedList({
-        limit: this.size,
-        offset: this.size * (this.page - 1),
-        ...this.queryParams
-      })
+      this.data = (await this.$api.data.list(
+        this.meta.id
+        , {
+          query: {
+            limit: this.size,
+            offset: this.size * (this.page - 1),
+            ...this.queryParams
+          }
+        })).data.data
     }
   }
 }

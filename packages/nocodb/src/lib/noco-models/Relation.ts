@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import NcRelation from '../../types/NcRelation';
+import { MetaTable } from '../utils/globals';
 
 export default class Relation implements NcRelation {
   constructor(data: NcColumn) {
@@ -11,7 +12,7 @@ export default class Relation implements NcRelation {
     await Noco.ncMeta.metaInsert2(
       relation.base_id,
       relation.db_alias,
-      'nc_relations_v2',
+      MetaTable.COL_RELATIONS,
       relation
     );
   }
@@ -25,9 +26,14 @@ export default class Relation implements NcRelation {
     condition: any;
   }): Promise<Relation[]> {
     return (
-      await Noco.ncMeta.metaList2(project_id, db_alias, 'nc_relations_v2', {
-        condition
-      })
+      await Noco.ncMeta.metaList2(
+        project_id,
+        db_alias,
+        MetaTable.COL_RELATIONS,
+        {
+          condition
+        }
+      )
     ).map(m => new Relation(m));
   }
 

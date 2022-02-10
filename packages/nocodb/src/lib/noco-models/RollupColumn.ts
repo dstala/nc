@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import Column from './Column';
+import { MetaTable } from '../utils/globals';
 
 export default class RollupColumn {
   constructor(data: NcColumn) {
@@ -11,7 +12,7 @@ export default class RollupColumn {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
       model.db_alias,
-      'nc_col_rollup_v2',
+      MetaTable.COL_ROLLUP,
       {
         tn: model.tn,
         _tn: model._tn
@@ -23,7 +24,7 @@ export default class RollupColumn {
     const column = await Noco.ncMeta.metaGet2(
       null, //,
       null, //model.db_alias,
-      'nc_col_rollup_v2',
+      MetaTable.COL_ROLLUP,
       { fk_column_id: columnId }
     );
 

@@ -106,6 +106,7 @@
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'
 import ItemChip from '~/components/project/spreadsheet/components/virtualCell/components/itemChip'
+import { parseIfInteger } from '~/helpers'
 
 export default {
   name: 'BelongsToCell',
@@ -319,7 +320,7 @@ export default {
       const pkColumns = this.parentMeta.columns.filter(c => c.pk)
       const pid = pkColumns.map(c => parent[c._cn]).join('___')
       const id = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
-      const _cn = this.meta.columns.find(c => c.cn === this.bt.cn)._cn
+      const _cn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
       let isNum = false
 
       if (pkColumns.length === 1) {
@@ -334,11 +335,14 @@ export default {
         return
       }
 
-      await this.api.update(id, {
-        [_cn]: isNum ? +pid : pid
-      }, {
-        [_cn]: this.value && this.value[this.parentPrimaryKey]
-      })
+      // await this.api.update(id, {
+      //   [_cn]: isNum ? +pid : pid
+      // }, {
+      //   [_cn]: this.value && this.value[this.parentPrimaryKey]
+      // })
+
+      await this.$api.data.update(this.meta.id, id, { [_cn]: isNum ? +pid : pid })
+
       this.pid = pid
 
       this.newRecordModal = false

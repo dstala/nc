@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import Model from './Model';
 import Column from './Column';
+import { MetaTable } from '../utils/globals';
 
 export default class Sort {
   id: string;
@@ -20,7 +21,7 @@ export default class Sort {
   }
 
   public static async insert(model: Partial<SortObject>) {
-    await Noco.ncMeta.metaInsert2(null, null, 'nc_sort_v2', {
+    await Noco.ncMeta.metaInsert2(null, null, MetaTable.SORT, {
       fk_model_id: model.fk_model_id,
       fk_column_id: model.fk_column_id,
       direction: model.direction
@@ -28,7 +29,7 @@ export default class Sort {
   }
 
   public static async deleteAll(modelId: string) {
-    await Noco.ncMeta.metaDelete(null, null, 'nc_sort_v2', {
+    await Noco.ncMeta.metaDelete(null, null, MetaTable.SORT, {
       fk_model_id: modelId
     });
   }
@@ -52,7 +53,7 @@ export default class Sort {
     const sortList = await Noco.ncMeta.metaList2(
       base_id,
       db_alias,
-      'nc_sort_v2',
+      MetaTable.SORT,
       { condition: { fk_model_id: modelId } }
     );
     return sortList.map(s => new Sort(s));

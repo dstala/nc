@@ -38,6 +38,7 @@ import Column from '../../noco-models/Column';
 // import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
 // import { RestCtrlv2 } from './RestCtrlv2';
 import registerRestCtrl from './registerRestCtrl';
+import { MetaTable } from '../../utils/globals';
 // import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const log = debug('nc:api:rest');
@@ -584,7 +585,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
           const { id: modelId } = await this.xcMeta.metaInsert2(
             this.projectId,
             this.dbAlias,
-            'nc_models_v2',
+            MetaTable.MODELS,
             {
               tn: table.tn,
               _tn: meta._tn,
