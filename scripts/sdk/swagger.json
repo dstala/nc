@@ -74,28 +74,6 @@
         ]
       }
     },
-    "/auth/user/me - copy": {
-      "parameters": [],
-      "get": {
-        "summary": "User Info",
-        "operationId": "me",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "AUTH"
-        ]
-      }
-    },
     "/auth/user/signin": {
       "post": {
         "summary": "Signin",
@@ -429,6 +407,27 @@
         }
       }
     },
+    "/projects/{projectId}/reorder": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "project-reorder",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/projects/{projectId}/{baseId}/tables": {
       "parameters": [
         {
@@ -665,6 +664,27 @@
         "description": ""
       }
     },
+    "/tables/{tableId}/reorder": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "table-reorder",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/tables/{tableId}/columns": {
       "parameters": [
         {
@@ -801,6 +821,27 @@
         ]
       }
     },
+    "/tables/{tableId}/columns/reorder": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "column-reorder",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/views/{viewId}/filters": {
       "parameters": [
         {
@@ -834,7 +875,16 @@
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Filter"
+              }
+            }
+          }
+        }
       }
     },
     "/views/{viewId}/sorts": {
@@ -870,10 +920,91 @@
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sort"
+              }
+            }
+          }
+        }
       }
     },
     "/views/{viewsId}/filters/{filterId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewsId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "filterId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "filter-get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Filter"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "filter-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Filter"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "filter-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/views/{viewsId}/filters/{filterId}/reorder": {
       "parameters": [
         {
           "schema": {
@@ -892,12 +1023,49 @@
           "required": true
         }
       ],
-      "get": {
+      "post": {
         "summary": "",
-        "operationId": "filter-get",
+        "operationId": "filter-reorder",
         "responses": {
           "200": {
             "description": "OK"
+          }
+        },
+        "description": ""
+      }
+    },
+    "/views/{viewId}/sorts/{sortId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "sortId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "sort-get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sort"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -906,7 +1074,7 @@
       },
       "put": {
         "summary": "",
-        "operationId": "filter-update",
+        "operationId": "sort-update",
         "responses": {
           "200": {
             "description": "OK"
@@ -914,11 +1082,20 @@
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sort"
+              }
+            }
+          }
+        }
       },
       "delete": {
         "summary": "",
-        "operationId": "filter-delete",
+        "operationId": "sort-delete",
         "responses": {
           "200": {
             "description": "OK"
@@ -929,7 +1106,7 @@
         ]
       }
     },
-    "/views/{viewId}/sorts/{sortId}": {
+    "/views/{viewId}/sorts/{sortId}/reorder": {
       "parameters": [
         {
           "schema": {
@@ -948,44 +1125,17 @@
           "required": true
         }
       ],
-      "get": {
+      "post": {
         "summary": "",
-        "operationId": "sort-get",
+        "operationId": "sort-reorder",
         "responses": {
           "200": {
             "description": "OK"
           }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "put": {
-        "summary": "",
-        "operationId": "sort-update",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "delete": {
-        "summary": "",
-        "operationId": "sort-delete",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
+        }
       }
     },
-    "tables/{tableId}/webhooks/{webhookId}": {
+    "/tables/{tableId}/webhooks/{webhookId}": {
       "parameters": [
         {
           "schema": {
@@ -1040,6 +1190,36 @@
         "tags": [
           "Meta"
         ]
+      }
+    },
+    "/tables/{tableId}/webhooks/{webhookId}/reorder": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "webhookId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "webhook-reorder",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": ""
       }
     },
     "/tables/{tableId}/webhooks": {
@@ -1204,7 +1384,7 @@
       ],
       "put": {
         "summary": "",
-        "operationId": "grid-update",
+        "operationId": "form-update",
         "responses": {
           "200": {
             "description": "OK"
@@ -1216,7 +1396,7 @@
       },
       "delete": {
         "summary": "",
-        "operationId": "grid-delete",
+        "operationId": "form-delete",
         "responses": {
           "200": {
             "description": "OK"
@@ -1228,7 +1408,7 @@
       },
       "get": {
         "summary": "",
-        "operationId": "grid-read",
+        "operationId": "form-read",
         "responses": {
           "200": {
             "description": "OK"
@@ -2043,6 +2223,93 @@
           "tn",
           "_tn"
         ]
+      },
+      "View": {
+        "title": "Table",
+        "type": "object",
+        "examples": [
+          {
+            "id": "string",
+            "fk_project_id": "string",
+            "fk_base_id": "string",
+            "title": "string",
+            "alias": "string",
+            "type": "string",
+            "enabled": true,
+            "parent_id": "string",
+            "show_as": "string",
+            "tags": "string",
+            "pinned": true,
+            "deleted": true,
+            "order": 0,
+            "column": [
+              {
+                "id": "string",
+                "base_id": "string",
+                "fk_model_id": "string",
+                "title": "string",
+                "alias": "string",
+                "ui_data_type": "string",
+                "data_type": "string",
+                "numeric_precision": "string",
+                "numeric_scale": "string",
+                "character_maximum_length": "string",
+                "column_ordinal_position": "string",
+                "primary_key": true,
+                "primary_value": true,
+                "rqd": "string",
+                "un": "string",
+                "column_type": "string",
+                "auto_increment": true,
+                "unique": true,
+                "column_default": "string",
+                "column_comment": "string",
+                "character_set_name": "string",
+                "data_type_x": "string",
+                "data_type_x_precision": "string",
+                "data_type_x_scale": "string",
+                "auto_update_timestamp": true,
+                "deleted": true,
+                "visible": true,
+                "order": 0,
+                "colOptions": {
+                  "id": "string",
+                  "type": "string",
+                  "virtual": true,
+                  "fk_column_id": "string",
+                  "fk_child_column_id": "string",
+                  "fk_parent_column_id": "string",
+                  "fk_mm_model_id": "string",
+                  "fk_mm_child_column_id": "string",
+                  "fk_mm_parent_column_id": "string",
+                  "ur": "string",
+                  "dr": "string",
+                  "fk_index_name": "string",
+                  "deleted": "string",
+                  "order": "string"
+                }
+              }
+            ],
+            "columnByIds": {}
+          }
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "boolean"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "order": {
+            "type": "number"
+          },
+          "fk_model_id": {
+            "type": "string"
+          }
+        }
       },
       "TableInfo": {
         "title": "Table",
@@ -2906,6 +3173,28 @@
         }
       },
       "GalleryColumn": {
+        "title": "GalleryColumn",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "help": {
+            "type": "string"
+          },
+          "fk_col_id": {
+            "type": "string"
+          },
+          "fk_gallery_id": {
+            "type": "string"
+          }
+        }
+      },
+      "GridColumn": {
         "title": "GalleryColumn",
         "type": "object",
         "description": "",

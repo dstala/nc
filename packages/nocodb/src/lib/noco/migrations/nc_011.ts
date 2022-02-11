@@ -286,6 +286,10 @@ const up = async knex => {
     table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
 
+    table.string('title');
+    table.integer('type');
+    table.boolean('is_default');
+
     // todo:  type
 
     table.boolean('show');
@@ -408,10 +412,8 @@ const up = async knex => {
       .primary()
       .notNullable();
 
-    table.string('fk_form_view_id', 20);
-    table
-      .foreign('fk_form_view_id')
-      .references(`${MetaTable.FORM_VIEW}.fk_view_id`);
+    table.string('fk_view_id', 20);
+    table.foreign('fk_view_id').references(`${MetaTable.FORM_VIEW}.fk_view_id`);
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
 
@@ -460,9 +462,9 @@ const up = async knex => {
       .primary()
       .notNullable();
 
-    table.string('fk_gallery_view_id', 20);
+    table.string('fk_view_id', 20);
     table
-      .foreign('fk_gallery_view_id')
+      .foreign('fk_view_id')
       .references(`${MetaTable.GALLERY_VIEW}.fk_view_id`);
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
@@ -503,10 +505,8 @@ const up = async knex => {
       .primary()
       .notNullable();
 
-    table.string('fk_grid_view_id', 20);
-    table
-      .foreign('fk_grid_view_id')
-      .references(`${MetaTable.GRID_VIEW}.fk_view_id`);
+    table.string('fk_view_id', 20);
+    table.foreign('fk_view_id').references(`${MetaTable.GRID_VIEW}.fk_view_id`);
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
 
@@ -548,9 +548,9 @@ const up = async knex => {
       .primary()
       .notNullable();
 
-    table.string('fk_kanban_view_id', 20);
+    table.string('fk_view_id', 20);
     table
-      .foreign('fk_kanban_view_id')
+      .foreign('fk_view_id')
       .references(`${MetaTable.KANBAN_VIEW}.fk_view_id`);
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);

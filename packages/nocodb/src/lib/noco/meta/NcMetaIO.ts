@@ -77,7 +77,8 @@ export default abstract class NcMetaIO {
     base_id: string,
     dbAlias: string,
     target: string,
-    data: any
+    data: any,
+    ignoreIdGeneration?: boolean
   ): Promise<any>;
 
   public abstract audit(

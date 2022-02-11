@@ -5,7 +5,7 @@ import { Acls } from '../../../interface/config';
 import { BaseModelSql } from '../../dataMapper';
 
 import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
-import { nocoExecute } from '../noco-resolver/NocoExecute';
+// import { nocoExecute } from '../noco-resolver/NocoExecute';
 
 // function parseHrtimeToSeconds(hrtime) {
 //   const seconds = (hrtime[0] + hrtime[1] / 1e6).toFixed(3);
@@ -48,47 +48,47 @@ export class RestCtrlv2 {
     // this.router = Router();
   }
 
-  public mapRoutes(router: Router): any {
+  public mapRoutes(_router: Router): any {
     // ruoter
-
-    router.get('/v2', async (_req, res) => {
-      try {
-        res.json(
-          await nocoExecute(
-            {
-              [`${this.models[this.table]._tn}List`]: await this.baseModels2[
-                this.table
-              ].defaultResolverReq
-            },
-            this.rootResolver,
-            {},
-            1
-          )
-        );
-      } catch (e) {
-        console.log(e);
-        res.status(500).json({ msg: e.message });
-      }
-    });
-    router.get('/v2/:id', async (req, res) => {
-      try {
-        res.json(
-          await nocoExecute(
-            {
-              [`${this.models[this.table]._tn}Read`]: await this.baseModels2[
-                this.table
-              ].defaultResolverReq
-            },
-            this.rootResolver,
-            {},
-            req.params.id
-          )
-        );
-      } catch (e) {
-        console.log(e);
-        res.status(500).json({ msg: e.message });
-      }
-    });
+    //   router.get('/v2', async (_req, res) => {
+    //     try {
+    //       res.json(
+    //         await nocoExecute(
+    //           {
+    //             [`${this.models[this.table]._tn}List`]: await this.baseModels2[
+    //               this.table
+    //             ].defaultResolverReq
+    //           },
+    //           this.rootResolver,
+    //           {},
+    //           1
+    //         )
+    //       );
+    //     } catch (e) {
+    //       console.log(e);
+    //       res.status(500).json({ msg: e.message });
+    //     }
+    //   });
+    //   router.get('/v2/:id', async (req, res) => {
+    //     try {
+    //       res.json(
+    //         await nocoExecute(
+    //           {
+    //             [`${this.models[this.table]._tn}Read`]: await this.baseModels2[
+    //               this.table
+    //             ].defaultResolverReq
+    //           },
+    //           this.rootResolver,
+    //           {},
+    //           req.params.id
+    //         )
+    //       );
+    //     } catch (e) {
+    //       console.log(e);
+    //       res.status(500).json({ msg: e.message });
+    //     }
+    //   });
+    // }
   }
 }
 

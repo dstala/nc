@@ -236,18 +236,19 @@ export default class NcMetaIOImpl extends NcMetaIO {
 
   public async metaInsert2(
     project_id: string,
-    db_alias: string,
+    base_id: string,
     target: string,
-    data: any
+    data: any,
+    ignoreIdGeneration?: boolean
   ): Promise<any> {
     const id = this.genNanoid(target);
     const insertObj = {
-      id,
+      ...(ignoreIdGeneration ? {} : { id }),
       created_at: this.knexConnection?.fn?.now(),
       updated_at: this.knexConnection?.fn?.now(),
       ...data
     };
-    if (db_alias !== null) insertObj.db_alias = db_alias;
+    if (base_id !== null) insertObj.base_id = base_id;
     if (project_id !== null) insertObj.project_id = project_id;
     await this.knexConnection(target).insert(insertObj);
     return { ...data, id };
@@ -790,6 +791,12 @@ export default class NcMetaIOImpl extends NcMetaIO {
         break;
       case MetaTable.TEAMS:
         prefix = 'tm_';
+        break;
+      case MetaTable.VIEWS:
+        prefix = 'vw_';
+        break;
+      default:
+        prefix = 'nc_';
         break;
     }
 

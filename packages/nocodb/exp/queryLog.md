@@ -3,11 +3,11 @@
 
 ```
   knex:client acquired connection from pool: __knexUid15 +1m
-  knex:query select * from `nc_models_v2` where `base_id` = ? and `db_alias` = ? and `title` = ? limit ? undefined +1m
+  knex:query select * from `nc_models_v2` where `base_id` = ? and `base_id` = ? and `title` = ? limit ? undefined +1m
   knex:bindings [ 'civil_pony_0uaa', 'db', 'country', 1 ] undefined +1m
   knex:client releasing connection to pool: __knexUid15 +8ms
   knex:client acquired connection from pool: __knexUid15 +3ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +9ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +9ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '26abfe9c-db14-4fd6-b4c5-c752deec8fb9' ] undefined +8ms
   knex:client releasing connection to pool: __knexUid15 +2ms
   knex:client acquired connection from pool: __knexUid15 +2ms
@@ -15,7 +15,7 @@
   knex:bindings [ '740ddb73-18cd-418b-9407-79aab0fa391f', 1 ] undefined +4ms
   knex:client releasing connection to pool: __knexUid15 +2ms
   knex:client acquired connection from pool: __knexUid15 +2ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +4ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +4ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '26abfe9c-db14-4fd6-b4c5-c752deec8fb9' ] undefined +4ms
   knex:client releasing connection to pool: __knexUid15 +2ms
   knex:client acquired connection from pool: __knexUid15 +1ms
@@ -27,7 +27,7 @@
   knex:bindings [ 10 ] undefined +18ms
   knex:client releasing connection to pool: __knexUid18 +3ms
   knex:client acquired connection from pool: __knexUid15 +5s
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +5s
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +5s
   knex:bindings [ 'civil_pony_0uaa', 'db', '26abfe9c-db14-4fd6-b4c5-c752deec8fb9' ] undefined +5s
   knex:client releasing connection to pool: __knexUid15 +288ms
   knex:client acquired connection from pool: __knexUid15 +2ms
@@ -47,7 +47,7 @@
   knex:bindings [ '26316257-7bb6-44dd-b4a9-cc52b06de966', 1 ] undefined +6ms
   knex:client releasing connection to pool: __knexUid15 +5ms
   knex:client acquired connection from pool: __knexUid15 +1ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +6ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +6ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '26316257-7bb6-44dd-b4a9-cc52b06de966' ] undefined +7ms
   knex:client releasing connection to pool: __knexUid15 +3ms
   knex:client acquired connection from pool: __knexUid15 +3ms
@@ -72,11 +72,11 @@ GET /nc/civil_pony_0uaa/api/v2/country 200 3228 - 9861.459 ms
 
 ```
   knex:client acquired connection from pool: __knexUid13 +2m
-  knex:query select * from `nc_models_v2` where `base_id` = ? and `db_alias` = ? and `title` = ? limit ? undefined +2m
+  knex:query select * from `nc_models_v2` where `base_id` = ? and `base_id` = ? and `title` = ? limit ? undefined +2m
   knex:bindings [ 'civil_pony_0uaa', 'db', 'city', 1 ] undefined +2m
   knex:client releasing connection to pool: __knexUid13 +105ms
   knex:client acquired connection from pool: __knexUid13 +9ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +114ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +114ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '26316257-7bb6-44dd-b4a9-cc52b06de966' ] undefined +114ms
   knex:client releasing connection to pool: __knexUid13 +3ms
   knex:client acquired connection from pool: __knexUid13 +3ms
@@ -88,7 +88,7 @@ GET /nc/civil_pony_0uaa/api/v2/country 200 3228 - 9861.459 ms
   knex:client releasing connection to pool: __knexUid13 +1ms
   knex:client releasing connection to pool: __knexUid15 +1ms
   knex:client acquired connection from pool: __knexUid15 +2ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +4ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +4ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '26316257-7bb6-44dd-b4a9-cc52b06de966' ] undefined +4ms
   knex:client releasing connection to pool: __knexUid15 +2ms
   knex:client acquired connection from pool: __knexUid15 +4ms
@@ -105,9 +105,9 @@ GET /nc/civil_pony_0uaa/api/v2/country 200 3228 - 9861.459 ms
   knex:client releasing connection to pool: __knexUid18 +2ms
   knex:client acquired connection from pool: __knexUid13 +4ms
   knex:client acquired connection from pool: __knexUid15 +0ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +5ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +5ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '26316257-7bb6-44dd-b4a9-cc52b06de966' ] undefined +5ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +1ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +1ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '26abfe9c-db14-4fd6-b4c5-c752deec8fb9' ] undefined +1ms
   knex:client releasing connection to pool: __knexUid13 +3ms
   knex:client acquired connection from pool: __knexUid13 +3ms
@@ -145,7 +145,7 @@ GET /nc/civil_pony_0uaa/api/v2/country 200 3228 - 9861.459 ms
   knex:client releasing connection to pool: __knexUid18 +1ms
   knex:client releasing connection to pool: __knexUid13 +2ms
   knex:client acquired connection from pool: __knexUid13 +1ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +4ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +4ms
   knex:bindings [ 'civil_pony_0uaa', 'db', 'b5a1ff69-7428-4700-911d-49dca323b54f' ] undefined +3ms
   knex:client releasing connection to pool: __knexUid13 +1ms
   knex:client acquired connection from pool: __knexUid13 +7ms
@@ -179,11 +179,11 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
 
 ```
   knex:client acquired connection from pool: __knexUid20 +53s
-  knex:query select * from `nc_models_v2` where `base_id` = ? and `db_alias` = ? and `title` = ? limit ? undefined +53s
+  knex:query select * from `nc_models_v2` where `base_id` = ? and `base_id` = ? and `title` = ? limit ? undefined +53s
   knex:bindings [ 'civil_pony_0uaa', 'db', 'film', 1 ] undefined +53s
   knex:client releasing connection to pool: __knexUid20 +9ms
   knex:client acquired connection from pool: __knexUid20 +7ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +15ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +15ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +15ms
   knex:client releasing connection to pool: __knexUid20 +7ms
   knex:client acquired connection from pool: __knexUid20 +17ms
@@ -215,7 +215,7 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
   knex:client releasing connection to pool: __knexUid19 +10ms
   knex:client releasing connection to pool: __knexUid20 +4ms
   knex:client acquired connection from pool: __knexUid20 +3ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +10ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +10ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +10ms
   knex:client releasing connection to pool: __knexUid20 +3ms
   knex:client acquired connection from pool: __knexUid20 +7ms
@@ -254,13 +254,13 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
   knex:client acquired connection from pool: __knexUid19 +0ms
   knex:client acquired connection from pool: __knexUid24 +0ms
   knex:client acquired connection from pool: __knexUid23 +0ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +14ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +14ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +14ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +0ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +0ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +0ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +1ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +1ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +3ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +2ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +2ms
   knex:bindings [ 'civil_pony_0uaa', 'db', 'e841c594-87da-45e5-b56e-94f9539823f0' ] undefined +0ms
   knex:client releasing connection to pool: __knexUid25 +7ms
   knex:client acquired connection from pool: __knexUid25 +13ms
@@ -437,7 +437,7 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
   knex:bindings [ 'c693f4b7-b885-4dc7-b98f-104240e24c2e', 1 ] undefined +2ms
   knex:client releasing connection to pool: __knexUid23 +1ms
   knex:client acquired connection from pool: __knexUid23 +1ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +2ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +2ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +2ms
   knex:client releasing connection to pool: __knexUid24 +1ms
   knex:client acquired connection from pool: __knexUid24 +0ms
@@ -472,7 +472,7 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
   knex:client releasing connection to pool: __knexUid23 +2ms
   knex:client releasing connection to pool: __knexUid24 +0ms
   knex:client acquired connection from pool: __knexUid24 +1ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +2ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +2ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +2ms
   knex:client releasing connection to pool: __knexUid28 +1ms
   knex:client releasing connection to pool: __knexUid27 +2ms
@@ -510,7 +510,7 @@ GET /nc/civil_pony_0uaa/api/v2/city 200 4101 - 254.456 ms
   knex:bindings [ 'e5da5b88-b280-4b67-b302-d44756c4d470', 1 ] undefined +1ms
   knex:client releasing connection to pool: __knexUid20 +51ms
   knex:client acquired connection from pool: __knexUid20 +1ms
-  knex:query select * from `nc_columns_v2` where `base_id` = ? and `db_alias` = ? and `fk_model_id` = ? undefined +11ms
+  knex:query select * from `nc_columns_v2` where `base_id` = ? and `base_id` = ? and `fk_model_id` = ? undefined +11ms
   knex:bindings [ 'civil_pony_0uaa', 'db', '3d5766d6-296f-419d-b0c6-e0f9fd2a7480' ] undefined +11ms
   knex:client releasing connection to pool: __knexUid24 +2ms
   knex:client releasing connection to pool: __knexUid20 +0ms

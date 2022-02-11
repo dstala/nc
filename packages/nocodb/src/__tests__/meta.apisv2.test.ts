@@ -84,19 +84,11 @@ describe('Noco v2 Tests', function() {
       const filmTableId = tablesList.find(t => t.tn === 'film')?.id;
       const countryTableId = tablesList.find(t => t.tn === 'country')?.id;
 
-      const { data: filmData } = await api.data.list(
-        project.id,
-        project.bases[0].id,
-        filmTableId
-      );
+      const { data: filmData } = await api.data.list(filmTableId);
 
       expect(filmData).length.gt(0);
 
-      const { data: countryData } = await api.data.list(
-        project.id,
-        project.bases[0].id,
-        countryTableId
-      );
+      const { data: countryData } = await api.data.list(countryTableId);
 
       expect(countryData).length.gt(0);
     });
@@ -118,8 +110,8 @@ describe('Noco v2 Tests', function() {
         ]
       });
 
-      const projectId = projectRes.data.id;
-      const baseId = projectRes.data.bases[0].id;
+      // const projectId = projectRes.data.id;
+      // const baseId = projectRes.data.bases[0].id;
 
       const tableRes = await api.meta.tableCreate(
         projectRes.data.id,
@@ -182,53 +174,39 @@ describe('Noco v2 Tests', function() {
 
       const tableId = tableRes.data.id;
 
-      const data = await api.data.list(projectId, baseId, tableId);
+      const data = await api.data.list(tableId);
       console.log(data.data);
       expect(data.data).to.have.length(0);
 
-      const createData = await api.data.create(projectId, baseId, tableId, {
+      const createData = await api.data.create(tableId, {
         Title: 'test'
       });
 
       console.log(createData.data);
-      const listData = await api.data.list(projectId, baseId, tableId);
+      const listData = await api.data.list(tableId);
       expect(listData.data).to.have.length(1);
 
-      const readData = await api.data.read(
-        projectId,
-        baseId,
-        tableId,
-        createData.data.Id
-      );
+      const readData = await api.data.read(tableId, createData.data.Id);
 
       console.log(readData.data);
 
-      await api.data.update(projectId, baseId, tableId, createData.data.Id, {
+      await api.data.update(tableId, createData.data.Id, {
         Title: 'new val'
       });
 
-      const updatedData = await api.data.read(
-        projectId,
-        baseId,
-        tableId,
-        createData.data.Id
-      );
+      const updatedData = await api.data.read(tableId, createData.data.Id);
 
       console.log(updatedData.data);
 
       expect(updatedData.data);
 
-      await api.data.delete(projectId, baseId, tableId, createData.data.Id);
+      await api.data.delete(tableId, createData.data.Id);
 
-      const listData1 = await api.data.list(projectId, baseId, tableId);
+      const listData1 = await api.data.list(tableId);
       expect(listData1.data).to.have.length(0);
-      const tableDelRes = await api.meta.tableDelete(
-        projectId,
-        baseId,
-        tableId
-      );
+      const tableDelRes = await api.meta.tableDelete(tableId);
       await expect(
-        api.data.list(projectId, baseId, tableId)
+        api.data.list(tableId)
         // @ts-ignore
       ).to.be.rejectedWith(Error);
 
@@ -285,31 +263,24 @@ describe('Noco v2 Tests', function() {
         ]
       });
 
-      const { data: tableMeta }: any = await api.meta.columnCreate(
-        projectId,
-        baseId,
-        table.id,
-        {
-          cn: 'title1',
-          _cn: 'Title1',
-          dt: 'varchar',
-          dtxp: '45',
-          uidt: UITypes.SingleLineText
-        }
-      );
+      const { data: tableMeta }: any = await api.meta.columnCreate(table.id, {
+        cn: 'title1',
+        _cn: 'Title1',
+        dt: 'varchar',
+        dtxp: '45',
+        uidt: UITypes.SingleLineText
+      });
 
-      await api.data.create(projectId, baseId, tableMeta.id, {
+      await api.data.create(tableMeta.id, {
         Title1: 'test'
       });
-      await api.data.create(projectId, baseId, tableMeta.id, {
+      await api.data.create(tableMeta.id, {
         Title1: 'test1'
       });
 
       console.log(tableMeta);
 
       const { data: tableFormulaMeta }: any = await api.meta.columnCreate(
-        projectId,
-        baseId,
         table.id,
         {
           _cn: 'formula',
@@ -320,17 +291,11 @@ describe('Noco v2 Tests', function() {
 
       console.log(tableFormulaMeta);
 
-      const { data: listData } = await api.data.list(
-        projectId,
-        baseId,
-        tableMeta.id
-      );
+      const { data: listData } = await api.data.list(tableMeta.id);
 
       console.log(listData);
 
       const { data: tableMetaAfterUpdate } = await api.meta.columnUpdate(
-        projectId,
-        baseId,
         table.id,
         tableMeta.columns.find(c => c.cn === 'title1')?.id,
         {
@@ -346,8 +311,6 @@ describe('Noco v2 Tests', function() {
 
       // delete column
       const { data: tableMetaAfterDel } = await api.meta.columnDelete(
-        projectId,
-        baseId,
         table.id,
         tableMeta.columns.find(c => c.cn === 'title1')?.id
       );
@@ -435,18 +398,13 @@ describe('Noco v2 Tests', function() {
       ]
     });
 
-    const { data: res } = await api.meta.columnCreate(
-      projectId,
-      baseId,
-      table1.id,
-      {
-        uidt: UITypes.LinkToAnotherRecord,
-        parentId: table1.id,
-        childId: table2.id,
-        type: 'hm',
-        _cn: 'test'
-      } as any
-    );
+    const { data: res } = await api.meta.columnCreate(table1.id, {
+      uidt: UITypes.LinkToAnotherRecord,
+      parentId: table1.id,
+      childId: table2.id,
+      type: 'hm',
+      _cn: 'test'
+    } as any);
     console.log(res);
   });
 
@@ -529,32 +487,27 @@ describe('Noco v2 Tests', function() {
       ]
     });
 
-    const { data: res } = await api.meta.columnCreate(
-      projectId,
-      baseId,
-      table1.id,
-      {
-        uidt: UITypes.LinkToAnotherRecord,
-        parentId: table1.id,
-        childId: table2.id,
-        type: 'mm',
-        _cn: 'test'
-      } as any
-    );
+    const { data: res } = await api.meta.columnCreate(table1.id, {
+      uidt: UITypes.LinkToAnotherRecord,
+      parentId: table1.id,
+      childId: table2.id,
+      type: 'mm',
+      _cn: 'test'
+    } as any);
 
     console.log(res);
 
-    await api.data.create(projectId, baseId, table1.id, {
+    await api.data.create(table1.id, {
       Title1: 'test1'
     });
-    await api.data.create(projectId, baseId, table1.id, {
+    await api.data.create(table1.id, {
       Title1: 'test2'
     });
-    await api.data.create(projectId, baseId, table2.id, {
+    await api.data.create(table2.id, {
       Title1: 'test3'
     });
 
-    const { data } = await api.data.list(projectId, baseId, table1.id);
+    const { data } = await api.data.list(table1.id);
     console.log(data);
   });
 });

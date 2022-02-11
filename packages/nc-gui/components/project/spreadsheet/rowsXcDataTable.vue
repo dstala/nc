@@ -83,6 +83,7 @@
           v-if="!isForm"
           :is-locked="isLocked"
           :meta="meta"
+          @updated="loadTableData"
         />
         <!--        v-model="sortList"-->
         <!--        :field-list="[...realFieldList, ...formulaFieldList]"-->
@@ -1275,8 +1276,8 @@ export default {
         // if (this.api) {
         // const { list, count } = await this.api.paginatedList(this.queryParams)
         const { list, pageInfo } = (await this.$api.data.list(
-          this.meta.id
-          , {
+          this.meta.views[0].id,
+          {
             query: this.queryParams
           })).data.data
 
@@ -1380,38 +1381,42 @@ export default {
           kanban.groupingColumnItems.unshift(uncategorized)
           kanban.recordCnt[uncategorized] = 0
           for (const groupingColumnItem of kanban.groupingColumnItems) {
-            // enrich Kanban data
-            var {
-              data
-            } = await this.api.get(`/nc/${this.$store.state.project.projectId}/api/v1/${this.$route.query.name}`, {
-              limit: initialLimit,
-              where: groupingColumnItem === uncategorized ? `(${this.groupingField},is,null)` : `(${this.groupingField},eq,${groupingColumnItem})`
-            })
-            data.map((d) => {
-              // handle composite primary key
-              d.c_pk = this.meta.columns.filter(c => c.pk).map(c => d[c._cn]).join('___')
-              if (!d.id) {
-                // id is required for <kanban-board/>
-                d.id = d.c_pk
-              }
-              kanban.data.push({
-                row: d,
-                oldRow: d,
-                rowMeta: {}
+            {
+              // enrich Kanban data
+              const {
+                data
+              } = await this.api.get(`/nc/${this.$store.state.project.projectId}/api/v1/${this.$route.query.name}`, {
+                limit: initialLimit,
+                where: groupingColumnItem === uncategorized ? `(${this.groupingField},is,null)` : `(${this.groupingField},eq,${groupingColumnItem})`
               })
-              kanban.recordCnt[groupingColumnItem] += 1
-              kanban.blocks.push({
-                status: groupingColumnItem,
-                ...d
+              data.map((d) => {
+                // handle composite primary key
+                d.c_pk = this.meta.columns.filter(c => c.pk).map(c => d[c._cn]).join('___')
+                if (!d.id) {
+                  // id is required for <kanban-board/>
+                  d.id = d.c_pk
+                }
+                kanban.data.push({
+                  row: d,
+                  oldRow: d,
+                  rowMeta: {}
+                })
+                kanban.recordCnt[groupingColumnItem] += 1
+                kanban.blocks.push({
+                  status: groupingColumnItem,
+                  ...d
+                })
               })
-            })
-            // enrich recordTotalCnt
-            var {
-              data
-            } = await this.api.get(`/nc/${this.$store.state.project.projectId}/api/v1/${this.$route.query.name}/count`, {
-              where: groupingColumnItem === uncategorized ? `(${this.groupingField},is,null)` : `(${this.groupingField},eq,${groupingColumnItem})`
-            })
-            kanban.recordTotalCnt[groupingColumnItem] = data.count
+            }
+            {
+              // enrich recordTotalCnt
+              const {
+                data
+              } = await this.api.get(`/nc/${this.$store.state.project.projectId}/api/v1/${this.$route.query.name}/count`, {
+                where: groupingColumnItem === uncategorized ? `(${this.groupingField},is,null)` : `(${this.groupingField},eq,${groupingColumnItem})`
+              })
+              kanban.recordTotalCnt[groupingColumnItem] = data.count
+            }
           }
         }
         this.kanban = kanban

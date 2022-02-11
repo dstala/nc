@@ -20,7 +20,7 @@ export async function sortList(
   next
 ) {
   try {
-    const sortList = await Sort.list({ modelId: req.params.viewId });
+    const sortList = await Sort.list({ viewId: req.params.viewId });
     res.json({
       sorts: new PagedResponseImpl(sortList)
     });
@@ -30,13 +30,37 @@ export async function sortList(
 }
 
 // @ts-ignore
-export async function sortCreate(req: Request<any, any, TableReq>, res, next) {}
+export async function sortCreate(req: Request<any, any, TableReq>, res, next) {
+  try {
+    const sort = await Sort.insert({
+      ...req.body,
+      fk_view_id: req.params.viewId
+    });
+    res.json(sort);
+  } catch (e) {
+    next(e);
+  }
+}
 
 // @ts-ignore
-export async function sortUpdate(req, res) {}
+export async function sortUpdate(req, res, next) {
+  try {
+    const sort = await Sort.update(req.params.sortId, req.body);
+    res.json(sort);
+  } catch (e) {
+    next(e);
+  }
+}
 
 // @ts-ignore
-export async function sortDelete(req: Request, res: Response, next) {}
+export async function sortDelete(req: Request, res: Response, next) {
+  try {
+    const sort = await Sort.delete(req.params.sortId);
+    res.json(sort);
+  } catch (e) {
+    next(e);
+  }
+}
 
 const router = Router({ mergeParams: true });
 router.get('/', sortList);

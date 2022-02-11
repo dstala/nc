@@ -6,7 +6,7 @@ import { MetaTable } from '../utils/globals';
 export default class Sort {
   id: string;
 
-  fk_model_id: string;
+  fk_view_id: string;
   fk_column_id?: string;
   direction?: 'asc' | 'desc';
 
@@ -14,24 +14,20 @@ export default class Sort {
     Object.assign(this, data);
   }
 
-  public async getModel(): Promise<Model> {
-    return Model.get({
-      id: this.fk_model_id
+  public static async deleteAll(modelId: string) {
+    await Noco.ncMeta.metaDelete(null, null, MetaTable.SORT, {
+      fk_view_id: modelId
     });
   }
 
   public static async insert(model: Partial<SortObject>) {
-    await Noco.ncMeta.metaInsert2(null, null, MetaTable.SORT, {
-      fk_model_id: model.fk_model_id,
+    const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.SORT, {
+      fk_view_id: model.fk_view_id,
       fk_column_id: model.fk_column_id,
       direction: model.direction
     });
-  }
 
-  public static async deleteAll(modelId: string) {
-    await Noco.ncMeta.metaDelete(null, null, MetaTable.SORT, {
-      fk_model_id: modelId
-    });
+    return this.get(id);
   }
 
   public getColumn(): Promise<Column> {
@@ -41,28 +37,46 @@ export default class Sort {
     });
   }
 
-  public static async list({
-    base_id,
-    db_alias,
-    modelId
-  }: {
-    base_id?: string;
-    db_alias?: string;
-    modelId: string;
-  }): Promise<Sort[]> {
-    const sortList = await Noco.ncMeta.metaList2(
-      base_id,
-      db_alias,
-      MetaTable.SORT,
-      { condition: { fk_model_id: modelId } }
-    );
+  public static async list({ viewId }: { viewId: string }): Promise<Sort[]> {
+    if (!viewId) return null;
+    const sortList = await Noco.ncMeta.metaList2(null, null, MetaTable.SORT, {
+      condition: { fk_view_id: viewId }
+    });
     return sortList.map(s => new Sort(s));
+  }
+
+  public static async update(sortId, body) {
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.SORT,
+      {
+        fk_column_id: body.fk_column_id,
+        direction: body.direction
+      },
+      sortId
+    );
+  }
+
+  public static async delete(sortId: string) {
+    await Noco.ncMeta.metaDelete(null, null, MetaTable.SORT, sortId);
+  }
+
+  public static async get(id: any) {
+    const sortData = await Noco.ncMeta.metaGet2(null, null, MetaTable.SORT, id);
+    return new Sort(sortData);
+  }
+
+  public async getModel(): Promise<Model> {
+    return Model.get({
+      id: this.fk_view_id
+    });
   }
 }
 
 export interface SortObject {
   id?: string;
-  fk_model_id: string;
+  fk_view_id: string;
   fk_column_id?: string;
   direction?: 'asc' | 'desc';
 }

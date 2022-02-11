@@ -7,7 +7,6 @@ import Project from '../../../noco-models/Project';
 
 export async function tableGet(req: Request, res: Response<Table>) {
   const table = await Model.getWithInfo({
-    base_id: req.params.projectId,
     id: req.params.tableId
   });
   res.json(table);
@@ -19,7 +18,7 @@ export async function tableList(
 ) {
   const tables = await Model.list({
     project_id: req.params.projectId,
-    db_alias: null
+    base_id: null
   });
 
   res // todo: pagination
@@ -44,7 +43,7 @@ export async function tableCreate(req: Request<any, any, TableReq>, res, next) {
 
     const tables = await Model.list({
       project_id: project.id,
-      db_alias: base.id
+      base_id: base.id
     });
 
     res.json(
@@ -71,7 +70,7 @@ export async function tableDelete(req: Request, res: Response, next) {
     const table = await Model.get({ id: req.params.tableId });
 
     const project = await Project.getWithInfo(table.project_id);
-    const base = project.bases.find(b => b.id === table.db_alias);
+    const base = project.bases.find(b => b.id === table.base_id);
     const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
 
     await sqlMgr.sqlOpPlus(base, 'tableDelete', table);

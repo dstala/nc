@@ -4,20 +4,25 @@ import { nocoExecute } from '../../noco-resolver/NocoExecute';
 import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { PagedResponseImpl } from './helpers/PagedResponse';
+import View from '../../../noco-models/View';
 
 export async function dataList(req: Request, res: Response, next) {
   try {
     console.time('Model.get');
+    const view = await View.get(req.params.viewId);
+
     const model = await Model.get({
-      id: req.params.modelId
+      id: view?.fk_model_id || req.params.viewId
     });
+
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(model.db_alias);
+    const base = await Base.get(model.base_id);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
+      viewId: view?.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
 
@@ -65,12 +70,12 @@ export async function dataList(req: Request, res: Response, next) {
 async function dataRead(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      id: req.params.modelId
+      id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(model.db_alias);
+    const base = await Base.get(model.base_id);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -104,12 +109,12 @@ async function dataRead(req: Request, res: Response, next) {
 async function dataInsert(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      id: req.params.modelId
+      id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(model.db_alias);
+    const base = await Base.get(model.base_id);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -127,12 +132,12 @@ async function dataInsert(req: Request, res: Response, next) {
 async function dataUpdate(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      id: req.params.modelId
+      id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(model.db_alias);
+    const base = await Base.get(model.base_id);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -150,12 +155,12 @@ async function dataUpdate(req: Request, res: Response, next) {
 async function dataDelete(req: Request, res: Response, next) {
   try {
     const model = await Model.get({
-      id: req.params.modelId
+      id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
 
     console.timeEnd('Model.get');
-    const base = await Base.get(model.db_alias);
+    const base = await Base.get(model.base_id);
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -171,9 +176,9 @@ async function dataDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/:modelId', dataList);
-router.post('/:modelId', dataInsert);
-router.get('/:modelId/:rowId', dataRead);
-router.put('/:modelId/:rowId', dataUpdate);
-router.delete('/:modelId/:rowId', dataDelete);
+router.get('/', dataList);
+router.post('/', dataInsert);
+router.get('/:rowId', dataRead);
+router.put('/:rowId', dataUpdate);
+router.delete('/:rowId', dataDelete);
 export default router;

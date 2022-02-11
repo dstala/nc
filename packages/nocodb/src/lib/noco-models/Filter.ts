@@ -4,13 +4,19 @@ import Column from './Column';
 import UITypes from '../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from './LinkToAnotherRecordColumn';
 import { MetaTable } from '../utils/globals';
+import View from './View';
 
 export default class Filter {
+  get fk_parent_id(): string {
+    return this._fk_parent_id;
+  }
+
   id: string;
 
-  fk_model_id: string;
+  fk_model_id?: string;
+  fk_view_id?: string;
   fk_column_id?: string;
-  fk_parent_id?: string;
+  private _fk_parent_id?: string;
 
   comparison_op?: string;
   value?: string;
@@ -23,9 +29,11 @@ export default class Filter {
   }
 
   public async getModel(): Promise<Model> {
-    return Model.get({
-      id: this.fk_model_id
-    });
+    return this.fk_view_id
+      ? (await View.get(this.fk_view_id)).getModel()
+      : Model.get({
+          id: this.fk_model_id
+        });
   }
 
   public static async insert(model: Partial<FilterObject>) {
@@ -34,7 +42,7 @@ export default class Filter {
       null,
       MetaTable.FILTER_EXP,
       {
-        fk_model_id: model.fk_model_id,
+        fk_view_id: model.fk_view_id,
         fk_column_id: model.fk_column_id,
         comparison_op: model.comparison_op,
         value: model.value,
@@ -49,6 +57,40 @@ export default class Filter {
         model.children.map(f => this.insert({ ...f, fk_parent_id: row.id }))
       );
     }
+
+    return new Filter(
+      await Noco.ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, row.id)
+    );
+  }
+
+  static async update(id, filter: Partial<Filter>) {
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.FILTER_EXP,
+      {
+        fk_column_id: filter.fk_column_id,
+        comparison_op: filter.comparison_op,
+        value: filter.value,
+        fk_parent_id: filter.fk_parent_id,
+
+        is_group: filter.is_group,
+        logical_op: filter.logical_op
+      },
+      id
+    );
+  }
+
+  static async delete(id: string) {
+    const filter = await this.get(id);
+
+    const deleteRecursively = async (filter: Filter) => {
+      if (!filter) return;
+      for (const f of (await filter?.getChildren()) || [])
+        await deleteRecursively(f);
+      await Noco.ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
+    };
+    await deleteRecursively(filter);
   }
 
   public getColumn(): Promise<Column> {
@@ -59,13 +101,13 @@ export default class Filter {
   }
 
   public async getGroup(): Promise<Filter> {
-    if (!this.fk_parent_id) return null;
+    if (!this._fk_parent_id) return null;
     const filterOdj = await Noco.ncMeta.metaGet2(
       null,
       null,
       MetaTable.FILTER_EXP,
       {
-        id: this.fk_parent_id
+        id: this._fk_parent_id
       }
     );
     return filterOdj && new Filter(filterOdj);
@@ -87,53 +129,51 @@ export default class Filter {
   }
 
   public static async getFilter({
-    base_id,
-    db_alias,
-    modelId
+    viewId
   }: {
-    base_id?: string;
-    db_alias?: string;
-    modelId: string;
+    viewId: string;
   }): Promise<Filter> {
+    if (!viewId) return null;
+
     const filterObj = await Noco.ncMeta.metaGet2(
-      base_id,
-      db_alias,
+      null,
+      null,
       MetaTable.FILTER_EXP,
-      { fk_model_id: modelId, fk_parent_id: null }
+      { fk_view_id: viewId, fk_parent_id: null }
     );
     return filterObj && new Filter(filterObj);
   }
 
   public static async getFilterObject({
-    base_id,
-    db_alias,
-    modelId
+    viewId
   }: {
-    base_id?: string;
-    db_alias?: string;
-    modelId: string;
+    viewId: string;
   }): Promise<FilterObject> {
     const filters = await Noco.ncMeta.metaList2(
-      base_id,
-      db_alias,
+      null,
+      null,
       MetaTable.FILTER_EXP,
       {
-        condition: { fk_model_id: modelId }
+        condition: { fk_view_id: viewId }
       }
     );
 
-    let result: FilterObject;
+    const result: FilterObject = {
+      is_group: true,
+      children: [],
+      logical_op: 'AND'
+    };
 
     const grouped = {};
     const idFilterMapping = {};
 
     for (const filter of filters) {
-      if (!filter.fk_parent_id) {
-        result = filter;
+      if (!filter._fk_parent_id) {
+        result.children.push(filter);
         idFilterMapping[result.id] = result;
       } else {
-        grouped[filter.fk_parent_id] = grouped[filter.fk_parent_id] || [];
-        grouped[filter.fk_parent_id].push(filter);
+        grouped[filter._fk_parent_id] = grouped[filter._fk_parent_id] || [];
+        grouped[filter._fk_parent_id].push(filter);
         idFilterMapping[filter.id] = filter;
         filter.column = await new Filter(filter).getColumn();
         if (filter.column?.uidt === UITypes.LinkToAnotherRecord) {
@@ -145,11 +185,19 @@ export default class Filter {
       if (idFilterMapping?.[id]) idFilterMapping[id].children = children;
     }
 
+    // if (!result) {
+    //   return (await Filter.insert({
+    //     fk_view_id: viewId,
+    //     is_group: true,
+    //     logical_op: 'AND'
+    //   })) as any;
+    // }
+
     return result;
   }
 
-  static async deleteAll(modelId: string) {
-    const filter = await this.getFilterObject({ modelId });
+  static async deleteAll(viewId: string) {
+    const filter = await this.getFilterObject({ viewId });
 
     const deleteRecursively = async filter => {
       if (!filter) return;
@@ -158,11 +206,37 @@ export default class Filter {
     };
     await deleteRecursively(filter);
   }
+
+  private static async get(id: string) {
+    const filterObj = await Noco.ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.FILTER_EXP,
+      { id }
+    );
+    return filterObj && new Filter(filterObj);
+  }
+
+  static async list({ viewId }: { viewId: any }) {
+    const filterOdjs = await Noco.ncMeta.metaList2(
+      null,
+      null,
+      MetaTable.FILTER_EXP,
+      {
+        condition: {
+          fk_parent_id: null,
+          fk_view_id: viewId
+        }
+      }
+    );
+    return filterOdjs?.map(f => new Filter(f));
+  }
 }
 
 export interface FilterObject {
   id?: string;
-  fk_model_id: string;
+  fk_view_id?: string;
+  fk_model_id?: string;
   fk_column_id?: string;
   fk_parent_id?: string;
 

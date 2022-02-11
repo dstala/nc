@@ -27,7 +27,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
     const table = await Model.getWithInfo({
       id: req.params.tableId
     });
-    const base = await Base.get(table.db_alias);
+    const base = await Base.get(table.base_id);
     const project = await base.getProject();
 
     const colBody = req.body;
@@ -400,7 +400,7 @@ export async function columnUpdate(req: Request, res: Response<Table>, next) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
-  const base = await Base.get(table.db_alias);
+  const base = await Base.get(table.base_id);
 
   const column = table.columns.find(c => c.id === req.params.columnId);
 
@@ -450,7 +450,7 @@ export async function columnDelete(req: Request, res: Response<Table>, next) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
-  const base = await Base.get(table.db_alias);
+  const base = await Base.get(table.base_id);
 
   const colBody = req.body;
   switch (colBody.uidt) {

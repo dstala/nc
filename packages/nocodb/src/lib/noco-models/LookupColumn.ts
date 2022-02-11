@@ -27,7 +27,7 @@ export default class LookupColumn {
   public static async insert(model: NcColumn | any) {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
-      model.db_alias,
+      model.base_id,
       MetaTable.COL_LOOKUP,
       {
         tn: model.tn,

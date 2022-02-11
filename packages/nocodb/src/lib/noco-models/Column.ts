@@ -11,6 +11,7 @@ import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
 import { Column as ColumnType } from 'nc-common';
 import { MetaTable } from '../utils/globals';
+import View from './View';
 
 export default class Column implements ColumnType {
   public fk_model_id: string;
@@ -93,6 +94,12 @@ export default class Column implements ColumnType {
     );
 
     await this.insertColOption(column, row.id);
+
+    await View.insertColumn({
+      fk_column_id: row.id,
+      fk_model_id: column.fk_model_id
+    });
+
     return row;
   }
 
@@ -104,77 +111,57 @@ export default class Column implements ColumnType {
       case UITypes.Lookup:
         // LookupColumn.insert()
 
-        await Noco.ncMeta.metaInsert2(
-          column.project_id,
-          column.db_alias,
-          MetaTable.COL_LOOKUP,
-          {
-            fk_column_id: colId,
+        await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_LOOKUP, {
+          fk_column_id: colId,
 
-            fk_relation_column_id: column.fk_relation_column_id,
+          fk_relation_column_id: column.fk_relation_column_id,
 
-            fk_lookup_column_id: column.fk_lookup_column_id
-          }
-        );
+          fk_lookup_column_id: column.fk_lookup_column_id
+        });
         break;
       case UITypes.Rollup:
-        await Noco.ncMeta.metaInsert2(
-          column.project_id,
-          column.db_alias,
-          MetaTable.COL_ROLLUP,
-          {
-            fk_column_id: colId,
-            fk_relation_column_id: column.fk_relation_column_id,
+        await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_ROLLUP, {
+          fk_column_id: colId,
+          fk_relation_column_id: column.fk_relation_column_id,
 
-            fk_rollup_column_id: column.fk_rollup_column_id,
-            rollup_function: column.rollup_function
-          }
-        );
+          fk_rollup_column_id: column.fk_rollup_column_id,
+          rollup_function: column.rollup_function
+        });
         break;
       case UITypes.LinkToAnotherRecord:
-        await Noco.ncMeta.metaInsert2(
-          column.project_id,
-          column.db_alias,
-          MetaTable.COL_RELATIONS,
-          {
-            fk_column_id: colId,
+        await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_RELATIONS, {
+          fk_column_id: colId,
 
-            // ref_db_alias
-            type: column.type,
-            // db_type:
+          // ref_db_alias
+          type: column.type,
+          // db_type:
 
-            fk_child_column_id: column.fk_child_column_id,
-            fk_parent_column_id: column.fk_parent_column_id,
+          fk_child_column_id: column.fk_child_column_id,
+          fk_parent_column_id: column.fk_parent_column_id,
 
-            fk_mm_model_id: column.fk_mm_model_id,
-            fk_mm_child_column_id: column.fk_mm_child_column_id,
-            fk_mm_parent_column_id: column.fk_mm_parent_column_id,
+          fk_mm_model_id: column.fk_mm_model_id,
+          fk_mm_child_column_id: column.fk_mm_child_column_id,
+          fk_mm_parent_column_id: column.fk_mm_parent_column_id,
 
-            ur: column.ur,
-            dr: column.dr,
+          ur: column.ur,
+          dr: column.dr,
 
-            fk_index_name: column.fk_index_name,
-            fk_related_table_id: column.fk_related_table_id
-          }
-        );
+          fk_index_name: column.fk_index_name,
+          fk_related_table_id: column.fk_related_table_id
+        });
         break;
       case UITypes.Formula:
-        await Noco.ncMeta.metaInsert2(
-          column.project_id,
-          column.db_alias,
-          MetaTable.COL_FORMULA,
-          {
-            fk_column_id: colId,
-            formula: column.formula
-          }
-        );
+        await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
+          fk_column_id: colId,
+          formula: column.formula
+        });
         break;
       case UITypes.MultiSelect:
       case UITypes.SingleSelect:
         for (const option of column.dtxp?.split(',') || [])
           await Noco.ncMeta.metaInsert2(
-            column.project_id,
-            column.db_alias,
+            null,
+            null,
             MetaTable.COL_SELECT_OPTIONS,
             {
               fk_column_id: colId,
@@ -271,8 +258,8 @@ export default class Column implements ColumnType {
   async loadModel(force = false): Promise<Model> {
     if (!this.model || force) {
       this.model = await Model.get({
-        base_id: this.project_id,
-        db_alias: this.db_alias,
+        // base_id: this.project_id,
+        // db_alias: this.db_alias,
         id: this.fk_model_id
       });
     }

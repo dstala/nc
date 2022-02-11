@@ -1516,6 +1516,7 @@ export class PgUi {
       case 'longblob':
         return 'blob';
       case 'enum':
+
         return 'enum';
       case 'set':
         return 'set';

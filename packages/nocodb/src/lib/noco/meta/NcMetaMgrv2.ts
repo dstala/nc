@@ -417,8 +417,8 @@ export default class NcMetaMgrv2 {
     return (
       args?.dbAlias ||
       args?.args?.dbAlias ||
-      args?.db_alias ||
-      args?.args?.db_alias
+      args?.base_id ||
+      args?.args?.base_id
     );
   }
   protected getProjectId(args): string {

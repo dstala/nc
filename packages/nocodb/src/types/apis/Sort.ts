@@ -1,7 +1,4 @@
-import NcTimestamps from './common/NcTimestamps';
-import NcOrder from './common/NcOrder';
-
-export default interface NcFilterExp extends NcTimestamps, NcOrder {
+export default interface NcFilterExp {
   id: string;
   project_id: string;
   db_alias: string;

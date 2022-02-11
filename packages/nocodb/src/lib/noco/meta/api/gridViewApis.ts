@@ -14,15 +14,15 @@ export async function gridViewGet(req: Request, res: Response<Table>) {}
 
 // @ts-ignore
 export async function gridViewList(
-  req: Request<any, any, any, TableListParams>,
-  res: Response<TableList>
+  _req: Request<any, any, any, TableListParams>,
+  _res: Response<TableList>
 ) {}
 
 // @ts-ignore
 export async function gridViewCreate(
-  req: Request<any, any, TableReq>,
-  res,
-  next
+  _req: Request<any, any, TableReq>,
+  _res,
+  _next
 ) {}
 
 // @ts-ignore

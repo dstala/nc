@@ -13,9 +13,7 @@ import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import getTableNameAlias from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
-import Noco from '../../Noco';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import { MetaTable } from '../../../utils/globals';
 
 // // Project CRUD
 
@@ -159,24 +157,18 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       // await Model.insert(project.id, base.id, meta);
 
       /* create nc_models and its rows if it doesn't exists  */
-      const { id: modelId } = await Noco.ncMeta.metaInsert2(
-        project.id,
-        base.id,
-        MetaTable.MODELS,
-        {
-          tn: table.tn,
-          _tn: meta._tn,
-          type: table.type || 'table',
-          order: table.order
-        }
-      );
-      models2[table.tn] = await Model.get({ id: modelId });
+      models2[table.tn] = await Model.insert(project.id, base.id, {
+        tn: table.tn,
+        _tn: meta._tn,
+        type: table.type || 'table',
+        order: table.order
+      });
 
       let colOrder = 1;
 
       for (const column of meta.columns) {
         await Column.insert({
-          fk_model_id: modelId,
+          fk_model_id: models2[table.tn].id,
           ...column,
           order: colOrder++
         });
@@ -223,7 +215,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
             await Column.insert<LinkToAnotherRecordColumn>({
               project_id: project.id,
               db_alias: base.id,
-              fk_model_id: modelId,
+              fk_model_id: models2[table.tn].id,
               cn: column.cn,
               _cn: column._cn,
               uidt: column.uidt,

@@ -29,37 +29,41 @@
     <div class="backgroundColor pa-2" style="min-width: 330px">
       <div class="sort-grid" @click.stop>
         <template v-for="(sort,i) in sortList" dense>
-          <v-icon :key="i + 'icon'" class="nc-sort-item-remove-btn" small @click.stop="sortList.splice(i,1)">
+          <v-icon :key="i + 'icon'" class="nc-sort-item-remove-btn" small @click.stop="deleteSort(sort)">
             mdi-close-box
           </v-icon>
 
           <v-select
             :key="i + 'sel1'"
-            v-model="sort.field"
+            v-model="sort.fk_column_id"
             class="caption nc-sort-field-select"
-            :items="fieldList"
+            :items="meta.columns"
+            item-value="id"
+            item-text="_cn"
             label="Field"
             solo
             flat
             dense
             hide-details
             @click.stop
+            @change="saveOrUpdate(sort, i)"
           >
             <template #item="{item}">
-              <span class="caption font-weight-regular">{{ item }}</span>
+              <span class="caption font-weight-regular">{{ item._cn }}</span>
             </template>
           </v-select>
           <v-select
             :key="i + 'sel2'"
-            v-model="sort.order"
+            v-model="sort.direction"
             class="flex-shrink-1 flex-grow-0 caption nc-sort-dir-select"
-            :items="[{text : 'A -> Z', value: ''},{text : 'Z -> A', value: '-'}]"
+            :items="[{text : 'A -> Z', value: 'asc'},{text : 'Z -> A', value: 'desc'}]"
             label="Operation"
             solo
             flat
             dense
             hide-details
             @click.stop
+            @change="saveOrUpdate(sort, i)"
           >
             <template #item="{item}">
               <span class="caption font-weight-regular">{{ item.text }}</span>
@@ -84,6 +88,11 @@ export default {
   data: () => ({
     sortList: []
   }),
+  computed: {
+    viewId() {
+      return this.meta && this.meta.views && this.meta.views[0] && this.meta.views[0].id
+    }
+  },
   watch: {
     sortList: {
       handler(v) {
@@ -94,19 +103,49 @@ export default {
     value(v) {
       this.sortList = v || []
     },
-    async meta(v) {
-      this.sortList = v ? await this.$api.meta.sortList(v.id) : [] // this.value || []
+    async viewId(v) {
+      if (v) {
+        await this.loadSortList()
+      }
     }
   },
   async created() {
+    this.loadSortList()
   },
   methods: {
     addSort() {
       this.sortList.push({
-        field: '',
-        order: ''
+        fk_column_id: null,
+        direction: 'asc'
       })
       this.sortList = this.sortList.slice()
+    },
+    async loadSortList() {
+      let sortList = []
+
+      if (this.viewId) {
+        const data = await this.$api.meta.sortList(this.viewId)
+        sortList = data.data.sorts.list
+      }
+
+      this.sortList = sortList
+    },
+    async saveOrUpdate(sort, i) {
+      if (sort.id) {
+        await this.$api.meta.sortUpdate(this.viewId, sort.id, sort)
+      } else {
+        this.sortList[i] = (await this.$api.meta.sortCreate(this.viewId, sort)).data
+      }
+      this.$emit('updated')
+    },
+    async deleteSort(sort, i) {
+      if (sort.id) {
+        await this.$api.meta.sortDelete(this.viewId, sort.id)
+        await this.loadSortList()
+      } else {
+        this.sortList.splice(i, 1)
+      }
+      this.$emit('updated')
     }
   }
 }

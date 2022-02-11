@@ -20,6 +20,7 @@ export default async function sortV2(
 
   for (const sort of sortList) {
     const column = await sort.getColumn();
+    if (!column) continue;
     const model = await column.getModel();
     switch (column.uidt) {
       case UITypes.Rollup:

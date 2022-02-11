@@ -29,8 +29,6 @@ export default function registerRestCtrl(ctx: {
     try {
       console.time('Model.get');
       const model = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         id: req.params.model_id,
         tn: req.params.model_name
       });
@@ -79,8 +77,6 @@ export default function registerRestCtrl(ctx: {
   router.get('/api/v2/:model_name/:id', async (req: any, res) => {
     try {
       const model = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         id: req.params.model_id,
         tn: req.params.model_name
       });
@@ -114,13 +110,9 @@ export default function registerRestCtrl(ctx: {
   router.post('/generateLookup', async (_req: any, res) => {
     try {
       let country = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'country'
       });
       let city = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'city'
       });
 
@@ -170,19 +162,13 @@ export default function registerRestCtrl(ctx: {
       await Model.clear({ id: country.id });
 
       country = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'country'
       });
       city = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'city'
       });
 
       let address = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'address'
       });
 
@@ -220,13 +206,9 @@ export default function registerRestCtrl(ctx: {
       await Model.clear({ id: country.id });
 
       country = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'country'
       });
       city = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'city'
       });
 
@@ -304,18 +286,12 @@ export default function registerRestCtrl(ctx: {
       // });
 
       let film = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'film'
       });
       let actor = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'actor'
       });
       const category = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'category'
       });
 
@@ -333,8 +309,6 @@ export default function registerRestCtrl(ctx: {
         )?.id
       });
       film = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'film'
       });
       await Column.insert<LookupColumn>({
@@ -351,8 +325,6 @@ export default function registerRestCtrl(ctx: {
         )?.id
       });
       actor = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'actor'
       });
       // film - filter
@@ -374,7 +346,7 @@ export default function registerRestCtrl(ctx: {
 
       await Sort.insert({
         direction: 'desc',
-        fk_model_id: country.id,
+        fk_view_id: country.id,
         fk_column_id: (await country.getColumns())?.find(
           c => c._cn === 'CityCount'
         )?.id
@@ -382,20 +354,18 @@ export default function registerRestCtrl(ctx: {
 
       await Sort.insert({
         direction: 'desc',
-        fk_model_id: city.id,
+        fk_view_id: city.id,
         fk_column_id: (await city.getColumns())?.find(
           c => c._cn === 'Country <= City'
         )?.id
       });
 
       address = await Model.get({
-        base_id: ctx.baseId,
-        db_alias: ctx.dbAlias,
         tn: 'address'
       });
       await Sort.insert({
         direction: 'desc',
-        fk_model_id: address.id,
+        fk_view_id: address.id,
         fk_column_id: (await address.getColumns())?.find(
           c => c._cn === 'Country Name'
         )?.id
@@ -422,8 +392,6 @@ export default function registerRestCtrl(ctx: {
               );
 
               const model = await Model.get({
-                base_id: ctx.baseId,
-                db_alias: ctx.dbAlias,
                 tn: body.table
               });
 
@@ -476,8 +444,6 @@ export default function registerRestCtrl(ctx: {
               );
 
               const model = await Model.get({
-                base_id: ctx.baseId,
-                db_alias: ctx.dbAlias,
                 tn: body.table
               });
 
@@ -525,8 +491,6 @@ export default function registerRestCtrl(ctx: {
             {
               validateParams(['table', 'formula', 'alias'], body);
               const model = await Model.get({
-                base_id: ctx.baseId,
-                db_alias: ctx.dbAlias,
                 tn: body.table
               });
               const columns = await model.getColumns();
@@ -573,8 +537,6 @@ export default function registerRestCtrl(ctx: {
             {
               validateParams(['table'], body);
               const model = await Model.get({
-                base_id: ctx.baseId,
-                db_alias: ctx.dbAlias,
                 tn: body.table
               });
               if (!model) {
@@ -587,8 +549,6 @@ export default function registerRestCtrl(ctx: {
             {
               validateParams(['table', 'column', 'direction'], body);
               const model = await Model.get({
-                base_id: ctx.baseId,
-                db_alias: ctx.dbAlias,
                 tn: body.table
               });
               if (!model) {
@@ -606,7 +566,7 @@ export default function registerRestCtrl(ctx: {
 
               await Sort.insert({
                 direction: body.direction || 'asc',
-                fk_model_id: model.id,
+                fk_view_id: model.id,
                 fk_column_id: column?.id
               });
             }
@@ -615,8 +575,6 @@ export default function registerRestCtrl(ctx: {
             {
               validateParams(['table'], body);
               const model = await Model.get({
-                base_id: ctx.baseId,
-                db_alias: ctx.dbAlias,
                 tn: body.table
               });
               if (!model) {
@@ -629,8 +587,6 @@ export default function registerRestCtrl(ctx: {
             {
               validateParams(['table', 'filter'], body);
               const model = await Model.get({
-                base_id: ctx.baseId,
-                db_alias: ctx.dbAlias,
                 tn: body.table
               });
               if (!model) {
@@ -686,7 +642,7 @@ export default function registerRestCtrl(ctx: {
 
               for (const model of await Model.list({
                 project_id: ctx.baseId,
-                db_alias: ctx.dbAlias
+                base_id: ctx.dbAlias
               })) {
                 if (model?.id) {
                   await Filter.deleteAll(model.id);

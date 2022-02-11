@@ -111,6 +111,14 @@ export interface Table {
   columnsById?: object;
 }
 
+export interface View {
+  id?: string;
+  title?: boolean;
+  deleted?: boolean;
+  order?: number;
+  fk_model_id?: string;
+}
+
 export interface TableInfo {
   id?: string;
   fk_project_id?: string;
@@ -175,7 +183,7 @@ export interface Sort {
 }
 
 export interface SortList {
-  sorts: { list: Sort[] };
+  sorts: { list: SharedView[] };
 }
 
 export interface Column {
@@ -310,6 +318,14 @@ export interface Gallery {
 }
 
 export interface GalleryColumn {
+  id?: string;
+  label?: string;
+  help?: string;
+  fk_col_id?: string;
+  fk_gallery_id?: string;
+}
+
+export interface GridColumn {
   id?: string;
   label?: string;
   help?: string;
@@ -582,24 +598,6 @@ export class Api<
     me: (params: RequestParams = {}) =>
       this.request<User, any>({
         path: `/auth/user/me`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags AUTH
-     * @name Me2
-     * @summary User Info
-     * @request GET:/auth/user/me - copy
-     * @originalName me
-     * @duplicate
-     */
-    me2: (params: RequestParams = {}) =>
-      this.request<User, any>({
-        path: `/auth/user/me - copy`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -971,10 +969,12 @@ export class Api<
      * @name FilterCreate
      * @request POST:/views/{viewId}/filters
      */
-    filterCreate: (viewId: string, params: RequestParams = {}) =>
+    filterCreate: (viewId: string, data: Filter, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/filters`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -999,10 +999,12 @@ export class Api<
      * @name SortCreate
      * @request POST:/views/{viewId}/sorts
      */
-    sortCreate: (viewId: string, params: RequestParams = {}) =>
+    sortCreate: (viewId: string, data: Sort, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/sorts`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -1014,13 +1016,14 @@ export class Api<
      * @request GET:/views/{viewsId}/filters/{filterId}
      */
     filterGet: (
-      filterId: string,
       viewsId: string,
+      filterId: string,
       params: RequestParams = {}
     ) =>
-      this.request<void, any>({
+      this.request<Filter, any>({
         path: `/views/${viewsId}/filters/${filterId}`,
         method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -1032,13 +1035,16 @@ export class Api<
      * @request PUT:/views/{viewsId}/filters/{filterId}
      */
     filterUpdate: (
-      filterId: string,
       viewsId: string,
+      filterId: string,
+      data: Filter,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
         path: `/views/${viewsId}/filters/${filterId}`,
         method: 'PUT',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -1050,8 +1056,8 @@ export class Api<
      * @request DELETE:/views/{viewsId}/filters/{filterId}
      */
     filterDelete: (
-      filterId: string,
       viewsId: string,
+      filterId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1067,10 +1073,11 @@ export class Api<
      * @name SortGet
      * @request GET:/views/{viewId}/sorts/{sortId}
      */
-    sortGet: (sortId: string, viewId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    sortGet: (viewId: string, sortId: string, params: RequestParams = {}) =>
+      this.request<Sort, any>({
         path: `/views/${viewId}/sorts/${sortId}`,
         method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -1081,10 +1088,17 @@ export class Api<
      * @name SortUpdate
      * @request PUT:/views/{viewId}/sorts/{sortId}
      */
-    sortUpdate: (sortId: string, viewId: string, params: RequestParams = {}) =>
+    sortUpdate: (
+      viewId: string,
+      sortId: string,
+      data: Sort,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/views/${viewId}/sorts/${sortId}`,
         method: 'PUT',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -1095,7 +1109,7 @@ export class Api<
      * @name SortDelete
      * @request DELETE:/views/{viewId}/sorts/{sortId}
      */
-    sortDelete: (sortId: string, viewId: string, params: RequestParams = {}) =>
+    sortDelete: (viewId: string, sortId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/sorts/${sortId}`,
         method: 'DELETE',
@@ -1107,7 +1121,7 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookGet
-     * @request GET:tables/{tableId}/webhooks/{webhookId}
+     * @request GET:/tables/{tableId}/webhooks/{webhookId}
      */
     webhookGet: (
       tableId: string,
@@ -1115,7 +1129,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `tables/${tableId}/webhooks/${webhookId}`,
+        path: `/tables/${tableId}/webhooks/${webhookId}`,
         method: 'GET',
         ...params,
       }),
@@ -1125,7 +1139,7 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookUpdate
-     * @request PUT:tables/{tableId}/webhooks/{webhookId}
+     * @request PUT:/tables/{tableId}/webhooks/{webhookId}
      */
     webhookUpdate: (
       tableId: string,
@@ -1133,7 +1147,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `tables/${tableId}/webhooks/${webhookId}`,
+        path: `/tables/${tableId}/webhooks/${webhookId}`,
         method: 'PUT',
         ...params,
       }),
@@ -1143,7 +1157,7 @@ export class Api<
      *
      * @tags Meta
      * @name WebhookDelete
-     * @request DELETE:tables/{tableId}/webhooks/{webhookId}
+     * @request DELETE:/tables/{tableId}/webhooks/{webhookId}
      */
     webhookDelete: (
       tableId: string,
@@ -1151,7 +1165,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `tables/${tableId}/webhooks/${webhookId}`,
+        path: `/tables/${tableId}/webhooks/${webhookId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1258,16 +1272,10 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name GridUpdate2
+     * @name FormUpdate
      * @request PUT:/tables/{tableId}/forms/{formId}
-     * @originalName gridUpdate
-     * @duplicate
      */
-    gridUpdate2: (
-      tableId: string,
-      formId: string,
-      params: RequestParams = {}
-    ) =>
+    formUpdate: (tableId: string, formId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/tables/${tableId}/forms/${formId}`,
         method: 'PUT',
@@ -1278,16 +1286,10 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name GridDelete2
+     * @name FormDelete
      * @request DELETE:/tables/{tableId}/forms/{formId}
-     * @originalName gridDelete
-     * @duplicate
      */
-    gridDelete2: (
-      tableId: string,
-      formId: string,
-      params: RequestParams = {}
-    ) =>
+    formDelete: (tableId: string, formId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/tables/${tableId}/forms/${formId}`,
         method: 'DELETE',
@@ -1298,12 +1300,10 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name GridRead2
+     * @name FormRead
      * @request GET:/tables/{tableId}/forms/{formId}
-     * @originalName gridRead
-     * @duplicate
      */
-    gridRead2: (tableId: string, formId: string, params: RequestParams = {}) =>
+    formRead: (tableId: string, formId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/tables/${tableId}/forms/${formId}`,
         method: 'GET',
@@ -1484,6 +1484,94 @@ export class Api<
       this.request<void, any>({
         path: `/projects/${projectId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name ProjectReorder
+     * @request POST:/projects/{projectId}/reorder
+     */
+    projectReorder: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/reorder`,
+        method: 'POST',
+        ...params,
+      }),
+  };
+  tables = {
+    /**
+     * No description
+     *
+     * @name TableReorder
+     * @request POST:/tables/{tableId}/reorder
+     */
+    tableReorder: (tableId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/reorder`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name ColumnReorder
+     * @request POST:/tables/{tableId}/columns/reorder
+     */
+    columnReorder: (tableId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/columns/reorder`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name WebhookReorder
+     * @request POST:/tables/{tableId}/webhooks/{webhookId}/reorder
+     */
+    webhookReorder: (
+      tableId: string,
+      webhookId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/webhooks/${webhookId}/reorder`,
+        method: 'POST',
+        ...params,
+      }),
+  };
+  views = {
+    /**
+     * No description
+     *
+     * @name FilterReorder
+     * @request POST:/views/{viewsId}/filters/{filterId}/reorder
+     */
+    filterReorder: (
+      filterId: string,
+      viewsId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewsId}/filters/${filterId}/reorder`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name SortReorder
+     * @request POST:/views/{viewId}/sorts/{sortId}/reorder
+     */
+    sortReorder: (sortId: string, viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/sorts/${sortId}/reorder`,
+        method: 'POST',
         ...params,
       }),
   };

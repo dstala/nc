@@ -39,15 +39,10 @@ export default class SingleSelectColumn implements NcColumn {
   }
 
   public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(
-      model.project_id,
-      model.db_alias,
-      MetaTable.COL_SELECT_OPTIONS,
-      {
-        tn: model.tn,
-        _tn: model._tn
-      }
-    );
+    await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_SELECT_OPTIONS, {
+      tn: model.tn,
+      _tn: model._tn
+    });
   }
 
   public static async read(columnId: string) {

@@ -28,6 +28,7 @@ import { QueryBuilder } from 'knex';
 class BaseModelSqlv2 {
   protected dbDriver: XKnex;
   protected model: Model;
+  protected viewId: string;
   private _proto: any;
   private _columns = {};
 
@@ -37,9 +38,17 @@ class BaseModelSqlv2 {
     limitMax: 1000
   };
 
-  constructor({ dbDriver, model }: { [key: string]: any; model: Model }) {
+  constructor({
+    dbDriver,
+    model,
+    viewId
+  }: {
+    [key: string]: any;
+    model: Model;
+  }) {
     this.dbDriver = dbDriver;
     this.model = model;
+    this.viewId = viewId;
     autoBind(this);
   }
 
@@ -71,18 +80,16 @@ class BaseModelSqlv2 {
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
         );*/
+
+    // todo: replace with view id
     if (!ignoreFilterSort) {
       await conditionV2(
-        await Filter.getFilter({ modelId: this.model.id }),
+        await Filter.getFilter({ viewId: this.viewId }),
         qb,
         this.dbDriver
       );
 
-      await sortV2(
-        await Sort.list({ modelId: this.model.id }),
-        qb,
-        this.dbDriver
-      );
+      await sortV2(await Sort.list({ viewId: this.viewId }), qb, this.dbDriver);
       this._paginateAndSort(qb, rest);
     }
 
@@ -370,9 +377,11 @@ class BaseModelSqlv2 {
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
         );*/
+
+    // todo: replace with view id
     if (!ignoreFilterSort) {
       await conditionV2(
-        await Filter.getFilter({ modelId: this.model.id }),
+        await Filter.getFilter({ viewId: this.model.id }),
         qb,
         this.dbDriver
       );
