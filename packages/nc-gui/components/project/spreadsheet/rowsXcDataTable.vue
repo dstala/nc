@@ -77,6 +77,7 @@
           :grouping-field.sync="groupingField"
           :is-gallery="isGallery"
           :is-kanban="isKanban"
+          @updated="loadTableData"
         />
 
         <sort-list

@@ -109,7 +109,8 @@ const up = async knex => {
     table.boolean('virtual');
 
     table.boolean('deleted');
-    table.boolean('visible').defaultTo(true);
+
+    table.boolean('system').defaultTo(false);
     table.float('order');
     table.timestamps(true, true);
   });

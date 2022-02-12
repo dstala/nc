@@ -29,18 +29,18 @@ process.env[`NC_DB`] = `mysql2://localhost:3306?u=root&p=password&d=${metaDb}`;
 process.env[`DEBUG`] = 'xc*';
 
 (async () => {
-  // try {
-  //   await require('knex')({
-  //     client: 'mysql2',
-  //     connection: {
-  //       host: 'localhost',
-  //       port: 3306,
-  //       user: 'root',
-  //       password: 'password',
-  //       database: metaDb
-  //     }
-  //   }).raw(`DROP DATABASE ??`, metaDb);
-  // } catch {}
+  try {
+    await require('knex')({
+      client: 'mysql2',
+      connection: {
+        host: 'localhost',
+        port: 3306,
+        user: 'root',
+        password: 'password',
+        database: metaDb
+      }
+    }).raw(`DROP DATABASE ??`, metaDb);
+  } catch {}
 
   server.use(await Noco.init({}));
   server.listen(process.env.PORT || 8080, () => {

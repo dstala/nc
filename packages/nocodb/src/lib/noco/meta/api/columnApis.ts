@@ -14,6 +14,7 @@ import {
   getUniqueColumnAliasName,
   getUniqueColumnName
 } from './helpers/getUniqueName';
+
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
 export enum Altered {
@@ -253,7 +254,8 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
                 dtxp: childPK.dtxp,
                 dtxs: childPK.dtxs,
                 un: childPK.un,
-                altered: 1
+                altered: 1,
+                uidt: UITypes.ForeignKey
               },
               {
                 cn: parentCn,
@@ -266,7 +268,8 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
                 dtxp: parentPK.dtxp,
                 dtxs: parentPK.dtxs,
                 un: parentPK.un,
-                altered: 1
+                altered: 1,
+                uidt: UITypes.ForeignKey
               }
             );
 

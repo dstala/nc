@@ -238,7 +238,7 @@ export default {
       if (filter.id) {
         await this.$api.meta.filterUpdate(this.viewId, filter.id, filter)
       } else {
-        this.filters[i] = (await this.$api.meta.filterCreate(this.viewId, filter)).data
+        this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, filter)).data)
       }
       this.$emit('updated')
     },

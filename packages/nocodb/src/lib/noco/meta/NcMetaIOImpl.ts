@@ -315,7 +315,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
       query.where('project_id', project_id);
     }
     if (dbAlias !== null && dbAlias !== undefined) {
-      query.where('db_alias', dbAlias);
+      query.where('base_id', dbAlias);
     }
 
     if (args?.condition) {

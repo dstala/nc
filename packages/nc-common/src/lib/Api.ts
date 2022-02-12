@@ -1012,6 +1012,46 @@ export class Api<
      * No description
      *
      * @tags Meta
+     * @name ViewColumnRead
+     * @request GET:/views/{viewId}/columns/{columnId}
+     */
+    viewColumnRead: (
+      viewId: string,
+      columnId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/views/${viewId}/columns/${columnId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name ViewColumnUpdate
+     * @request PUT:/views/{viewId}/columns/{columnId}
+     */
+    viewColumnUpdate: (
+      viewId: string,
+      columnId: string,
+      data: any,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/columns/${columnId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
      * @name SortList
      * @request GET:/views/{viewId}/sorts
      */
@@ -1035,6 +1075,56 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name SortGet
+     * @request GET:/views/{viewId}/sorts/{sortId}
+     */
+    sortGet: (viewId: string, sortId: string, params: RequestParams = {}) =>
+      this.request<Sort, any>({
+        path: `/views/${viewId}/sorts/${sortId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name SortUpdate
+     * @request PUT:/views/{viewId}/sorts/{sortId}
+     */
+    sortUpdate: (
+      viewId: string,
+      sortId: string,
+      data: Sort,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/sorts/${sortId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name SortDelete
+     * @request DELETE:/views/{viewId}/sorts/{sortId}
+     */
+    sortDelete: (viewId: string, sortId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/sorts/${sortId}`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1088,96 +1178,6 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/views/${viewId}/filters/${filterId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewColumnRead
-     * @request GET:/views/{viewId}/columns/{columnId}
-     */
-    viewColumnRead: (
-      viewId: string,
-      columnId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/views/${viewId}/columns/${columnId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewColumnUpdate
-     * @request PUT:/views/{viewId}/columns/{columnId}
-     */
-    viewColumnUpdate: (
-      viewId: string,
-      columnId: string,
-      data: any,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/columns/${columnId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortGet
-     * @request GET:/views/{viewId}/sorts/{sortId}
-     */
-    sortGet: (viewId: string, sortId: string, params: RequestParams = {}) =>
-      this.request<Sort, any>({
-        path: `/views/${viewId}/sorts/${sortId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortUpdate
-     * @request PUT:/views/{viewId}/sorts/{sortId}
-     */
-    sortUpdate: (
-      viewId: string,
-      sortId: string,
-      data: Sort,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts/${sortId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortDelete
-     * @request DELETE:/views/{viewId}/sorts/{sortId}
-     */
-    sortDelete: (viewId: string, sortId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts/${sortId}`,
         method: 'DELETE',
         ...params,
       }),

@@ -61,6 +61,7 @@ export default class Column implements ColumnType {
     column: Partial<T> & { base_id?: string; [key: string]: any }
   ) {
     if (!column.uidt) throw new Error('UI Datatype not found');
+    const order = 1;
     const row = await Noco.ncMeta.metaInsert2(
       null, //column.project_id || column.base_id,
       null, //column.db_alias,
@@ -97,7 +98,9 @@ export default class Column implements ColumnType {
 
     await View.insertColumn({
       fk_column_id: row.id,
-      fk_model_id: column.fk_model_id
+      fk_model_id: column.fk_model_id,
+      order,
+      show: true
     });
 
     return row;

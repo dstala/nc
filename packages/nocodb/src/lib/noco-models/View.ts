@@ -149,7 +149,12 @@ export default class View {
     return View.get(id);
   }
 
-  static async insertColumn(param: { fk_column_id: any; fk_model_id: any }) {
+  static async insertColumn(param: {
+    fk_column_id: any;
+    fk_model_id: any;
+    order;
+    show;
+  }) {
     const views = await this.list(param.fk_model_id);
 
     for (const view of views) {

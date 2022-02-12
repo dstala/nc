@@ -74,8 +74,8 @@ export default abstract class NcMetaIO {
   ): Promise<any>;
 
   public abstract metaInsert2(
+    project_id: string,
     base_id: string,
-    dbAlias: string,
     target: string,
     data: any,
     ignoreIdGeneration?: boolean
@@ -119,8 +119,8 @@ export default abstract class NcMetaIO {
     xcCondition?: XcCondition
   ): Promise<any>;
   public abstract metaGet2(
+    project_id: string,
     base_id: string,
-    dbAlias: string,
     target: string,
     idOrCondition: string | { [key: string]: any },
     fields?: string[],
@@ -142,7 +142,7 @@ export default abstract class NcMetaIO {
   ): Promise<any[]>;
   public abstract metaList2(
     project_id: string,
-    dbAlias: string,
+    base_id: string,
     target: string,
     args?: {
       condition?: { [key: string]: any };

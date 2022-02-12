@@ -18,6 +18,7 @@ import FormulaColumn from '../../../noco-models/FormulaColumn';
 import genRollupSelectv2 from './genRollupSelectv2';
 import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
 import { QueryBuilder } from 'knex';
+import View from '../../../noco-models/View';
 
 /**
  * Base class for models
@@ -73,7 +74,6 @@ class BaseModelSqlv2 {
     const { where, ...rest } = this._getListArgs(args);
 
     const qb = this.dbDriver(this.model.tn);
-
     await this.selectObject({ qb });
     qb.xwhere(where);
 
@@ -417,9 +417,17 @@ class BaseModelSqlv2 {
     }
   }*/
 
-  public defaultResolverReq(query?: any) {
+  public async defaultResolverReq(query?: any) {
     const fields = query?.fields || query?.f;
-
+    let allowedCols = null;
+    if (this.viewId)
+      allowedCols = (await View.getColumns(this.viewId)).reduce(
+        (o, c) => ({
+          ...o,
+          [c.fk_column_id]: c.show
+        }),
+        {}
+      );
     if (fields && fields !== '*') {
       return fields.split(',').reduce((obj, f) => ({ ...obj, [f]: 1 }), {});
     }
@@ -427,9 +435,9 @@ class BaseModelSqlv2 {
     return this.model.getColumns().then(columns =>
       Promise.resolve(
         columns.reduce(
-          (obj, o) => ({
+          (obj, col) => ({
             ...obj,
-            [o._cn]: 1
+            [col._cn]: allowedCols && !col.pk ? allowedCols[col.id] : 1
           }),
           {}
         )
@@ -1022,6 +1030,7 @@ class BaseModelSqlv2 {
   get isMssql() {
     return this.clientType === 'mssql';
   }
+
   get isPg() {
     return this.clientType === 'pg';
   }

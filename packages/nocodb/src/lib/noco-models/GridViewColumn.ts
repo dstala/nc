@@ -32,7 +32,9 @@ export default class GridViewColumn {
   static async insert(column: Partial<GridViewColumn>) {
     await Noco.ncMeta.metaInsert2(null, null, MetaTable.GRID_VIEW_COLUMNS, {
       fk_view_id: column.fk_view_id,
-      fk_column_id: column.fk_column_id
+      fk_column_id: column.fk_column_id,
+      order: column.order,
+      show: column.show
     });
   }
 }

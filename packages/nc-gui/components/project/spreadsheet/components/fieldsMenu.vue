@@ -97,24 +97,29 @@
                     </template>-->
         </v-text-field>
       </v-list-item>
-      <draggable v-model="fieldsOrderLoc" @start="drag=true" @end="drag=false">
+      <draggable
+        v-model="fields"
+        @start="drag=true"
+        @end="drag=false"
+        @change="onMove($event)"
+      >
         <template
-          v-for="field in fieldsOrderLoc"
+          v-for="field in fields"
         >
           <v-list-item
-            v-if="field && field.toLowerCase().indexOf(fieldFilter.toLowerCase()) > -1"
             :key="field"
             dense
           >
             <v-checkbox
-              v-model="showFields[field]"
+              v-model="field.show"
               class="mt-0 pt-0"
               dense
               hide-details
               @click.stop
+              @change="saveOrUpdate(field, i)"
             >
               <template #label>
-                <span class="caption">{{ field }}</span>
+                <span class="caption">{{ field._cn }}</span>
               </template>
             </v-checkbox>
             <v-spacer />
@@ -274,13 +279,27 @@ export default {
   methods: {
     async loadFields() {
       let fields = []
-
+      let order = 1
       if (this.viewId) {
         const data = await this.$api.meta.viewColumnList(this.viewId)
-        fields = data.data
+        const fieldById = data.data.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
+        fields = this.meta.columns.map(c => ({ _cn: c._cn, fk_column_id: c.id, ...fieldById[c.id], order: fieldById[c.id].order || order++ })).sort((a, b) => a.order - b.order)
       }
 
       this.fields = fields
+
+      this.$emit('input', this.fields.reduce((o, c) => ({ ...o, [c._cn]: c.show }), {}))
+      this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+    },
+    async saveOrUpdate(field, i) {
+      if (field.id) {
+        await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
+      } else {
+        this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field)).data
+      }
+      this.$emit('updated')
+      this.$emit('input', this.fields.reduce((o, c) => ({ ...o, [c._cn]: c.show }), {}))
+      this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     showAll() {
       // eslint-disable-next-line no-return-assign,no-sequences
@@ -289,6 +308,16 @@ export default {
     hideAll() {
       // eslint-disable-next-line no-return-assign,no-sequences
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = false, o), {})
+    },
+    onMove(event) {
+      if (this.fields.length - 1 === event.moved.newIndex) {
+        this.$set(this.fields[event.moved.newIndex], 'order', this.fields[event.moved.newIndex - 1].order + 1)
+      } else if (event.moved.newIndex === 0) {
+        this.$set(this.fields[event.moved.newIndex], 'order', this.fields[1].order / 2)
+      } else {
+        this.$set(this.fields[event.moved.newIndex], 'order', (this.fields[event.moved.newIndex - 1].order + this.fields[event.moved.newIndex + 1].order) / 2)
+      }
+      this.saveOrUpdate(this.fields[event.moved.newIndex], event.moved.newIndex)
     }
   }
 }
@@ -317,7 +346,7 @@ export default {
       max-height: 20px !important;
     }
 
-    .field-icon{
+    .field-icon {
       margin-top: 2px;
     }
   }

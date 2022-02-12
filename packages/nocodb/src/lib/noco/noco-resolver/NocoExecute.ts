@@ -91,8 +91,10 @@ const nocoExecute = async (
     }
   }
 
-  let extractKeys = Object.keys(requestObj);
-  if (!extractKeys?.length) extractKeys = Object.keys(requestObj);
+  const extractKeys =
+    requestObj && typeof requestObj === 'object'
+      ? Object.keys(requestObj).filter(k => requestObj[k])
+      : Object.keys(resolverObj);
 
   const out: any = {};
   const resolPromises = [];

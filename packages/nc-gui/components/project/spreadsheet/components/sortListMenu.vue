@@ -94,12 +94,6 @@ export default {
     }
   },
   watch: {
-    sortList: {
-      handler(v) {
-        this.$emit('input', v)
-      },
-      deep: true
-    },
     value(v) {
       this.sortList = v || []
     },
@@ -134,7 +128,7 @@ export default {
       if (sort.id) {
         await this.$api.meta.sortUpdate(this.viewId, sort.id, sort)
       } else {
-        this.sortList[i] = (await this.$api.meta.sortCreate(this.viewId, sort)).data
+        this.$set(this.sortList, i, (await this.$api.meta.sortCreate(this.viewId, sort)).data)
       }
       this.$emit('updated')
     },
