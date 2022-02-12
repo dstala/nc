@@ -26,7 +26,7 @@
         </v-btn>
       </v-badge>
     </template>
-    <column-filter v-model="filters" :field-list="fieldList" :meta="meta">
+    <column-filter v-model="filters" :field-list="fieldList" :meta="meta" v-on="$listeners">
       <div class="d-flex align-center mx-2" @click.stop>
         <v-checkbox
           id="col-filter-checkbox"

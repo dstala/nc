@@ -982,6 +982,36 @@ export class Api<
      * No description
      *
      * @tags Meta
+     * @name ViewColumnList
+     * @request GET:/views/{viewId}/columns
+     */
+    viewColumnList: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/columns`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name ViewColumnCreate
+     * @request POST:/views/{viewId}/columns
+     */
+    viewColumnCreate: (viewId: string, data: any, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/columns`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
      * @name SortList
      * @request GET:/views/{viewId}/sorts
      */
@@ -1013,15 +1043,11 @@ export class Api<
      *
      * @tags Meta
      * @name FilterGet
-     * @request GET:/views/{viewsId}/filters/{filterId}
+     * @request GET:/views/{viewId}/filters/{filterId}
      */
-    filterGet: (
-      viewsId: string,
-      filterId: string,
-      params: RequestParams = {}
-    ) =>
+    filterGet: (viewId: string, filterId: string, params: RequestParams = {}) =>
       this.request<Filter, any>({
-        path: `/views/${viewsId}/filters/${filterId}`,
+        path: `/views/${viewId}/filters/${filterId}`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -1032,16 +1058,16 @@ export class Api<
      *
      * @tags Meta
      * @name FilterUpdate
-     * @request PUT:/views/{viewsId}/filters/{filterId}
+     * @request PUT:/views/{viewId}/filters/{filterId}
      */
     filterUpdate: (
-      viewsId: string,
+      viewId: string,
       filterId: string,
       data: Filter,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/views/${viewsId}/filters/${filterId}`,
+        path: `/views/${viewId}/filters/${filterId}`,
         method: 'PUT',
         body: data,
         type: ContentType.Json,
@@ -1053,16 +1079,56 @@ export class Api<
      *
      * @tags Meta
      * @name FilterDelete
-     * @request DELETE:/views/{viewsId}/filters/{filterId}
+     * @request DELETE:/views/{viewId}/filters/{filterId}
      */
     filterDelete: (
-      viewsId: string,
+      viewId: string,
       filterId: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/views/${viewsId}/filters/${filterId}`,
+        path: `/views/${viewId}/filters/${filterId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name ViewColumnRead
+     * @request GET:/views/{viewId}/columns/{columnId}
+     */
+    viewColumnRead: (
+      viewId: string,
+      columnId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/views/${viewId}/columns/${columnId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name ViewColumnUpdate
+     * @request PUT:/views/{viewId}/columns/{columnId}
+     */
+    viewColumnUpdate: (
+      viewId: string,
+      columnId: string,
+      data: any,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/columns/${columnId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 

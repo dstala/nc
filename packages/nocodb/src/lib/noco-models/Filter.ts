@@ -7,16 +7,12 @@ import { MetaTable } from '../utils/globals';
 import View from './View';
 
 export default class Filter {
-  get fk_parent_id(): string {
-    return this._fk_parent_id;
-  }
-
   id: string;
 
   fk_model_id?: string;
   fk_view_id?: string;
   fk_column_id?: string;
-  private _fk_parent_id?: string;
+  fk_parent_id?: string;
 
   comparison_op?: string;
   value?: string;
@@ -101,13 +97,13 @@ export default class Filter {
   }
 
   public async getGroup(): Promise<Filter> {
-    if (!this._fk_parent_id) return null;
+    if (!this.fk_parent_id) return null;
     const filterOdj = await Noco.ncMeta.metaGet2(
       null,
       null,
       MetaTable.FILTER_EXP,
       {
-        id: this._fk_parent_id
+        id: this.fk_parent_id
       }
     );
     return filterOdj && new Filter(filterOdj);
@@ -128,21 +124,21 @@ export default class Filter {
     return childFilters && childFilters.map(f => new Filter(f));
   }
 
-  public static async getFilter({
-    viewId
-  }: {
-    viewId: string;
-  }): Promise<Filter> {
-    if (!viewId) return null;
-
-    const filterObj = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.FILTER_EXP,
-      { fk_view_id: viewId, fk_parent_id: null }
-    );
-    return filterObj && new Filter(filterObj);
-  }
+  // public static async getFilter({
+  //   viewId
+  // }: {
+  //   viewId: string;
+  // }): Promise<Filter> {
+  //   if (!viewId) return null;
+  //
+  //   const filterObj = await Noco.ncMeta.metaGet2(
+  //     null,
+  //     null,
+  //     MetaTable.FILTER_EXP,
+  //     { fk_view_id: viewId, fk_parent_id: null }
+  //   );
+  //   return filterObj && new Filter(filterObj);
+  // }
 
   public static async getFilterObject({
     viewId
@@ -217,7 +213,7 @@ export default class Filter {
     return filterObj && new Filter(filterObj);
   }
 
-  static async list({ viewId }: { viewId: any }) {
+  static async rootFilterList({ viewId }: { viewId: any }) {
     const filterOdjs = await Noco.ncMeta.metaList2(
       null,
       null,

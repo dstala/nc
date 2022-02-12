@@ -179,6 +179,7 @@ export default {
     isPublic: Boolean
   },
   data: () => ({
+    fields: [],
     fieldFilter: '',
     showFields: {},
     fieldsOrderLoc: []
@@ -226,9 +227,17 @@ export default {
       set(v) {
         this.$emit('update:showSystemFields', v)
       }
+    },
+    viewId() {
+      return this.meta && this.meta.views && this.meta.views[0] && this.meta.views[0].id
     }
   },
   watch: {
+    async viewId(v) {
+      if (v) {
+        await this.loadFields()
+      }
+    },
     fieldList(f) {
       this.fieldsOrderLoc = [...f]
     },
@@ -258,10 +267,21 @@ export default {
     }
   },
   created() {
+    this.loadFields()
     this.showFields = this.value
     this.fieldsOrderLoc = this.fieldsOrder && this.fieldsOrder.length ? this.fieldsOrder : [...this.fieldList]
   },
   methods: {
+    async loadFields() {
+      let fields = []
+
+      if (this.viewId) {
+        const data = await this.$api.meta.viewColumnList(this.viewId)
+        fields = data.data
+      }
+
+      this.fields = fields
+    },
     showAll() {
       // eslint-disable-next-line no-return-assign,no-sequences
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = true, o), {})

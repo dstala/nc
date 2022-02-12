@@ -18,6 +18,7 @@ export async function filterGet(req: Request, res: Response, next) {
 
     res.json(filter);
   } catch (e) {
+    console.log(e);
     next(e);
   }
 }
@@ -29,10 +30,11 @@ export async function filterList(
   next
 ) {
   try {
-    const filter = await Filter.list({ viewId: req.params.viewId });
+    const filter = await Filter.rootFilterList({ viewId: req.params.viewId });
 
     res.json(filter);
   } catch (e) {
+    console.log(e);
     next(e);
   }
 }
@@ -50,6 +52,7 @@ export async function filterCreate(
 
     res.json(filter);
   } catch (e) {
+    console.log(e);
     next(e);
   }
 }
@@ -63,6 +66,7 @@ export async function filterUpdate(req, res, next) {
     });
     res.json(filter);
   } catch (e) {
+    console.log(e);
     next(e);
   }
 }
@@ -73,6 +77,7 @@ export async function filterDelete(req: Request, res: Response, next) {
     const filter = await Filter.delete(req.params.filterId);
     res.json(filter);
   } catch (e) {
+    console.log(e);
     next(e);
   }
 }

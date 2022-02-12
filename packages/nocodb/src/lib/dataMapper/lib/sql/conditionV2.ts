@@ -12,7 +12,7 @@ import FormulaColumn from '../../../noco-models/FormulaColumn';
 // import LookupColumn from '../../../noco-models/LookupColumn';
 
 export default async function conditionV2(
-  conditionObj: Filter,
+  conditionObj: Filter | Filter[],
   qb: QueryBuilder,
   knex: XKnex
 ) {
@@ -23,14 +23,25 @@ export default async function conditionV2(
 }
 
 const parseConditionV2 = async (
-  filter: Filter,
+  filter: Filter | Filter[],
   knex: XKnex,
   aliasCount = { count: 0 },
   alias?,
   customWhereClause?
 ) => {
-  // const model = await filter.getModel();
-  if (filter.is_group) {
+  if (Array.isArray(filter)) {
+    const qbs = await Promise.all(
+      filter.map(child => parseConditionV2(child, knex, aliasCount))
+    );
+
+    return qbP => {
+      qbP.where(qb => {
+        for (const qb1 of qbs) {
+          qb.andWhere(qb1);
+        }
+      });
+    };
+  } else if (filter.is_group) {
     const children = await filter.getChildren();
 
     const qbs = await Promise.all(

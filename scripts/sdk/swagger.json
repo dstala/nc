@@ -887,6 +887,103 @@
         }
       }
     },
+    "/views/{viewId}/columns": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "view-column-list",
+        "responses": {
+          "200": {}
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "view-column-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
+    "/views/{viewId}/columns/{columnId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "columnId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "view-column-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "view-column-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
     "/views/{viewId}/sorts": {
       "parameters": [
         {
@@ -932,13 +1029,85 @@
         }
       }
     },
-    "/views/{viewsId}/filters/{filterId}": {
+    "/views/{viewId}/sorts/{sortId}": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
-          "name": "viewsId",
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "sortId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "sort-get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sort"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "sort-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sort"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "sort-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/views/{viewId}/filters/{filterId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
           "in": "path",
           "required": true
         },
@@ -1032,78 +1201,6 @@
           }
         },
         "description": ""
-      }
-    },
-    "/views/{viewId}/sorts/{sortId}": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "viewId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "sortId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "get": {
-        "summary": "",
-        "operationId": "sort-get",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Sort"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "put": {
-        "summary": "",
-        "operationId": "sort-update",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sort"
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "",
-        "operationId": "sort-delete",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
       }
     },
     "/views/{viewId}/sorts/{sortId}/reorder": {

@@ -100,6 +100,7 @@ export default class View {
       viewId: this.id
     })) as any);
   }
+
   public async getSorts() {
     return (this.sorts = await Sort.list({ viewId: this.id }));
   }
@@ -169,5 +170,61 @@ export default class View {
       await item.getViewWithInfo();
     }
     return list;
+  }
+
+  static async getColumns(
+    viewId: string
+  ): Promise<Array<GridViewColumn | any>> {
+    let columns: Array<GridViewColumn | any> = [];
+    const view = await this.get(viewId);
+
+    // todo:  just get - order & show props
+    switch (view.type) {
+      case ViewTypes.GRID:
+        columns = await GridViewColumn.list(viewId);
+        break;
+    }
+
+    return columns;
+  }
+
+  static async updateColumn(
+    viewId: string,
+    colId: string,
+    colData: {
+      order: number;
+      show: boolean;
+    }
+  ): Promise<Array<GridViewColumn | any>> {
+    const columns: Array<GridViewColumn | any> = [];
+    const view = await this.get(viewId);
+    let table;
+    switch (view.type) {
+      case ViewTypes.GRID:
+        table = MetaTable.GRID_VIEW_COLUMNS;
+        break;
+      case ViewTypes.GALLERY:
+        table = MetaTable.GALLERY_VIEW_COLUMNS;
+        break;
+      case ViewTypes.KANBAN:
+        table = MetaTable.KANBAN_VIEW_COLUMNS;
+        break;
+      case ViewTypes.FORM:
+        table = MetaTable.FORM_VIEW_COLUMNS;
+        break;
+    }
+
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      table,
+      {
+        order: colData.order,
+        show: colData.show
+      },
+      colId
+    );
+
+    return columns;
   }
 }

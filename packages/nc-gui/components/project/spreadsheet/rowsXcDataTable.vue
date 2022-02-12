@@ -94,6 +94,7 @@
           :is-locked="isLocked"
           :field-list="[...realFieldList, ...formulaFieldList]"
           dense
+          @updated="loadTableData"
         />
 
         <share-view-menu @share="$refs.drawer && $refs.drawer.genShareLink()" />

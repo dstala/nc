@@ -5,6 +5,7 @@ import columnApis from './columnApis';
 import { Router } from 'express';
 import sortApis from './sortApis';
 import filterApis from './filterApis';
+import viewColumnApis from './viewColumnApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -13,4 +14,5 @@ export default function(router: Router) {
   router.use('/data/:viewId', dataApis);
   router.use('/views/:viewId/sorts', sortApis);
   router.use('/views/:viewId/filters', filterApis);
+  router.use('/views/:viewId/columns', viewColumnApis);
 }

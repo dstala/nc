@@ -84,7 +84,7 @@ class BaseModelSqlv2 {
     // todo: replace with view id
     if (!ignoreFilterSort) {
       await conditionV2(
-        await Filter.getFilter({ viewId: this.viewId }),
+        await Filter.rootFilterList({ viewId: this.viewId }),
         qb,
         this.dbDriver
       );
@@ -381,7 +381,7 @@ class BaseModelSqlv2 {
     // todo: replace with view id
     if (!ignoreFilterSort) {
       await conditionV2(
-        await Filter.getFilter({ viewId: this.model.id }),
+        await Filter.rootFilterList({ viewId: this.viewId }),
         qb,
         this.dbDriver
       );

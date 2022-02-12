@@ -10,7 +10,7 @@
           :key="i + '_3'"
           small
           class="nc-filter-item-remove-btn"
-          @click.stop="filters.splice(i,1)"
+          @click.stop="deleteFilter(filter,i)"
         >
           mdi-close-box
         </v-icon>
@@ -118,7 +118,7 @@
           class="caption nc-filter-value-select"
           :disabled="filter.readOnly"
           @click.stop
-          @change="saveOrUpdate(filter, i)"
+          @input="saveOrUpdate(filter, i)"
         />
       </template>
     </div>
@@ -245,7 +245,7 @@ export default {
     async deleteFilter(filter, i) {
       if (filter.id) {
         await this.$api.meta.filterDelete(this.viewId, filter.id)
-        await this.loadSortList()
+        await this.loadFilter()
       } else {
         this.sortList.splice(i, 1)
       }
