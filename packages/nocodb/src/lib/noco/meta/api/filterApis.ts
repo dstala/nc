@@ -38,6 +38,24 @@ export async function filterList(
     next(e);
   }
 }
+// @ts-ignore
+export async function filterChildrenRead(
+  req: Request<any, any, any, TableListParams>,
+  res: Response,
+  next
+) {
+  try {
+    const filter = await Filter.parentFilterList({
+      viewId: req.params.viewId,
+      parentId: req.params.filterParentId
+    });
+
+    res.json(filter);
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
+}
 
 export async function filterCreate(
   req: Request<any, any, TableReq>,
@@ -88,4 +106,5 @@ router.post('/', filterCreate);
 router.get('/:filterId', filterGet);
 router.put('/:filterId', filterUpdate);
 router.delete('/:filterId', filterDelete);
+router.get('/:filterParentId/children', filterChildrenRead);
 export default router;

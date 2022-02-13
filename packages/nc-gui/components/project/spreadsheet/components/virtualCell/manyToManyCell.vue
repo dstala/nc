@@ -393,10 +393,10 @@ export default {
       const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
       const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
 
-      const vcidCol = this.assocMeta.columns.find(c => c.cn === this.mm.vrcn)._cn
-      const vpidCol = this.assocMeta.columns.find(c => c.cn === this.mm.vcn)._cn
+      const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id)._cn
+      const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id)._cn
       try {
-        await this.assocApi.insert({
+        await this.$api.data.create(this.assocMeta.id, {
           [vcidCol]: parseIfInteger(cid),
           [vpidCol]: parseIfInteger(pid)
         })

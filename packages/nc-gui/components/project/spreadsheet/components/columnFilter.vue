@@ -1,125 +1,158 @@
 <template>
   <div
     class="backgroundColor pa-2"
-    style="width:530px"
+    :style="{width:nested ? '100%' : '530px'}"
   >
     <div class="grid" @click.stop>
       <template v-for="(filter,i) in filters" dense>
-        <v-icon
-          v-if="!filter.readOnly"
-          :key="i + '_3'"
-          small
-          class="nc-filter-item-remove-btn"
-          @click.stop="deleteFilter(filter,i)"
-        >
-          mdi-close-box
-        </v-icon>
-        <span v-else :key="i + '_1'" />
+        <div v-if="filter.is_group" :key="i" style="grid-column: span 4; padding:6px" class="elevation-4 ">
+          <div class="d-flex" style="gap:6px; padding: 0 6px">
+            <v-icon
+              v-if="!filter.readOnly"
+              :key="i + '_3'"
+              small
+              class="nc-filter-item-remove-btn"
+              @click.stop="deleteFilter(filter,i)"
+            >
+              mdi-close-box
+            </v-icon>
+            <span v-else :key="i + '_1'" />
+            <v-select
+              v-model="filter.logical_op"
+              class="flex-shrink-1 flex-grow-0 elevation-0 caption "
+              :items="['and' ,'or']"
+              solo
+              flat
+              dense
+              hide-details
+              placeholder="Group op"
+              @click.stop
+              @change="saveOrUpdate(filter, i)"
+            >
+              <template #item="{item}">
+                <span class="caption font-weight-regular">{{ item }}</span>
+              </template>
+            </v-select>
+          </div>
+          <column-filter v-if="filter.id" :parent-id="filter.id" nested :meta="meta" @updated="$emit('updated')" />
+        </div>
+        <template v-else>
+          <v-icon
+            v-if="!filter.readOnly"
+            :key="i + '_3'"
+            small
+            class="nc-filter-item-remove-btn"
+            @click.stop="deleteFilter(filter,i)"
+          >
+            mdi-close-box
+          </v-icon>
+          <span v-else :key="i + '_1'" />
 
-        <!--        <span
-          v-if="!i"
-          :key="i + '_2'"
-          class="caption d-flex align-center"
-        >where</span>
+          <!--        <span
+            v-if="!i"
+            :key="i + '_2'"
+            class="caption d-flex align-center"
+          >where</span>
 
-        <v-select
-          v-else
-          :key="i + '_4'"
-          v-model="filter.logicOp"
-          class="flex-shrink-1 flex-grow-0 elevation-0 caption "
-          :items="['and' ,'or']"
-          solo
-          flat
-          dense
-          hide-details
-          :disabled="filter.readOnly"
-          @click.stop
-        >
-          <template #item="{item}">
-            <span class="caption font-weight-regular">{{ item }}</span>
-          </template>
-        </v-select>-->
-        <!--        <v-text-field-->
-        <!--          v-if="filter.readOnly"-->
-        <!--          :key="i + '_5'"-->
-        <!--          v-model="filter.field"-->
-        <!--          class="caption "-->
-        <!--          placeholder="Field"-->
-        <!--          solo-->
-        <!--          flat-->
-        <!--          dense-->
-        <!--          disabled-->
-        <!--          hide-details-->
-        <!--          @click.stop-->
-        <!--        >-->
-        <!--          <template #item="{item}">-->
-        <!--            <span class="caption font-weight-regular">{{ item }}</span>-->
-        <!--          </template>-->
-        <!--        </v-text-field>-->
-        <!--        v-else-->
+          <v-select
+            v-else
+            :key="i + '_4'"
+            v-model="filter.logicOp"
+            class="flex-shrink-1 flex-grow-0 elevation-0 caption "
+            :items="['and' ,'or']"
+            solo
+            flat
+            dense
+            hide-details
+            :disabled="filter.readOnly"
+            @click.stop
+          >
+            <template #item="{item}">
+              <span class="caption font-weight-regular">{{ item }}</span>
+            </template>
+          </v-select>-->
+          <!--        <v-text-field-->
+          <!--          v-if="filter.readOnly"-->
+          <!--          :key="i + '_5'"-->
+          <!--          v-model="filter.field"-->
+          <!--          class="caption "-->
+          <!--          placeholder="Field"-->
+          <!--          solo-->
+          <!--          flat-->
+          <!--          dense-->
+          <!--          disabled-->
+          <!--          hide-details-->
+          <!--          @click.stop-->
+          <!--        >-->
+          <!--          <template #item="{item}">-->
+          <!--            <span class="caption font-weight-regular">{{ item }}</span>-->
+          <!--          </template>-->
+          <!--        </v-text-field>-->
+          <!--        v-else-->
 
-        <v-select
-          :key="i + '_6'"
-          v-model="filter.fk_column_id"
-          class="caption nc-filter-field-select"
-          :items="meta.columns"
-          placeholder="Field"
-          solo
-          flat
-          dense
-          :disabled="filter.readOnly"
-          hide-details
-          item-value="id"
-          item-text="_cn"
-          @click.stop
-          @change="saveOrUpdate(filter, i)"
-        >
-          <template #item="{item}">
-            <span class="caption font-weight-regular">{{ item._cn }}</span>
-          </template>
-        </v-select>
-        <v-select
-          :key="'k' + i"
-          v-model="filter.comparison_op"
-          class="flex-shrink-1 flex-grow-0 caption  nc-filter-operation-select"
-          :items="comparisonOp"
-          placeholder="Operation"
-          solo
-          flat
-          style="max-width:120px"
-          dense
-          :disabled="filter.readOnly"
-          hide-details
-          item-value="value"
-          @click.stop
-          @change="saveOrUpdate(filter, i)"
-        >
-          <template #item="{item}">
-            <span class="caption font-weight-regular">{{ item.text }}</span>
-          </template>
-        </v-select>
-        <span v-if="['is null', 'is not null'].includes(filter.op)" :key="'span' + i" />
-        <v-checkbox
-          v-else-if="types[filter.field] === 'boolean'"
-          :key="i + '_7'"
-          v-model="filter.value"
-          dense
-          :disabled="filter.readOnly"
-          @change="saveOrUpdate(filter, i)"
-        />
-        <v-text-field
-          v-else
-          :key="i + '_7'"
-          v-model="filter.value"
-          solo
-          flat
-          hide-details
-          dense
-          class="caption nc-filter-value-select"
-          :disabled="filter.readOnly"
-          @click.stop
-          @input="saveOrUpdate(filter, i)"
-        />
+          <v-select
+            :key="i + '_6'"
+            v-model="filter.fk_column_id"
+            class="caption nc-filter-field-select"
+            :items="meta.columns"
+            placeholder="Field"
+            solo
+            flat
+            dense
+            :disabled="filter.readOnly"
+            hide-details
+            item-value="id"
+            item-text="_cn"
+            @click.stop
+            @change="saveOrUpdate(filter, i)"
+          >
+            <template #item="{item}">
+              <span class="caption font-weight-regular">{{ item._cn }}</span>
+            </template>
+          </v-select>
+          <v-select
+            :key="'k' + i"
+            v-model="filter.comparison_op"
+            class="flex-shrink-1 flex-grow-0 caption  nc-filter-operation-select"
+            :items="comparisonOp"
+            placeholder="Operation"
+            solo
+            flat
+            style="max-width:120px"
+            dense
+            :disabled="filter.readOnly"
+            hide-details
+            item-value="value"
+            @click.stop
+            @change="saveOrUpdate(filter, i)"
+          >
+            <template #item="{item}">
+              <span class="caption font-weight-regular">{{ item.text }}</span>
+            </template>
+          </v-select>
+          <span v-if="['is null', 'is not null'].includes(filter.op)" :key="'span' + i" />
+          <v-checkbox
+            v-else-if="types[filter.field] === 'boolean'"
+            :key="i + '_7'"
+            v-model="filter.value"
+            dense
+            :disabled="filter.readOnly"
+            @change="saveOrUpdate(filter, i)"
+          />
+          <v-text-field
+            v-else
+            :key="i + '_7'"
+            v-model="filter.value"
+            solo
+            flat
+            hide-details
+            dense
+            class="caption nc-filter-value-select"
+            :disabled="filter.readOnly"
+            @click.stop
+            @input="saveOrUpdate(filter, i)"
+          />
+        </template>
       </template>
     </div>
 
@@ -136,6 +169,12 @@
       </v-icon>
       Add Filter
     </v-btn>
+    <v-btn small class="elevation-0 grey--text my-3" @click.stop="addFilterGroup">
+      <v-icon small color="grey">
+        mdi-plus
+      </v-icon>
+      Add Filter Group
+    </v-btn>
     <slot />
   </div>
 </template>
@@ -145,7 +184,9 @@ import { UITypes } from '~/components/project/spreadsheet/helpers/uiTypes'
 
 export default {
   name: 'ColumnFilter',
-  props: ['fieldList', 'meta'],
+  props: {
+    fieldList: [Array], meta: Object, nested: Boolean, parentId: String
+  },
   data: () => ({
     filters: [],
     opList: [
@@ -172,7 +213,9 @@ export default {
   }),
   computed: {
     types() {
-      if (!this.meta || !this.meta.columns || !this.meta.columns.length) { return {} }
+      if (!this.meta || !this.meta.columns || !this.meta.columns.length) {
+        return {}
+      }
 
       return this.meta.columns.reduce((obj, col) => {
         switch (col.uidt) {
@@ -214,7 +257,9 @@ export default {
       let filters = []
 
       if (this.viewId) {
-        const data = await this.$api.meta.filterRead(this.viewId)
+        const data = this.parentId
+          ? (await this.$api.meta.filterChildrenRead(this.viewId, this.parentId))
+          : (await this.$api.meta.filterRead(this.viewId))
         filters = data.data
       }
 
@@ -234,11 +279,20 @@ export default {
       })
       this.filters = this.filters.slice()
     },
+    addFilterGroup() {
+      this.filters.push({
+        parentId: this.parentId,
+        is_group: true
+      })
+      this.filters = this.filters.slice()
+      const index = this.filters.length - 1
+      this.saveOrUpdate(this.filters[index], index)
+    },
     async saveOrUpdate(filter, i) {
       if (filter.id) {
-        await this.$api.meta.filterUpdate(this.viewId, filter.id, filter)
+        await this.$api.meta.filterUpdate(this.viewId, filter.id, { ...filter, fk_parent_id: this.parentId })
       } else {
-        this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, filter)).data)
+        this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, { ...filter, fk_parent_id: this.parentId })).data)
       }
       this.$emit('updated')
     },

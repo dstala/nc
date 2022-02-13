@@ -82,7 +82,7 @@ class BaseModelSqlv2 {
         );*/
 
     // todo: replace with view id
-    if (!ignoreFilterSort) {
+    if (!ignoreFilterSort && this.viewId) {
       await conditionV2(
         await Filter.rootFilterList({ viewId: this.viewId }),
         qb,
@@ -379,19 +379,12 @@ class BaseModelSqlv2 {
         );*/
 
     // todo: replace with view id
-    if (!ignoreFilterSort) {
+    if (!ignoreFilterSort && this.viewId) {
       await conditionV2(
         await Filter.rootFilterList({ viewId: this.viewId }),
         qb,
         this.dbDriver
       );
-
-      // await sortV2(
-      //   await Sort.list({ modelId: this.model.id }),
-      //   qb,
-      //   this.dbDriver
-      // );
-      // this._paginateAndSort(qb, rest);
     }
 
     qb.count(this.model.primaryKey.cn, {

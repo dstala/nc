@@ -151,36 +151,36 @@ export default {
         //   return
         // }
 
-        const where = this.queryParams.where || ''
+        // const where = this.queryParams.where || ''
         // if (this.query) {
         //   where += (where ? '~and' : '') + `(${this.primaryCol},like,%${this.query}%)`
         // }
 
-        if (this.mm) {
-          this.data = await this.api.paginatedM2mNotChildrenList({
-            limit: this.size,
-            offset: this.size * (this.page - 1),
-            ...this.queryParams,
-            where
-          }, this.mm.vtn, this.parentId)
-        } else {
-          this.data = (await this.$api.data.list(
-            this.meta.id, {
-              query: {
-                limit: this.size,
-                offset: this.size * (this.page - 1)
-                // ...this.queryParams,
-                // where
-              }
-            })).data.data
+        // if (this.mm) {
+        //   this.data = await this.api.paginatedM2mNotChildrenList({
+        //     limit: this.size,
+        //     offset: this.size * (this.page - 1),
+        //     ...this.queryParams,
+        //     where
+        //   }, this.mm.vtn, this.parentId)
+        // } else {
+        this.data = (await this.$api.data.list(
+          this.meta.id, {
+            query: {
+              limit: this.size,
+              offset: this.size * (this.page - 1)
+              // ...this.queryParams,
+              // where
+            }
+          })).data.data
 
-          //   await this.api.paginatedList({
-          //   limit: this.size,
-          //   offset: this.size * (this.page - 1),
-          //   ...this.queryParams,
-          //   where
-          // })
-        }
+        //   await this.api.paginatedList({
+        //   limit: this.size,
+        //   offset: this.size * (this.page - 1),
+        //   ...this.queryParams,
+        //   where
+        // })
+        // }
       }
     }
   }

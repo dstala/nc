@@ -227,6 +227,27 @@ export default class Filter {
     );
     return filterOdjs?.map(f => new Filter(f));
   }
+
+  static async parentFilterList({
+    viewId,
+    parentId
+  }: {
+    viewId: any;
+    parentId: any;
+  }) {
+    const filterOdjs = await Noco.ncMeta.metaList2(
+      null,
+      null,
+      MetaTable.FILTER_EXP,
+      {
+        condition: {
+          fk_parent_id: parentId,
+          fk_view_id: viewId
+        }
+      }
+    );
+    return filterOdjs?.map(f => new Filter(f));
+  }
 }
 
 export interface FilterObject {

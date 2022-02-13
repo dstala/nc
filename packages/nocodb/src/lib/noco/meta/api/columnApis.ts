@@ -315,7 +315,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
             await Column.insert({
               _cn: getUniqueColumnAliasName(
                 await child.getColumns(),
-                req.body._cn ?? `${child._tn}List`
+                `${child._tn}List`
               ),
               uidt: UITypes.LinkToAnotherRecord,
               type: 'mm',
@@ -330,12 +330,12 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               fk_mm_model_id: assocModel.id,
               fk_mm_child_column_id: childCol.id,
               fk_mm_parent_column_id: parentCol.id,
-              fk_related_table_id: child.id
+              fk_related_table_id: parent.id
             });
             await Column.insert({
               _cn: getUniqueColumnAliasName(
                 await parent.getColumns(),
-                `${parent._tn}List`
+                req.body._cn ?? `${parent._tn}List`
               ),
 
               uidt: UITypes.LinkToAnotherRecord,
@@ -349,7 +349,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               fk_mm_model_id: assocModel.id,
               fk_mm_child_column_id: parentCol.id,
               fk_mm_parent_column_id: childCol.id,
-              fk_related_table_id: parent.id
+              fk_related_table_id: child.id
             });
           }
         }

@@ -1186,6 +1186,25 @@ export class Api<
      * No description
      *
      * @tags Meta
+     * @name FilterChildrenRead
+     * @request GET:/views/{viewId}/filters/{filterParentId}/children
+     */
+    filterChildrenRead: (
+      viewId: string,
+      filterParentId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<Filter, any>({
+        path: `/views/${viewId}/filters/${filterParentId}/children`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
      * @name WebhookGet
      * @request GET:/tables/{tableId}/webhooks/{webhookId}
      */
