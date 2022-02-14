@@ -1363,41 +1363,20 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name FormUpdate
-     * @request PUT:/tables/{tableId}/forms/{formId}
+     * @name FormColumnUpdate
+     * @request PUT:/formColumns/{columnId}
      */
-    formUpdate: (tableId: string, formId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/forms/${formId}`,
+    formColumnUpdate: (
+      columnId: string,
+      data: FormColumn,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/formColumns/${columnId}`,
         method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FormDelete
-     * @request DELETE:/tables/{tableId}/forms/{formId}
-     */
-    formDelete: (tableId: string, formId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/forms/${formId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FormRead
-     * @request GET:/tables/{tableId}/forms/{formId}
-     */
-    formRead: (tableId: string, formId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/forms/${formId}`,
-        method: 'GET',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 

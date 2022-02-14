@@ -36,7 +36,6 @@
       :api="parentApi"
       :query-params="parentQueryParams"
       :is-public="isPublic"
-      :tn="bt && bt.rtn"
       :password="password"
       @add-new-record="insertAndMapNewParentRecord"
       @add="addChildToParent"
@@ -122,7 +121,6 @@ export default {
     isForm: Boolean,
     value: [Object, Array],
     meta: [Object],
-    bt: Object,
     nodes: [Object],
     row: [Object],
     api: [Object, Function],

@@ -45,8 +45,6 @@
     <list-items
       v-if="newRecordModal"
       v-model="newRecordModal"
-      :hm="hm"
-      :tn="hm && hm.tn"
       :size="10"
       :meta="childMeta"
       :primary-col="childPrimaryCol"
@@ -119,7 +117,6 @@
         :table="childMeta.tn"
         :old-row="{...selectedChild}"
         :meta="childMeta"
-        :sql-ui="sqlUi"
         :primary-value-column="childPrimaryCol"
         :api="childApi"
         :available-columns="childAvailableColumns"
@@ -169,10 +166,8 @@ export default {
     },
     value: [Object, Array],
     meta: [Object],
-    hm: Object,
     nodes: [Object],
     row: [Object],
-    sqlUi: [Object, Function],
     active: Boolean,
     isNew: Boolean,
     isForm: Boolean,

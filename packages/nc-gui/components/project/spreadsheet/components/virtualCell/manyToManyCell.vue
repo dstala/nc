@@ -108,9 +108,7 @@
         :table="childMeta.tn"
         :old-row="{...selectedChild}"
         :meta="childMeta"
-        :sql-ui="sqlUi"
         :primary-value-column="childPrimaryCol"
-        :api="childApi"
         :available-columns="childAvailableColumns"
         icon-color="warning"
         :nodes="nodes"
@@ -246,15 +244,15 @@ export default {
       }
     },
     conditionGraph() {
-      if (!this.childMeta || !this.assocMeta) { return null }
-      return {
-        [this.assocMeta.tn]: {
-          relationType: 'hm',
-          [this.assocMeta.columns.find(c => c.cn === this.mm.vcn).cn]: {
-            eq: this.row[this.parentPrimaryKey]
-          }
-        }
-      }
+      // if (!this.childMeta || !this.assocMeta) { return null }
+      // return {
+      //   [this.assocMeta.tn]: {
+      //     relationType: 'hm',
+      //     [this.assocMeta.columns.find(c => c.cn === this.mm.vcn).cn]: {
+      //       eq: this.row[this.parentPrimaryKey]
+      //     }
+      //   }
+      // }
     },
     childAvailableColumns() {
       const hideCols = ['created_at', 'updated_at']
@@ -304,25 +302,25 @@ export default {
       this.childListModal = true
     },
     async unlinkChild(child) {
-      if (this.isNew) {
-        this.localState.splice(this.localState.indexOf(child), 1)
-        this.$emit('update:localState', [...this.localState])
-        return
-      }
-      await Promise.all([this.loadChildMeta(), this.loadAssociateTableMeta()])
-
-      const _pcn = this.meta.columns.find(c => c.cn === this.mm.cn)._cn
-      const _ccn = this.childMeta.columns.find(c => c.cn === this.mm.rcn)._cn
-
-      const apcn = this.assocMeta.columns.find(c => c.cn === this.mm.vcn).cn
-      const accn = this.assocMeta.columns.find(c => c.cn === this.mm.vrcn).cn
-
-      const id = this.assocMeta.columns.filter(c => c.cn === apcn || c.cn === accn).map(c => c.cn === apcn ? this.row[_pcn] : child[_ccn]).join('___')
-      await this.assocApi.delete(id)
-      this.$emit('loadTableData')
-      if ((this.childListModal || this.isForm) && this.$refs.childList) {
-        this.$refs.childList.loadData()
-      }
+      // if (this.isNew) {
+      //   this.localState.splice(this.localState.indexOf(child), 1)
+      //   this.$emit('update:localState', [...this.localState])
+      //   return
+      // }
+      // await Promise.all([this.loadChildMeta(), this.loadAssociateTableMeta()])
+      //
+      // const _pcn = this.meta.columns.find(c => c.cn === this.mm.cn)._cn
+      // const _ccn = this.childMeta.columns.find(c => c.cn === this.mm.rcn)._cn
+      //
+      // const apcn = this.assocMeta.columns.find(c => c.cn === this.mm.vcn).cn
+      // const accn = this.assocMeta.columns.find(c => c.cn === this.mm.vrcn).cn
+      //
+      // const id = this.assocMeta.columns.filter(c => c.cn === apcn || c.cn === accn).map(c => c.cn === apcn ? this.row[_pcn] : child[_ccn]).join('___')
+      // await this.assocApi.delete(id)
+      // this.$emit('loadTableData')
+      // if ((this.childListModal || this.isForm) && this.$refs.childList) {
+      //   this.$refs.childList.loadData()
+      // }
     },
     async removeChild(child) {
       this.dialogShow = true
@@ -442,8 +440,8 @@ export default {
           const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
           const pid = this.meta.columns.filter(c => c.pk).map(c => row[c._cn]).join('___')
 
-          const vcidCol = this.assocMeta.columns.find(c => c.cn === this.mm.vrcn)._cn
-          const vpidCol = this.assocMeta.columns.find(c => c.cn === this.mm.vcn)._cn
+          const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id)._cn
+          const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id)._cn
           await this.assocApi.insert({
             [vcidCol]: parseIfInteger(cid),
             [vpidCol]: parseIfInteger(pid)

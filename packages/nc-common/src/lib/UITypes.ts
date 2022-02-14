@@ -36,4 +36,15 @@ enum UITypes {
   Button = 'Button'
 }
 
+export function isVirtualCol(col: UITypes | {readonly uidt: UITypes}) {
+  return [
+    UITypes.LinkToAnotherRecord,
+    UITypes.Formula,
+    UITypes.Rollup,
+    UITypes.Lookup
+  ].includes(typeof col === 'object' ? col?.uidt : col)
+}
+
 export default UITypes;
+
+

@@ -404,7 +404,7 @@
 import draggable from 'vuedraggable'
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
-import { UITypes } from 'nc-common'
+import { UITypes, isVirtualCol } from 'nc-common'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'
@@ -430,6 +430,7 @@ export default {
   mixins: [form, validationMixin],
   props: ['meta', 'availableColumns', 'nodes', 'sqlUi', 'formParams', 'showFields', 'fieldsOrder', 'allColumns', 'dbAlias', 'api', 'id'],
   data: () => ({
+    isVirtualCol,
     localState: {},
     moved: false,
     addNewColMenu: false,
@@ -620,7 +621,8 @@ export default {
         // if (this.isNew) {
 
         // todo: add params option in GraphQL
-        let data = await this.api.insert(this.localState, { params: { form: this.$route.query.view } })
+        // let data = await this.api.insert(this.localState, { params: { form: this.$route.query.view } })
+        let data = await this.$api.data.create(this.meta.id, this.localState, { query: { form: this.$route.query.view } })
         data = { ...this.localState, ...data }
 
         // save hasmany and manytomany relations from local state

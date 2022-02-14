@@ -742,7 +742,7 @@ export default {
     loadingMeta: true,
     loadingData: true,
     toggleDrawer: false,
-    selectedViewId: 0,
+    selectedViewId: '',
     searchField: null,
     searchQuery: '',
     showExpandModal: false,
@@ -1291,7 +1291,7 @@ export default {
       // }
 
       // load latest table meta
-      this.meta = await this.$store.dispatch('meta/ActLoadMeta', {
+      await this.$store.dispatch('meta/ActLoadMeta', {
         env: this.nodes.env,
         dbAlias: this.nodes.dbAlias,
         tn: this.table,

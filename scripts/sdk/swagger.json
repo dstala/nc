@@ -1531,60 +1531,44 @@
         }
       }
     },
-    "/tables/{tableId}/forms/{formId}": {
+    "/formColumns/{columnId}": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
-          "name": "tableId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "formId",
+          "name": "columnId",
           "in": "path",
           "required": true
         }
       ],
       "put": {
         "summary": "",
-        "operationId": "form-update",
+        "operationId": "form-column-update",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": ""
+                }
+              }
+            }
           }
         },
         "tags": [
           "Meta"
-        ]
-      },
-      "delete": {
-        "summary": "",
-        "operationId": "form-delete",
-        "responses": {
-          "200": {
-            "description": "OK"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FormColumn"
+              }
+            }
           }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "get": {
-        "summary": "",
-        "operationId": "form-read",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
+        }
       }
     },
     "/tables/{tableId}/galleries": {

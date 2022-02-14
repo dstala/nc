@@ -91,7 +91,7 @@
                   <div>
                     <label :for="`data-table-form-${col._cn}`" class="body-2 text-capitalize">
                       <virtual-header-cell
-                        v-if="col.virtual"
+                        v-if="col.colOptions"
                         :column="col"
                         :nodes="nodes"
                         :is-form="true"
@@ -100,7 +100,7 @@
                       <header-cell
                         v-else
                         :is-form="true"
-                        :is-foreign-key="col.cn in belongsTo || col.cn in hasMany"
+                        :is-foreign-key="col.type === UITypes.ForeignKey"
                         :value="col._cn"
                         :column="col"
                         :sql-ui="sqlUi"
@@ -108,7 +108,7 @@
 
                     </label>
                     <virtual-cell
-                      v-if="col.virtual"
+                      v-if="isVirtualCol(col)"
                       ref="virtual"
                       :disabled-columns="disabledColumns"
                       :column="col"
@@ -117,7 +117,6 @@
                       :meta="meta"
                       :api="api"
                       :active="true"
-                      :sql-ui="sqlUi"
                       :is-new="isNew"
                       :is-form="true"
                       :breadcrumbs="localBreadcrumbs"
@@ -261,6 +260,7 @@
 <script>
 
 import dayjs from 'dayjs'
+import { isVirtualCol, UITypes } from 'nc-common'
 import form from '../mixins/form'
 import HeaderCell from '@/components/project/spreadsheet/components/headerCell'
 import EditableCell from '@/components/project/spreadsheet/components/editableCell'
@@ -291,8 +291,8 @@ export default {
     value: Object,
     table: String,
     primaryValueColumn: String,
-    hasMany: [Object, Array],
-    belongsTo: [Object, Array],
+    // hasMany: [Object, Array],
+    // belongsTo: [Object, Array],
     isNew: Boolean,
     oldRow: Object,
     iconColor: {
@@ -305,6 +305,8 @@ export default {
     presetValues: Object
   },
   data: () => ({
+    isVirtualCol,
+    UITypes,
     showborder: false,
     loadingLogs: true,
     toggleDrawer: false,
@@ -409,7 +411,7 @@ export default {
         }, {})
 
         if (this.isNew) {
-          const data = await this.api.insert(updatedObj)
+          const data = await this.$api.data.create(this.viewId || this.meta.id, updatedObj)
           this.localState = { ...this.localState, ...data }
 
           // save hasmany and manytomany relations from local state
@@ -426,7 +428,8 @@ export default {
           if (!id) {
             return this.$toast.info('Update not allowed for table which doesn\'t have primary Key').goAway(3000)
           }
-          await this.api.update(id, updatedObj, this.oldRow)
+          // await this.api.update(id, updatedObj, this.oldRow)
+          await this.$api.data.update(this.viewId || this.meta.id, id, updatedObj)
         } else {
           return this.$toast.info('No columns to update').goAway(3000)
         }
@@ -447,12 +450,12 @@ export default {
       const id = this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___')
       // const where = this.meta.columns.filter(c => c.pk).map(c => `(${c._cn},eq,${this.localState[c._cn]})`).join('~and')
       this.$set(this, 'changedColumns', {})
-      this.localState = await this.api.read(id, this.queryParams || {})
+      this.localState = (await this.$api.data.read(this.viewId || this.meta.id, id, { query: this.queryParams || {} })).data
       // const data = await this.api.list({ ...(this.queryParams || {}), where }) || [{}]
       // this.localState = data[0] || this.localState
-      if (!this.isNew && this.toggleDrawer) {
-        this.getAuditsAndComments()
-      }
+      // if (!this.isNew && this.toggleDrawer) {
+      //   this.getAuditsAndComments()
+      // }
     },
     calculateDiff(date) {
       return dayjs.utc(date).fromNow()

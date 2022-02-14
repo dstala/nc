@@ -268,6 +268,7 @@
 </template>
 
 <script>
+import { isVirtualCol } from 'nc-common'
 import HeaderCell from '../components/headerCell'
 import EditableCell from '../components/editableCell'
 import EditColumn from '../components/editColumn'
@@ -318,6 +319,7 @@ export default {
   },
   data: () => ({
     resizingCol: null,
+    isVirtualCol,
     resizingColWidth: null,
     selectedExpandRowIndex: null,
     selectedExpandRowMeta: null,
@@ -394,14 +396,6 @@ export default {
     document.removeEventListener('keydown', this.onKeyDown)
   },
   methods: {
-    isVirtualCol(col) {
-      return [
-        UITypes.LinkToAnotherRecord,
-        UITypes.Formula,
-        UITypes.Rollup,
-        UITypes.Lookup
-      ].includes(col.uidt)
-    },
     onFileDrop(event) {
       this.$emit('drop', event)
     },
