@@ -107,7 +107,7 @@
           v-for="field in fields"
         >
           <v-list-item
-            :key="field"
+            :key="field.id"
             dense
           >
             <v-checkbox
@@ -181,7 +181,8 @@ export default {
       default: false
     },
     isLocked: Boolean,
-    isPublic: Boolean
+    isPublic: Boolean,
+    viewId: String
   },
   data: () => ({
     fields: [],
@@ -232,10 +233,10 @@ export default {
       set(v) {
         this.$emit('update:showSystemFields', v)
       }
-    },
-    viewId() {
-      return this.meta && this.meta.views && this.meta.views[0] && this.meta.views[0].id
     }
+    // viewId() {
+    //   return this.meta && this.meta.views && this.meta.views[0] && this.meta.views[0].id
+    // }
   },
   watch: {
     async viewId(v) {
@@ -283,7 +284,13 @@ export default {
       if (this.viewId) {
         const data = await this.$api.meta.viewColumnList(this.viewId)
         const fieldById = data.data.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
-        fields = this.meta.columns.map(c => ({ _cn: c._cn, fk_column_id: c.id, ...fieldById[c.id], order: fieldById[c.id].order || order++ })).sort((a, b) => a.order - b.order)
+        fields = this.meta.columns.map(c => ({
+          _cn: c._cn,
+          fk_column_id: c.id,
+          ...(fieldById[c.id] ? fieldById[c.id] : {}),
+          order: (fieldById[c.id] && fieldById[c.id].order) || order++
+        })
+        ).sort((a, b) => a.order - b.order)
       }
 
       this.fields = fields
@@ -315,7 +322,9 @@ export default {
       } else if (event.moved.newIndex === 0) {
         this.$set(this.fields[event.moved.newIndex], 'order', this.fields[1].order / 2)
       } else {
-        this.$set(this.fields[event.moved.newIndex], 'order', (this.fields[event.moved.newIndex - 1].order + this.fields[event.moved.newIndex + 1].order) / 2)
+        this.$set(this.fields[event.moved.newIndex], 'order', (
+          this.fields[event.moved.newIndex - 1].order + this.fields[event.moved.newIndex + 1].order) / 2
+        )
       }
       this.saveOrUpdate(this.fields[event.moved.newIndex], event.moved.newIndex)
     }

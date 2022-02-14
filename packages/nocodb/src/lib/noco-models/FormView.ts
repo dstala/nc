@@ -20,4 +20,18 @@ export default class FormView {
 
     return view && new FormView(view);
   }
+
+  static async insert(view: Partial<FormView>) {
+    await Noco.ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.FORM_VIEW,
+      {
+        fk_view_id: view.fk_view_id
+      },
+      true
+    );
+
+    return this.get(view.fk_view_id);
+  }
 }

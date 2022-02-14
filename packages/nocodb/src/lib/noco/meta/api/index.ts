@@ -6,6 +6,10 @@ import { Router } from 'express';
 import sortApis from './sortApis';
 import filterApis from './filterApis';
 import viewColumnApis from './viewColumnApis';
+import gridViewApis from './gridViewApis';
+import viewApis from './viewApis';
+import galleryViewApis from './galleryViewApis';
+import formViewApis from './formViewApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -15,4 +19,8 @@ export default function(router: Router) {
   router.use('/views/:viewId/sorts', sortApis);
   router.use('/views/:viewId/filters', filterApis);
   router.use('/views/:viewId/columns', viewColumnApis);
+  router.use('/tables/:tableId/grids', gridViewApis);
+  router.use('/tables/:tableId/galleries', galleryViewApis);
+  router.use('/tables/:tableId/forms', formViewApis);
+  router.use('/', viewApis);
 }

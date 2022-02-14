@@ -214,7 +214,7 @@ export default class Filter {
   }
 
   static async rootFilterList({ viewId }: { viewId: any }) {
-    const filterOdjs = await Noco.ncMeta.metaList2(
+    const filterObjs = await Noco.ncMeta.metaList2(
       null,
       null,
       MetaTable.FILTER_EXP,
@@ -225,7 +225,7 @@ export default class Filter {
         }
       }
     );
-    return filterOdjs?.map(f => new Filter(f));
+    return filterObjs?.map(f => new Filter(f));
   }
 
   static async parentFilterList({

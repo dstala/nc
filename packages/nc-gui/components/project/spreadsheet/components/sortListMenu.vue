@@ -84,15 +84,10 @@
 <script>
 export default {
   name: 'SortListMenu',
-  props: ['fieldList', 'value', 'isLocked', 'meta'],
+  props: ['fieldList', 'value', 'isLocked', 'meta', 'viewId'],
   data: () => ({
     sortList: []
   }),
-  computed: {
-    viewId() {
-      return this.meta && this.meta.views && this.meta.views[0] && this.meta.views[0].id
-    }
-  },
   watch: {
     value(v) {
       this.sortList = v || []

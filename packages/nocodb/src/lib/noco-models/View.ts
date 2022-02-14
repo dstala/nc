@@ -1,5 +1,5 @@
 import Noco from '../noco/Noco';
-import { MetaTable, ViewTypes } from '../utils/globals';
+import { MetaTable } from '../utils/globals';
 import Model from './Model';
 import FormView from './FormView';
 import GridView from './GridView';
@@ -9,10 +9,13 @@ import { Transaction } from 'knex';
 import GridViewColumn from './GridViewColumn';
 import Sort from './Sort';
 import Filter from './Filter';
+import { View as ViewType, ViewTypes } from 'nc-common';
+import GalleryViewColumn from './GalleryViewColumn';
+import FormViewColumn from './FormViewColumn';
 
-export default class View {
+export default class View implements ViewType {
   id?: string;
-  title: string;
+  title?: string;
   show: boolean;
   is_default: boolean;
   order: number;
@@ -107,33 +110,49 @@ export default class View {
 
   static async insert(
     view: Partial<View> &
-      Partial<FormView | GridView | GalleryView | KanbanView>,
-    _trx: Transaction
+      Partial<FormView | GridView | GalleryView | KanbanView> & {
+        copy_from_id?: string;
+      },
+    _trx?: Transaction
   ) {
-    const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.VIEWS, {
-      title: view.title,
-      show: true,
-      is_default: view.is_default,
-      order: view.order,
-      type: view.type,
-      fk_model_id: view.fk_model_id
-    });
+    const copyFormView =
+      view.copy_from_id && (await View.get(view.copy_from_id));
+
+    const { id: view_id } = await Noco.ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.VIEWS,
+      {
+        title: view.title,
+        show: true,
+        is_default: view.is_default,
+        order: view.order,
+        type: view.type,
+        fk_model_id: view.fk_model_id
+      }
+    );
 
     switch (view.type) {
       case ViewTypes.GRID:
         await GridView.insert({
           ...view,
-          fk_view_id: id
+          fk_view_id: view_id
+        });
+        break;
+      case ViewTypes.GALLERY:
+        await GalleryView.insert({
+          ...view,
+          fk_view_id: view_id
+        });
+        break;
+      case ViewTypes.FORM:
+        await FormView.insert({
+          ...view,
+          fk_view_id: view_id
         });
         break;
       // case ViewTypes.KANBAN:
       //   await KanbanView.insert({
-      //     ...view,
-      //     fk_view_id: id
-      //   });
-      //   break;
-      // case ViewTypes.GALLERY:
-      //   await GalleryView.insert({
       //     ...view,
       //     fk_view_id: id
       //   });
@@ -146,10 +165,44 @@ export default class View {
       //   break;
     }
 
-    return View.get(id);
+    let columns = await (
+      await Model.get({ id: view.fk_model_id })
+    ).getColumns();
+
+    if (copyFormView) {
+      const sorts = await copyFormView.getSorts();
+      const filters = await copyFormView.getFilters();
+      columns = await copyFormView.getColumns();
+
+      for (const sort of sorts) {
+        await Sort.insert({
+          ...sort,
+          fk_view_id: view_id
+        });
+      }
+
+      for (const filter of filters.children) {
+        await Filter.insert({
+          ...filter,
+          fk_view_id: view_id
+        });
+      }
+    }
+
+    let order = 1;
+    for (const col of columns) {
+      await View.insertColumn({
+        view_id,
+        show: true,
+        order: order++,
+        ...col
+      });
+    }
+
+    return View.get(view_id);
   }
 
-  static async insertColumn(param: {
+  static async insertColumnToAllViews(param: {
     fk_column_id: any;
     fk_model_id: any;
     order;
@@ -165,8 +218,47 @@ export default class View {
             fk_view_id: view.id
           });
           break;
+        case ViewTypes.GALLERY:
+          await GalleryViewColumn.insert({
+            ...param,
+            fk_view_id: view.id
+          });
+          break;
       }
     }
+  }
+  static async insertColumn(param: { view_id: any; order; show }) {
+    const view = await this.get(param.view_id);
+
+    let col;
+    switch (view.type) {
+      case ViewTypes.GRID:
+        {
+          col = await GridViewColumn.insert({
+            ...param,
+            fk_view_id: view.id
+          });
+        }
+        break;
+      case ViewTypes.GALLERY:
+        {
+          col = await GalleryViewColumn.insert({
+            ...param,
+            fk_view_id: view.id
+          });
+        }
+        break;
+      case ViewTypes.FORM:
+        {
+          col = await FormViewColumn.insert({
+            ...param,
+            fk_view_id: view.id
+          });
+        }
+        break;
+    }
+
+    return col;
   }
 
   static async listWithInfo(id: string) {
@@ -188,11 +280,21 @@ export default class View {
       case ViewTypes.GRID:
         columns = await GridViewColumn.list(viewId);
         break;
+
+      case ViewTypes.GALLERY:
+        columns = await GalleryViewColumn.list(viewId);
+        break;
+      case ViewTypes.FORM:
+        columns = await FormViewColumn.list(viewId);
+        break;
     }
 
     return columns;
   }
 
+  async getColumns() {
+    return View.getColumns(this.id);
+  }
   static async updateColumn(
     viewId: string,
     colId: string,

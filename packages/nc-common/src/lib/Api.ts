@@ -113,7 +113,7 @@ export interface Table {
 
 export interface View {
   id?: string;
-  title?: boolean;
+  title?: string;
   deleted?: boolean;
   order?: number;
   fk_model_id?: string;
@@ -393,7 +393,7 @@ export interface SharedViewList {
 }
 
 export interface ViewList {
-  sharedViews: { list: Grid | Form | Kanban | Gallery; pageInfo: Paginated };
+  views: { list: Grid | Form | Kanban | Gallery; pageInfo: Paginated };
 }
 
 export interface ProjectListParams {
@@ -1290,10 +1290,13 @@ export class Api<
      * @name GridCreate
      * @request POST:/tables/{tableId}/grids
      */
-    gridCreate: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    gridCreate: (tableId: string, data: Grid, params: RequestParams = {}) =>
+      this.request<Grid, any>({
         path: `/tables/${tableId}/grids`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
@@ -1346,10 +1349,13 @@ export class Api<
      * @name FormCreate
      * @request POST:/tables/{tableId}/forms
      */
-    formCreate: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    formCreate: (tableId: string, data: Form, params: RequestParams = {}) =>
+      this.request<Form, any>({
         path: `/tables/${tableId}/forms`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
@@ -1402,10 +1408,17 @@ export class Api<
      * @name GalleryCreate
      * @request POST:/tables/{tableId}/galleries
      */
-    galleryCreate: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    galleryCreate: (
+      tableId: string,
+      data: Gallery,
+      params: RequestParams = {}
+    ) =>
+      this.request<object, any>({
         path: `/tables/${tableId}/galleries`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 

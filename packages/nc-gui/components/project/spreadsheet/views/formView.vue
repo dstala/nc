@@ -404,6 +404,7 @@
 import draggable from 'vuedraggable'
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
+import { UITypes } from 'nc-common'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'
@@ -417,7 +418,15 @@ const hiddenCols = ['created_at', 'updated_at']
 
 export default {
   name: 'FormView',
-  components: { EditColumn, Editable, EditableCell, VirtualCell, HeaderCell, VirtualHeaderCell, draggable },
+  components: {
+    EditColumn,
+    Editable,
+    EditableCell,
+    VirtualCell,
+    HeaderCell,
+    VirtualHeaderCell,
+    draggable
+  },
   mixins: [form, validationMixin],
   props: ['meta', 'availableColumns', 'nodes', 'sqlUi', 'formParams', 'showFields', 'fieldsOrder', 'allColumns', 'dbAlias', 'api', 'id'],
   data: () => ({
@@ -435,7 +444,10 @@ export default {
     // hiddenColumns: []
   }),
   validations() {
-    const obj = { localState: {}, virtual: {} }
+    const obj = {
+      localState: {},
+      virtual: {}
+    }
     for (const column of this.columns) {
       if (!this.localParams || !this.localParams.fields || !this.localParams.fields[column.alias]) {
         continue
@@ -448,7 +460,10 @@ export default {
           obj.localState[col._cn] = { required }
         }
       } else if (column.virtual && this.localParams.fields[column.alias].required && (column.mm || column.hm)) {
-        obj.virtual[column.alias] = { minLength: minLength(1), required }
+        obj.virtual[column.alias] = {
+          minLength: minLength(1),
+          required
+        }
       }
     }
 
@@ -456,7 +471,7 @@ export default {
   },
   computed: {
     allColumnsLoc() {
-      return this.allColumns.filter(c => !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && this.meta.belongsTo.every(bt => c.cn !== bt.cn))
+      return this.meta.columns// this.mets.columns.filter(c => !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && this.meta.belongsTo.every(bt => c.cn !== bt.cn))
     },
     isEditable() {
       return this._isUIAllowed('editFormView')
@@ -540,11 +555,16 @@ export default {
       if (hiddenCols.includes(column.cn)) {
         return true
       }
-      let isRequired = (!column.virtual && column.rqd && !column.default && this.meta.belongsTo.every(bt => column.cn !== bt.cn)) ||
+      let isRequired =
+        (!column.virtual && column.rqd && !column.default && this.meta.columns.every(
+          c => c.uidt === UITypes.LinkToAnotherRecord &&
+            c.type === 'bt' &&
+            column.id !== c.fk_child_column_id
+        )) ||
         (column.pk && !(column.ai || column.default))
 
-      if (column.bt) {
-        const col = this.meta.columns.find(c => c.cn === column.bt.cn)
+      if (column.uidt === UITypes.LinkToAnotherRecord && column.type === 'bt') {
+        const col = this.meta.columns.find(c => c.id === column.fk_child_column_id)
         if ((col.rqd && !col.default) || this.localParams.fields[column.alias].required) {
           isRequired = true
         }

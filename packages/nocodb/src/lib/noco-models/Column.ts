@@ -96,7 +96,7 @@ export default class Column implements ColumnType {
 
     await this.insertColOption(column, row.id);
 
-    await View.insertColumn({
+    await View.insertColumnToAllViews({
       fk_column_id: row.id,
       fk_model_id: column.fk_model_id,
       order,

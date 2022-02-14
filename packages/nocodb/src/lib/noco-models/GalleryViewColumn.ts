@@ -1,15 +1,16 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
 
-export default class GalleryView {
-  title: string;
-  show: boolean;
-  is_default: boolean;
-  order: number;
+export default class GalleryViewColumn {
+  id: string;
+  title?: string;
+  show?: boolean;
+  order?: number;
 
   fk_view_id: string;
+  fk_column_id: string;
 
-  constructor(data: GalleryView) {
+  constructor(data: GalleryViewColumn) {
     Object.assign(this, data);
   }
 
@@ -23,6 +24,41 @@ export default class GalleryView {
       }
     );
 
-    return view && new GalleryView(view);
+    return view && new GalleryViewColumn(view);
+  }
+  static async insert(column: Partial<GalleryViewColumn>) {
+    const { id } = await Noco.ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.GALLERY_VIEW_COLUMNS,
+      {
+        fk_view_id: column.fk_view_id,
+        fk_column_id: column.fk_column_id,
+        order: column.order,
+        show: column.show
+      }
+    );
+    return new GalleryViewColumn({
+      id,
+      fk_view_id: column.fk_view_id,
+      fk_column_id: column.fk_column_id,
+      order: column.order,
+      show: column.show
+    });
+  }
+
+  public static async list(viewId: string): Promise<GalleryViewColumn[]> {
+    const views = await Noco.ncMeta.metaList2(
+      null,
+      null,
+      MetaTable.GALLERY_VIEW_COLUMNS,
+      {
+        condition: {
+          fk_view_id: viewId
+        }
+      }
+    );
+
+    return views?.map(v => new GalleryViewColumn(v));
   }
 }

@@ -3,11 +3,19 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import { Table, TableList, TableListParams, TableReq } from 'nc-common';
+import {
+  Table,
+  TableList,
+  TableListParams,
+  TableReq,
+  ViewTypes
+} from 'nc-common';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
+import catchError from './helpers/catchError';
+import View from '../../../noco-models/View';
 
 // @ts-ignore
 export async function gridViewGet(req: Request, res: Response<Table>) {}
@@ -19,11 +27,14 @@ export async function gridViewList(
 ) {}
 
 // @ts-ignore
-export async function gridViewCreate(
-  _req: Request<any, any, TableReq>,
-  _res,
-  _next
-) {}
+export async function gridViewCreate(req: Request<any, any, TableReq>, res) {
+  const view = await View.insert({
+    ...req.body,
+    fk_model_id: req.params.tableId,
+    type: ViewTypes.GRID
+  });
+  res.json(view);
+}
 
 // @ts-ignore
 export async function gridViewUpdate(req, res) {}
@@ -32,9 +43,9 @@ export async function gridViewUpdate(req, res) {}
 export async function gridViewDelete(req: Request, res: Response, next) {}
 
 const router = Router({ mergeParams: true });
-router.get('/', gridViewList);
-router.post('/', gridViewCreate);
-router.get('/:gridViewId', gridViewGet);
-router.put('/:gridViewId', gridViewUpdate);
-router.delete('/:gridViewId', gridViewDelete);
+// router.get('/', gridViewList);
+router.post('/', catchError(gridViewCreate));
+// router.get('/:gridViewId', gridViewGet);
+// router.put('/:gridViewId', gridViewUpdate);
+// router.delete('/:gridViewId', gridViewDelete);
 export default router;

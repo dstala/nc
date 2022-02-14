@@ -6,9 +6,9 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
-import { Table, TableReq } from 'nc-common';
+import { Table, TableReq, ViewTypes } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
-import { MetaTable, ViewTypes } from '../utils/globals';
+import { MetaTable } from '../utils/globals';
 import View from './View';
 import { Transaction } from 'knex';
 

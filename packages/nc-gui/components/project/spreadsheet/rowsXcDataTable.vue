@@ -77,6 +77,7 @@
           :grouping-field.sync="groupingField"
           :is-gallery="isGallery"
           :is-kanban="isKanban"
+          :view-id="selectedViewId"
           @updated="loadTableData"
         />
 
@@ -84,6 +85,7 @@
           v-if="!isForm"
           :is-locked="isLocked"
           :meta="meta"
+          :view-id="selectedViewId"
           @updated="loadTableData"
         />
         <!--        v-model="sortList"-->
@@ -95,6 +97,7 @@
           :is-locked="isLocked"
           :field-list="[...realFieldList, ...formulaFieldList]"
           dense
+          :view-id="selectedViewId"
           @updated="loadTableData"
         />
 
@@ -288,12 +291,13 @@
     >
       <div class="flex-grow-1 h-100" style="overflow-y: auto">
         <div
+          v-if="selectedView"
           ref="table"
           :style="{height:isForm ? '100%' : 'calc(100% - 36px)'}"
           style="overflow: auto;width:100%"
         >
           <!--          <v-skeleton-loader v-if="!dataLoaded && loadingData || !meta" type="table" />-->
-          <template v-if="true || selectedView && (selectedView.type === 'table' || selectedView.show_as === 'grid' )">
+          <template v-if=" selectedView.type === viewTypes.GRID">
             <xc-grid-view
               ref="ncgridview"
               droppable
@@ -327,7 +331,7 @@
               @loadMeta="loadMeta"
             />
           </template>
-          <template v-else-if="isGallery ">
+          <template v-else-if="selectedView.type === viewTypes.GALLERY ">
             <gallery-view
               :nodes="nodes"
               :table="table"
@@ -378,7 +382,7 @@
               @expandForm="({rowIndex,rowMeta}) => expandRow(rowIndex,rowMeta)"
             />
           </template>
-          <template v-else-if="isForm">
+          <template v-else-if=" selectedView.type === viewTypes.FORM">
             <form-view
               :id="selectedViewId"
               :key="selectedViewId + viewKey"
@@ -412,6 +416,7 @@
       </div>
 
       <spreadsheet-nav-drawer
+        v-if="meta"
         ref="drawer"
         :current-api-url="currentApiUrl"
         :toggle-drawer="toggleDrawer"
@@ -436,6 +441,7 @@
         :columns-width.sync="columnsWidth"
         :show-system-fields.sync="showSystemFields"
         :extra-view-params.sync="extraViewParams"
+        :views.sync="meta.views"
         @generateNewViewKey="generateNewViewKey"
         @mapFieldsAndShowFields="mapFieldsAndShowFields"
         @loadTableData="loadTableData"
@@ -644,6 +650,7 @@
 
 import { mapActions } from 'vuex'
 import debounce from 'debounce'
+import { ViewTypes } from 'nc-common'
 import FormView from './views/formView'
 import XcGridView from './views/xcGridView'
 import spreadsheet from './mixins/spreadsheet'
@@ -884,7 +891,7 @@ export default {
     loadPrev() {
       this.selectedExpandRowIndex = --this.selectedExpandRowIndex === -1 ? this.data.length - 1 : this.selectedExpandRowIndex
     },
-    async  checkAndDeleteTable() {
+    async checkAndDeleteTable() {
       // if (
       //   !this.meta || (
       //     (this.meta.hasMany && this.meta.hasMany.length) ||
@@ -923,36 +930,36 @@ export default {
         return
       }
       try {
-        const queryParams = {
-          filters: this.filters,
-          sortList: this.sortList,
-          showFields: this.showFields,
-          fieldsOrder: this.fieldsOrder,
-          viewStatus: this.viewStatus,
-          columnsWidth: this.columnsWidth,
-          showSystemFields: this.showSystemFields,
-          extraViewParams: this.extraViewParams
-        }
-
-        if (this.isGallery) {
-          queryParams.coverImageField = this.coverImageField
-        }
-
-        if (this.isKanban) {
-          queryParams.groupingField = this.groupingField
-        }
-
-        this.$set(this.selectedView, 'query_params', JSON.stringify(queryParams))
-
-        if (!this._isUIAllowed('xcVirtualTableUpdate')) {
-          return
-        }
-        await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableUpdate', {
-          id: this.selectedViewId,
-          query_params: queryParams,
-          tn: this.meta.tn,
-          view_name: this.$route.query.view
-        })
+        // const queryParams = {x
+        //   filters: this.filters,
+        //   sortList: this.sortList,
+        //   showFields: this.showFields,
+        //   fieldsOrder: this.fieldsOrder,
+        //   viewStatus: this.viewStatus,
+        //   columnsWidth: this.columnsWidth,
+        //   showSystemFields: this.showSystemFields,
+        //   extraViewParams: this.extraViewParams
+        // }
+        //
+        // if (this.isGallery) {
+        //   queryParams.coverImageField = this.coverImageField
+        // }
+        //
+        // if (this.isKanban) {
+        //   queryParams.groupingField = this.groupingField
+        // }
+        //
+        // this.$set(this.selectedView, 'query_params', JSON.stringify(queryParams))
+        //
+        // if (!this._isUIAllowed('xcVirtualTableUpdate')) {
+        //   return
+        // }
+        // await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableUpdate', {
+        //   id: this.selectedViewId,
+        //   query_params: queryParams,
+        //   tn: this.meta.tn,
+        //   view_name: this.$route.query.view
+        // })
       } catch (e) {
         // this.$toast.error(e.message).goAway(3000);
       }
@@ -1025,7 +1032,10 @@ export default {
     },
     async save() {
       for (let row = 0; row < this.rowLength; row++) {
-        const { row: rowObj, rowMeta } = this.data[row]
+        const {
+          row: rowObj,
+          rowMeta
+        } = this.data[row]
         if (rowMeta.new) {
           try {
             this.$set(this.data[row], 'saving', true)
@@ -1085,7 +1095,12 @@ export default {
       if (!this.data[row]) {
         return
       }
-      const { row: rowObj, rowMeta, oldRow, saving } = this.data[row]
+      const {
+        row: rowObj,
+        rowMeta,
+        oldRow,
+        saving
+      } = this.data[row]
       if (rowMeta.new) {
         // return if there is no change
         if (oldRow[column._cn] === rowObj[column._cn] || saving) {
@@ -1153,7 +1168,10 @@ export default {
       // let success = 0
       while (row--) {
         try {
-          const { row: rowObj, rowMeta } = this.data[row]
+          const {
+            row: rowObj,
+            rowMeta
+          } = this.data[row]
           if (!rowMeta.selected) {
             continue
           }
@@ -1177,7 +1195,12 @@ export default {
     },
 
     async clearCellValue() {
-      const { col, colIndex, row, index } = this.rowContextMenu
+      const {
+        col,
+        colIndex,
+        row,
+        index
+      } = this.rowContextMenu
       if (row[col._cn] === null) {
         return
       }
@@ -1192,10 +1215,16 @@ export default {
       data.splice(focusRow, 0, {
         row: this.relationType === 'hm'
           ? {
-              ...this.fieldList.reduce((o, f) => ({ ...o, [f]: presetValues[f] ?? null }), {}),
+              ...this.fieldList.reduce((o, f) => ({
+                ...o,
+                [f]: presetValues[f] ?? null
+              }), {}),
               [this.relation.cn]: this.relationIdValue
             }
-          : this.fieldList.reduce((o, f) => ({ ...o, [f]: presetValues[f] ?? null }), {}),
+          : this.fieldList.reduce((o, f) => ({
+            ...o,
+            [f]: presetValues[f] ?? null
+          }), {}),
         rowMeta: {
           new: true
         },
@@ -1204,8 +1233,14 @@ export default {
       if (data[focusRow].row[this.groupingField] === 'Uncategorized') {
         data[focusRow].row[this.groupingField] = null
       }
-      this.selected = { row: focusRow, col: focusCol }
-      this.editEnabled = { row: focusRow, col: focusCol }
+      this.selected = {
+        row: focusRow,
+        col: focusCol
+      }
+      this.editEnabled = {
+        row: focusRow,
+        col: focusCol
+      }
       this.presetValues = presetValues
 
       if (expand) {
@@ -1219,7 +1254,13 @@ export default {
       // this.save()
     },
 
-    async handleKeyDown({ metaKey, key, altKey, shiftKey, ctrlKey }) {
+    async handleKeyDown({
+      metaKey,
+      key,
+      altKey,
+      shiftKey,
+      ctrlKey
+    }) {
       switch ([
         this._isMac ? metaKey : ctrlKey,
         key].join('_')) {
@@ -1277,8 +1318,11 @@ export default {
       try {
         // if (this.api) {
         // const { list, count } = await this.api.paginatedList(this.queryParams)
-        const { list, pageInfo } = (await this.$api.data.list(
-          this.meta.views[0].id,
+        const {
+          list,
+          pageInfo
+        } = (await this.$api.data.list(
+          this.selectedViewId || this.meta.views[0].id,
           {
             query: this.queryParams
           })).data.data
@@ -1476,6 +1520,9 @@ export default {
     }
   },
   computed: {
+    viewTypes() {
+      return ViewTypes
+    },
     tabsState() {
       return this.$store.state.tabs.tabsState || {}
     },

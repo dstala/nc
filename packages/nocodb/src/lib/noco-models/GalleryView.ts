@@ -25,4 +25,17 @@ export default class GalleryView {
 
     return view && new GalleryView(view);
   }
+  static async insert(view: Partial<GalleryView>) {
+    await Noco.ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.GALLERY_VIEW,
+      {
+        fk_view_id: view.fk_view_id
+      },
+      true
+    );
+
+    return this.get(view.fk_view_id);
+  }
 }

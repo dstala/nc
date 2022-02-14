@@ -185,7 +185,11 @@ import { UITypes } from '~/components/project/spreadsheet/helpers/uiTypes'
 export default {
   name: 'ColumnFilter',
   props: {
-    fieldList: [Array], meta: Object, nested: Boolean, parentId: String
+    fieldList: [Array],
+    meta: Object,
+    nested: Boolean,
+    parentId: String,
+    viewId: String
   },
   data: () => ({
     filters: [],
@@ -231,9 +235,6 @@ export default {
         }
         return obj
       }, {})
-    },
-    viewId() {
-      return this.meta && this.meta.views && this.meta.views[0] && this.meta.views[0].id
     }
   },
   watch: {

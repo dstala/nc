@@ -1410,12 +1410,28 @@
         "operationId": "grid-create",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Grid"
+                }
+              }
+            }
           }
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Grid"
+              }
+            }
+          }
+        }
       }
     },
     "/tables/{tableId}/grids/{gridId}": {
@@ -1490,13 +1506,29 @@
         "operationId": "form-create",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Form"
+                }
+              }
+            }
           }
         },
         "description": "",
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Form"
+              }
+            }
+          }
+        }
       }
     },
     "/tables/{tableId}/forms/{formId}": {
@@ -1571,12 +1603,29 @@
         "operationId": "gallery-create",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
           }
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Gallery"
+              }
+            }
+          }
+        }
       }
     },
     "/tables/{tableId}/galleries/{galleryId}": {
@@ -2434,7 +2483,7 @@
             "type": "string"
           },
           "title": {
-            "type": "boolean"
+            "type": "string"
           },
           "deleted": {
             "type": "boolean"
@@ -3652,7 +3701,7 @@
           }
         },
         "properties": {
-          "sharedViews": {
+          "views": {
             "type": "object",
             "required": [
               "list",
@@ -3682,8 +3731,9 @@
           }
         },
         "required": [
-          "sharedViews"
-        ]
+          "views"
+        ],
+        "title": ""
       }
     },
     "requestBodies": {

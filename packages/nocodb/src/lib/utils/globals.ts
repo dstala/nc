@@ -27,10 +27,3 @@ export enum MetaTable {
   TEAM_USERS = 'nc_team_users_v2',
   VIEWS = 'nc_views_v2'
 }
-
-export enum ViewTypes {
-  FORM = 1,
-  GALLERY = 2,
-  GRID = 3,
-  KANBAN = 4
-}

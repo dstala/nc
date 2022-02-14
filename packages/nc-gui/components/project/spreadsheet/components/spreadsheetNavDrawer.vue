@@ -10,7 +10,7 @@
     <v-container fluid class="h-100 py-0">
       <div class="d-flex flex-column h-100">
         <div class="flex-grow-1" style="overflow: auto; min-height: 350px">
-          <v-list v-if="viewsList && viewsList.length" dense>
+          <v-list v-if="views && views.length" dense>
             <v-list-item dense>
               <!-- Views -->
               <span class="body-2 font-weight-medium">{{ $t('nav_drawer.title') }}</span>
@@ -25,14 +25,13 @@
               >
                 <transition-group type="transition" :name="!drag ? 'flip-list' : null">
                   <v-list-item
-                    v-for="(view, i) in viewsList"
+                    v-for="(view, i) in views"
                     :key="view.id"
                     dense
                     :value="view.id"
                     active-class="x-active--text"
                     class="body-2  view nc-view-item nc-draggable-child"
-                    :class="`nc-${view.show_as}-view-item`"
-                    @click="$emit('generateNewViewKey')"
+                    :class="`nc-${view.type}-view-item`"
                   >
                     <v-icon
                       v-if="_isUIAllowed('viewlist-drag-n-drop')"
@@ -44,11 +43,11 @@
                     </v-icon>
                     <v-list-item-icon class="mr-n1">
                       <v-icon
-                        v-if="viewIcons[view.show_as]"
+                        v-if="viewIcons[view.type]"
                         x-small
-                        :color="viewIcons[view.show_as].color"
+                        :color="viewIcons[view.type].color"
                       >
-                        {{ viewIcons[view.show_as].icon }}
+                        {{ viewIcons[view.type].icon }}
                       </v-icon>
                       <v-icon v-else color="primary" small>
                         mdi-table
@@ -162,7 +161,7 @@
               </v-list-item>
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2  nc-create-grid-view" v-on="on" @click="openCreateViewDlg('grid')">
+                  <v-list-item dense class="body-2  nc-create-grid-view" v-on="on" @click="openCreateViewDlg(viewTypes.GRID)">
                     <v-list-item-icon class="mr-n1">
                       <v-icon color="blue" x-small>
                         mdi-grid-large
@@ -189,7 +188,7 @@
                     dense
                     class="body-2 nc-create-gallery-view"
                     v-on="on"
-                    @click="openCreateViewDlg('gallery')"
+                    @click="openCreateViewDlg(viewTypes.GALLERY)"
                   >
                     <v-list-item-icon class="mr-n1">
                       <v-icon color="orange" x-small>
@@ -277,10 +276,10 @@
                     dense
                     class="body-2 nc-create-form-view"
                     v-on="on"
-                    @click="openCreateViewDlg('form')"
+                    @click="openCreateViewDlg(viewTypes.FORM)"
                   >
                     <v-list-item-icon class="mr-n1">
-                      <v-icon x-small :color="viewIcons['form'].color" class="mt-n1">
+                      <v-icon x-small :color="viewIcons[viewTypes.FORM].color" class="mt-n1">
                         mdi-form-select
                       </v-icon>
                     </v-list-item-icon>
@@ -441,6 +440,7 @@
       :copy-view="copyViewRef"
       :alias="meta._tn"
       :views-list="viewsList"
+      :selected-view-id="selectedViewId"
       @created="onViewCreate"
     />
 
@@ -519,6 +519,7 @@
 
 <script>
 import draggable from 'vuedraggable'
+import { ViewTypes } from 'nc-common'
 import CreateViewDialog from '@/components/project/spreadsheet/dialog/createViewDialog'
 import Extras from '~/components/project/spreadsheet/components/extras'
 import viewIcons from '~/helpers/viewIcons'
@@ -555,7 +556,8 @@ export default {
     columnsWidth: Object,
     coverImageField: String,
     groupingField: String,
-    showSystemFields: Boolean
+    showSystemFields: Boolean,
+    views: Array
   },
   data: () => ({
     drag: false,
@@ -583,6 +585,9 @@ export default {
     loading: false
   }),
   computed: {
+    viewTypes() {
+      return ViewTypes
+    },
     newViewParams() {
       if (!this.showFields) {
         return {}
@@ -595,20 +600,20 @@ export default {
     },
     selectedViewIdLocal: {
       set(val) {
-        const view = (this.viewsList || []).find(v => v.id === val)
+        const view = (this.views || []).find(v => v.id === val)
         this.$router.push({
           query: {
             ...this.$route.query,
-            view: view && (view.alias || view.title)
+            view: view && (view.id)
           }
         })
       },
       get() {
         let id
-        if (this.viewsList) {
-          console.log(this.viewsList)
-          const view = this.viewsList.find(v => (v.alias ? v.alias : v.title) === this.$route.query.view)
-          id = (view && view.id) || ((this.viewsList && this.viewsList[0]) || {}).id
+        if (this.views) {
+          console.log(this.views)
+          const view = this.views.find(v => v.id === this.$route.query.view)
+          id = (view && view.id) || ((this.views && this.views[0]) || {}).id
         }
         return id
       }
@@ -616,10 +621,10 @@ export default {
     sharedViewUrl() {
       let viewType
       switch (this.shareLink.view_type) {
-        case 'form':
+        case this.viewTypes.FORM:
           viewType = 'form'
           break
-        case 'kanban':
+        case this.viewTypes.KANBAN:
           viewType = 'kanban'
           break
         default:
@@ -663,32 +668,32 @@ export default {
       }])
     },
     onViewIdChange(id) {
-      const selectedView = this.viewsList && this.viewsList.find(v => v.id === id)
-      let queryParams = {}
+      const selectedView = this.views && this.views.find(v => v.id === id)
+      // const queryParams = {}
       this.$emit('update:selectedViewId', id)
       this.$emit('update:selectedView', selectedView)
       // if (selectedView.type === 'table') {
       //   return;
       // }
-      try {
-        queryParams = JSON.parse(selectedView.query_params) || {}
-      } catch (e) {
-        // console.log(e)
-      }
-      this.$emit('update:filters', queryParams.filters || [])
-      this.$emit('update:sortList', queryParams.sortList || [])
-      this.$emit('update:fieldsOrder', queryParams.fieldsOrder || [])
-      this.$emit('update:viewStatus', queryParams.viewStatus || {})
-      this.$emit('update:columnsWidth', queryParams.columnsWidth || {})
-      this.$emit('update:extraViewParams', queryParams.extraViewParams || {})
-      this.$emit('update:coverImageField', queryParams.coverImageField)
-      this.$emit('update:groupingField', queryParams.groupingField)
-      this.$emit('update:showSystemFields', queryParams.showSystemFields)
-      if (queryParams.showFields) {
-        this.$emit('update:showFields', queryParams.showFields)
-      } else {
-        this.$emit('mapFieldsAndShowFields')
-      }
+      // try {
+      //   queryParams = JSON.parse(selectedView.query_params) || {}
+      // } catch (e) {
+      //   // console.log(e)
+      // }
+      // this.$emit('update:filters', queryParams.filters || [])
+      // this.$emit('update:sortList', queryParams.sortList || [])
+      // this.$emit('update:fieldsOrder', queryParams.fieldsOrder || [])
+      // this.$emit('update:viewStatus', queryParams.viewStatus || {})
+      // this.$emit('update:columnsWidth', queryParams.columnsWidth || {})
+      // this.$emit('update:extraViewParams', queryParams.extraViewParams || {})
+      // this.$emit('update:coverImageField', queryParams.coverImageField)
+      // this.$emit('update:groupingField', queryParams.groupingField)
+      // this.$emit('update:showSystemFields', queryParams.showSystemFields)
+      // if (queryParams.showFields) {
+      //   this.$emit('update:showFields', queryParams.showFields)
+      // } else {
+      //   this.$emit('mapFieldsAndShowFields')
+      // }
       this.$emit('loadTableData')
     },
     hideMiniSponsorCard() {
@@ -755,7 +760,10 @@ export default {
       // )
       // this.selectedViewIdLocal = this.viewsList && this.viewsList[0] && this.viewsList[0].id
 
-      this.viewsList = []
+      // this.viewsList = []
+
+      const views = (await this.$api.meta.viewsList(this.meta.id)).data.views.list
+      this.$emit('update:views', views)
     },
     // async onViewChange() {
     //   let query_params = {}

@@ -2,9 +2,8 @@ import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
 
 export default class GridViewColumn {
-  title: string;
+  id: string;
   show: boolean;
-  is_default: boolean;
   order: number;
 
   fk_view_id: string;
@@ -30,7 +29,19 @@ export default class GridViewColumn {
   }
 
   static async insert(column: Partial<GridViewColumn>) {
-    await Noco.ncMeta.metaInsert2(null, null, MetaTable.GRID_VIEW_COLUMNS, {
+    const { id } = await Noco.ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.GRID_VIEW_COLUMNS,
+      {
+        fk_view_id: column.fk_view_id,
+        fk_column_id: column.fk_column_id,
+        order: column.order,
+        show: column.show
+      }
+    );
+    return new GridViewColumn({
+      id,
       fk_view_id: column.fk_view_id,
       fk_column_id: column.fk_column_id,
       order: column.order,
