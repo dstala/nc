@@ -115,6 +115,17 @@ export default class View implements ViewType {
       },
     _trx?: Transaction
   ) {
+    const order =
+      (+(
+        await Noco.ncMeta
+          .knex(MetaTable.VIEWS)
+          .max('order', { as: 'order' })
+          .where({
+            fk_model_id: view.fk_model_id
+          })
+          .first()
+      )?.order || 0) + 1;
+
     const copyFormView =
       view.copy_from_id && (await View.get(view.copy_from_id));
 
@@ -126,7 +137,7 @@ export default class View implements ViewType {
         title: view.title,
         show: true,
         is_default: view.is_default,
-        order: view.order,
+        order,
         type: view.type,
         fk_model_id: view.fk_model_id
       }
@@ -188,15 +199,16 @@ export default class View implements ViewType {
         });
       }
     }
-
-    let order = 1;
-    for (const col of columns) {
-      await View.insertColumn({
-        view_id,
-        show: true,
-        order: order++,
-        ...col
-      });
+    {
+      let order = 1;
+      for (const col of columns) {
+        await View.insertColumn({
+          view_id,
+          show: true,
+          order: order++,
+          ...col
+        });
+      }
     }
 
     return View.get(view_id);

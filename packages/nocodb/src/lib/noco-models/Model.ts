@@ -85,9 +85,8 @@ export default class Model implements Table {
       MetaTable.MODELS,
       {
         tn: model.tn,
-        _tn: model._tn
-        // base_id: dbAlias,
-        // project_id: projectId
+        _tn: model._tn,
+        order: model.order
       }
     );
 
