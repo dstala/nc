@@ -48,7 +48,7 @@
                   >
                     <label :for="`data-table-form-${col._cn}`" class="body-2 text-capitalize caption grey--text">
                       <virtual-header-cell
-                        v-if="col.virtual"
+                        v-if="isVirtualCol(col)"
                         :column="col"
                         :nodes="nodes"
                         :is-form="true"
@@ -64,7 +64,7 @@
                     </label>
 
                     <virtual-cell
-                      v-if="col.virtual"
+                      v-if="isVirtualCol(col)"
                       ref="virtual"
                       :column="col"
                       :row="row"
@@ -91,6 +91,7 @@
 </template>
 
 <script>
+import { isVirtualCol } from 'nc-common'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'
@@ -156,6 +157,7 @@ export default {
     this.loadView()
   },
   methods: {
+    isVirtualCol,
     async loadView() {
       this.galleryView = (await this.$api.meta.galleryRead(this.viewId)).data
       this.$emit('update:coverImageField', this.galleryView.fk_cover_image_col_id)
