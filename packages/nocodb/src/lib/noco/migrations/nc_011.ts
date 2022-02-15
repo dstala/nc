@@ -397,11 +397,9 @@ const up = async knex => {
     table.string('redirect_after_secs');
     table.string('email');
     table.boolean('submit_another_form');
+    table.boolean('show_blank_form');
     table.string('uuid');
     table.string('banner_image_url');
-    table.string('public');
-    table.string('password');
-    table.boolean('show_all_fields');
     table.string('logo_url');
 
     table.timestamps(true, true);
@@ -423,6 +421,7 @@ const up = async knex => {
 
     table.string('label');
     table.string('help');
+    table.string('description');
     table.boolean('required');
     table.boolean('show');
     table.float('order');

@@ -1531,6 +1531,58 @@
         }
       }
     },
+    "/forms/{formId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "formId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "form-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Form"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "form-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Form"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
     "/formColumns/{columnId}": {
       "parameters": [
         {
@@ -3449,11 +3501,32 @@
           "title": {
             "type": "string"
           },
-          "alias": {
+          "heading": {
             "type": "string"
           },
-          "order": {
-            "type": "number"
+          "subheading": {
+            "type": "string"
+          },
+          "sucess_msg": {
+            "type": "string"
+          },
+          "redirect_url": {
+            "type": "string"
+          },
+          "redirect_after_secs": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "banner_image_url": {
+            "type": "string"
+          },
+          "logo_url": {
+            "type": "string"
+          },
+          "submit_another_form": {
+            "type": "boolean"
           },
           "columns": {
             "type": "array",
@@ -3467,24 +3540,65 @@
         }
       },
       "FormColumn": {
-        "title": "FormColumn",
-        "type": "object",
         "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "_cn": "first_name",
+            "alias": "first_name",
+            "fk_column_id": "cl_yvyhsl9u81tokc",
+            "id": "fvc_8z1i7t8aswkqxx",
+            "fk_view_id": "vw_s1pf4umdnikoyn",
+            "uuid": null,
+            "label": "dsdsds",
+            "help": null,
+            "required": false,
+            "show": 1,
+            "order": 1,
+            "created_at": "2022-02-15 12:39:04",
+            "updated_at": "2022-02-15 12:39:16",
+            "description": "dsdsdsdsd"
+          }
+        },
         "properties": {
-          "id": {
-            "type": "string"
+          "fk_column_id": {
+            "type": "string",
+            "minLength": 1
           },
-          "public": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fk_view_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uuid": {},
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "help": {},
+          "required": {
             "type": "boolean"
           },
-          "password": {
-            "type": "string"
+          "show": {
+            "type": "boolean"
           },
-          "fk_column_id": {
-            "type": "string"
+          "order": {
+            "type": "number"
           },
-          "fk_form_id": {
-            "type": "string"
+          "created_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "updated_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },

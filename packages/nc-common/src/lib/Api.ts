@@ -354,18 +354,32 @@ export interface Kanban {
 export interface Form {
   id?: string;
   title?: string;
-  alias?: string;
-  order?: number;
+  heading?: string;
+  subheading?: string;
+  sucess_msg?: string;
+  redirect_url?: string;
+  redirect_after_secs?: string;
+  email?: string;
+  banner_image_url?: string;
+  logo_url?: string;
+  submit_another_form?: boolean;
   columns?: FormColumn[];
   fk_model_id?: string;
 }
 
 export interface FormColumn {
-  id?: string;
-  public?: boolean;
-  password?: string;
   fk_column_id?: string;
-  fk_form_id?: string;
+  id?: string;
+  fk_view_id?: string;
+  uuid?: any;
+  label?: string;
+  help?: any;
+  required?: boolean;
+  show?: boolean;
+  order?: number;
+  created_at?: string;
+  updated_at?: string;
+  description?: string;
 }
 
 export interface Paginated {
@@ -1355,6 +1369,37 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name FormUpdate
+     * @request PUT:/forms/{formId}
+     */
+    formUpdate: (formId: string, data: Form, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/forms/${formId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name FormRead
+     * @request GET:/forms/{formId}
+     */
+    formRead: (formId: string, params: RequestParams = {}) =>
+      this.request<Form, any>({
+        path: `/forms/${formId}`,
+        method: 'GET',
         format: 'json',
         ...params,
       }),

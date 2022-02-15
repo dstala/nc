@@ -10,6 +10,7 @@ import gridViewApis from './gridViewApis';
 import viewApis from './viewApis';
 import galleryViewApis from './galleryViewApis';
 import formViewApis from './formViewApis';
+import formViewColumnApis from './formViewColumnApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -21,6 +22,7 @@ export default function(router: Router) {
   router.use('/views/:viewId/columns', viewColumnApis);
   router.use('/tables/:tableId/grids', gridViewApis);
   router.use('/tables/:tableId/galleries', galleryViewApis);
-  router.use('/tables/:tableId/forms', formViewApis);
+  router.use('/formColumns', formViewColumnApis);
+  router.use('/', formViewApis);
   router.use('/', viewApis);
 }

@@ -146,7 +146,7 @@ export default class View implements ViewType {
     switch (view.type) {
       case ViewTypes.GRID:
         await GridView.insert({
-          ...view,
+          ...(view as GridView),
           fk_view_id: view_id
         });
         break;

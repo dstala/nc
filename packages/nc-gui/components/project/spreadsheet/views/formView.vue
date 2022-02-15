@@ -134,22 +134,24 @@
               </div>
               <editable
                 :is="isEditable ? 'editable' : 'h2'"
-                v-model.lazy="localParams.name"
+                v-model="view.heading"
                 class="display-1 font-weight-bold text-left mx-4 mb-3 px-1 text--text  text--lighten-1"
                 :class="{'nc-meta-inputs': isEditable}"
                 placeholder="Form Title"
+                @input="updateView"
               >
-                {{ localParams.name }}
+                {{ view.heading }}
               </editable>
 
               <editable
                 :is="isEditable ? 'editable' : 'div'"
-                v-model.lazy="localParams.description"
+                v-model="view.subheading"
                 :class="{'nc-meta-inputs': isEditable}"
                 class="body-1  text-left mx-4 py-2 px-1 text--text text--lighten-2"
                 placeholder="Add form description"
+                @input="updateView"
               >
-                {{ localParams.description }}
+                {{ view.subheading }}
               </editable>
               <draggable
                 v-model="columns"
@@ -192,29 +194,32 @@
 
                           <label
                             class="grey--text caption ml-2"
-                            @click="localParams.fields[col.alias].required= !localParams.fields[col.alias].required"
+                            @click="col.required= !col.required,updateColMeta(col,i)"
                           >Required</label>
                           <v-switch
-                            v-model="localParams.fields[col.alias].required"
+                            v-model="col.required"
                             class="nc-required-switch ml-1 mt-0"
                             hide-details
                             flat
                             color="primary"
                             dense
                             inset
+                            @change="updateColMeta(col,i)"
                           />
                         </div>
                         <editable
-                          v-model="localParams.fields[col.alias].label"
+                          v-model="col.label"
                           style="width:300px;white-space: pre-wrap"
                           placeholder=" Enter form input label"
                           class="caption pa-1 backgroundColor darken-1 mb-2 "
+                          @input="updateColMeta(col,i)"
                         />
                         <editable
-                          v-model="localParams.fields[col.alias].description"
+                          v-model="col.description"
                           style="width:300px;white-space: pre-wrap"
                           placeholder=" Add some help text"
                           class="caption pa-1 backgroundColor darken-1 mb-2"
+                          @input="updateColMeta(col,i)"
                           @keydown.enter.prevent
                         />
                       </div>
@@ -224,9 +229,9 @@
                         class="body-2 text-capitalize nc-field-labels"
                       >
                         <virtual-header-cell
-                          v-if="col.virtual"
+                          v-if="isVirtualCol(col)"
                           class="caption"
-                          :column="{...col, _cn: localParams.fields[col.alias].label || col._cn}"
+                          :column="{...col, _cn: col.label || col._cn}"
                           :nodes="nodes"
                           :is-form="true"
                           :meta="meta"
@@ -236,7 +241,7 @@
                           v-else
                           class="caption"
                           :is-form="true"
-                          :value="localParams.fields[col.alias].label || col._cn"
+                          :value="col.label || col._cn"
                           :column="col"
                           :sql-ui="sqlUi"
                           :required="isRequired(col, localState, localParams.fields[col.alias].required)"
@@ -357,20 +362,34 @@
                 </div>
                 <label class="caption grey--text font-weight-bold">Show this message:</label>
                 <v-textarea
-                  v-model="localParams.submit.message"
+                  v-model="view.success_msg"
                   rows="3"
                   hide-details
                   solo
-
                   class="caption"
+                  @input="updateView"
                 />
 
-                <v-switch v-model="localParams.submit.showAnotherSubmit" dense inset hide-details class="nc-switch">
+                <v-switch
+                  v-model="view.submit_another_form"
+                  dense
+                  inset
+                  hide-details
+                  class="nc-switch"
+                  @change="updateView"
+                >
                   <template #label>
                     <span class="font-weight-bold grey--text caption">Show "Submit Another Form" button</span>
                   </template>
                 </v-switch>
-                <v-switch v-model="localParams.submit.showBlankForm" dense inset hide-details class="nc-switch">
+                <v-switch
+                  v-model="view.show_blank_form"
+                  dense
+                  inset
+                  hide-details
+                  class="nc-switch"
+                  @change="updateView"
+                >
                   <template #label>
                     <span class="font-weight-bold grey--text caption">Show a blank form after 5 seconds</span>
                   </template>
@@ -428,7 +447,12 @@ export default {
     draggable
   },
   mixins: [form, validationMixin],
-  props: ['meta', 'availableColumns', 'nodes', 'sqlUi', 'formParams', 'showFields', 'fieldsOrder', 'allColumns', 'dbAlias', 'api', 'id'],
+  props: [
+    'meta', 'availableColumns', 'nodes',
+    'sqlUi', 'formParams', 'showFields',
+    'fieldsOrder', 'allColumns', 'dbAlias',
+    'api', 'id', 'viewId'
+  ],
   data: () => ({
     isVirtualCol,
     localState: {},
@@ -441,7 +465,10 @@ export default {
     submitted: false,
     secondsRemain: null,
     loading: false,
-    virtual: {}
+    virtual: {},
+    formColumns: [],
+    fields: [],
+    view: {}
     // hiddenColumns: []
   }),
   validations() {
@@ -472,7 +499,7 @@ export default {
   },
   computed: {
     allColumnsLoc() {
-      return this.meta.columns// this.mets.columns.filter(c => !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && this.meta.belongsTo.every(bt => c.cn !== bt.cn))
+      return this.fields// this.mets.columns.filter(c => !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && this.meta.belongsTo.every(bt => c.cn !== bt.cn))
     },
     isEditable() {
       return this._isUIAllowed('editFormView')
@@ -526,6 +553,9 @@ export default {
       }
     }
   },
+  created() {
+    this.loadView()
+  },
   mounted() {
     const localParams = Object.assign({
       name: this.meta._tn,
@@ -542,6 +572,42 @@ export default {
     // this.hiddenColumns = this.meta.columns.filter(c => this.availableColumns.find(c1 => c.cn === c1.cn && c._cn === c1._cn))
   },
   methods: {
+    async updateColMeta(col, i) {
+      if (col.id) { await this.$api.meta.formColumnUpdate(col.id, col) }
+    },
+    async updateView() {
+      await this.$api.meta.formUpdate(this.viewId, this.view)
+    },
+    async loadView() {
+      const { columns, ...view } = (await this.$api.meta.formRead(this.viewId)).data
+      this.view = view
+      this.formColumns = columns
+      let order = 1
+      const fieldById = this.formColumns.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
+      this.fields = this.meta.columns.map(c => ({
+        _cn: c._cn,
+        uidt: c.uidt,
+        alias: c._cn,
+        fk_column_id: c.id,
+        ...(fieldById[c.id] ? fieldById[c.id] : {}),
+        order: (fieldById[c.id] && fieldById[c.id].order) || order++
+      })
+      ).sort((a, b) => a.order - b.order)
+    },
+    // async loadFormColumns() {
+    //   this.formColumns = (await this.$api.meta.viewColumnList(this.viewId)).data
+    //   let order = 1
+    //   const fieldById = this.formColumns.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
+    //   this.fields = this.meta.columns.map(c => ({
+    //     _cn: c._cn,
+    //     uidt: c.uidt,
+    //     alias: c._cn,
+    //     fk_column_id: c.id,
+    //     ...(fieldById[c.id] ? fieldById[c.id] : {}),
+    //     order: (fieldById[c.id] && fieldById[c.id].order) || order++
+    //   })
+    //   ).sort((a, b) => a.order - b.order)
+    // },
     hideColumn(i) {
       if (this.isDbRequired(this.columns[i])) {
         this.$toast.info('Required field can\'t be removed').goAway(3000)

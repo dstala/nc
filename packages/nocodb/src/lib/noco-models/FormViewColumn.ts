@@ -1,9 +1,13 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
+import { FormColumn } from 'nc-common';
 
-export default class FormViewColumn {
+export default class FormViewColumn implements FormColumn {
   id?: string;
-  title?: string;
+  label?: string;
+  help?: string;
+  description?: string;
+  required?: boolean;
   show?: boolean;
   order?: number;
 
@@ -13,6 +17,8 @@ export default class FormViewColumn {
   constructor(data: FormViewColumn) {
     Object.assign(this, data);
   }
+
+  uuid?: any;
 
   public static async get(viewId: string) {
     const view = await Noco.ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
@@ -57,4 +63,22 @@ export default class FormViewColumn {
 
     return views?.map(v => new FormViewColumn(v));
   }
+
+  static async update(columnId: string, body: Partial<FormViewColumn>) {
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.FORM_VIEW_COLUMNS,
+      {
+        label: body.label,
+        help: body.help,
+        description: body.description,
+        required: body.required
+      },
+      columnId
+    );
+  }
+
+  created_at?: string;
+  updated_at?: string;
 }

@@ -386,6 +386,7 @@
             <form-view
               :id="selectedViewId"
               :key="selectedViewId + viewKey"
+              :view-id="selectedViewId"
               :nodes="nodes"
               :table="table"
               :available-columns="availableColumns"
@@ -401,6 +402,7 @@
               :fields-order.sync="fieldsOrder"
               :primary-value-column="primaryValueColumn"
               :form-params.sync="extraViewParams.formParams"
+              :view.sync="selectedView"
               @onNewColCreation="loadMeta(false)"
             />
           </template>
