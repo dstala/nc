@@ -340,8 +340,9 @@
               :meta="meta"
               :data="data"
               :sql-ui="sqlUi"
+              :view-id="selectedViewId"
               :primary-value-column="primaryValueColumn"
-              :cover-image-field="coverImageField"
+              :cover-image-field.sync="coverImageField"
               @expandForm="({rowIndex,rowMeta}) => expandRow(rowIndex,rowMeta)"
             />
           </template>
@@ -1437,7 +1438,7 @@ export default {
                 limit: initialLimit,
                 where: groupingColumnItem === uncategorized ? `(${this.groupingField},is,null)` : `(${this.groupingField},eq,${groupingColumnItem})`
               })
-              data.map((d) => {
+              data.forEach((d) => {
                 // handle composite primary key
                 d.c_pk = this.meta.columns.filter(c => c.pk).map(c => d[c._cn]).join('___')
                 if (!d.id) {
@@ -1538,13 +1539,16 @@ export default {
       return this.meta && this.meta.columns.some(c => c.pk)
     },
     isGallery() {
-      return this.selectedView && this.selectedView.show_as === 'gallery'
+      return this.selectedView && this.selectedView.type === ViewTypes.GALLERY
     },
     isForm() {
-      return this.selectedView && this.selectedView.show_as === 'form'
+      return this.selectedView && this.selectedView.type === ViewTypes.FORM
     },
     isKanban() {
-      return this.selectedView && this.selectedView.show_as === 'kanban'
+      return this.selectedView && this.selectedView.type === ViewTypes.KANBAN
+    },
+    isGrid() {
+      return this.selectedView && this.selectedView.type === ViewTypes.GRID
     },
     meta() {
       return this.$store.state.meta.metas[this.table]

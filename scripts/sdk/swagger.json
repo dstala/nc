@@ -1708,16 +1708,8 @@
         }
       }
     },
-    "/tables/{tableId}/galleries/{galleryId}": {
+    "/galleries/{galleryId}": {
       "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "tableId",
-          "in": "path",
-          "required": true
-        },
         {
           "schema": {
             "type": "string"
@@ -1737,7 +1729,16 @@
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Gallery"
+              }
+            }
+          }
+        }
       },
       "delete": {
         "summary": "",
@@ -1756,7 +1757,14 @@
         "operationId": "gallery-read",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Gallery"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -3405,7 +3413,7 @@
           "cover_image_idx": {
             "type": "integer"
           },
-          " cover_image": {
+          "cover_image": {
             "type": "string"
           },
           "restrict_types": {
@@ -3433,6 +3441,9 @@
             }
           },
           "fk_model_id": {
+            "type": "string"
+          },
+          "fk_cover_image_col_id": {
             "type": "string"
           }
         }

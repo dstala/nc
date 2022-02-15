@@ -3,16 +3,19 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import { Table, TableList, TableListParams, ViewTypes } from 'nc-common';
+import { Gallery, TableList, TableListParams, ViewTypes } from 'nc-common';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
 import catchError from './helpers/catchError';
 import View from '../../../noco-models/View';
+import GalleryView from '../../../noco-models/GalleryView';
 
 // @ts-ignore
-export async function galleyViewGet(req: Request, res: Response<Table>) {}
+export async function galleryViewGet(req: Request, res: Response<Gallery>) {
+  res.json(await GalleryView.get(req.params.galleyViewId));
+}
 
 // @ts-ignore
 export async function galleyViewList(
@@ -31,15 +34,18 @@ export async function galleryViewCreate(req: Request<any, any>, res) {
 }
 
 // @ts-ignore
-export async function galleyViewUpdate(req, res) {}
+export async function galleryViewUpdate(req, res) {
+  res.json(await GalleryView.update(req.params.galleyViewId, req.body));
+}
 
 // @ts-ignore
 export async function galleyViewDelete(req: Request, res: Response, next) {}
 
 const router = Router({ mergeParams: true });
 // router.get('/', galleyViewList);
-router.post('/', catchError(galleryViewCreate));
+router.post('/tables/:tableId/galleries', catchError(galleryViewCreate));
 // router.get('/:galleyViewId', galleyViewGet);
-// router.put('/:galleyViewId', galleyViewUpdate);
+router.put('/galleries/:galleyViewId', catchError(galleryViewUpdate));
+router.get('/galleries/:galleyViewId', catchError(galleryViewGet));
 // router.delete('/:galleyViewId', galleyViewDelete);
 export default router;

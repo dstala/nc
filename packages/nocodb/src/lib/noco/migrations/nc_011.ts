@@ -443,13 +443,15 @@ const up = async knex => {
     table.boolean('next_enabled');
     table.boolean('prev_enabled');
     table.integer('cover_image_idx');
+    table.string('fk_cover_image_col_id', 20);
+    table
+      .foreign('fk_cover_image_col_id')
+      .references(`${MetaTable.COLUMNS}.id`);
     table.string('cover_image');
     table.string('restrict_types');
     table.string('restrict_size');
     table.string('restrict_number');
     table.boolean('public');
-    table.string('password');
-    table.boolean('show_all_fields');
     table.string('dimensions');
     table.string('responsive_columns');
     // todo : condition

@@ -38,7 +38,7 @@
             outlined
             :items="attachmentFields"
             item-text="alias"
-            item-value="_cn"
+            item-value="id"
             hide-details
             @click.stop
           >
@@ -194,13 +194,13 @@ export default {
     attachmentFields() {
       return [...(this.meta && this.meta.columns ? this.meta.columns.filter(f => f.uidt === 'Attachment') : []), {
         alias: 'None',
-        _cn: ''
+        id: null
       }]
     },
     singleSelectFields() {
       return [...(this.meta && this.meta.columns ? this.meta.columns.filter(f => f.uidt === 'SingleSelect') : []), {
         alias: 'None',
-        _cn: ''
+        id: null
       }]
     },
     coverImageFieldLoc: {

@@ -22,8 +22,8 @@ export default function(router: Router) {
   router.use('/views/:viewId/filters', filterApis);
   router.use('/views/:viewId/columns', viewColumnApis);
   router.use('/tables/:tableId/grids', gridViewApis);
-  router.use('/tables/:tableId/galleries', galleryViewApis);
   router.use('/formColumns', formViewColumnApis);
+  router.use('/', galleryViewApis);
   router.use('/', formViewApis);
   router.use('/', viewApis);
   router.use('/', attachmentApis);

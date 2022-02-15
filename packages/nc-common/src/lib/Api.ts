@@ -306,7 +306,7 @@ export interface Gallery {
   next_enabled?: boolean;
   prev_enabled?: boolean;
   cover_image_idx?: number;
-  ' cover_image'?: string;
+  cover_image?: string;
   restrict_types?: string;
   restrict_size?: string;
   restrict_number?: string;
@@ -315,6 +315,7 @@ export interface Gallery {
   show_all_fields?: boolean;
   columns?: GalleryColumn[];
   fk_model_id?: string;
+  fk_cover_image_col_id?: string;
 }
 
 export interface GalleryColumn {
@@ -1481,16 +1482,18 @@ export class Api<
      *
      * @tags Meta
      * @name GalleryUpdate
-     * @request PUT:/tables/{tableId}/galleries/{galleryId}
+     * @request PUT:/galleries/{galleryId}
      */
     galleryUpdate: (
-      tableId: string,
       galleryId: string,
+      data: Gallery,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/tables/${tableId}/galleries/${galleryId}`,
+        path: `/galleries/${galleryId}`,
         method: 'PUT',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -1499,15 +1502,11 @@ export class Api<
      *
      * @tags Meta
      * @name GalleryDelete
-     * @request DELETE:/tables/{tableId}/galleries/{galleryId}
+     * @request DELETE:/galleries/{galleryId}
      */
-    galleryDelete: (
-      tableId: string,
-      galleryId: string,
-      params: RequestParams = {}
-    ) =>
+    galleryDelete: (galleryId: string, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/tables/${tableId}/galleries/${galleryId}`,
+        path: `/galleries/${galleryId}`,
         method: 'DELETE',
         ...params,
       }),
@@ -1517,16 +1516,13 @@ export class Api<
      *
      * @tags Meta
      * @name GalleryRead
-     * @request GET:/tables/{tableId}/galleries/{galleryId}
+     * @request GET:/galleries/{galleryId}
      */
-    galleryRead: (
-      tableId: string,
-      galleryId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/galleries/${galleryId}`,
+    galleryRead: (galleryId: string, params: RequestParams = {}) =>
+      this.request<Gallery, any>({
+        path: `/galleries/${galleryId}`,
         method: 'GET',
+        format: 'json',
         ...params,
       }),
 

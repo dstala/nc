@@ -95,9 +95,15 @@ import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'
 import TableCell from '../components/cell'
+
 export default {
   name: 'GalleryView',
-  components: { TableCell, VirtualCell, HeaderCell, VirtualHeaderCell },
+  components: {
+    TableCell,
+    VirtualCell,
+    HeaderCell,
+    VirtualHeaderCell
+  },
   props: [
     'nodes',
     'table',
@@ -108,11 +114,17 @@ export default {
     'primaryValueColumn',
     'showSystemFields',
     'sqlUi',
-    'coverImageField'
+    'coverImageField',
+    'viewId'
   ],
+  data() {
+    return {
+      galleryView: {}
+    }
+  },
   computed: {
     attachmentColumn() {
-      return this.coverImageField && this.meta && this.meta.columns && this.meta.columns.find(c => c._cn === this.coverImageField)
+      return this.coverImageField && this.meta && this.meta.columns && this.meta.columns.find(c => c.id === this.coverImageField)
     },
     fields() {
       if (this.availableColumns) {
@@ -130,7 +142,24 @@ export default {
       }
     }
   },
+  watch: {
+    async coverImageField(v) {
+      if (this.galleryView && v !== this.galleryView.fk_cover_image_col_id) {
+        (await this.$api.meta.galleryUpdate(this.viewId, {
+          ...this.galleryView,
+          fk_cover_image_col_id: v
+        }))
+      }
+    }
+  },
+  created() {
+    this.loadView()
+  },
   methods: {
+    async loadView() {
+      this.galleryView = (await this.$api.meta.galleryRead(this.viewId)).data
+      this.$emit('update:coverImageField', this.galleryView.fk_cover_image_col_id)
+    },
     getCovers(row) {
       if (this.attachmentColumn &&
         row[this.attachmentColumn.cn] && row[this.attachmentColumn.cn][0] &&
