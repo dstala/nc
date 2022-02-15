@@ -1,4 +1,7 @@
 # Run
+
+If you are doing a git pull on same day - you will have to remove existing metadb as underlying metadb can differ
+
 ```
 # build xc-lib-private
 git clone https://github.com/nocodb/xc-lib-private
