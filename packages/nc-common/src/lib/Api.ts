@@ -410,6 +410,14 @@ export interface ViewList {
   views: { list: Grid | Form | Kanban | Gallery; pageInfo: Paginated };
 }
 
+export interface Attachment {
+  url?: string;
+  title?: string;
+  mimetype?: string;
+  size?: string;
+  icon?: string;
+}
+
 export interface ProjectListParams {
   page?: number;
   pageSize?: number;
@@ -734,6 +742,28 @@ export class Api<
       }),
   };
   meta = {
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name Upload
+     * @summary Attachment
+     * @request POST:/projects/{projectId}/views/{viewId}/upload
+     */
+    upload: (
+      projectId: string,
+      viewId: string,
+      data: { files?: any; json?: string },
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/views/${viewId}/upload`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
+        ...params,
+      }),
+
     /**
      * @description Read project details
      *

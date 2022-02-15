@@ -257,7 +257,7 @@ import { isImage } from '@/components/project/spreadsheet/helpers/imageExt'
 export default {
   name: 'EditableAttachmentCell',
   components: { draggable },
-  props: ['dbAlias', 'value', 'active', 'isLocked', 'meta', 'column', 'isPublicGrid', 'isForm', 'isPublicForm'],
+  props: ['dbAlias', 'value', 'active', 'isLocked', 'meta', 'column', 'isPublicGrid', 'isForm', 'isPublicForm', 'viewId'],
   data: () => ({
     carousel: null,
     uploading: false,
@@ -343,13 +343,20 @@ export default {
       this.uploading = true
       for (const file of this.$refs.file.files) {
         try {
-          const item = await this.$store.dispatch('sqlMgr/ActUploadOld', [{
-            dbAlias: this.dbAlias
-          }, 'xcAttachmentUpload', {
-            appendPath: [this.meta.tn],
-            prependName: [this.column.cn]
-          }, file])
-          this.localState.push(item)
+        // const item = await this.$store.dispatch('sqlMgr/ActUploadOld', [{
+        //   dbAlias: this.dbAlias
+        // }, 'xcAttachmentUpload', {
+        //   appendPath: [this.meta.tn],
+        //   prependName: [this.column.cn]
+        // }, file])
+
+          const data = await this.$api.meta.upload(this.$store.state.project.projectId, this.viewId, {
+            files: file,
+            json: '{}'
+          })
+
+          console.log(data.data)
+          this.localState.push(...data.data)
         } catch (e) {
           this.$toast.error((e.message) || 'Some internal error occurred').goAway(3000)
           this.uploading = false

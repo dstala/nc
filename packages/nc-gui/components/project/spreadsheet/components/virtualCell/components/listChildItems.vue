@@ -102,10 +102,10 @@
     </v-card-text>
     <v-card-actions v-if="!isForm" class="justify-center flex-column" :class="{'py-0':isForm}">
       <pagination
-        v-if="!bt && data && data.count > 1"
+        v-if="!bt && data && data.pageInfo&& data.pageInfo.totalRows > 1"
         v-model="page"
         :size="size"
-        :count="data && data.count"
+        :count="data && data.pageInfo&& data.pageInfo.totalRows"
         class="mb-3"
         @input="loadData"
       />

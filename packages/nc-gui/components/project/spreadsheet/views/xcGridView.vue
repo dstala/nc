@@ -217,6 +217,7 @@
               :db-alias="nodes.dbAlias"
               :is-locked="isLocked"
               :is-public="isPublicView"
+              :view-id="viewId"
               @save="editEnabled = {}"
               @cancel="editEnabled = {}"
               @update="onCellValueChange(col, row, columnObj)"
@@ -315,7 +316,8 @@ export default {
     isLocked: Boolean,
     columnsWidth: { type: Object },
     isPkAvail: Boolean,
-    password: String
+    password: String,
+    viewId: String
   },
   data: () => ({
     resizingCol: null,

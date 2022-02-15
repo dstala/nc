@@ -82,14 +82,20 @@ class BaseModelSqlv2 {
         );*/
 
     // todo: replace with view id
-    if (!ignoreFilterSort && this.viewId) {
-      await conditionV2(
-        await Filter.rootFilterList({ viewId: this.viewId }),
-        qb,
-        this.dbDriver
-      );
+    if (!ignoreFilterSort) {
+      if (this.viewId) {
+        await conditionV2(
+          await Filter.rootFilterList({ viewId: this.viewId }),
+          qb,
+          this.dbDriver
+        );
 
-      await sortV2(await Sort.list({ viewId: this.viewId }), qb, this.dbDriver);
+        await sortV2(
+          await Sort.list({ viewId: this.viewId }),
+          qb,
+          this.dbDriver
+        );
+      }
       this._paginateAndSort(qb, rest);
     }
 

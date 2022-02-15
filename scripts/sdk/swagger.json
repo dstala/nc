@@ -52,6 +52,50 @@
         }
       }
     },
+    "/projects/{projectId}/views/{viewId}/upload": {
+      "post": {
+        "summary": "Attachment",
+        "operationId": "upload",
+        "responses": {},
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {},
+                  "json": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
     "/auth/user/me": {
       "parameters": [],
       "get": {
@@ -3832,6 +3876,27 @@
           "views"
         ],
         "title": ""
+      },
+      "Attachment": {
+        "title": "Attachment",
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        }
       }
     },
     "requestBodies": {

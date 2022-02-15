@@ -99,7 +99,6 @@
     />
 
     <v-dialog
-      v-if="selectedChild && !isPublic"
       v-model="expandFormModal"
       :overlay-opacity="0.8"
       width="1000px"
@@ -371,8 +370,8 @@ export default {
     async editChild(child) {
       await this.loadChildMeta()
       this.isNewChild = false
-      this.selectedChild = child
       this.expandFormModal = true
+      this.selectedChild = child
       setTimeout(() => {
         this.$refs.expandedForm && this.$refs.expandedForm.reload()
       }, 500)

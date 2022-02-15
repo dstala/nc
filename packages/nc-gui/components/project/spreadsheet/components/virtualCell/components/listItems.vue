@@ -72,7 +72,7 @@
           v-if="data && data.list && data.list.length"
           v-model="page"
           :size="size"
-          :count="data.count"
+          :count="data && data.pageInfo&& data.pageInfo.totalRows"
           class="mb-3"
           @input="loadData"
         />
