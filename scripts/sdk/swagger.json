@@ -1416,14 +1416,24 @@
       "get": {
         "summary": "",
         "operationId": "webhook-list",
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/HookList"
-          }
-        },
         "tags": [
           "Meta"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Webhook"
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       "post": {
         "summary": "",
@@ -1435,7 +1445,16 @@
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Webhook"
+              }
+            }
+          }
+        }
       }
     },
     "/tables/{tableId}/grids": {
@@ -2004,6 +2023,59 @@
           "Data"
         ],
         "description": ""
+      }
+    },
+    "/data/{tableId}/{rowId}/mm/{colId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "rowId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "colId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "mm-list",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "tags": [
+          "Data"
+        ]
       }
     }
   },
@@ -3389,7 +3461,7 @@
         "type": "object",
         "description": "",
         "properties": {
-          "id": {
+          "fk_view_id": {
             "type": "string"
           },
           "title": {
@@ -3424,15 +3496,6 @@
           },
           "restrict_number": {
             "type": "string"
-          },
-          "public": {
-            "type": "boolean"
-          },
-          "password": {
-            "type": "string"
-          },
-          "show_all_fields": {
-            "type": "boolean"
           },
           "columns": {
             "type": "array",
@@ -3905,6 +3968,21 @@
             "type": "string"
           },
           "icon": {
+            "type": "string"
+          }
+        }
+      },
+      "Webhook": {
+        "title": "Webhook",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
             "type": "string"
           }
         }

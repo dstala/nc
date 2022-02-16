@@ -195,15 +195,27 @@ export default {
       }
 
       if (this.isNew) { return }
-      this.data = (await this.$api.data.list(
-        this.meta.id
-        , {
-          query: {
-            limit: this.size,
-            offset: this.size * (this.page - 1),
-            ...this.queryParams
-          }
-        })).data.data
+      if (this.column && this.column.colOptions && this.column.colOptions.type === 'mm') {
+        this.data = (await this.$api.data.mmList(
+          this.column.fk_model_id,
+          this.rowId,
+          this.column.id, {
+            query: {
+              limit: this.size,
+              offset: this.size * (this.page - 1),
+              ...this.queryParams
+            }
+          })).data.data
+      } else {
+        this.data = (await this.$api.data.list(
+          this.meta.id, {
+            query: {
+              limit: this.size,
+              offset: this.size * (this.page - 1),
+              ...this.queryParams
+            }
+          })).data.data
+      }
     }
   }
 }

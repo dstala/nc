@@ -1132,7 +1132,7 @@ export default {
           })).data// { [column._cn]: oldRow[column._cn] })
           this.$set(this.data[row], 'row', { ...rowObj, ...newData })
 
-          this.$set(oldRow, column._cn, rowObj[column._cn])
+            .this.$set(oldRow, column._cn, rowObj[column._cn])
           /*    this.$toast.success(`${rowObj[this.primaryValueColumn] ? `${rowObj[this.primaryValueColumn]}'s c` : 'C'}olumn '${column.cn}' updated successfully.`, {
             position: 'bottom-center'
           }).goAway(3000) */

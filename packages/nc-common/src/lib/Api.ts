@@ -298,7 +298,7 @@ export interface Grid {
 }
 
 export interface Gallery {
-  id?: string;
+  fk_view_id?: string;
   title?: string;
   alias?: string;
   deleted?: boolean;
@@ -310,9 +310,6 @@ export interface Gallery {
   restrict_types?: string;
   restrict_size?: string;
   restrict_number?: string;
-  public?: boolean;
-  password?: string;
-  show_all_fields?: boolean;
   columns?: GalleryColumn[];
   fk_model_id?: string;
   fk_cover_image_col_id?: string;
@@ -417,6 +414,12 @@ export interface Attachment {
   mimetype?: string;
   size?: string;
   icon?: string;
+}
+
+export interface Webhook {
+  id?: string;
+  title?: string;
+  type?: string;
 }
 
 export interface ProjectListParams {
@@ -1308,9 +1311,10 @@ export class Api<
      * @request GET:/tables/{tableId}/webhooks
      */
     webhookList: (tableId: string, params: RequestParams = {}) =>
-      this.request<HookList, any>({
+      this.request<Webhook[], any>({
         path: `/tables/${tableId}/webhooks`,
         method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -1321,10 +1325,16 @@ export class Api<
      * @name WebhookCreate
      * @request POST:/tables/{tableId}/webhooks
      */
-    webhookCreate: (tableId: string, params: RequestParams = {}) =>
+    webhookCreate: (
+      tableId: string,
+      data: Webhook,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/tables/${tableId}/webhooks`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -1804,6 +1814,26 @@ export class Api<
       this.request<void, any>({
         path: `/data/${tableId}/${rowId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name MmList
+     * @request GET:/data/{tableId}/{rowId}/mm/{colId}
+     */
+    mmList: (
+      tableId: string,
+      rowId: string,
+      colId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${tableId}/${rowId}/mm/${colId}`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
   };

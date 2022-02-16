@@ -3,14 +3,14 @@
     <v-row class="h-100 my-0" :class="{'d-flex justify-center': submitted}">
       <template v-if="submitted">
         <v-col class="d-flex justify-center">
-          <div v-if="localParams && localParams.submit" style="min-width: 350px">
+          <div v-if="view" style="min-width: 350px">
             <v-alert type="success" outlined>
-              <span class="title">{{ localParams.submit.message || 'Successfully submitted form data' }}</span>
+              <span class="title">{{ view.success_msg || 'Successfully submitted form data' }}</span>
             </v-alert>
-            <p v-if="localParams.submit.showBlankForm" class="caption grey--text text-center">
+            <p v-if="view.show_blank_form" class="caption grey--text text-center">
               New form will be loaded after {{ secondsRemain }} seconds
             </p>
-            <div v-if="localParams.submit.showAnotherSubmit" class=" text-center">
+            <div v-if="view.submit_another_form" class=" text-center">
               <v-btn color="primary" @click="submitted = false">
                 Submit Another Form
               </v-btn>
@@ -395,8 +395,7 @@
                   </template>
                 </v-switch>
                 <v-switch
-                  v-if="localParams.emailMe"
-                  v-model="localParams.emailMe[$store.state.users.user.email]"
+                  v-model="emailMe"
                   dense
                   inset
                   hide-details
@@ -498,6 +497,26 @@ export default {
     return obj
   },
   computed: {
+    emailMe: {
+      get() {
+        try {
+          const data = JSON.parse(this.view.email)
+          return data[this.$store.state.users.user.email]
+        } catch (e) {
+        }
+        return false
+      },
+      set(v) {
+        let data = {}
+        try {
+          data = JSON.parse(this.view.email) || {}
+        } catch (e) {
+        }
+        data[this.$store.state.users.user.email] = v
+        this.view.email = JSON.stringify(data)
+        this.updateView()
+      }
+    },
     allColumnsLoc() {
       return this.fields// this.mets.columns.filter(c => !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && this.meta.belongsTo.every(bt => c.cn !== bt.cn))
     },
@@ -542,7 +561,7 @@ export default {
       })
     },
     submitted(val) {
-      if (val && this.localParams.submit.showBlankForm) {
+      if (val && this.view.show_blank_form) {
         this.secondsRemain = 5
         const intvl = setInterval(() => {
           if (--this.secondsRemain < 0) {
@@ -573,17 +592,25 @@ export default {
   },
   methods: {
     async updateColMeta(col, i) {
-      if (col.id) { await this.$api.meta.formColumnUpdate(col.id, col) }
+      if (col.id) {
+        await this.$api.meta.formColumnUpdate(col.id, col)
+      }
     },
     async updateView() {
       await this.$api.meta.formUpdate(this.viewId, this.view)
     },
     async loadView() {
-      const { columns, ...view } = (await this.$api.meta.formRead(this.viewId)).data
+      const {
+        columns,
+        ...view
+      } = (await this.$api.meta.formRead(this.viewId)).data
       this.view = view
       this.formColumns = columns
       let order = 1
-      const fieldById = this.formColumns.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
+      const fieldById = this.formColumns.reduce((o, f) => ({
+        ...o,
+        [f.fk_column_id]: f
+      }), {})
       this.fields = this.meta.columns.map(c => ({
         _cn: c._cn,
         uidt: c.uidt,
@@ -640,13 +667,14 @@ export default {
       return isRequired
     },
     async checkSMTPStatus() {
-      if (this.localParams.emailMe[this.$store.state.users.user.email]) {
-        const emailPlugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', { title: 'SMTP' }])
-        if (!emailPlugin.active) {
-          this.$set(this.localParams.emailMe, this.$store.state.users.user.email, false)
-          this.$toast.info('Please activate SMTP plugin in App store for enabling email notification').goAway(5000)
-        }
-      }
+      // todo:
+      // if (this.localParams.emailMe[this.$store.state.users.user.email]) {
+      //   const emailPlugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', { title: 'SMTP' }])
+      //   if (!emailPlugin.active) {
+      //     this.$set(this.localParams.emailMe, this.$store.state.users.user.email, false)
+      //     this.$toast.info('Please activate SMTP plugin in App store for enabling email notification').goAway(5000)
+      //   }
+      // }
     },
     updateCol(_, column, id) {
       this.$set(this.localState, column, id)

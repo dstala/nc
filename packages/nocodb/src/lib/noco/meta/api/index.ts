@@ -12,6 +12,7 @@ import galleryViewApis from './galleryViewApis';
 import formViewApis from './formViewApis';
 import formViewColumnApis from './formViewColumnApis';
 import attachmentApis from './attachmentApis';
+import webhookApis from './webhookApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -27,4 +28,5 @@ export default function(router: Router) {
   router.use('/', formViewApis);
   router.use('/', viewApis);
   router.use('/', attachmentApis);
+  router.use('/', webhookApis);
 }

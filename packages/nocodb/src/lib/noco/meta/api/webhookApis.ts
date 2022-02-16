@@ -8,6 +8,7 @@ import { Table, TableList, TableListParams, TableReq } from 'nc-common';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
+import catchError from './helpers/catchError';
 
 // @ts-ignore
 export async function webhookGet(req: Request, res: Response<Table>) {}
@@ -32,9 +33,9 @@ export async function webhookUpdate(req, res) {}
 export async function webhookDelete(req: Request, res: Response, next) {}
 
 const router = Router({ mergeParams: true });
-router.get('/', webhookList);
-router.post('/', webhookCreate);
-router.get('/:webhookId', webhookGet);
-router.put('/:webhookId', webhookUpdate);
-router.delete('/:webhookId', webhookDelete);
+router.get('/tables/:tableId/webhooks', catchError(webhookList));
+router.post('/tables/:tableId/webhooks', webhookCreate);
+router.get('/webhooks/:webhookId', webhookGet);
+router.put('/webhooks/:webhookId', webhookUpdate);
+router.delete('/webhooks/:webhookId', webhookDelete);
 export default router;

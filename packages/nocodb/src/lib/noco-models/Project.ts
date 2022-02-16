@@ -54,6 +54,7 @@ export default class Project implements ProjectType {
 
     return projectList.map(m => new Project(m));
   }
+
   // @ts-ignore
   static async get(projectId: string): Promise<Project> {
     const projectData = await Noco.ncMeta.metaGet2(

@@ -545,7 +545,7 @@ class BaseModelSqlv2 {
     }
   }
 
-  public async _getGroupedManyToManyList({ colId, parentIds }) {
+  public async _getGroupedManyToManyList({ colId, parentIds, ...params }) {
     // const { where, limit, offset, sort, ...restArgs } = this._getChildListArgs(
     //   rest,
     //   index,
@@ -593,6 +593,87 @@ class BaseModelSqlv2 {
       });
 
     await childModel.selectObject({ qb });
+    const childs = await this.dbDriver.union(
+      parentIds.map(id => {
+        // const query = this.dbDriver(rtn)
+        //   .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
+        //   .where(`${vtn}.${vcn}`, id) // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].title])
+        //   // .xwhere(where, this.dbModels[child].selectQuery(''))
+        //   .select(colSelect)
+        //   .select({
+        //     [`${tn}_${vcn}`]: `${vtn}.${vcn}`
+        //     // ...this.dbModels[child].selectQuery(fields)
+        //   }); // ...fields.split(','));
+        const query = qb.clone().where(`${vtn}.${vcn}`, id);
+        this._paginateAndSort(query, params);
+        return this.isSqlite ? this.dbDriver.select().from(query) : query;
+      }),
+      !this.isSqlite
+    );
+
+    const proto = await (
+      await Model.getBaseModelSQL({ tn: rtn, dbDriver: this.dbDriver })
+    ).getProto();
+    const gs = _.groupBy(
+      childs.map(c => {
+        c.__proto__ = proto;
+        return c;
+      }),
+      `${tn}_${vcn}`
+    );
+    return parentIds.map(id => gs[id] || []);
+  }
+
+  public async _getGroupedManyToManyCount({ colId, parentIds }) {
+    // const { where, limit, offset, sort, ...restArgs } = this._getChildListArgs(
+    //   rest,
+    //   index,
+    //   child,
+    //   'm'
+    // );
+    // const driver = trx || this.dbDriver;
+    // let { fields } = restArgs;
+
+    const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
+    const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
+
+    const tn = this.model.tn;
+    // const cn = (await relColOptions.getChildColumn()).title;
+    const vtn = (await relColOptions.getMMModel()).tn;
+    const vcn = (await relColOptions.getMMChildColumn()).cn;
+    const vrcn = (await relColOptions.getMMParentColumn()).cn;
+    const rcn = (await relColOptions.getParentColumn()).cn;
+    const childTable = await (await relColOptions.getParentColumn()).getModel();
+    // const childModel = await Model.getBaseModelSQL({
+    //   dbDriver: this.dbDriver,
+    //   model: childTable
+    // });
+    const rtn = childTable.tn;
+
+    // const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
+    // @ts-ignore
+    // const alias = this.dbModels[tn].columnToAlias?.[cn];
+
+    // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
+    //   fields += ',' + cn;
+    // }
+    //
+    // if (!this.dbModels[child]) {
+    //   return;
+    // }
+
+    const qb = this.dbDriver(rtn)
+      .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
+      // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].title])
+      // .xwhere(where, this.dbModels[child].selectQuery(''))
+      .select({
+        [`${tn}_${vcn}`]: `${vtn}.${vcn}`
+        // ...this.dbModels[child].selectQuery(fields)
+      })
+      .count(`*`, { as: 'count' })
+      .groupBy(`${vtn}.${vcn}`);
+
+    // await childModel.selectObject({ qb });
     const childs = await this.dbDriver.union(
       parentIds.map(id => {
         // const query = this.dbDriver(rtn)
