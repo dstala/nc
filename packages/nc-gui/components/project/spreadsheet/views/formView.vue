@@ -160,6 +160,8 @@
                 class="h-100"
                 @start="drag=true"
                 @end="drag=false"
+
+                @change="onMove($event)"
               >
                 <div
                   v-for="(col,i) in columns"
@@ -533,25 +535,29 @@ export default {
     },
     hiddenColumns: {
       get() {
-        return this.allColumns.filter(c => !this.showFields[c.alias] && !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && !(this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn))
+        return this.fields.filter(f => !f.show)
+        // return this.allColumns.filter(c => !this.showFields[c.alias] && !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && !(this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn))
       }
     },
     columns: {
       get() {
-        return this.allColumnsLoc.filter(c => this.showFields[c.alias] && !hiddenCols.includes(c.cn)).sort((a, b) => ((this.fieldsOrder.indexOf(a.alias) + 1) || Infinity) - ((this.fieldsOrder.indexOf(b.alias) + 1) || Infinity))
-      },
-      set(val) {
-        const showFields = val.reduce((o, v) => {
-          o[v.alias] = true
-          return o
-        }, this.allColumnsLoc.reduce((o, v) => {
-          o[v.alias] = this.isDbRequired(v)
-          return o
-        }, {}))
-        const fieldsOrder = val.map(v => v.alias)
-        this.$emit('update:showFields', showFields)
-        this.$emit('update:fieldsOrder', fieldsOrder)
+        return this.fields.filter(f => f.show).sort((a, b) => a.order - b.order)
+        //   .sort((a, b) =>
+        //   ((this.fieldsOrder.indexOf(a.alias) + 1) || Infinity) - ((this.fieldsOrder.indexOf(b.alias) + 1) || Infinity)
+        // )
       }
+      // set(val) {
+      //   const showFields = val.reduce((o, v) => {
+      //     o[v.alias] = true
+      //     return o
+      //   }, this.allColumnsLoc.reduce((o, v) => {
+      //     o[v.alias] = this.isDbRequired(v)
+      //     return o
+      //   }, {}))
+      //   const fieldsOrder = val.map(v => v.alias)
+      //   this.$emit('update:showFields', showFields)
+      //   this.$emit('update:fieldsOrder', fieldsOrder)
+      // }
     }
   },
   watch: {
@@ -591,6 +597,38 @@ export default {
     // this.hiddenColumns = this.meta.columns.filter(c => this.availableColumns.find(c1 => c.cn === c1.cn && c._cn === c1._cn))
   },
   methods: {
+    onMove(event) {
+      const {
+        newIndex,
+        element
+      } = (event.added || event.moved)
+      if (event.added) {
+        element.show = true
+      }
+
+      if (this.columns.length === 0) {
+        this.$set(element, 'order', 1)
+      } else if (this.columns.length - 1 === newIndex) {
+        this.$set(element, 'order', this.columns[newIndex - 1].order + 1)
+      } else if (newIndex === 0) {
+        this.$set(element, 'order', this.columns[1].order / 2)
+      } else {
+        this.$set(element, 'order', (
+          this.columns[newIndex - 1].order + this.columns[newIndex + 1].order) / 2
+        )
+      }
+
+      this.saveOrUpdateOrderOrVisibility(element, newIndex)
+    },
+
+    async saveOrUpdateOrderOrVisibility(field, i) {
+      if (field.id) {
+        await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
+      } else {
+        this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field)).data
+      }
+      this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+    },
     async updateColMeta(col, i) {
       if (col.id) {
         await this.$api.meta.formColumnUpdate(col.id, col)
@@ -640,7 +678,15 @@ export default {
         this.$toast.info('Required field can\'t be removed').goAway(3000)
         return
       }
-      this.columns = this.columns.filter((_, j) => i !== j)
+
+      this.saveOrUpdateOrderOrVisibility({
+        ...this
+          .columns[i],
+        show: false
+      }, i)
+      this.columns[i].show = false
+
+      // this.columns = this.columns.filter((_, j) => i !== j)
     },
     addAllColumns() {
       this.columns = [...this.allColumnsLoc]
