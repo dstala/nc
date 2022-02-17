@@ -303,7 +303,7 @@ export default {
       this.meta = this.viewMeta.model
       this.metas = this.viewMeta.relatedMetas
       this.columns = this.meta.columns
-
+      this.client = this.viewMeta.client
       // try {
       //   // eslint-disable-next-line camelcase
       //   const {
@@ -393,7 +393,7 @@ export default {
         // if (this.isNew) {
 
         // const formData = new FormData()
-        const data = { ...this.localState }
+        const data = { ...this.localState, ...this.virtual }
 
         for (const col of this.meta.columns) {
           if (col.uidt === UITypes.Attachment) {

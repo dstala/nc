@@ -6,7 +6,7 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
-import { Table, TableReq, ViewTypes } from 'nc-common';
+import { isVirtualCol, Table, TableReq, ViewTypes } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
 import { MetaTable } from '../utils/globals';
 import View from './View';
@@ -336,6 +336,7 @@ export default class Model implements Table {
   async mapAliasToColumn(data) {
     const insertObj = {};
     for (const col of await this.getColumns()) {
+      if (isVirtualCol(col)) continue;
       const val = data?.[col.cn] ?? data?.[col._cn];
       if (val !== undefined) insertObj[col.cn] = val;
     }

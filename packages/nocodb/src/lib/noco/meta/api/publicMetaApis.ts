@@ -5,10 +5,12 @@ import Model from '../../../noco-models/Model';
 import UITypes from '../../../sqlUi/UITypes';
 import { LinkToAnotherRecord } from 'nc-common';
 import Column from '../../../noco-models/Column';
+import Base from '../../../noco-models/Base';
 
 export async function viewMetaGet(req: Request, res: Response, next) {
   const view: View & {
     relatedMetas?: { [ket: string]: Model };
+    client?: string;
   } = await View.getByUUID(req.params.uuid);
 
   if (!view) return next(new Error('Not found'));
@@ -17,6 +19,9 @@ export async function viewMetaGet(req: Request, res: Response, next) {
   await view.getColumns();
   await view.getModelWithInfo();
   await view.model.getColumns();
+
+  const base = await Base.get(view.model.base_id);
+  view.client = base.type;
 
   // todo: return only required props
   delete view['password'];

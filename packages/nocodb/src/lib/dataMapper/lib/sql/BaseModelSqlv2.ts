@@ -1133,7 +1133,7 @@ class BaseModelSqlv2 {
     try {
       const insertObj = await this.model.mapAliasToColumn(data);
 
-      const rowId = null;
+      let rowId = null;
       const postInsertOps = [];
 
       const nestedCols = (await this.model.getColumns()).filter(
@@ -1146,7 +1146,10 @@ class BaseModelSqlv2 {
             LinkToAnotherRecordColumn
           >();
 
-          const nestedData = data[col._cn];
+          const nestedData =
+            typeof data[col._cn] === 'string'
+              ? JSON.parse(data[col._cn])
+              : data[col._cn];
           switch (colOptions.type) {
             case RelationTypes.BELONGS_TO:
               {
@@ -1183,8 +1186,8 @@ class BaseModelSqlv2 {
                 const mmModel = await colOptions.getMMModel();
 
                 const rows = nestedData.map(r => ({
-                  [parentMMCol.cn]: rowId,
-                  [childMMCol.cn]: r[parentModel.primaryKey._cn]
+                  [parentMMCol.cn]: r[parentModel.primaryKey._cn],
+                  [childMMCol.cn]: rowId
                 }));
                 await driver(mmModel.tn).insert(rows);
               });
@@ -1226,12 +1229,15 @@ class BaseModelSqlv2 {
           Array.isArray(response) ? response?.[0]?.[ai._cn] : response?.[ai._cn]
         );
       }
+      response = Array.isArray(response) ? response[0] : response;
+      if (response) rowId = response[this.model.primaryKey.cn];
+      await Promise.all(postInsertOps.map(f => f()));
 
       if (!trx) {
         await driver.commit();
       }
 
-      return Array.isArray(response) ? response[0] : response;
+      return response;
     } catch (e) {
       console.log(e);
       // await this.errorInsert(e, data, trx, cookie);
