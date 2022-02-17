@@ -1146,10 +1146,12 @@ class BaseModelSqlv2 {
             LinkToAnotherRecordColumn
           >();
 
+          // parse data if it's JSON string
           const nestedData =
             typeof data[col._cn] === 'string'
               ? JSON.parse(data[col._cn])
               : data[col._cn];
+
           switch (colOptions.type) {
             case RelationTypes.BELONGS_TO:
               {
