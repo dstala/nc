@@ -24,6 +24,13 @@ export async function viewList(
     views: new PagedResponseImpl(await View.list(req.params.tableId))
   } as any);
 }
+// @ts-ignore
+export async function shareView(
+  req: Request<any, any, any>,
+  res: Response<View>
+) {
+  res.json(await View.share(req.params.viewId));
+}
 
 // @ts-ignore
 export async function viewCreate(req: Request<any, any, TableReq>, res, next) {}
@@ -38,6 +45,7 @@ const router = Router({ mergeParams: true });
 router.get('/tables/:tableId/views', catchError(viewList));
 // router.post('/tables/:tableId/views', viewCreate);
 // router.get('/views/:viewId', viewGet);
+router.post('/views/:viewId/share', catchError(shareView));
 // router.put('/views/:viewId', viewUpdate);
 // router.delete('/views/:viewId', viewDelete);
 export default router;

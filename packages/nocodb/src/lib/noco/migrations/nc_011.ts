@@ -169,8 +169,8 @@ const up = async knex => {
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
 
-    table.string('fk_related_table_id', 20);
-    table.foreign('fk_related_table_id').references(`${MetaTable.MODELS}.id`);
+    table.string('fk_related_model_id', 20);
+    table.foreign('fk_related_model_id').references(`${MetaTable.MODELS}.id`);
 
     // fk_rel_column_id
     // fk_rel_ref_column_id
@@ -290,6 +290,9 @@ const up = async knex => {
     table.string('title');
     table.integer('type');
     table.boolean('is_default');
+
+    table.string('uuid');
+    table.string('password');
 
     // todo:  type
 

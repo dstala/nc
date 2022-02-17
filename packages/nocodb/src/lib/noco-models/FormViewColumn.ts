@@ -57,6 +57,9 @@ export default class FormViewColumn implements FormColumn {
       {
         condition: {
           fk_view_id: viewId
+        },
+        orderBy: {
+          order: 'asc'
         }
       }
     );

@@ -237,6 +237,7 @@ export interface LinkToAnotherRecord {
   fk_child_column_id?: string;
   fk_parent_column_id?: string;
   fk_mm_model_id?: string;
+  fk_related_model_id?: string;
   fk_mm_child_column_id?: string;
   fk_mm_parent_column_id?: string;
   ur?: string;
@@ -434,6 +435,12 @@ export interface TableListParams {
   sort?: string;
   projectId: string;
   baseId: string;
+}
+
+export interface DataListParams {
+  offset?: string;
+  limit?: string;
+  uuid: string;
 }
 
 import axios, {
@@ -1104,7 +1111,7 @@ export class Api<
      * @request GET:/views/{viewId}/sorts
      */
     sortList: (viewId: string, params: RequestParams = {}) =>
-      this.request<SortList, any>({
+      this.request<SortList, { uuid?: string; url?: string }>({
         path: `/views/${viewId}/sorts`,
         method: 'GET',
         ...params,
@@ -1123,6 +1130,21 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name ShareView
+     * @request POST:/views/{viewId}/share
+     */
+    shareView: (viewId: string, params: RequestParams = {}) =>
+      this.request<{ uuid?: string }, any>({
+        path: `/views/${viewId}/share`,
+        method: 'POST',
+        format: 'json',
         ...params,
       }),
 
@@ -1770,6 +1792,44 @@ export class Api<
      * No description
      *
      * @tags Data
+     * @name Create2
+     * @request POST:public/data/{uuid}
+     * @originalName create
+     * @duplicate
+     */
+    create2: (uuid: string, data: any, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `public/data/${uuid}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name Create3
+     * @request POST:public/meta/{uuid}
+     * @originalName create
+     * @duplicate
+     */
+    create3: (uuid: string, data: any, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `public/meta/${uuid}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
      * @name Read
      * @request GET:/data/{tableId}/{rowId}
      */
@@ -1832,6 +1892,40 @@ export class Api<
     ) =>
       this.request<any, any>({
         path: `/data/${tableId}/${rowId}/mm/${colId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+  };
+  public = {
+    /**
+     * No description
+     *
+     * @name DataList
+     * @request GET:public/data/{uuid}
+     */
+    dataList: (
+      { uuid, ...query }: DataListParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `public/data/${uuid}`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
+     * @name SharedViewMetaGet
+     * @request GET:public/meta/{uuid}
+     */
+    sharedViewMetaGet: (uuid: string, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `public/meta/${uuid}`,
         method: 'GET',
         format: 'json',
         ...params,

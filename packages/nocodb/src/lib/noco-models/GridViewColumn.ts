@@ -21,6 +21,9 @@ export default class GridViewColumn {
       {
         condition: {
           fk_view_id: viewId
+        },
+        orderBy: {
+          order: 'asc'
         }
       }
     );

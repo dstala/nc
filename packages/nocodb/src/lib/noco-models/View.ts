@@ -13,9 +13,11 @@ import { View as ViewType, ViewTypes } from 'nc-common';
 import GalleryViewColumn from './GalleryViewColumn';
 import FormViewColumn from './FormViewColumn';
 
+const { v4: uuidv4 } = require('uuid');
 export default class View implements ViewType {
   id?: string;
   title?: string;
+  uuid?: string;
   show: boolean;
   is_default: boolean;
   order: number;
@@ -24,6 +26,7 @@ export default class View implements ViewType {
   fk_model_id: string;
   model?: Model;
   view?: FormView | GridView | KanbanView | GalleryView;
+  columns?: Array<FormViewColumn | GridViewColumn | GalleryViewColumn>;
 
   sorts: Sort[];
   filter: Filter;
@@ -34,6 +37,9 @@ export default class View implements ViewType {
 
   async getModel(): Promise<Model> {
     return (this.model = await Model.get({ id: this.fk_model_id }));
+  }
+  async getModelWithInfo(): Promise<Model> {
+    return (this.model = await Model.getWithInfo({ id: this.fk_model_id }));
   }
 
   async getView(): Promise<FormView | GridView | KanbanView | GalleryView> {
@@ -305,7 +311,7 @@ export default class View implements ViewType {
   }
 
   async getColumns() {
-    return View.getColumns(this.id);
+    return (this.columns = await View.getColumns(this.id));
   }
   static async updateColumn(
     viewId: string,
@@ -345,5 +351,31 @@ export default class View implements ViewType {
     );
 
     return columns;
+  }
+
+  static async getByUUID(uuid: string) {
+    const view = await Noco.ncMeta.metaGet2(null, null, MetaTable.VIEWS, {
+      uuid
+    });
+
+    return view && new View(view);
+  }
+
+  static async share(viewId) {
+    const view = await this.get(viewId);
+    if (!view.uuid) {
+      view.uuid = uuidv4();
+      await Noco.ncMeta.metaUpdate(
+        null,
+        null,
+        MetaTable.VIEWS,
+        {
+          uuid: view.uuid
+        },
+        viewId
+      );
+    }
+
+    return view;
   }
 }

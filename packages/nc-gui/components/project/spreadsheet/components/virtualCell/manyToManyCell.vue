@@ -185,7 +185,7 @@ export default {
       }
     },
     childMeta() {
-      return this.metas ? this.metas[this.column.colOptions.fk_related_table_id] : this.$store.state.meta.metas[this.column.colOptions.fk_related_table_id]
+      return this.metas ? this.metas[this.column.colOptions.fk_related_model_id] : this.$store.state.meta.metas[this.column.colOptions.fk_related_model_id]
     },
     assocMeta() {
       return this.metas ? this.metas[this.column.colOptions.fk_mm_model_id] : this.$store.state.meta.metas[this.column.colOptions.fk_mm_model_id]
@@ -195,7 +195,7 @@ export default {
       // return this.childMeta && this.$ncApis.get({
       //   env: this.nodes.env,
       //   dbAlias: this.nodes.dbAlias,
-      //   id: this.column.colOptions.fk_related_table_id
+      //   id: this.column.colOptions.fk_related_model_id
       // })
       //
       // return this.childMeta && this.childMeta._tn
@@ -347,7 +347,7 @@ export default {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
           // tn: this.mm.rtn,
-          id: this.column.colOptions.fk_related_table_id
+          id: this.column.colOptions.fk_related_model_id
         })
         // const parentTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,

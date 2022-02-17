@@ -12,7 +12,7 @@ export default class LinkToAnotherRecordColumn {
   fk_mm_model_id?: string;
   fk_mm_child_column_id?: string;
   fk_mm_parent_column_id?: string;
-  fk_related_table_id?: string;
+  fk_related_model_id?: string;
 
   type: 'hm' | 'bt' | 'mm';
   virtual = false;
@@ -57,7 +57,7 @@ export default class LinkToAnotherRecordColumn {
   }
   public async getRelatedTable(): Promise<Model> {
     return (this.relatedTable = await Model.get({
-      id: this.fk_related_table_id
+      id: this.fk_related_model_id
     }));
   }
 

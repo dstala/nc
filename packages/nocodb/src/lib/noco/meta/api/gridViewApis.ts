@@ -3,13 +3,7 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import {
-  Table,
-  TableList,
-  TableListParams,
-  TableReq,
-  ViewTypes
-} from 'nc-common';
+import { Table, TableList, TableListParams, ViewTypes } from 'nc-common';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
@@ -27,7 +21,7 @@ export async function gridViewList(
 ) {}
 
 // @ts-ignore
-export async function gridViewCreate(req: Request<any, any, TableReq>, res) {
+export async function gridViewCreate(req: Request<any, any>, res) {
   const view = await View.insert({
     ...req.body,
     fk_model_id: req.params.tableId,

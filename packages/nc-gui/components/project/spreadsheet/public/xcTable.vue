@@ -120,6 +120,7 @@
         </v-list>
       </v-menu>-->
       </v-toolbar>
+
       <div
         v-if="meta"
         class="nc-grid-wrapper d-flex"
@@ -138,8 +139,6 @@
               :data="data"
               :available-columns="availableColumns"
               :show-fields="showFields"
-              :belongs-to="belongsTo"
-              :has-many="hasMany"
               :nodes="{dbAlias:''}"
               :sql-ui="sqlUi"
               :columns-width="columnsWidth"
@@ -333,23 +332,23 @@ export default {
     edited() {
       return this.data && this.data.some(r => r.rowMeta && (r.rowMeta.new || r.rowMeta.changed))
     },
-    hasMany() {
-      return this.meta && this.meta.hasMany
-        ? this.meta.hasMany.reduce((hm, o) => {
-          hm[o.rcn] = hm[o.rcn] || []
-          hm[o.rcn].push(o)
-          return hm
-        }, {})
-        : {}
-    },
-    belongsTo() {
-      return this.meta && this.meta.belongsTo
-        ? this.meta.belongsTo.reduce((bt, o) => {
-          bt[o._cn] = o
-          return bt
-        }, {})
-        : {}
-    },
+    // hasMany() {
+    //   return this.meta && this.meta.hasMany
+    //     ? this.meta.hasMany.reduce((hm, o) => {
+    //       hm[o.rcn] = hm[o.rcn] || []
+    //       hm[o.rcn].push(o)
+    //       return hm
+    //     }, {})
+    //     : {}
+    // },
+    // belongsTo() {
+    //   return this.meta && this.meta.belongsTo
+    //     ? this.meta.belongsTo.reduce((bt, o) => {
+    //       bt[o._cn] = o
+    //       return bt
+    //     }, {})
+    //     : {}
+    // },
     table() {
       if (this.relationType === 'hm') {
         return this.relation.tn
@@ -464,82 +463,90 @@ export default {
     },
     async loadMetaData() {
       this.loading = true
-      try {
-        // eslint-disable-next-line camelcase
-        const {
-          meta,
-          // model_name,
-          view_name,
-          view_type,
-          client,
-          query_params: qp = {},
-          db_alias: dbAlias = '_noco',
-          relatedTableMetas = {}
-        } = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewGet', {
-          view_id: this.$route.params.id,
-          password: this.password
-        }])
+      // try {
 
-        this.fieldsOrder = qp.fieldsOrder || []
-        this.viewName = view_name
-        this.viewType = view_type
+      this.viewMeta = (await this.$api.public.sharedViewMetaGet(this.$route.params.id)).data
 
-        this.columnsWidth = qp.columnsWidth || {}
+      this.meta = this.viewMeta.model
+      this.metas = this.viewMeta.relatedMetas
 
-        this.client = client
-        this.meta = meta
-        this.query_params = qp
-        this.dbAlias = dbAlias
-        this.metas = relatedTableMetas
-        this.sortList = qp.sortList || []
-
-        this.showFields = this.query_params.showFields || {}
-
-        // this.fieldList = Object.keys(this.showFields)
-
-        let fields = this.query_params.fieldsOrder || []
-        if (!fields.length) { fields = Object.keys(this.showFields) }
-        // eslint-disable-next-line camelcase
-
-        let columns = this.meta.columns
-        if (this.meta && this.meta.v) {
-          columns = [...columns, ...this.meta.v.map(v => ({ ...v, virtual: 1 }))]
-        }
-
-        {
-          const _ref = {}
-          columns.forEach((c) => {
-            if (c.virtual && c.bt) {
-              c.prop = `${c.bt.rtn}Read`
-            }
-            if (c.virtual && c.mm) {
-              c.prop = `${c.mm.rtn}MMList`
-            }
-            if (c.virtual && c.hm) {
-              c.prop = `${c.hm.tn}List`
-            }
-
-            // if (c.virtual && c.lk) {
-            //   c.alias = `${c.lk._lcn} (from ${c.lk._ltn})`
-            // } else {
-            c.alias = c._cn
-            // }
-            if (c.alias in _ref) {
-              c.alias += _ref[c.alias]++
-            } else {
-              _ref[c.alias] = 1
-            }
-          })
-        }
-      } catch (e) {
-        if (e.message === 'Not found' || e.message === 'Meta not found') {
-          this.notFound = true
-        } else if (e.message === 'Invalid password') {
-          this.showPasswordModal = true
-        } else {
-          console.log(e)
-        }
-      }
+      //
+      //
+      //   // eslint-disable-next-line camelcase
+      //   const {
+      //     meta,
+      //     // model_name,
+      //     view_name,
+      //     view_type,
+      //     client,
+      //     query_params: qp = {},
+      //     db_alias: dbAlias = '_noco',
+      //     relatedTableMetas = {}
+      //   } = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewGet', {
+      //     view_id: this.$route.params.id,
+      //     password: this.password
+      //   }])
+      //
+      //   this.fieldsOrder = qp.fieldsOrder || []
+      //   this.viewName = view_name
+      //   this.viewType = view_type
+      //
+      //   this.columnsWidth = qp.columnsWidth || {}
+      //
+      //   this.client = client
+      //   this.meta = meta
+      //   this.query_params = qp
+      //   this.dbAlias = dbAlias
+      //   this.metas = relatedTableMetas
+      //   this.sortList = qp.sortList || []
+      //
+      //   this.showFields = this.query_params.showFields || {}
+      //
+      //   // this.fieldList = Object.keys(this.showFields)
+      //
+      //   let fields = this.query_params.fieldsOrder || []
+      //   if (!fields.length) { fields = Object.keys(this.showFields) }
+      //   // eslint-disable-next-line camelcase
+      //
+      //   let columns = this.meta.columns
+      //   if (this.meta && this.meta.v) {
+      //     columns = [...columns, ...this.meta.v.map(v => ({ ...v, virtual: 1 }))]
+      //   }
+      //
+      //   {
+      //     const _ref = {}
+      //     columns.forEach((c) => {
+      //       if (c.virtual && c.bt) {
+      //         c.prop = `${c.bt.rtn}Read`
+      //       }
+      //       if (c.virtual && c.mm) {
+      //         c.prop = `${c.mm.rtn}MMList`
+      //       }
+      //       if (c.virtual && c.hm) {
+      //         c.prop = `${c.hm.tn}List`
+      //       }
+      //
+      //       // if (c.virtual && c.lk) {
+      //       //   c.alias = `${c.lk._lcn} (from ${c.lk._ltn})`
+      //       // } else {
+      //       c.alias = c._cn
+      //       // }
+      //       if (c.alias in _ref) {
+      //         c.alias += _ref[c.alias]++
+      //       } else {
+      //         _ref[c.alias] = 1
+      //       }
+      //     })
+      //   }
+      // } catch (e) {
+      //   if (e.message === 'Not found' || e.message === 'Meta not found') {
+      //     this.notFound = true
+      //   } else if (e.message === 'Invalid password') {
+      //     this.showPasswordModal = true
+      //   } else {
+      //     console.log(e)
+      //   }
+      // }
 
       this.loadingData = false
     },
@@ -548,19 +555,24 @@ export default {
       this.loadingData = true
       try {
         // eslint-disable-next-line camelcase
-        const { data: list, count, model_name, client } = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          query: this.queryParams
-        }, 'getSharedViewData', {
-          view_id: this.$route.params.id,
-          password: this.password
-        }])
+        // const { data: list, count, model_name, client } = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   query: this.queryParams
+        // }, 'getSharedViewData', {
+        //   view_id: this.$route.params.id,
+        //   password: this.password
+        // }])
 
-        this.client = client
+        const { data: { list, pageInfo: { totalRows: count } } } = (await this.$api.public.dataList({
+          ...this.queryParams,
+          uuid: this.$route.params.id
+        })).data
+
+        // this.client = client
 
         // this.showFields = queryParams && queryParams.showFields
         // this.meta = meta
         // eslint-disable-next-line camelcase
-        this.modelName = model_name
+        // this.modelName = model_name
 
         this.count = count
         this.data = list.map(row => ({

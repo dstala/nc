@@ -211,7 +211,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
 
                 fk_child_column_id: childColumn.id,
                 fk_parent_column_id: parent.primaryKey.id,
-                fk_related_table_id: parent.id
+                fk_related_model_id: parent.id
               });
             }
             // save hm column
@@ -227,7 +227,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
                 type: 'hm',
                 fk_child_column_id: childColumn.id,
                 fk_parent_column_id: parent.primaryKey.id,
-                fk_related_table_id: child.id
+                fk_related_model_id: child.id
               });
             }
           } else if (req.body.type === 'mm') {
@@ -330,7 +330,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               fk_mm_model_id: assocModel.id,
               fk_mm_child_column_id: childCol.id,
               fk_mm_parent_column_id: parentCol.id,
-              fk_related_table_id: parent.id
+              fk_related_model_id: parent.id
             });
             await Column.insert({
               _cn: getUniqueColumnAliasName(
@@ -349,7 +349,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
               fk_mm_model_id: assocModel.id,
               fk_mm_child_column_id: parentCol.id,
               fk_mm_parent_column_id: childCol.id,
-              fk_related_table_id: child.id
+              fk_related_model_id: child.id
             });
           }
         }

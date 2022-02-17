@@ -1045,6 +1045,23 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/SortList"
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1071,6 +1088,42 @@
             }
           }
         }
+      }
+    },
+    "/views/{viewId}/share": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "share-view",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
       }
     },
     "/views/{viewId}/sorts/{sortId}": {
@@ -1924,6 +1977,132 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "",
+        "operationId": "create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
+    "public/data/{uuid}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "uuid",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "data-list",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "default": "1",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "offset"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "default": "25",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "limit"
+          }
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "data-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
+    "public/meta/{uuid}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "uuid",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "shared-view-meta-get",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "tags": [
+          "Public"
+        ]
       },
       "post": {
         "summary": "",
@@ -3293,6 +3472,9 @@
             "type": "string"
           },
           "fk_mm_model_id": {
+            "type": "string"
+          },
+          "fk_related_model_id": {
             "type": "string"
           },
           "fk_mm_child_column_id": {

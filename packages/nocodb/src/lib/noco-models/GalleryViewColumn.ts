@@ -55,6 +55,9 @@ export default class GalleryViewColumn {
       {
         condition: {
           fk_view_id: viewId
+        },
+        orderBy: {
+          order: 'asc'
         }
       }
     );

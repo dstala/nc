@@ -150,7 +150,7 @@ export default class Column implements ColumnType {
           dr: column.dr,
 
           fk_index_name: column.fk_index_name,
-          fk_related_table_id: column.fk_related_table_id
+          fk_related_model_id: column.fk_related_model_id
         });
         break;
       case UITypes.Formula:

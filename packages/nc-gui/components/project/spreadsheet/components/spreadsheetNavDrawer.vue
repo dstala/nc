@@ -630,7 +630,7 @@ export default {
         default:
           viewType = 'view'
       }
-      return `${this.dashboardUrl}#/nc/${viewType}/${this.shareLink.view_id}`
+      return `${this.dashboardUrl}#/nc/${viewType}/${this.shareLink.uuid}`
     }
   },
   watch: {
@@ -847,31 +847,34 @@ export default {
       }
     },
     async genShareLink() {
-      const sharedViewUrl = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-        { dbAlias: this.nodes.dbAlias },
-        'createSharedViewLink',
-        {
-          model_name: this.table,
-          // meta: this.meta,
-          query_params: {
-            where: this.concatenatedXWhere,
-            sort: this.sort,
-            fields: Object.keys(this.showFields)
-              .filter(f => this.showFields[f])
-              .join(','),
-            showFields: this.showFields,
-            fieldsOrder: this.fieldsOrder,
-            extraViewParams: this.extraViewParams,
-            selectedViewId: this.selectedViewId,
-            columnsWidth: this.columnsWidth
-          },
-          view_name: this.selectedView.title,
-          type: this.selectedView.type,
-          show_as: this.selectedView.show_as,
-          password: this.sharedViewPassword
-        }
-      ])
-      this.shareLink = sharedViewUrl
+      // const sharedViewUrl = await this.$store.dispatch('sqlMgr/ActSqlOp', [
+      //   { dbAlias: this.nodes.dbAlias },
+      //   'createSharedViewLink',
+      //   {
+      //     model_name: this.table,
+      //     // meta: this.meta,
+      //     query_params: {
+      //       where: this.concatenatedXWhere,
+      //       sort: this.sort,
+      //       fields: Object.keys(this.showFields)
+      //         .filter(f => this.showFields[f])
+      //         .join(','),
+      //       showFields: this.showFields,
+      //       fieldsOrder: this.fieldsOrder,
+      //       extraViewParams: this.extraViewParams,
+      //       selectedViewId: this.selectedViewId,
+      //       columnsWidth: this.columnsWidth
+      //     },
+      //     view_name: this.selectedView.title,
+      //     type: this.selectedView.type,
+      //     show_as: this.selectedView.show_as,
+      //     password: this.sharedViewPassword
+      //   }
+      // ])
+      const shared = (await this.$api.meta.shareView(this.selectedViewId)).data
+
+      // todo: url
+      this.shareLink = shared
       this.showShareModel = true
     },
     copyView(view, i) {

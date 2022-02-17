@@ -13,6 +13,8 @@ import formViewApis from './formViewApis';
 import formViewColumnApis from './formViewColumnApis';
 import attachmentApis from './attachmentApis';
 import webhookApis from './webhookApis';
+import publicDataApis from './publicDataApis';
+import publicMetaApis from './publicMetaApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -29,4 +31,6 @@ export default function(router: Router) {
   router.use('/', viewApis);
   router.use('/', attachmentApis);
   router.use('/', webhookApis);
+  router.use('/public/data/:uuid', publicDataApis);
+  router.use('/public/meta/:uuid', publicMetaApis);
 }

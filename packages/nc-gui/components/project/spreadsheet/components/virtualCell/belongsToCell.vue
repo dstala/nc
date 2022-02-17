@@ -150,7 +150,7 @@ export default {
   }),
   computed: {
     parentMeta() {
-      return this.metas ? this.metas[this.column.colOptions.fk_related_table_id] : this.$store.state.meta.metas[this.column.colOptions.fk_related_table_id]
+      return this.metas ? this.metas[this.column.colOptions.fk_related_model_id] : this.$store.state.meta.metas[this.column.colOptions.fk_related_model_id]
     },
     // todo : optimize
     parentApi() {
@@ -299,7 +299,7 @@ export default {
         await this.$store.dispatch('meta/ActLoadMeta', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          id: this.column.colOptions.fk_related_table_id
+          id: this.column.colOptions.fk_related_model_id
         })
         // const parentTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,

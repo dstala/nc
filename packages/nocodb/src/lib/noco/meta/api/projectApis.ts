@@ -230,7 +230,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
               fk_mm_child_column_id,
               fk_mm_parent_column_id,
               order: colOrder++,
-              fk_related_table_id: column.hm ? tnId : rtnId
+              fk_related_model_id: column.hm ? tnId : rtnId
             });
           } catch (e) {
             console.log(e);

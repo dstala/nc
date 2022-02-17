@@ -244,7 +244,6 @@ async function dataDelete(req: Request, res: Response, next) {
 
 const router = Router({ mergeParams: true });
 router.get('/', dataList);
-router.get('/', dataList);
 router.post('/', dataInsert);
 router.get('/:rowId', dataRead);
 router.put('/:rowId', dataUpdate);

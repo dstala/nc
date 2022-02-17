@@ -67,7 +67,6 @@
               :sql-ui="sqlUi"
               :meta="meta"
               :column-index="meta && meta.columns && meta.columns.indexOf(col)"
-              :is-foreign-key="col._cn in belongsTo || col._cn in hasMany"
               :column="col"
               :is-virtual="isVirtual"
               :is-locked="isLocked"
@@ -305,8 +304,8 @@ export default {
     isEditable: Boolean,
     nodes: Object,
     primaryValueColumn: String,
-    belongsTo: [Object, Array],
-    hasMany: [Object, Array],
+    // belongsTo: [Object, Array],
+    // hasMany: [Object, Array],
     data: [Array, Object],
     meta: Object,
     visibleColLength: [Number, String],

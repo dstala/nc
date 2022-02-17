@@ -98,7 +98,7 @@ export default {
         c.uidt === UITypes.LinkToAnotherRecord && c.colOptions.type !== 'bt'
       ).map(c => ({
         col: c.colOptions,
-        ...this.tables.find(t => t.id === c.colOptions.fk_related_table_id)
+        ...this.tables.find(t => t.id === c.colOptions.fk_related_model_id)
       }))
 
       return refTables
