@@ -363,9 +363,15 @@ export default {
         return ''
       }
 
-      const pkIndex = this.meta.columns.findIndex(c => c.pk)
+      const pvIndex = this.meta.columns.findIndex(c => c.pv)
 
-      if (pkIndex > -1 && pkIndex <= this.colLength - 1) {
+      if (pvIndex > -1 && pvIndex <= this.colLength - 1) {
+        return this.meta.columns[pvIndex]._cn
+      }
+
+      const pkIndex = this.meta.columns.findIndex(c => c.pv)
+
+      if (pkIndex > -1 && pkIndex < this.colLength - 1) {
         return this.meta.columns[pkIndex + 1]._cn
       }
       return this.meta.columns[0]._cn
