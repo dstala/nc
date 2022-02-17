@@ -19,6 +19,7 @@ import genRollupSelectv2 from './genRollupSelectv2';
 import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
 import { QueryBuilder } from 'knex';
 import View from '../../../noco-models/View';
+import { RelationTypes } from 'nc-common';
 
 /**
  * Base class for models
@@ -416,7 +417,15 @@ class BaseModelSqlv2 {
     }
   }*/
 
-  public async defaultResolverReq(query?: any) {
+  public async defaultResolverReq(query?: any, extractOnlyPrimaries = false) {
+    await this.model.getColumns();
+    if (extractOnlyPrimaries) {
+      return {
+        [this.model.primaryKey._cn]: 1,
+        [this.model.primaryValue._cn]: 1
+      };
+    }
+
     const fields = query?.fields || query?.f;
     let allowedCols = null;
     if (this.viewId)
@@ -1117,6 +1126,120 @@ class BaseModelSqlv2 {
 
   get clientType() {
     return this.dbDriver.clientType();
+  }
+
+  async nestedInsert(data, trx = null) {
+    const driver = trx ? trx : await this.dbDriver.transaction();
+    try {
+      const insertObj = await this.model.mapAliasToColumn(data);
+
+      const rowId = null;
+      const postInsertOps = [];
+
+      const nestedCols = (await this.model.getColumns()).filter(
+        c => c.uidt === UITypes.LinkToAnotherRecord
+      );
+
+      for (const col of nestedCols) {
+        if (col._cn in data) {
+          const colOptions = await col.getColOptions<
+            LinkToAnotherRecordColumn
+          >();
+
+          const nestedData = data[col._cn];
+          switch (colOptions.type) {
+            case RelationTypes.BELONGS_TO:
+              {
+                const parentCol = await colOptions.getParentColumn();
+                insertObj[parentCol.cn] = nestedData?.[parentCol._cn];
+              }
+              break;
+            case RelationTypes.HAS_MANY:
+              {
+                const childCol = await colOptions.getChildColumn();
+                const childModel = await childCol.getModel();
+                await childModel.getColumns();
+
+                postInsertOps.push(async () => {
+                  await driver(childModel.tn)
+                    .update({
+                      [childCol.cn]: rowId
+                    })
+                    .whereIn(
+                      childModel.primaryKey.cn,
+                      nestedData?.map(r => r[childModel.primaryKey._cn])
+                    );
+                });
+              }
+              break;
+            case RelationTypes.MANY_TO_MANY: {
+              postInsertOps.push(async () => {
+                const parentModel = await colOptions
+                  .getParentColumn()
+                  .then(c => c.getModel());
+                await parentModel.getColumns();
+                const parentMMCol = await colOptions.getMMParentColumn();
+                const childMMCol = await colOptions.getMMChildColumn();
+                const mmModel = await colOptions.getMMModel();
+
+                const rows = nestedData.map(r => ({
+                  [parentMMCol.cn]: rowId,
+                  [childMMCol.cn]: r[parentModel.primaryKey._cn]
+                }));
+                await driver(mmModel.tn).insert(rows);
+              });
+            }
+          }
+        }
+      }
+
+      let response;
+      const query = this.dbDriver(this.tnPath).insert(insertObj);
+
+      if (this.isPg || this.isMssql) {
+        query.returning(
+          `${this.model.primaryKey.cn} as ${this.model.primaryKey._cn}`
+        );
+        response = await query;
+      }
+
+      const ai = this.model.columns.find(c => c.ai);
+      if (
+        !response ||
+        (typeof response?.[0] !== 'object' && response?.[0] !== null)
+      ) {
+        let id;
+        if (response?.length) {
+          id = response[0];
+        } else {
+          id = (await query)[0];
+        }
+
+        if (ai) {
+          // response = await this.readByPk(id)
+          response = await this.readByPk(id);
+        } else {
+          response = data;
+        }
+      } else if (ai) {
+        response = await this.readByPk(
+          Array.isArray(response) ? response?.[0]?.[ai._cn] : response?.[ai._cn]
+        );
+      }
+
+      if (!trx) {
+        await driver.commit();
+      }
+
+      return Array.isArray(response) ? response[0] : response;
+    } catch (e) {
+      console.log(e);
+      // await this.errorInsert(e, data, trx, cookie);
+      if (!trx) {
+        await driver.rollback(e);
+      }
+      throw e;
+    }
   }
 }
 

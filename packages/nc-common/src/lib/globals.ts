@@ -4,3 +4,8 @@ export enum ViewTypes {
   GRID = 3,
   KANBAN = 4
 }
+export enum RelationTypes {
+  HAS_MANY = 'hm',
+  BELONGS_TO = 'bt',
+  MANY_TO_MANY = 'mm'
+}

@@ -443,6 +443,13 @@ export interface DataListParams {
   uuid: string;
 }
 
+export interface DataRelationListParams {
+  offset?: string;
+  limit?: string;
+  uuid: string;
+  relationColumnId: string;
+}
+
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -1792,44 +1799,6 @@ export class Api<
      * No description
      *
      * @tags Data
-     * @name Create2
-     * @request POST:public/data/{uuid}
-     * @originalName create
-     * @duplicate
-     */
-    create2: (uuid: string, data: any, params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `public/data/${uuid}`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Data
-     * @name Create3
-     * @request POST:public/meta/{uuid}
-     * @originalName create
-     * @duplicate
-     */
-    create3: (uuid: string, data: any, params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `public/meta/${uuid}`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Data
      * @name Read
      * @request GET:/data/{tableId}/{rowId}
      */
@@ -1901,6 +1870,7 @@ export class Api<
     /**
      * No description
      *
+     * @tags Public
      * @name DataList
      * @request GET:public/data/{uuid}
      */
@@ -1910,6 +1880,42 @@ export class Api<
     ) =>
       this.request<any, any>({
         path: `public/data/${uuid}`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
+     * @name DataCreate
+     * @request POST:public/data/{uuid}
+     */
+    dataCreate: (uuid: string, data: any, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `public/data/${uuid}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
+     * @name DataRelationList
+     * @request GET:public/data/{uuid}/relationTable/{relationColumnId}
+     */
+    dataRelationList: (
+      { uuid, relationColumnId, ...query }: DataRelationListParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `public/data/${uuid}/relationTable/${relationColumnId}`,
         method: 'GET',
         query: query,
         format: 'json',

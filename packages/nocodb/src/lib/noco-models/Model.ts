@@ -59,6 +59,7 @@ export default class Model implements Table {
     });
     return this.columns;
   }
+
   // @ts-ignore
   public async getViews(force = false): Promise<View[]> {
     this.views = await View.listWithInfo(this.id);
@@ -66,11 +67,17 @@ export default class Model implements Table {
   }
 
   public get primaryKey(): Column {
+    if (!this.columns) return null;
     return this.columns?.find(c => c.pk);
   }
 
   public get primaryValue(): Column {
-    return this.columns?.find(c => c.pv);
+    if (!this.columns) return null;
+    const pCol = this.columns?.find(c => c.pv);
+    if (pCol) return pCol;
+    const pkIndex = this.columns.indexOf(this.primaryKey);
+    if (pkIndex < this.columns.length - 1) return this.columns[pkIndex + 1];
+    return this.columns[0];
   }
 
   public static async insert(

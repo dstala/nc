@@ -31,6 +31,7 @@
       v-model="newRecordModal"
       :size="10"
       :meta="parentMeta"
+      :column="column"
       :primary-col="parentPrimaryCol"
       :primary-key="parentPrimaryKey"
       :api="parentApi"
@@ -105,7 +106,6 @@
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'
 import ItemChip from '~/components/project/spreadsheet/components/virtualCell/components/itemChip'
-import { parseIfInteger } from '~/helpers'
 
 export default {
   name: 'BelongsToCell',

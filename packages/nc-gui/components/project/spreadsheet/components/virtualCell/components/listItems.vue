@@ -110,7 +110,8 @@ export default {
     parentId: [String, Number],
     parentMeta: [Object],
     isPublic: Boolean,
-    password: String
+    password: String,
+    column: Object
   },
   data: () => ({
     data: null,
@@ -138,14 +139,16 @@ export default {
   methods: {
     async loadData() {
       if (this.isPublic) {
-        this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedDataGet', {
-          password: this.password,
-          limit: this.size,
-          tn: this.tn,
-          view_id: this.$route.params.id,
-          offset: this.size * (this.page - 1),
-          query: this.query
-        }])
+        this.data = (await this.$api.public.dataRelationList(
+          { uuid: this.$route.params.id, relationColumnId: this.column.id })).data.data
+        // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedDataGet', {
+        //   password: this.password,
+        //   limit: this.size,
+        //   tn: this.tn,
+        //   view_id: this.$route.params.id,
+        //   offset: this.size * (this.page - 1),
+        //   query: this.query
+        // }])
       } else {
         // if (!this.api) {
         //   return

@@ -9,6 +9,7 @@ import genRollupSelectv2 from './genRollupSelectv2';
 import RollupColumn from '../../../noco-models/RollupColumn';
 import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
 import FormulaColumn from '../../../noco-models/FormulaColumn';
+import { RelationTypes } from 'nc-common';
 // import LookupColumn from '../../../noco-models/LookupColumn';
 
 export default async function conditionV2(
@@ -72,7 +73,7 @@ const parseConditionV2 = async (
       await childModel.getColumns();
       const parentModel = await parentColumn.getModel();
       await parentModel.getColumns();
-      if (colOptions.type === 'hm') {
+      if (colOptions.type === RelationTypes.HAS_MANY) {
         const selectQb = knex(childModel.tn).select(childColumn.cn);
         (
           await parseConditionV2(
@@ -94,7 +95,7 @@ const parseConditionV2 = async (
             qbP.whereNotIn(parentColumn.cn, selectQb);
           else qbP.whereIn(parentColumn.cn, selectQb);
         };
-      } else if (colOptions.type === 'bt') {
+      } else if (colOptions.type === RelationTypes.BELONGS_TO) {
         const selectQb = knex(parentModel.tn).select(childColumn.cn);
         (
           await parseConditionV2(
@@ -116,7 +117,7 @@ const parseConditionV2 = async (
             qbP.whereNotIn(childColumn.cn, selectQb);
           else qbP.whereIn(childColumn.cn, selectQb);
         };
-      } else if (colOptions.type === 'mm') {
+      } else if (colOptions.type === RelationTypes.MANY_TO_MANY) {
         const mmModel = await colOptions.getMMModel();
         const mmParentColumn = await colOptions.getMMParentColumn();
         const mmChildColumn = await colOptions.getMMChildColumn();
@@ -318,7 +319,7 @@ async function generateLookupCondition(
           qbP.whereNotIn(childColumn.cn, qb);
         else qbP.whereIn(childColumn.cn, qb);
       };
-    } else if (relationColumnOptions.type === 'mm') {
+    } else if (relationColumnOptions.type === RelationTypes.MANY_TO_MANY) {
       const mmModel = await relationColumnOptions.getMMModel();
       const mmParentColumn = await relationColumnOptions.getMMParentColumn();
       const mmChildColumn = await relationColumnOptions.getMMChildColumn();

@@ -40,6 +40,7 @@
       v-model="newRecordModal"
       :hm="true"
       :size="10"
+      :column="column"
       :meta="childMeta"
       :primary-col="childPrimaryCol"
       :primary-key="childPrimaryKey"

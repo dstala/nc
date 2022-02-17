@@ -2,6 +2,7 @@ import RollupColumn from '../../../noco-models/RollupColumn';
 import { XKnex } from '../..';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import { QueryBuilder } from 'knex';
+import { RelationTypes } from 'nc-common';
 
 export default async function({
   knex,
@@ -23,7 +24,7 @@ export default async function({
   const parentModel = await parentCol?.getModel();
 
   switch (relationColumnOption.type) {
-    case 'hm':
+    case RelationTypes.HAS_MANY:
       // if (!rollup.tn || !rollup.rtn) {
       //   rollup = { ...rollup, ...hasMany.find(hm => hm.tn === rollup.rltn) };
       // }
@@ -38,7 +39,7 @@ export default async function({
             knex.ref(`${childModel.tn}.${childCol.cn}`)
           )
       };
-    case 'mm': {
+    case RelationTypes.MANY_TO_MANY: {
       const mmModel = await relationColumnOption.getMMModel();
       const mmChildCol = await relationColumnOption.getMMChildColumn();
       const mmParentCol = await relationColumnOption.getMMParentColumn();

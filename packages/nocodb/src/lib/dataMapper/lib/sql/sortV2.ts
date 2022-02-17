@@ -8,6 +8,7 @@ import RollupColumn from '../../../noco-models/RollupColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
 import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
 import FormulaColumn from '../../../noco-models/FormulaColumn';
+import { RelationTypes } from 'nc-common';
 
 export default async function sortV2(
   sortList: Sort[],
@@ -60,7 +61,7 @@ export default async function sortV2(
               const relation = await relationCol.getColOptions<
                 LinkToAnotherRecordColumn
               >();
-              if (relation.type !== 'bt') return;
+              if (relation.type !== RelationTypes.BELONGS_TO) return;
 
               const childColumn = await relation.getChildColumn();
               const parentColumn = await relation.getParentColumn();

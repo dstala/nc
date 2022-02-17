@@ -2047,6 +2047,9 @@
             "in": "query",
             "name": "limit"
           }
+        ],
+        "tags": [
+          "Public"
         ]
       },
       "post": {
@@ -2063,15 +2066,81 @@
           }
         },
         "tags": [
-          "Data"
+          "Public"
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {}
             }
-          }
+          },
+          "description": ""
         }
+      }
+    },
+    "public/data/{uuid}/relationTable/{relationColumnId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "uuid",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "relationColumnId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "data-relation-list",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "default": "1",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "offset"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "default": "25",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "limit"
+          }
+        ],
+        "tags": [
+          "Public"
+        ]
       }
     },
     "public/meta/{uuid}": {
@@ -2103,30 +2172,6 @@
         "tags": [
           "Public"
         ]
-      },
-      "post": {
-        "summary": "",
-        "operationId": "create",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        },
-        "tags": [
-          "Data"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {}
-            }
-          }
-        }
       }
     },
     "/data/{tableId}/{rowId}": {

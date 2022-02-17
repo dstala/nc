@@ -51,6 +51,7 @@
       :primary-key="childPrimaryKey"
       :api="childApi"
       :parent-meta="meta"
+      :column="column"
       :query-params="{
         ...childQueryParams,
         where: isNew ? null :`~not(${childForeignKey},eq,${parentId})~or(${childForeignKey},is,null)`,
@@ -190,7 +191,9 @@ export default {
   }),
   computed: {
     childMeta() {
-      return this.metas ? this.metas[this.hm.tn] : this.$store.state.meta.metas[this.column.colOptions.fk_related_model_id]
+      return this.metas
+        ? this.metas[this.column.colOptions.fk_related_model_id]
+        : this.$store.state.meta.metas[this.column.colOptions.fk_related_model_id]
     },
     // todo : optimize
     childApi() {

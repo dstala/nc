@@ -620,7 +620,8 @@ export default {
     },
     sharedViewUrl() {
       let viewType
-      switch (this.shareLink.view_type) {
+
+      switch (this.shareLink.type) {
         case this.viewTypes.FORM:
           viewType = 'form'
           break
