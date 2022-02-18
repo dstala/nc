@@ -9,3 +9,6 @@ export enum RelationTypes {
   BELONGS_TO = 'bt',
   MANY_TO_MANY = 'mm'
 }
+export enum ExportTypes {
+  CSV = 'csv'
+}

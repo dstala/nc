@@ -1799,6 +1799,24 @@ export class Api<
      * No description
      *
      * @tags Data
+     * @name CsvExport
+     * @request GET:/data/{tableId}/export/{type}
+     */
+    csvExport: (
+      tableId: string,
+      type: 'csv' | 'excel',
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${tableId}/export/${type}`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
      * @name Read
      * @request GET:/data/{tableId}/{rowId}
      */

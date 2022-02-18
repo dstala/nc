@@ -15,6 +15,7 @@ import attachmentApis from './attachmentApis';
 import webhookApis from './webhookApis';
 import publicDataApis from './publicDataApis';
 import publicMetaApis from './publicMetaApis';
+import exportApis from './exportApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -33,4 +34,5 @@ export default function(router: Router) {
   router.use('/', webhookApis);
   router.use('/public/data/:uuid', publicDataApis);
   router.use('/public/meta/:uuid', publicMetaApis);
+  router.use('/', exportApis);
 }

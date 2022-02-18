@@ -104,7 +104,7 @@
         @change="onMove($event)"
       >
         <template
-          v-for="field in fields"
+          v-for="(field,i) in fields"
         >
           <v-list-item
             :key="field.id"

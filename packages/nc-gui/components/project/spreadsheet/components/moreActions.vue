@@ -69,7 +69,8 @@
               Shared View List
             </span>
           </v-list-item-title>
-        </v-list-item>  <v-list-item
+        </v-list-item>
+        <v-list-item
           v-if="_isUIAllowed('csvImport') && !isView"
           dense
           @click="$emit('webhook')"
@@ -100,13 +101,17 @@
 <script>
 
 import FileSaver from 'file-saver'
+import { ExportTypes } from 'nc-common'
 import DropOrSelectFileModal from '~/components/import/dropOrSelectFileModal'
 import ColumnMappingModal from '~/components/project/spreadsheet/components/importExport/columnMappingModal'
 import CSVTemplateAdapter from '~/components/import/templateParsers/CSVTemplateAdapter'
 
 export default {
   name: 'ExportImport',
-  components: { ColumnMappingModal, DropOrSelectFileModal },
+  components: {
+    ColumnMappingModal,
+    DropOrSelectFileModal
+  },
   props: {
     meta: Object,
     nodes: Object,
@@ -222,34 +227,40 @@ export default {
 
       try {
         while (!isNaN(offset) && offset > -1) {
-          const res = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-            this.publicViewId
-              ? null
-              : {
-                  dbAlias: this.nodes.dbAlias,
-                  env: '_noco'
-                },
-            this.publicViewId ? 'sharedViewExportAsCsv' : 'xcExportAsCsv',
-            {
-              query: { offset },
-              localQuery: this.queryParams || {},
-              ...(this.publicViewId
-                ? {
-                    view_id: this.publicViewId
-                  }
-                : {
-                    view_name: this.selectedView.title,
-                    model_name: this.meta.tn
-                  })
-            },
-            null,
-            {
-              responseType: 'blob'
-            },
-            null,
-            true
-          ])
-          const data = res.data
+          // const res = await this.$store.dispatch('sqlMgr/ActSqlOp', [
+          //   this.publicViewId
+          //     ? null
+          //     : {
+          //         dbAlias: this.nodes.dbAlias,
+          //         env: '_noco'
+          //       },
+          //   this.publicViewId ? 'sharedViewExportAsCsv' : 'xcExportAsCsv',
+          //   {
+          //     query: { offset },
+          //     localQuery: this.queryParams || {},
+          //     ...(this.publicViewId
+          //       ? {
+          //           view_id: this.publicViewId
+          //         }
+          //       : {
+          //           view_name: this.selectedView.title,
+          //           model_name: this.meta.tn
+          //         })
+          //   },
+          //   null,
+          //   {
+          //     responseType: 'blob'
+          //   },
+          //   null,
+          //   true
+          // ])
+
+          const res = await this.$api.data.csvExport(this.selectedView.id, ExportTypes.CSV, {
+            responseType: 'blob'
+          })
+
+          const { data } = res
+
           offset = +res.headers['nc-export-offset']
           const blob = new Blob([data], { type: 'text/plain;charset=utf-8' })
           FileSaver.saveAs(blob, `${this.meta._tn}_exported_${c++}.csv`)
@@ -260,6 +271,7 @@ export default {
           }
         }
       } catch (e) {
+        console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
     },
