@@ -38,6 +38,7 @@ export default class View implements ViewType {
   async getModel(): Promise<Model> {
     return (this.model = await Model.get({ id: this.fk_model_id }));
   }
+
   async getModelWithInfo(): Promise<Model> {
     return (this.model = await Model.getWithInfo({ id: this.fk_model_id }));
   }
@@ -245,6 +246,7 @@ export default class View implements ViewType {
       }
     }
   }
+
   static async insertColumn(param: { view_id: any; order; show }) {
     const view = await this.get(param.view_id);
 
@@ -313,6 +315,7 @@ export default class View implements ViewType {
   async getColumns() {
     return (this.columns = await View.getColumns(this.id));
   }
+
   static async updateColumn(
     viewId: string,
     colId: string,
@@ -349,6 +352,60 @@ export default class View implements ViewType {
       },
       colId
     );
+
+    return columns;
+  }
+
+  static async insertOrUpdateColumn(
+    viewId: string,
+    fkColId: string,
+    colData: {
+      order: number;
+      show: boolean;
+    }
+  ): Promise<Array<GridViewColumn | any>> {
+    const columns: Array<GridViewColumn | any> = [];
+    const view = await this.get(viewId);
+    let table;
+    switch (view.type) {
+      case ViewTypes.GRID:
+        table = MetaTable.GRID_VIEW_COLUMNS;
+        break;
+      case ViewTypes.GALLERY:
+        table = MetaTable.GALLERY_VIEW_COLUMNS;
+        break;
+      case ViewTypes.KANBAN:
+        table = MetaTable.KANBAN_VIEW_COLUMNS;
+        break;
+      case ViewTypes.FORM:
+        table = MetaTable.FORM_VIEW_COLUMNS;
+        break;
+    }
+
+    const existingCol = await Noco.ncMeta.metaGet2(null, null, table, {
+      fk_view_id: viewId,
+      fk_column_id: fkColId
+    });
+
+    if (existingCol) {
+      await Noco.ncMeta.metaUpdate(
+        null,
+        null,
+        table,
+        {
+          order: colData.order,
+          show: colData.show
+        },
+        existingCol.id
+      );
+    } else {
+      await Noco.ncMeta.metaInsert2(null, null, table, {
+        fk_view_id: viewId,
+        fk_column_id: fkColId,
+        order: colData.order,
+        show: colData.show
+      });
+    }
 
     return columns;
   }

@@ -6,10 +6,14 @@ export async function columnList(req: Request, res: Response) {
   res.json(await View.getColumns(req.params.viewId));
 }
 export async function columnAdd(req: Request, res: Response) {
-  const viewColumn = await View.insertColumn({
-    ...req.body,
-    view_id: req.params.viewId
-  });
+  const viewColumn = await View.insertOrUpdateColumn(
+    req.params.viewId,
+    req.body.fk_column_id,
+    {
+      ...req.body,
+      view_id: req.params.viewId
+    }
+  );
 
   res.json(viewColumn);
 }
