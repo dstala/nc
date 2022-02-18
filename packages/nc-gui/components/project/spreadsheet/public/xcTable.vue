@@ -85,7 +85,7 @@
           Reload
         </v-btn>
 
-        <fields-menu v-model="showFields" :field-list="fieldList" is-public />
+        <fields-menu v-model="showFields" :field-list="fieldList" :fields-order.sync="fieldsOrder" is-public :meta="meta" />
 
         <sort-list-menu v-model="sortList" :field-list="realFieldList" />
 

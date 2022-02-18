@@ -291,6 +291,8 @@ export default {
           order: (fieldById[c.id] && fieldById[c.id].order) || order++
         })
         ).sort((a, b) => a.order - b.order)
+      } else if (this.isPublic) {
+        fields = this.meta.columns
       }
 
       this.fields = fields
@@ -299,10 +301,12 @@ export default {
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     async saveOrUpdate(field, i) {
-      if (field.id) {
-        await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
-      } else {
-        this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field)).data
+      if (!this.isPublic) {
+        if (field.id) {
+          await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
+        } else {
+          this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field)).data
+        }
       }
       this.$emit('updated')
       this.$emit('input', this.fields.reduce((o, c) => ({ ...o, [c._cn]: c.show }), {}))
