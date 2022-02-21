@@ -87,9 +87,9 @@
 
         <fields-menu v-model="showFields" :field-list="fieldList" :fields-order.sync="fieldsOrder" is-public :meta="meta" />
 
-        <sort-list-menu v-model="sortList" :field-list="realFieldList" />
+        <sort-list-menu v-model="sortList" :meta="meta" :shared="true" :field-list="realFieldList" @input="loadTableData" />
 
-        <column-filter-menu v-model="filters" :field-list="realFieldList" />
+        <column-filter-menu v-model="filters" :meta="meta" :field-list="realFieldList" :shared="true" @input="loadTableData" />
 
         <csv-export-import :is-view="isView" :query-params="{...queryParams, showFields}" :public-view-id="$route.params.id" :meta="meta" />
 
@@ -472,9 +472,10 @@ export default {
       // try {
 
       this.viewMeta = (await this.$api.public.sharedViewMetaGet(this.$route.params.id)).data
-
       this.meta = this.viewMeta.model
       this.metas = this.viewMeta.relatedMetas
+
+      this.sortList = this.viewMeta.sorts
 
       //
       //
@@ -571,6 +572,13 @@ export default {
         const { data: { list, pageInfo: { totalRows: count } } } = (await this.$api.public.dataList({
           ...this.queryParams,
           uuid: this.$route.params.id
+        }, {
+          query: {
+            sorts: JSON.stringify(this.sortList && this.sortList
+              .map(({ fk_column_id, direction }) => ({ direction, fk_column_id }))
+            ),
+            filters: JSON.stringify(this.filters)
+          }
         })).data
 
         // this.client = client

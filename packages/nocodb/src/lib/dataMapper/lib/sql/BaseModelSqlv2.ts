@@ -69,7 +69,13 @@ class BaseModelSqlv2 {
   }
 
   public async list(
-    args: { where?: string; limit?; offset? } = {},
+    args: {
+      where?: string;
+      limit?;
+      offset?;
+      filterArr?: Filter[];
+      sortArr?: Sort[];
+    } = {},
     ignoreFilterSort = false
   ): Promise<any> {
     const { where, ...rest } = this._getListArgs(args);
@@ -86,13 +92,18 @@ class BaseModelSqlv2 {
     if (!ignoreFilterSort) {
       if (this.viewId) {
         await conditionV2(
-          await Filter.rootFilterList({ viewId: this.viewId }),
+          [
+            ...((await Filter.rootFilterList({ viewId: this.viewId })) || []),
+            ...(args.filterArr || [])
+          ],
           qb,
           this.dbDriver
         );
 
         await sortV2(
-          await Sort.list({ viewId: this.viewId }),
+          args.sortArr?.length
+            ? args.sortArr
+            : await Sort.list({ viewId: this.viewId }),
           qb,
           this.dbDriver
         );

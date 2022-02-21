@@ -26,7 +26,14 @@
         </v-btn>
       </v-badge>
     </template>
-    <column-filter v-model="filters" :view-id="viewId" :field-list="fieldList" :meta="meta" v-on="$listeners">
+    <column-filter
+      v-model="filters"
+      :shared="shared"
+      :view-id="viewId"
+      :field-list="fieldList"
+      :meta="meta"
+      v-on="$listeners"
+    >
       <div class="d-flex align-center mx-2" @click.stop>
         <v-checkbox
           id="col-filter-checkbox"
@@ -58,7 +65,7 @@ import ColumnFilter from '@/components/project/spreadsheet/components/columnFilt
 export default {
   name: 'ColumnFilterMenu',
   components: { ColumnFilter },
-  props: ['fieldList', 'isLocked', 'value', 'meta', 'viewId'],
+  props: ['fieldList', 'isLocked', 'value', 'meta', 'viewId', 'shared'],
   data: () => ({
     filters: []
   }),

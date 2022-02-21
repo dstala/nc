@@ -404,17 +404,17 @@ export default {
     },
     sortList: {
       async handler(sortList) {
-        const sort = sortList.map((sort) => {
-          // && this.allColumnsNames.includes(sort.field)
-          return sort.field ? `${sort.order}${sort.field}` : ''
-        }).filter(Boolean).join(',')
-        this.sort = sort
-        // if (!this.progress) {
-        //   await this.loadTableData();
+        // const sort = sortList.map((sort) => {
+        //   // && this.allColumnsNames.includes(sort.field)
+        //   return sort.field ? `${sort.order}${sort.field}` : ''
+        // }).filter(Boolean).join(',')
+        // this.sort = sort
+        // // if (!this.progress) {
+        // //   await this.loadTableData();
+        // // }
+        // if (!this.loadingMeta || !this.loadingData) {
+        //   this.syncDataDebounce(this)
         // }
-        if (!this.loadingMeta || !this.loadingData) {
-          this.syncDataDebounce(this)
-        }
       },
       deep: true
     },

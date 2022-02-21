@@ -19,6 +19,7 @@ export default class Filter {
 
   logical_op?: string;
   is_group?: boolean;
+  children?: Filter[];
 
   constructor(data: Filter | FilterObject) {
     Object.assign(this, data);
@@ -110,6 +111,7 @@ export default class Filter {
   }
 
   public async getChildren(): Promise<Filter[]> {
+    if (this.children) return this.children;
     if (!this.is_group) return null;
     const childFilters = await Noco.ncMeta.metaList2(
       null,

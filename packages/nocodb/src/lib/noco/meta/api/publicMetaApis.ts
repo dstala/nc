@@ -15,6 +15,9 @@ export async function viewMetaGet(req: Request, res: Response, next) {
 
   if (!view) return next(new Error('Not found'));
 
+  await view.getFilters();
+  await view.getSorts();
+
   await view.getViewWithInfo();
   await view.getColumns();
   await view.getModelWithInfo();

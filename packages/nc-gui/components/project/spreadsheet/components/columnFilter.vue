@@ -34,7 +34,16 @@
               </template>
             </v-select>
           </div>
-          <column-filter v-if="filter.id" :parent-id="filter.id" nested :meta="meta" @updated="$emit('updated')" />
+          <column-filter
+            v-if="filter.id || shared"
+            v-model="filter.children"
+            :parent-id="filter.id"
+            nested
+            :meta="meta"
+            :shared="shared"
+            @updated="$emit('updated')"
+            @input="$emit('input', filters)"
+          />
         </div>
         <template v-else>
           <v-icon
@@ -189,7 +198,8 @@ export default {
     meta: Object,
     nested: Boolean,
     parentId: String,
-    viewId: String
+    viewId: String,
+    shared: Boolean
   },
   data: () => ({
     filters: [],
@@ -245,7 +255,7 @@ export default {
     },
     filters: {
       handler(v) {
-        this.$emit('input', v)
+        this.$emit('input', v && v.filter(f => (f.fk_column_id && f.comparison_op) || f.is_group))
       },
       deep: true
     }
@@ -290,20 +300,32 @@ export default {
       this.saveOrUpdate(this.filters[index], index)
     },
     async saveOrUpdate(filter, i) {
-      if (filter.id) {
-        await this.$api.meta.filterUpdate(this.viewId, filter.id, { ...filter, fk_parent_id: this.parentId })
+      if (this.shared) {
+        // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
+      } else if (filter.id) {
+        await this.$api.meta.filterUpdate(this.viewId, filter.id, {
+          ...filter,
+          fk_parent_id: this.parentId
+        })
       } else {
-        this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, { ...filter, fk_parent_id: this.parentId })).data)
+        this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
+          ...filter,
+          fk_parent_id: this.parentId
+        })).data)
       }
       this.$emit('updated')
     },
     async deleteFilter(filter, i) {
-      if (filter.id) {
+      if (this.shared) {
+        this.filters.splice(i, 1)
+        // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
+      } else if (filter.id) {
         await this.$api.meta.filterDelete(this.viewId, filter.id)
         await this.loadFilter()
       } else {
-        this.sortList.splice(i, 1)
+        this.filters.splice(i, 1)
       }
+      // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
       this.$emit('updated')
     }
   }

@@ -24,15 +24,20 @@ export default async function conditionV2(
 }
 
 const parseConditionV2 = async (
-  filter: Filter | Filter[],
+  _filter: Filter | Filter[],
   knex: XKnex,
   aliasCount = { count: 0 },
   alias?,
   customWhereClause?
 ) => {
-  if (Array.isArray(filter)) {
+  let filter: Filter;
+  if (!Array.isArray(_filter)) {
+    if (!(_filter instanceof Filter)) filter = new Filter(_filter as Filter);
+    else filter = _filter;
+  }
+  if (Array.isArray(_filter)) {
     const qbs = await Promise.all(
-      filter.map(child => parseConditionV2(child, knex, aliasCount))
+      _filter.map(child => parseConditionV2(child, knex, aliasCount))
     );
 
     return qbP => {

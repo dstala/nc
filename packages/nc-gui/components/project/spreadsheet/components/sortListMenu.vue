@@ -84,7 +84,14 @@
 <script>
 export default {
   name: 'SortListMenu',
-  props: ['fieldList', 'value', 'isLocked', 'meta', 'viewId'],
+  props: {
+    fieldList: Array,
+    value: [Array, Object],
+    isLocked: Boolean,
+    meta: [Object],
+    viewId: String,
+    shared: Boolean
+  },
   data: () => ({
     sortList: []
   }),
@@ -99,6 +106,7 @@ export default {
     }
   },
   async created() {
+    this.sortList = this.value
     this.loadSortList()
   },
   methods: {
@@ -110,20 +118,26 @@ export default {
       this.sortList = this.sortList.slice()
     },
     async loadSortList() {
-      let sortList = []
+      if (!this.shared) {
+        let sortList = []
 
-      if (this.viewId) {
-        const data = await this.$api.meta.sortList(this.viewId)
-        sortList = data.data.sorts.list
+        if (this.viewId) {
+          const data = await this.$api.meta.sortList(this.viewId)
+          sortList = data.data.sorts.list
+        }
+
+        this.sortList = sortList
       }
-
-      this.sortList = sortList
     },
     async saveOrUpdate(sort, i) {
-      if (sort.id) {
-        await this.$api.meta.sortUpdate(this.viewId, sort.id, sort)
+      if (!this.shared) {
+        if (sort.id) {
+          await this.$api.meta.sortUpdate(this.viewId, sort.id, sort)
+        } else {
+          this.$set(this.sortList, i, (await this.$api.meta.sortCreate(this.viewId, sort)).data)
+        }
       } else {
-        this.$set(this.sortList, i, (await this.$api.meta.sortCreate(this.viewId, sort)).data)
+        this.$emit('input', this.sortList)
       }
       this.$emit('updated')
     },

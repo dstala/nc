@@ -22,6 +22,18 @@ export async function dataList(req: Request, res: Response, next) {
       id: view?.fk_model_id
     });
 
+    let sortArr = [];
+
+    try {
+      sortArr = JSON.parse(req.query.sorts as string);
+    } catch {}
+
+    let filterArr = [];
+
+    try {
+      filterArr = JSON.parse(req.query.filters as string);
+    } catch {}
+
     console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
     console.time('BaseModel.get');
@@ -50,7 +62,7 @@ export async function dataList(req: Request, res: Response, next) {
           }
         },
         {},
-        req.query
+        { ...req.query, sortArr, filterArr }
       )
     )?.[key];
 

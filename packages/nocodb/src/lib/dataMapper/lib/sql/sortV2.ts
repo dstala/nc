@@ -19,7 +19,13 @@ export default async function sortV2(
     return;
   }
 
-  for (const sort of sortList) {
+  for (const _sort of sortList) {
+    let sort: Sort;
+    if (_sort instanceof Sort) {
+      sort = _sort;
+    } else {
+      sort = new Sort(_sort);
+    }
     const column = await sort.getColumn();
     if (!column) continue;
     const model = await column.getModel();
