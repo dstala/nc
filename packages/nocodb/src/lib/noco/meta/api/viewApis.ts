@@ -36,10 +36,17 @@ export async function shareView(
 export async function viewCreate(req: Request<any, any>, res, next) {}
 
 // @ts-ignore
-export async function viewUpdate(req, res) {}
+export async function viewUpdate(req, res) {
+  res.json(await View.update(req.params.viewId, req.body));
+}
 
 // @ts-ignore
-export async function viewDelete(req: Request, res: Response, next) {}
+export async function viewDelete(req: Request, res: Response, next) {
+  // @ts-ignore
+  export async function viewDelete(req, res) {
+    res.json(await View.delete(req.params.viewId));
+  }
+}
 
 const router = Router({ mergeParams: true });
 router.get('/tables/:tableId/views', catchError(viewList));
@@ -57,6 +64,6 @@ async function shareViewDelete(req: Request<any, any>, res) {
 
 router.put('/views/:viewId/share', catchError(shareViewPasswqordUpdate));
 router.delete('/views/:viewId/share', catchError(shareViewDelete));
-// router.put('/views/:viewId', viewUpdate);
-// router.delete('/views/:viewId', viewDelete);
+router.put('/views/:viewId', viewUpdate);
+router.delete('/views/:viewId', viewDelete);
 export default router;

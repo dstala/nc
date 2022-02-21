@@ -463,4 +463,28 @@ export default class View implements ViewType {
       viewId
     );
   }
+
+  static async update(
+    viewId: string,
+    body: {
+      title: string;
+      order: number;
+    }
+  ) {
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.VIEWS,
+      {
+        title: body.title,
+        order: body.order
+      },
+      viewId
+    );
+  }
+
+  // @ts-ignore
+  static async delete(viewId) {
+    // todo:
+  }
 }

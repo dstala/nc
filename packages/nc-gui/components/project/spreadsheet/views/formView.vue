@@ -600,25 +600,29 @@ export default {
     onMove(event) {
       const {
         newIndex,
-        element
-      } = (event.added || event.moved)
+        element, oldIndex
+      } = (event.added || event.moved || event.removed)
       if (event.added) {
         element.show = true
       }
 
-      if (this.columns.length === 0) {
-        this.$set(element, 'order', 1)
-      } else if (this.columns.length - 1 === newIndex) {
-        this.$set(element, 'order', this.columns[newIndex - 1].order + 1)
-      } else if (newIndex === 0) {
-        this.$set(element, 'order', this.columns[1].order / 2)
+      if (event.removed) {
+        element.show = false
+        this.saveOrUpdateOrderOrVisibility(element, oldIndex)
       } else {
-        this.$set(element, 'order', (
-          this.columns[newIndex - 1].order + this.columns[newIndex + 1].order) / 2
-        )
+        if (this.columns.length === 0) {
+          this.$set(element, 'order', 1)
+        } else if (this.columns.length - 1 === newIndex) {
+          this.$set(element, 'order', this.columns[newIndex - 1].order + 1)
+        } else if (newIndex === 0) {
+          this.$set(element, 'order', this.columns[1].order / 2)
+        } else {
+          this.$set(element, 'order', (
+            this.columns[newIndex - 1].order + this.columns[newIndex + 1].order) / 2
+          )
+        }
+        this.saveOrUpdateOrderOrVisibility(element, newIndex)
       }
-
-      this.saveOrUpdateOrderOrVisibility(element, newIndex)
     },
 
     async saveOrUpdateOrderOrVisibility(field, i) {
