@@ -7,7 +7,7 @@ import { PagedResponseImpl } from './helpers/PagedResponse';
 import View from '../../../noco-models/View';
 import catchError from './helpers/catchError';
 import multer from 'multer';
-import { UITypes, ViewTypes } from 'nc-common';
+import { ErrorMessages, UITypes, ViewTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 
@@ -18,21 +18,13 @@ export async function dataList(req: Request, res: Response, next) {
     if (!view) return next(new Error('Not found'));
     if (view.type !== ViewTypes.GRID) return next(new Error('Not found'));
 
+    if (view.password && view.password !== req.body?.password) {
+      return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+    }
+
     const model = await Model.get({
       id: view?.fk_model_id
     });
-
-    let sortArr = [];
-
-    try {
-      sortArr = JSON.parse(req.query.sorts as string);
-    } catch {}
-
-    let filterArr = [];
-
-    try {
-      filterArr = JSON.parse(req.query.filters as string);
-    } catch {}
 
     console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
@@ -62,7 +54,7 @@ export async function dataList(req: Request, res: Response, next) {
           }
         },
         {},
-        { ...req.query, sortArr, filterArr }
+        { ...req.query, sortArr: req.body?.sorts, filterArr: req.body?.filters }
       )
     )?.[key];
 
@@ -114,6 +106,10 @@ async function dataInsert(
 
   if (!view) return next(new Error('Not found'));
   if (view.type !== ViewTypes.FORM) return next(new Error('Not found'));
+
+  if (view.password && view.password !== req.body?.password) {
+    return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
 
   const model = await Model.get({
     id: view?.fk_model_id
@@ -191,6 +187,10 @@ async function relDataList(req, res, next) {
   if (!view) return next(new Error('Not found'));
   if (view.type !== ViewTypes.FORM) return next(new Error('Not found'));
 
+  if (view.password && view.password !== req.body?.password) {
+    return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
   const column = await Column.get({ colId: req.params.relationColumnId });
   const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
 
@@ -267,10 +267,10 @@ async function relDataList(req, res, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', catchError(dataList));
-router.get('/relationTable/:relationColumnId', catchError(relDataList));
+router.post('/list', catchError(dataList));
+router.post('/relationTable/:relationColumnId', catchError(relDataList));
 router.post(
-  '/',
+  '/create',
   multer({
     storage: multer.diskStorage({})
   }).any(),

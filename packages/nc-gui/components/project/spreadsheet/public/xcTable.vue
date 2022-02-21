@@ -190,6 +190,7 @@
 <script>
 /* eslint-disable camelcase */
 
+import { ErrorMessages } from 'nc-common'
 import spreadsheet from '../mixins/spreadsheet'
 import ApiFactory from '../apis/apiFactory'
 // import EditableCell from "../editableCell";
@@ -469,13 +470,14 @@ export default {
     },
     async loadMetaData() {
       this.loading = true
-      // try {
+      try {
+        this.viewMeta = (await this.$api.public.sharedViewMetaGet(this.$route.params.id, {
+          password: this.password
+        })).data
+        this.meta = this.viewMeta.model
+        this.metas = this.viewMeta.relatedMetas
 
-      this.viewMeta = (await this.$api.public.sharedViewMetaGet(this.$route.params.id)).data
-      this.meta = this.viewMeta.model
-      this.metas = this.viewMeta.relatedMetas
-
-      this.sortList = this.viewMeta.sorts
+        this.sortList = this.viewMeta.sorts
 
       //
       //
@@ -545,15 +547,15 @@ export default {
       //       }
       //     })
       //   }
-      // } catch (e) {
-      //   if (e.message === 'Not found' || e.message === 'Meta not found') {
-      //     this.notFound = true
-      //   } else if (e.message === 'Invalid password') {
-      //     this.showPasswordModal = true
-      //   } else {
-      //     console.log(e)
-      //   }
-      // }
+      } catch (e) {
+        if (e.message === 'Not found' || e.message === 'Meta not found') {
+          this.notFound = true
+        } else if (e.response && e.response.data === ErrorMessages.INVALID_SHARED_VIEW_PASSWORD) {
+          this.showPasswordModal = true
+        } else {
+          console.log(e)
+        }
+      }
 
       this.loadingData = false
     },
@@ -573,13 +575,11 @@ export default {
           ...this.queryParams,
           uuid: this.$route.params.id
         }, {
-          query: {
-            sorts: JSON.stringify(this.sortList && this.sortList
-              .map(({ fk_column_id, direction }) => ({ direction, fk_column_id }))
-            ),
-            filters: JSON.stringify(this.filters)
-          }
-        })).data
+          password: this.password,
+          sorts: this.sortList && this.sortList.map(({ fk_column_id, direction }) => ({ direction, fk_column_id })),
+          filters: JSON.stringify(this.filters)
+        }
+        )).data
 
         // this.client = client
 
@@ -595,9 +595,9 @@ export default {
           rowMeta: {}
         }))
       } catch (e) {
-        if (e.message === 'Not found' || e.message === 'Meta not found') {
+        if ((e.response && e.response.data === 'Not found') || (e.response && e.response.data === 'Meta not found')) {
           this.notFound = true
-        } else if (e.message === 'Invalid password') {
+        } else if (e.response && e.response.data === ErrorMessages.INVALID_SHARED_VIEW_PASSWORD) {
           this.showPasswordModal = true
         } else {
           console.log(e)

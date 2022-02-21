@@ -736,15 +736,19 @@ export default {
     },
     async saveShareLinkPassword() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [
-          { dbAlias: this.nodes.dbAlias },
-          'updateSharedViewLinkPassword',
-          {
-            id: this.shareLink.id,
-            password: this.shareLink.password
-          }
-        ])
-        this.$toast.success('Successfully updated').goAway(3000)
+        await this.$api.meta.setSharedViewPassword(this.shareLink.id, {
+          password: this.shareLink.password
+        })
+
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [
+        //   { dbAlias: this.nodes.dbAlias },
+        //   'updateSharedViewLinkPassword',
+        //   {
+        //     id: this.shareLink.id,
+        //     password: this.shareLink.password
+        //   }
+        // ])
+          .this.$toast.success('Successfully updated').goAway(3000)
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }

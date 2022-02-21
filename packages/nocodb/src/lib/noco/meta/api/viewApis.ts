@@ -33,7 +33,7 @@ export async function shareView(
 }
 
 // @ts-ignore
-export async function viewCreate(req: Request<any, any, TableReq>, res, next) {}
+export async function viewCreate(req: Request<any, any>, res, next) {}
 
 // @ts-ignore
 export async function viewUpdate(req, res) {}
@@ -46,6 +46,17 @@ router.get('/tables/:tableId/views', catchError(viewList));
 // router.post('/tables/:tableId/views', viewCreate);
 // router.get('/views/:viewId', viewGet);
 router.post('/views/:viewId/share', catchError(shareView));
+
+async function shareViewPasswqordUpdate(req: Request<any, any>, res) {
+  res.json(await View.passwordUpdate(req.params.viewId, req.body));
+}
+
+async function shareViewDelete(req: Request<any, any>, res) {
+  res.json(await View.sharedViewDelete(req.params.viewId));
+}
+
+router.put('/views/:viewId/share', catchError(shareViewPasswqordUpdate));
+router.delete('/views/:viewId/share', catchError(shareViewDelete));
 // router.put('/views/:viewId', viewUpdate);
 // router.delete('/views/:viewId', viewDelete);
 export default router;

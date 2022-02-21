@@ -1,6 +1,7 @@
 import {Api} from "./Api";
 
 
+// @ts-ignore
 // eslint-disable-next-line functional/no-class
 class CustomAPI extends Api<unknown> {
   public createFormData(input: Record<string, unknown>): FormData {
@@ -21,6 +22,7 @@ class CustomAPI extends Api<unknown> {
     }, new FormData());
   }
 }
+
 
 
 export default CustomAPI

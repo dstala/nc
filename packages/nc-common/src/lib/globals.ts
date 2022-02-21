@@ -9,6 +9,13 @@ export enum RelationTypes {
   BELONGS_TO = 'bt',
   MANY_TO_MANY = 'mm'
 }
+
+
 export enum ExportTypes {
   CSV = 'csv'
+}
+
+
+export enum ErrorMessages {
+  INVALID_SHARED_VIEW_PASSWORD = 'INVALID_SHARED_VIEW_PASSWORD'
 }

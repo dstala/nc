@@ -1124,6 +1124,53 @@
         "tags": [
           "Meta"
         ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "set-shared-view-password",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SharedView"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        },
+        "tags": [
+          "meta"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "delete-shared-view",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "meta"
+        ]
       }
     },
     "/views/{viewId}/sorts/{sortId}": {
@@ -2052,7 +2099,7 @@
         }
       }
     },
-    "public/data/{uuid}": {
+    "public/data/{uuid}/list": {
       "parameters": [
         {
           "schema": {
@@ -2063,10 +2110,9 @@
           "required": true
         }
       ],
-      "get": {
+      "post": {
         "summary": "",
         "operationId": "data-list",
-        "description": "",
         "responses": {
           "200": {
             "description": "OK",
@@ -2077,30 +2123,59 @@
             }
           }
         },
+        "tags": [
+          "Public"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "sorts": {
+                    "type": "string"
+                  },
+                  "filters": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        },
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "default": "1",
-              "minLength": 1
-            },
-            "in": "query",
-            "name": "offset"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "default": "25",
-              "minLength": 1
+              "type": "string"
             },
             "in": "query",
             "name": "limit"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "offset"
           }
-        ],
-        "tags": [
-          "Public"
         ]
-      },
+      }
+    },
+    "public/data/{uuid}/create": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "uuid",
+          "in": "path",
+          "required": true
+        }
+      ],
       "post": {
         "summary": "",
         "operationId": "data-create",
@@ -2120,11 +2195,27 @@
         "requestBody": {
           "content": {
             "multipart/form-data": {
-              "schema": {}
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {},
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           },
           "description": ""
-        }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header"
+          }
+        ]
       }
     },
     "public/data/{uuid}/relationTable/{relationColumnId}": {
@@ -2146,20 +2237,12 @@
           "required": true
         }
       ],
-      "get": {
+      "post": {
         "summary": "",
         "operationId": "data-relation-list",
-        "description": "",
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "": {
             "content": {
               "application/json": {
                 "schema": {}
@@ -2170,26 +2253,37 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "default": "1",
-              "minLength": 1
-            },
-            "in": "query",
-            "name": "offset"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "default": "25",
-              "minLength": 1
+              "type": "string"
             },
             "in": "query",
             "name": "limit"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "offset"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "tags": [
           "Public"
-        ]
+        ],
+        "description": ""
       }
     },
     "public/meta/{uuid}": {
@@ -2203,24 +2297,44 @@
           "required": true
         }
       ],
-      "get": {
+      "post": {
         "summary": "",
         "operationId": "shared-view-meta-get",
-        "description": "",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              "application/xml": {
                 "schema": {}
               }
             }
           }
         },
-        "parameters": [],
         "tags": [
-          "Public"
-        ]
+          ""
+        ],
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/data/{tableId}/{rowId}": {

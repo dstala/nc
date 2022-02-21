@@ -83,6 +83,7 @@
 
 <script>
 import Pagination from '@/components/project/spreadsheet/components/pagination'
+import password from '~/pages/user/settings/password'
 
 export default {
   name: 'ListItems',
@@ -140,7 +141,7 @@ export default {
     async loadData() {
       if (this.isPublic) {
         this.data = (await this.$api.public.dataRelationList(
-          { uuid: this.$route.params.id, relationColumnId: this.column.id })).data.data
+          { uuid: this.$route.params.id, relationColumnId: this.column.id }, { password: this.password })).data.data
         // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedDataGet', {
         //   password: this.password,
         //   limit: this.size,

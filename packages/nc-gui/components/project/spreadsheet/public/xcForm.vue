@@ -229,7 +229,7 @@
 
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
-import { isVirtualCol, UITypes } from 'nc-common'
+import { ErrorMessages, isVirtualCol, UITypes } from 'nc-common'
 import form from '../mixins/form'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
@@ -296,14 +296,16 @@ export default {
     isVirtualCol,
     async loadMetaData() {
       this.loading = true
+      try {
+        this.viewMeta = (await this.$api.public.sharedViewMetaGet(this.$route.params.id, {
+          password: this.password
+        })).data
 
-      this.viewMeta = (await this.$api.public.sharedViewMetaGet(this.$route.params.id)).data
-
-      this.view = this.viewMeta.view
-      this.meta = this.viewMeta.model
-      this.metas = this.viewMeta.relatedMetas
-      this.columns = this.meta.columns
-      this.client = this.viewMeta.client
+        this.view = this.viewMeta.view
+        this.meta = this.viewMeta.model
+        this.metas = this.viewMeta.relatedMetas
+        this.columns = this.meta.columns
+        this.client = this.viewMeta.client
       // try {
       //   // eslint-disable-next-line camelcase
       //   const {
@@ -364,13 +366,13 @@ export default {
       //   this.columns = columns.filter(c => showFields[c.alias]).sort((a, b) => fields.indexOf(a.alias) - fields.indexOf(b.alias))
       //
       //   this.localParams = (this.query_params.extraViewParams && this.query_params.extraViewParams.formParams) || {}
-      // } catch (e) {
-      //   if (e.message === 'Not found' || e.message === 'Meta not found') {
-      //     this.notFound = true
-      //   } else if (e.message === 'Invalid password') {
-      //     this.showPasswordModal = true
-      //   }
-      // }
+      } catch (e) {
+        if (e.message === 'Not found' || e.message === 'Meta not found') {
+          this.notFound = true
+        } else if (e.response && e.response.data === ErrorMessages.INVALID_SHARED_VIEW_PASSWORD) {
+          this.showPasswordModal = true
+        }
+      }
 
       this.loadingData = false
     },
@@ -418,7 +420,10 @@ export default {
         //   formData
         // })
 
-        await this.$api.public.dataCreate(this.$route.params.id, data)
+        await this.$api.public.dataCreate(this.$route.params.id, {
+          data,
+          password: this.password
+        })
 
         this.virtual = {}
         this.localState = {}

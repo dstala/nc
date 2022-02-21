@@ -3,7 +3,7 @@ import catchError from './helpers/catchError';
 import View from '../../../noco-models/View';
 import Model from '../../../noco-models/Model';
 import UITypes from '../../../sqlUi/UITypes';
-import { LinkToAnotherRecord } from 'nc-common';
+import { ErrorMessages, LinkToAnotherRecord } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import Base from '../../../noco-models/Base';
 
@@ -14,6 +14,10 @@ export async function viewMetaGet(req: Request, res: Response, next) {
   } = await View.getByUUID(req.params.uuid);
 
   if (!view) return next(new Error('Not found'));
+
+  if (view.password && view.password !== req.body?.password) {
+    return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
 
   await view.getFilters();
   await view.getSorts();
@@ -61,5 +65,5 @@ export async function viewMetaGet(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', catchError(viewMetaGet));
+router.post('/', catchError(viewMetaGet));
 export default router;

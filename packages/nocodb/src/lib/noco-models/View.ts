@@ -18,6 +18,7 @@ export default class View implements ViewType {
   id?: string;
   title?: string;
   uuid?: string;
+  password?: string;
   show: boolean;
   is_default: boolean;
   order: number;
@@ -434,5 +435,32 @@ export default class View implements ViewType {
     }
 
     return view;
+  }
+
+  static async passwordUpdate(
+    viewId: string,
+    { password }: { password: string }
+  ) {
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.VIEWS,
+      {
+        password
+      },
+      viewId
+    );
+  }
+
+  static async sharedViewDelete(viewId) {
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.VIEWS,
+      {
+        uuid: null
+      },
+      viewId
+    );
   }
 }

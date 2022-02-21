@@ -438,14 +438,14 @@ export interface TableListParams {
 }
 
 export interface DataListParams {
-  offset?: string;
   limit?: string;
+  offset?: string;
   uuid: string;
 }
 
 export interface DataRelationListParams {
-  offset?: string;
   limit?: string;
+  offset?: string;
   uuid: string;
   relationColumnId: string;
 }
@@ -1152,6 +1152,41 @@ export class Api<
         path: `/views/${viewId}/share`,
         method: 'POST',
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name SetSharedViewPassword
+     * @request PUT:/views/{viewId}/share
+     */
+    setSharedViewPassword: (
+      viewId: string,
+      data: { password?: string },
+      params: RequestParams = {}
+    ) =>
+      this.request<SharedView, any>({
+        path: `/views/${viewId}/share`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name DeleteSharedView
+     * @request DELETE:/views/{viewId}/share
+     */
+    deleteSharedView: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/share`,
+        method: 'DELETE',
         ...params,
       }),
 
@@ -1890,16 +1925,19 @@ export class Api<
      *
      * @tags Public
      * @name DataList
-     * @request GET:public/data/{uuid}
+     * @request POST:public/data/{uuid}/list
      */
     dataList: (
       { uuid, ...query }: DataListParams,
+      data: { password?: string; sorts?: string; filters?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `public/data/${uuid}`,
-        method: 'GET',
+        path: `public/data/${uuid}/list`,
+        method: 'POST',
         query: query,
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),
@@ -1909,11 +1947,15 @@ export class Api<
      *
      * @tags Public
      * @name DataCreate
-     * @request POST:public/data/{uuid}
+     * @request POST:public/data/{uuid}/create
      */
-    dataCreate: (uuid: string, data: any, params: RequestParams = {}) =>
+    dataCreate: (
+      uuid: string,
+      data: { data?: any; password?: string },
+      params: RequestParams = {}
+    ) =>
       this.request<any, any>({
-        path: `public/data/${uuid}`,
+        path: `public/data/${uuid}/create`,
         method: 'POST',
         body: data,
         type: ContentType.FormData,
@@ -1926,16 +1968,19 @@ export class Api<
      *
      * @tags Public
      * @name DataRelationList
-     * @request GET:public/data/{uuid}/relationTable/{relationColumnId}
+     * @request POST:public/data/{uuid}/relationTable/{relationColumnId}
      */
     dataRelationList: (
       { uuid, relationColumnId, ...query }: DataRelationListParams,
+      data: { password?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
         path: `public/data/${uuid}/relationTable/${relationColumnId}`,
-        method: 'GET',
+        method: 'POST',
         query: query,
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),
@@ -1943,14 +1988,20 @@ export class Api<
     /**
      * No description
      *
-     * @tags Public
+     * @tags
      * @name SharedViewMetaGet
-     * @request GET:public/meta/{uuid}
+     * @request POST:public/meta/{uuid}
      */
-    sharedViewMetaGet: (uuid: string, params: RequestParams = {}) =>
-      this.request<any, any>({
+    sharedViewMetaGet: (
+      uuid: string,
+      data: { password?: string },
+      params: RequestParams = {}
+    ) =>
+      this.request<object, any>({
         path: `public/meta/${uuid}`,
-        method: 'GET',
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),
