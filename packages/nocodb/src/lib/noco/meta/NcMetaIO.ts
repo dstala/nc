@@ -80,6 +80,10 @@ export default abstract class NcMetaIO {
     data: any,
     ignoreIdGeneration?: boolean
   ): Promise<any>;
+  public abstract metaGetNextOrder(
+    target: string,
+    condition: { [key: string]: any }
+  ): Promise<number>;
 
   public abstract audit(
     project_id: string,

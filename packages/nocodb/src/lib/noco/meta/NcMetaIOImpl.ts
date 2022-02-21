@@ -219,6 +219,18 @@ export default class NcMetaIOImpl extends NcMetaIO {
     return query.first();
   }
 
+  public async metaGetNextOrder(
+    target: string,
+    condition: { [key: string]: any }
+  ): Promise<number> {
+    const query = this.knexConnection(target);
+
+    query.where(condition);
+    query.max('order', { as: 'order' });
+
+    return (+(await query.first())?.order || 0) + 1;
+  }
+
   public async metaInsert(
     project_id: string,
     dbAlias: string,

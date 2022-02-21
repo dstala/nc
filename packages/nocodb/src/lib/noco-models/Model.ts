@@ -93,7 +93,12 @@ export default class Model implements Table {
       {
         tn: model.tn,
         _tn: model._tn,
-        order: model.order
+        order:
+          model.order ||
+          (await Noco.ncMeta.metaGetNextOrder(MetaTable.FORM_VIEW_COLUMNS, {
+            project_id: projectId,
+            base_id: baseId
+          }))
       }
     );
 
