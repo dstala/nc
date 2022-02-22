@@ -650,7 +650,39 @@ const up = async knex => {
     table.text('description');
     table.text('details');
 
-    table.timestamps(false, true);
+    table.timestamps(true, true);
+  });
+
+  await knex.schema.createTable(MetaTable.AUDIT, table => {
+    table.increments();
+
+    table.string('fk_model_id', 20);
+    table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
+
+    table.string('title');
+    table.string('description', 255);
+    table.string('env').defaultTo('all');
+    table.string('type');
+    table.string('event');
+
+    table.string('operation');
+    table.boolean('async').defaultTo(false);
+    table.boolean('payload').defaultTo(true);
+
+    table.text('url', 'text');
+    table.text('headers', 'text');
+
+    // todo: normalise
+    table.text('condition', 'text');
+
+    table.text('notification', 'text');
+
+    table.integer('retries').defaultTo(0);
+    table.integer('retry_interval').defaultTo(60000);
+    table.integer('timeout').defaultTo(60000);
+    table.boolean('active').defaultTo(true);
+
+    table.timestamps();
   });
 };
 

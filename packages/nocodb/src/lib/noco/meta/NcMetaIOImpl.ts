@@ -807,6 +807,12 @@ export default class NcMetaIOImpl extends NcMetaIO {
       case MetaTable.VIEWS:
         prefix = 'vw_';
         break;
+      case MetaTable.HOOKS:
+        prefix = 'hk_';
+        break;
+      case MetaTable.AUDIT:
+        prefix = 'adt_';
+        break;
       default:
         prefix = 'nc_';
         break;

@@ -45,7 +45,7 @@ export default class View implements ViewType {
     return (this.model = await Model.getWithInfo({ id: this.fk_model_id }));
   }
 
-  async getView(): Promise<FormView | GridView | KanbanView | GalleryView> {
+  async getView<T>(): Promise<T> {
     switch (this.type) {
       case ViewTypes.GRID:
         this.view = await GridView.get(this.id);
@@ -60,7 +60,7 @@ export default class View implements ViewType {
         this.view = await FormView.get(this.id);
         break;
     }
-    return this.view;
+    return <T>this.view;
   }
 
   async getViewWithInfo(): Promise<

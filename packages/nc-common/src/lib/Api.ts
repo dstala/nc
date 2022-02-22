@@ -432,12 +432,34 @@ export interface AuditType {
   ip?: string;
   base_id?: string;
   project_id?: string;
+  fk_model_id?: string;
   row_id?: string;
   op_type?: string;
   op_sub_type?: string;
   status?: string;
   description?: string;
   details?: string;
+}
+
+export interface HookType {
+  id?: string;
+  fk_model_id?: string;
+  title?: string;
+  description?: string;
+  env?: string;
+  type?: string;
+  event?: 'After' | 'Before';
+  operation?: 'insert' | 'delete' | 'update';
+  async?: boolean;
+  payload?: boolean;
+  url?: string;
+  headers?: string;
+  condition?: string;
+  notification?: string;
+  retries?: number;
+  retry_interval?: number;
+  timeout?: number;
+  active?: boolean;
 }
 
 export interface UploadPayloadType {
@@ -1877,10 +1899,111 @@ export class Api<
      * @request GET:/audits
      */
     auditList: (params: RequestParams = {}) =>
-      this.request<any, any>({
+      this.request<
+        { audits?: { list: AuditType[]; pageInfo: PaginatedType } },
+        any
+      >({
         path: `/audits`,
         method: 'GET',
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name AuditCreate
+     * @request POST:/audits
+     */
+    auditCreate: (data: AuditType, params: RequestParams = {}) =>
+      this.request<AuditType, any>({
+        path: `/audits`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookList
+     * @request GET:/tables/{tableId}/hooks
+     */
+    hookList: (tableId: string, params: RequestParams = {}) =>
+      this.request<
+        { hooks?: { list: HookType[]; pageInfo: PaginatedType } },
+        any
+      >({
+        path: `/tables/${tableId}/hooks`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookCreate
+     * @request POST:/tables/{tableId}/hooks
+     */
+    hookCreate: (
+      tableId: string,
+      data: AuditType,
+      params: RequestParams = {}
+    ) =>
+      this.request<AuditType, any>({
+        path: `/tables/${tableId}/hooks`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name HookTest
+     * @request POST:/tables/{tableId}/hooks/test
+     */
+    hookTest: (tableId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/hooks/test`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name HookUpdate
+     * @request PUT:/hooks/{hookId}
+     */
+    hookUpdate: (hookId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/hooks/${hookId}`,
+        method: 'PUT',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name HookDelete
+     * @request DELETE:/hooks/{hookId}
+     */
+    hookDelete: (hookId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/hooks/${hookId}`,
+        method: 'DELETE',
         ...params,
       }),
   };

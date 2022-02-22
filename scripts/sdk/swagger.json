@@ -2664,7 +2664,115 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "audits": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 1,
+                          "items": {
+                            "$ref": "#/components/schemas/Audit"
+                          }
+                        },
+                        "pageInfo": {
+                          "$ref": "#/components/schemas/Paginated"
+                        }
+                      },
+                      "required": [
+                        "list",
+                        "pageInfo"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "parameters": [],
+        "tags": [
+          "Meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "audit-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Audit"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Audit"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/tables/{tableId}/hooks": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "hook-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hooks": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 1,
+                          "items": {
+                            "$ref": "#/components/schemas/Hook"
+                          }
+                        },
+                        "pageInfo": {
+                          "$ref": "#/components/schemas/Paginated"
+                        }
+                      },
+                      "required": [
+                        "list",
+                        "pageInfo"
+                      ]
+                    }
+                  }
+                }
               }
             }
           },
@@ -2680,6 +2788,95 @@
         "parameters": [],
         "tags": [
           "Meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "hook-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Audit"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Audit"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/tables/{tableId}/hooks/test": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "hook-test",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/hooks/{hookId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "hookId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "hook-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "hook-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
         ]
       }
     }
@@ -4615,6 +4812,9 @@
           "project_id": {
             "type": "string"
           },
+          "fk_model_id": {
+            "type": "string"
+          },
           "row_id": {
             "type": "string"
           },
@@ -4632,6 +4832,75 @@
           },
           "details": {
             "type": "string"
+          }
+        }
+      },
+      "Hook": {
+        "title": "AuditType",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_model_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "env": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "After",
+              "Before"
+            ]
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "insert",
+              "delete",
+              "update"
+            ]
+          },
+          "async": {
+            "type": "boolean"
+          },
+          "payload": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          },
+          "notification": {
+            "type": "string"
+          },
+          "retries": {
+            "type": "number"
+          },
+          "retry_interval": {
+            "type": "number"
+          },
+          "timeout": {
+            "type": "number"
+          },
+          "active": {
+            "type": "boolean"
           }
         }
       }

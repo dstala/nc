@@ -23,5 +23,11 @@ NOT_IMPLEMENTED='NOT_IMPLEMENTED',
 
 
 export enum AuditOperationTypes {
-  COMMENT='COMMENT'
+  COMMENT='COMMENT',
+  DATA='DATA',
+}
+export enum AuditOperationSubTypes {
+  UPDATE='UPDATE',
+  INSERT='INSERT',
+  DELETE='DELETE',
 }
