@@ -25,5 +25,6 @@ export enum MetaTable {
   ORGS = 'nc_orgs_v2',
   TEAMS = 'nc_teams_v2',
   TEAM_USERS = 'nc_team_users_v2',
-  VIEWS = 'nc_views_v2'
+  VIEWS = 'nc_views_v2',
+  AUDIT = 'nc_audit_v2'
 }

@@ -3,7 +3,12 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import { Table, TableList, TableListParams, ViewTypes } from 'nc-common';
+import {
+  TableListParamsType,
+  TableListType,
+  TableType,
+  ViewTypes
+} from 'nc-common';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
@@ -12,12 +17,12 @@ import catchError from './helpers/catchError';
 import View from '../../../noco-models/View';
 
 // @ts-ignore
-export async function gridViewGet(req: Request, res: Response<Table>) {}
+export async function gridViewGet(req: Request, res: Response<TableType>) {}
 
 // @ts-ignore
 export async function gridViewList(
-  _req: Request<any, any, any, TableListParams>,
-  _res: Response<TableList>
+  _req: Request<any, any, any, TableListParamsType>,
+  _res: Response<TableListType>
 ) {}
 
 // @ts-ignore

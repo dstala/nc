@@ -1,6 +1,5 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
-import { LinkToAnotherRecord, Table } from 'nc-common';
 import UITypes from '../../../sqlUi/UITypes';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Base from '../../../noco-models/Base';
@@ -14,6 +13,7 @@ import {
   getUniqueColumnAliasName,
   getUniqueColumnName
 } from './helpers/getUniqueName';
+import { LinkToAnotherRecordType, TableType } from 'nc-common';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
@@ -23,7 +23,7 @@ export enum Altered {
   UPDATE_COLUMN = 8
 }
 
-export async function columnAdd(req: Request, res: Response<Table>, next) {
+export async function columnAdd(req: Request, res: Response<TableType>, next) {
   try {
     const table = await Model.getWithInfo({
       id: req.params.tableId
@@ -49,7 +49,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
             await Column.get({
               colId: req.body.fk_relation_column_id
             })
-          ).getColOptions<LinkToAnotherRecord>();
+          ).getColOptions<LinkToAnotherRecordType>();
 
           if (!relation) {
             throw new Error('Relation column not found');
@@ -95,7 +95,7 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
             await Column.get({
               colId: req.body.fk_relation_column_id
             })
-          ).getColOptions<LinkToAnotherRecord>();
+          ).getColOptions<LinkToAnotherRecordType>();
 
           if (!relation) {
             throw new Error('Relation column not found');
@@ -399,7 +399,11 @@ export async function columnAdd(req: Request, res: Response<Table>, next) {
   }
 }
 
-export async function columnUpdate(req: Request, res: Response<Table>, next) {
+export async function columnUpdate(
+  req: Request,
+  res: Response<TableType>,
+  next
+) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
@@ -449,7 +453,11 @@ export async function columnUpdate(req: Request, res: Response<Table>, next) {
   res.json(table);
 }
 
-export async function columnDelete(req: Request, res: Response<Table>, next) {
+export async function columnDelete(
+  req: Request,
+  res: Response<TableType>,
+  next
+) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });

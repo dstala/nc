@@ -1,11 +1,16 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import { Table, TableList, TableListParams, TableReq } from 'nc-common';
+import {
+  TableListParamsType,
+  TableListType,
+  TableReqType,
+  TableType
+} from 'nc-common';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 
-export async function tableGet(req: Request, res: Response<Table>) {
+export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
@@ -13,8 +18,8 @@ export async function tableGet(req: Request, res: Response<Table>) {
 }
 
 export async function tableList(
-  req: Request<any, any, any, TableListParams>,
-  res: Response<TableList>
+  req: Request<any, any, any, TableListParamsType>,
+  res: Response<TableListType>
 ) {
   const tables = await Model.list({
     project_id: req.params.projectId,
@@ -31,7 +36,11 @@ export async function tableList(
     });
 }
 
-export async function tableCreate(req: Request<any, any, TableReq>, res, next) {
+export async function tableCreate(
+  req: Request<any, any, TableReqType>,
+  res,
+  next
+) {
   try {
     console.log(req.params);
 

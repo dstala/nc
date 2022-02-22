@@ -386,12 +386,19 @@ export default {
     },
     async getAuditsAndComments() {
       this.loadingLogs = true
-      const data = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: this.dbAlias }, 'xcModelRowAuditAndCommentList', {
-        model_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___'),
-        model_name: this.meta._tn,
-        comments: this.commentsOnly
-      }])
-      this.logs = data.list
+      // const data = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: this.dbAlias }, 'xcModelRowAuditAndCommentList', {
+      //   model_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___'),
+      //   model_name: this.meta._tn,
+      //   comments: this.commentsOnly
+      // }])
+
+      const data = (await this.$api.meta.commentList({
+        row_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___'),
+        fk_model_id: this.meta.id,
+        comments_only: this.commentsOnly
+      })).data
+
+      this.logs = data
       this.loadingLogs = false
     },
     async save() {
@@ -462,14 +469,21 @@ export default {
     },
     async saveComment() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [
-          { dbAlias: this.dbAlias },
-          'xcAuditCommentInsert', {
-            model_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___'),
-            model_name: this.meta._tn,
-            description: this.comment
-          }
-        ])
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [
+        //   { dbAlias: this.dbAlias },
+        //   'xcAuditCommentInsert', {
+        //     model_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___'),
+        //     model_name: this.meta._tn,
+        //     description: this.comment
+        //   }
+        // ])
+
+        await this.$api.meta.commentRow({
+          fk_model_id: this.meta.id,
+          row_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___'),
+          description: this.comment
+        })
+
         this.comment = ''
         this.$toast.success('Comment added successfully').goAway(3000)
         this.$emit('commented')

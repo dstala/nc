@@ -9,7 +9,7 @@ import { Transaction } from 'knex';
 import GridViewColumn from './GridViewColumn';
 import Sort from './Sort';
 import Filter from './Filter';
-import { View as ViewType, ViewTypes } from 'nc-common';
+import { ViewType, ViewTypes } from 'nc-common';
 import GalleryViewColumn from './GalleryViewColumn';
 import FormViewColumn from './FormViewColumn';
 import { NcError } from '../noco/meta/api/helpers/catchError';

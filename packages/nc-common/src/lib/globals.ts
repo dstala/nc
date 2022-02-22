@@ -20,3 +20,8 @@ export enum ErrorMessages {
   INVALID_SHARED_VIEW_PASSWORD = 'INVALID_SHARED_VIEW_PASSWORD',
 NOT_IMPLEMENTED='NOT_IMPLEMENTED',
 }
+
+
+export enum AuditOperationTypes {
+  COMMENT='COMMENT'
+}

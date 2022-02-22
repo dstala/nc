@@ -3,7 +3,12 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import { SortList, Table, TableListParams, TableReq } from 'nc-common';
+import {
+  SortListType,
+  TableListParamsType,
+  TableReqType,
+  TableType
+} from 'nc-common';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
@@ -11,12 +16,12 @@ import Project from '../../../noco-models/Project';
 import Sort from '../../../noco-models/Sort';
 
 // @ts-ignore
-export async function sortGet(req: Request, res: Response<Table>) {}
+export async function sortGet(req: Request, res: Response<TableType>) {}
 
 // @ts-ignore
 export async function sortList(
-  req: Request<any, any, any, TableListParams>,
-  res: Response<SortList>,
+  req: Request<any, any, any, TableListParamsType>,
+  res: Response<SortListType>,
   next
 ) {
   try {
@@ -30,7 +35,11 @@ export async function sortList(
 }
 
 // @ts-ignore
-export async function sortCreate(req: Request<any, any, TableReq>, res, next) {
+export async function sortCreate(
+  req: Request<any, any, TableReqType>,
+  res,
+  next
+) {
   try {
     const sort = await Sort.insert({
       ...req.body,

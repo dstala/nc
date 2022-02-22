@@ -9,7 +9,7 @@
  * ---------------------------------------------------------------
  */
 
-export interface User {
+export interface UserType {
   /** Unique identifier for the given user. */
   id: number;
   firstName: string;
@@ -34,11 +34,18 @@ export interface User {
   createDate?: string;
 }
 
-export interface UserList {
-  users: { list: User; pageInfo: Paginated };
+export interface UserListType {
+  users: { list: UserType; pageInfo: PaginatedType };
 }
 
-export interface Project {
+export interface ProjectReqType {
+  title?: string;
+  description?: string;
+  color?: string;
+  bases?: BaseReqType[];
+}
+
+export interface ProjectType {
   id?: string;
   title?: string;
   status?: string;
@@ -47,21 +54,14 @@ export interface Project {
   color?: string;
   deleted?: string | boolean;
   order?: number;
-  bases?: Base[];
+  bases?: BaseType[];
 }
 
-export interface ProjectReq {
-  title?: string;
-  description?: string;
-  color?: string;
-  bases?: BaseReq[];
+export interface ProjectListType {
+  projects: { list: ProjectType[]; pageInfo: PaginatedType };
 }
 
-export interface ProjectList {
-  projects: { list: Project[]; pageInfo: Paginated };
-}
-
-export interface Base {
+export interface BaseType {
   id?: string;
   project_id?: string;
   alias?: string;
@@ -76,7 +76,7 @@ export interface Base {
   ssl?: string;
 }
 
-export interface BaseReq {
+export interface BaseReqType {
   alias?: string;
   host?: string;
   port?: number;
@@ -89,11 +89,11 @@ export interface BaseReq {
   ssl?: string;
 }
 
-export interface BaseList {
-  bases: { list: Base[]; pageInfo: Paginated };
+export interface BaseListType {
+  bases: { list: BaseType[]; pageInfo: PaginatedType };
 }
 
-export interface Table {
+export interface TableType {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
@@ -107,11 +107,11 @@ export interface Table {
   pinned?: boolean;
   deleted?: boolean;
   order?: number;
-  columns?: Column[];
+  columns?: ColumnType[];
   columnsById?: object;
 }
 
-export interface View {
+export interface ViewType {
   id?: string;
   title?: string;
   deleted?: boolean;
@@ -119,7 +119,7 @@ export interface View {
   fk_model_id?: string;
 }
 
-export interface TableInfo {
+export interface TableInfoType {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
@@ -133,12 +133,12 @@ export interface TableInfo {
   pinned?: boolean;
   deleted?: boolean;
   order?: number;
-  column?: Column[];
-  filters?: Filter[];
-  sort?: Sort[];
+  column?: ColumnType[];
+  filters?: FilterType[];
+  sort?: SortType[];
 }
 
-export interface TableReq {
+export interface TableReqType {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
@@ -155,11 +155,11 @@ export interface TableReq {
   columns?: string | any[];
 }
 
-export interface TableList {
-  tables: { list: Table[]; pageInfo: Paginated };
+export interface TableListType {
+  tables: { list: TableType[]; pageInfo: PaginatedType };
 }
 
-export interface Filter {
+export interface FilterType {
   id?: string;
   fk_model_id?: string;
   fk_column_id?: string;
@@ -167,14 +167,14 @@ export interface Filter {
   comparison_op?: string;
   value?: string | number | number | boolean | null;
   is_group?: boolean;
-  children?: Filter[];
+  children?: FilterType[];
 }
 
-export interface FilterList {
-  filters: { list: Filter[] };
+export interface FilterListType {
+  filters: { list: FilterType[] };
 }
 
-export interface Sort {
+export interface SortType {
   id?: string;
   fk_model_id?: string;
   fk_column_id?: string;
@@ -182,11 +182,11 @@ export interface Sort {
   order?: number;
 }
 
-export interface SortList {
-  sorts: { list: SharedView[] };
+export interface SortListType {
+  sorts: { list: SharedViewType[] };
 }
 
-export interface Column {
+export interface ColumnType {
   id?: string;
   base_id?: string;
   fk_model_id?: string;
@@ -216,20 +216,20 @@ export interface Column {
   visible?: boolean;
   order?: number;
   colOptions?:
-    | LinkToAnotherRecord
-    | Formula
-    | Rollup
-    | Lookup
-    | SelectOptions[];
+    | LinkToAnotherRecordType
+    | FormulaType
+    | RollupType
+    | LookupType
+    | SelectOptionsType[];
   cn?: string;
   _cn?: string;
 }
 
-export interface ColumnList {
-  columns: { list: Column[] };
+export interface ColumnListType {
+  columns: { list: ColumnType[] };
 }
 
-export interface LinkToAnotherRecord {
+export interface LinkToAnotherRecordType {
   id?: string;
   type?: string;
   virtual?: boolean;
@@ -247,7 +247,7 @@ export interface LinkToAnotherRecord {
   order?: string;
 }
 
-export interface Lookup {
+export interface LookupType {
   id?: string;
   type?: string;
   virtual?: boolean;
@@ -258,7 +258,7 @@ export interface Lookup {
   order?: string;
 }
 
-export interface Rollup {
+export interface RollupType {
   id?: string;
   type?: string;
   virtual?: boolean;
@@ -270,7 +270,7 @@ export interface Rollup {
   order?: string;
 }
 
-export interface Formula {
+export interface FormulaType {
   id?: string;
   type?: string;
   virtual?: boolean;
@@ -280,7 +280,7 @@ export interface Formula {
   order?: string;
 }
 
-export interface SelectOptions {
+export interface SelectOptionsType {
   id?: string;
   type?: string;
   virtual?: boolean;
@@ -290,7 +290,7 @@ export interface SelectOptions {
   order?: number;
 }
 
-export interface Grid {
+export interface GridType {
   id?: string;
   title?: string;
   alias?: string;
@@ -298,7 +298,7 @@ export interface Grid {
   order?: number;
 }
 
-export interface Gallery {
+export interface GalleryType {
   fk_view_id?: string;
   title?: string;
   alias?: string;
@@ -311,12 +311,12 @@ export interface Gallery {
   restrict_types?: string;
   restrict_size?: string;
   restrict_number?: string;
-  columns?: GalleryColumn[];
+  columns?: GalleryColumnType[];
   fk_model_id?: string;
   fk_cover_image_col_id?: string;
 }
 
-export interface GalleryColumn {
+export interface GalleryColumnType {
   id?: string;
   label?: string;
   help?: string;
@@ -324,7 +324,7 @@ export interface GalleryColumn {
   fk_gallery_id?: string;
 }
 
-export interface GridColumn {
+export interface GridColumnType {
   id?: string;
   label?: string;
   help?: string;
@@ -332,7 +332,7 @@ export interface GridColumn {
   fk_gallery_id?: string;
 }
 
-export interface KanbanColumn {
+export interface KanbanColumnType {
   id?: string;
   label?: string;
   help?: string;
@@ -340,17 +340,17 @@ export interface KanbanColumn {
   fk_kanban_id?: string;
 }
 
-export interface Kanban {
+export interface KanbanType {
   id?: string;
   title?: string;
   alias?: string;
   public?: boolean;
   password?: string;
-  columns?: KanbanColumn[];
+  columns?: KanbanColumnType[];
   fk_model_id?: string;
 }
 
-export interface Form {
+export interface FormType {
   id?: string;
   title?: string;
   heading?: string;
@@ -362,11 +362,11 @@ export interface Form {
   banner_image_url?: string;
   logo_url?: string;
   submit_another_form?: boolean;
-  columns?: FormColumn[];
+  columns?: FormColumnType[];
   fk_model_id?: string;
 }
 
-export interface FormColumn {
+export interface FormColumnType {
   fk_column_id?: string;
   id?: string;
   fk_view_id?: string;
@@ -381,7 +381,7 @@ export interface FormColumn {
   description?: string;
 }
 
-export interface Paginated {
+export interface PaginatedType {
   pageSize?: number;
   totalRows?: number;
   sort?: string | any[];
@@ -390,26 +390,29 @@ export interface Paginated {
   page?: number;
 }
 
-export interface HookList {
-  hooks: { list: object[]; pageInfo: Paginated };
+export interface HookListType {
+  hooks: { list: object[]; pageInfo: PaginatedType };
 }
 
-export interface SharedView {
+export interface SharedViewType {
   id?: string;
   fk_view_id?: string;
   password?: string;
   deleted?: string;
 }
 
-export interface SharedViewList {
-  sharedViews: { list: SharedView[]; pageInfo: Paginated };
+export interface SharedViewListType {
+  sharedViews: { list: SharedViewType[]; pageInfo: PaginatedType };
 }
 
-export interface ViewList {
-  views: { list: Grid | Form | Kanban | Gallery; pageInfo: Paginated };
+export interface ViewListType {
+  views: {
+    list: GridType | FormType | KanbanType | GalleryType;
+    pageInfo: PaginatedType;
+  };
 }
 
-export interface Attachment {
+export interface AttachmentType {
   url?: string;
   title?: string;
   mimetype?: string;
@@ -417,19 +420,63 @@ export interface Attachment {
   icon?: string;
 }
 
-export interface Webhook {
+export interface WebhookType {
   id?: string;
   title?: string;
   type?: string;
 }
 
-export interface ProjectListParams {
+export interface AuditType {
+  id?: string;
+  user?: string;
+  ip?: string;
+  base_id?: string;
+  project_id?: string;
+  row_id?: string;
+  op_type?: string;
+  op_sub_type?: string;
+  status?: string;
+  description?: string;
+  details?: string;
+}
+
+export interface UploadPayloadType {
+  files?: any;
+  json?: string;
+}
+
+export interface SigninPayloadType {
+  email: string;
+  password: string;
+}
+
+export interface PasswordForgotPayloadType {
+  email?: string;
+}
+
+export interface PasswordChangePayloadType {
+  old_password?: string;
+  new_password?: string;
+  new_password_repeat?: string;
+}
+
+export interface PasswordResetPayloadType {
+  reset_token?: string;
+  new_password?: string;
+}
+
+export interface TokenVerifyPayloadType {
+  token?: string;
+  email?: string;
+}
+
+export interface ProjectListParamsType {
   page?: number;
   pageSize?: number;
   sort?: string;
 }
 
-export interface TableListParams {
+export interface TableListParamsType {
   page?: number;
   pageSize?: number;
   sort?: string;
@@ -437,17 +484,70 @@ export interface TableListParams {
   baseId: string;
 }
 
-export interface DataListParams {
+export interface ViewUpdatePayloadType {
+  order?: string;
+  title?: string;
+}
+
+export type ViewColumnCreatePayloadType = any;
+
+export type ViewColumnUpdatePayloadType = any;
+
+export interface SetSharedViewPasswordPayloadType {
+  password?: string;
+}
+
+export type CreatePayloadType = any;
+
+export interface DataListPayloadType {
+  password?: string;
+  sorts?: string;
+  filters?: string;
+}
+
+export interface DataListParamsType {
   limit?: string;
   offset?: string;
   uuid: string;
 }
 
-export interface DataRelationListParams {
+export interface DataCreatePayloadType {
+  data?: any;
+  password?: string;
+}
+
+export interface DataRelationListPayloadType {
+  password?: string;
+}
+
+export interface DataRelationListParamsType {
   limit?: string;
   offset?: string;
   uuid: string;
   relationColumnId: string;
+}
+
+export interface SharedViewMetaGetPayloadType {
+  password?: string;
+}
+
+export type UpdatePayloadType = any;
+
+export interface CommentListParamsType {
+  row_id: string;
+  fk_model_id: string;
+  comments_only?: boolean;
+}
+
+export interface CommentRowPayloadType {
+  row_id: string;
+  fk_model_id: string;
+  comment: string;
+}
+
+export interface CommentCountParamsType {
+  ids: any[];
+  fk_model_id: string;
 }
 
 import axios, {
@@ -636,7 +736,7 @@ export class Api<
      * @request GET:/auth/user/me
      */
     me: (params: RequestParams = {}) =>
-      this.request<User, any>({
+      this.request<UserType, any>({
         path: `/auth/user/me`,
         method: 'GET',
         format: 'json',
@@ -651,10 +751,7 @@ export class Api<
      * @summary Signin
      * @request POST:/auth/user/signin
      */
-    signin: (
-      data: { email: string; password: string },
-      params: RequestParams = {}
-    ) =>
+    signin: (data: SigninPayloadType, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/auth/user/signin`,
         method: 'POST',
@@ -671,7 +768,10 @@ export class Api<
      * @summary Password Forgot
      * @request POST:/auth/password/forgot
      */
-    passwordForgot: (data: { email?: string }, params: RequestParams = {}) =>
+    passwordForgot: (
+      data: PasswordForgotPayloadType,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/auth/password/forgot`,
         method: 'POST',
@@ -689,11 +789,7 @@ export class Api<
      * @request POST:/auth/password/change
      */
     passwordChange: (
-      data: {
-        old_password?: string;
-        new_password?: string;
-        new_password_repeat?: string;
-      },
+      data: PasswordChangePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -713,7 +809,7 @@ export class Api<
      * @request POST:/auth/password/reset
      */
     passwordReset: (
-      data: { reset_token?: string; new_password?: string },
+      data: PasswordResetPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -732,10 +828,7 @@ export class Api<
      * @summary Password Verify
      * @request POST:/auth/token/verify
      */
-    tokenVerify: (
-      data: { token?: string; email?: string },
-      params: RequestParams = {}
-    ) =>
+    tokenVerify: (data: TokenVerifyPayloadType, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/auth/token/verify`,
         method: 'POST',
@@ -771,7 +864,7 @@ export class Api<
     upload: (
       projectId: string,
       viewId: string,
-      data: { files?: any; json?: string },
+      data: UploadPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -790,11 +883,11 @@ export class Api<
      * @request GET:/projects/
      */
     projectList: (
-      query: ProjectListParams,
-      data: ProjectReq,
+      query: ProjectListParamsType,
+      data: ProjectReqType,
       params: RequestParams = {}
     ) =>
-      this.request<ProjectList, any>({
+      this.request<ProjectListType, any>({
         path: `/projects/`,
         method: 'GET',
         query: query,
@@ -809,8 +902,8 @@ export class Api<
      * @name ProjectCreate
      * @request POST:/projects/
      */
-    projectCreate: (data: Project, params: RequestParams = {}) =>
-      this.request<Project, any>({
+    projectCreate: (data: ProjectType, params: RequestParams = {}) =>
+      this.request<ProjectType, any>({
         path: `/projects/`,
         method: 'POST',
         body: data,
@@ -827,7 +920,7 @@ export class Api<
      * @request GET:/projects/{projectId}
      */
     projectRead: (projectId: string, params: RequestParams = {}) =>
-      this.request<object, Project>({
+      this.request<object, ProjectType>({
         path: `/projects/${projectId}`,
         method: 'GET',
         format: 'json',
@@ -844,10 +937,10 @@ export class Api<
     tableCreate: (
       projectId: string,
       baseId: string,
-      data: TableReq,
+      data: TableReqType,
       params: RequestParams = {}
     ) =>
-      this.request<Table, any>({
+      this.request<TableType, any>({
         path: `/projects/${projectId}/${baseId}/tables`,
         method: 'POST',
         body: data,
@@ -864,10 +957,10 @@ export class Api<
      * @request GET:/projects/{projectId}/{baseId}/tables
      */
     tableList: (
-      { projectId, baseId, ...query }: TableListParams,
+      { projectId, baseId, ...query }: TableListParamsType,
       params: RequestParams = {}
     ) =>
-      this.request<TableList, any>({
+      this.request<TableListType, any>({
         path: `/projects/${projectId}/${baseId}/tables`,
         method: 'GET',
         query: query,
@@ -882,7 +975,7 @@ export class Api<
      * @request GET:/tables/{tableId}
      */
     tableRead: (tableId: string, params: RequestParams = {}) =>
-      this.request<TableInfo, any>({
+      this.request<TableInfoType, any>({
         path: `/tables/${tableId}`,
         method: 'GET',
         format: 'json',
@@ -926,7 +1019,7 @@ export class Api<
      * @request GET:/tables/{tableId}/columns
      */
     columnList: (tableId: string, params: RequestParams = {}) =>
-      this.request<ColumnList, any>({
+      this.request<ColumnListType, any>({
         path: `/tables/${tableId}/columns`,
         method: 'GET',
         ...params,
@@ -940,7 +1033,11 @@ export class Api<
      * @summary Column create
      * @request POST:/tables/{tableId}/columns
      */
-    columnCreate: (tableId: string, data: Column, params: RequestParams = {}) =>
+    columnCreate: (
+      tableId: string,
+      data: ColumnType,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/tables/${tableId}/columns`,
         method: 'POST',
@@ -962,7 +1059,7 @@ export class Api<
       columnId: string,
       params: RequestParams = {}
     ) =>
-      this.request<Column, any>({
+      this.request<ColumnType, any>({
         path: `/tables/${tableId}/columns/${columnId}`,
         method: 'GET',
         format: 'json',
@@ -980,10 +1077,10 @@ export class Api<
     columnUpdate: (
       tableId: string,
       columnId: string,
-      data: Column,
+      data: ColumnType,
       params: RequestParams = {}
     ) =>
-      this.request<Column, any>({
+      this.request<ColumnType, any>({
         path: `/tables/${tableId}/columns/${columnId}`,
         method: 'PUT',
         body: data,
@@ -1019,7 +1116,7 @@ export class Api<
      */
     viewUpdate: (
       viewId: string,
-      data: { order?: string; title?: string },
+      data: ViewUpdatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1052,7 +1149,7 @@ export class Api<
      * @request GET:/views/{viewId}/filters - copy
      */
     filterRead: (viewId: string, params: RequestParams = {}) =>
-      this.request<FilterList, any>({
+      this.request<FilterListType, any>({
         path: `/views/${viewId}/filters - copy`,
         method: 'GET',
         ...params,
@@ -1065,7 +1162,11 @@ export class Api<
      * @name FilterCreate
      * @request POST:/views/{viewId}/filters - copy
      */
-    filterCreate: (viewId: string, data: Filter, params: RequestParams = {}) =>
+    filterCreate: (
+      viewId: string,
+      data: FilterType,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/views/${viewId}/filters - copy`,
         method: 'POST',
@@ -1095,7 +1196,11 @@ export class Api<
      * @name ViewColumnCreate
      * @request POST:/views/{viewId}/columns
      */
-    viewColumnCreate: (viewId: string, data: any, params: RequestParams = {}) =>
+    viewColumnCreate: (
+      viewId: string,
+      data: ViewColumnCreatePayloadType,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/views/${viewId}/columns`,
         method: 'POST',
@@ -1133,7 +1238,7 @@ export class Api<
     viewColumnUpdate: (
       viewId: string,
       columnId: string,
-      data: any,
+      data: ViewColumnUpdatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1152,7 +1257,7 @@ export class Api<
      * @request GET:/views/{viewId}/sorts
      */
     sortList: (viewId: string, params: RequestParams = {}) =>
-      this.request<SortList, { uuid?: string; url?: string }>({
+      this.request<SortListType, { uuid?: string; url?: string }>({
         path: `/views/${viewId}/sorts`,
         method: 'GET',
         ...params,
@@ -1165,7 +1270,7 @@ export class Api<
      * @name SortCreate
      * @request POST:/views/{viewId}/sorts
      */
-    sortCreate: (viewId: string, data: Sort, params: RequestParams = {}) =>
+    sortCreate: (viewId: string, data: SortType, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/sorts`,
         method: 'POST',
@@ -1198,10 +1303,10 @@ export class Api<
      */
     setSharedViewPassword: (
       viewId: string,
-      data: { password?: string },
+      data: SetSharedViewPasswordPayloadType,
       params: RequestParams = {}
     ) =>
-      this.request<SharedView, any>({
+      this.request<SharedViewType, any>({
         path: `/views/${viewId}/share`,
         method: 'PUT',
         body: data,
@@ -1232,7 +1337,7 @@ export class Api<
      * @request GET:/views/{viewId}/sorts/{sortId}
      */
     sortGet: (viewId: string, sortId: string, params: RequestParams = {}) =>
-      this.request<Sort, any>({
+      this.request<SortType, any>({
         path: `/views/${viewId}/sorts/${sortId}`,
         method: 'GET',
         format: 'json',
@@ -1249,7 +1354,7 @@ export class Api<
     sortUpdate: (
       viewId: string,
       sortId: string,
-      data: Sort,
+      data: SortType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1282,7 +1387,7 @@ export class Api<
      * @request GET:/views/{viewId}/filters/{filterId}
      */
     filterGet: (viewId: string, filterId: string, params: RequestParams = {}) =>
-      this.request<Filter, any>({
+      this.request<FilterType, any>({
         path: `/views/${viewId}/filters/${filterId}`,
         method: 'GET',
         format: 'json',
@@ -1299,7 +1404,7 @@ export class Api<
     filterUpdate: (
       viewId: string,
       filterId: string,
-      data: Filter,
+      data: FilterType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1340,7 +1445,7 @@ export class Api<
       filterParentId: string,
       params: RequestParams = {}
     ) =>
-      this.request<Filter, any>({
+      this.request<FilterType, any>({
         path: `/views/${viewId}/filters/${filterParentId}/children`,
         method: 'GET',
         format: 'json',
@@ -1409,7 +1514,7 @@ export class Api<
      * @request GET:/tables/{tableId}/webhooks
      */
     webhookList: (tableId: string, params: RequestParams = {}) =>
-      this.request<Webhook[], any>({
+      this.request<WebhookType[], any>({
         path: `/tables/${tableId}/webhooks`,
         method: 'GET',
         format: 'json',
@@ -1425,7 +1530,7 @@ export class Api<
      */
     webhookCreate: (
       tableId: string,
-      data: Webhook,
+      data: WebhookType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1443,8 +1548,8 @@ export class Api<
      * @name GridCreate
      * @request POST:/tables/{tableId}/grids
      */
-    gridCreate: (tableId: string, data: Grid, params: RequestParams = {}) =>
-      this.request<Grid, any>({
+    gridCreate: (tableId: string, data: GridType, params: RequestParams = {}) =>
+      this.request<GridType, any>({
         path: `/tables/${tableId}/grids`,
         method: 'POST',
         body: data,
@@ -1502,8 +1607,8 @@ export class Api<
      * @name FormCreate
      * @request POST:/tables/{tableId}/forms
      */
-    formCreate: (tableId: string, data: Form, params: RequestParams = {}) =>
-      this.request<Form, any>({
+    formCreate: (tableId: string, data: FormType, params: RequestParams = {}) =>
+      this.request<FormType, any>({
         path: `/tables/${tableId}/forms`,
         method: 'POST',
         body: data,
@@ -1519,7 +1624,7 @@ export class Api<
      * @name FormUpdate
      * @request PUT:/forms/{formId}
      */
-    formUpdate: (formId: string, data: Form, params: RequestParams = {}) =>
+    formUpdate: (formId: string, data: FormType, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/forms/${formId}`,
         method: 'PUT',
@@ -1536,7 +1641,7 @@ export class Api<
      * @request GET:/forms/{formId}
      */
     formRead: (formId: string, params: RequestParams = {}) =>
-      this.request<Form, any>({
+      this.request<FormType, any>({
         path: `/forms/${formId}`,
         method: 'GET',
         format: 'json',
@@ -1552,7 +1657,7 @@ export class Api<
      */
     formColumnUpdate: (
       columnId: string,
-      data: FormColumn,
+      data: FormColumnType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1573,7 +1678,7 @@ export class Api<
      */
     galleryCreate: (
       tableId: string,
-      data: Gallery,
+      data: GalleryType,
       params: RequestParams = {}
     ) =>
       this.request<object, any>({
@@ -1594,7 +1699,7 @@ export class Api<
      */
     galleryUpdate: (
       galleryId: string,
-      data: Gallery,
+      data: GalleryType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1627,7 +1732,7 @@ export class Api<
      * @request GET:/galleries/{galleryId}
      */
     galleryRead: (galleryId: string, params: RequestParams = {}) =>
-      this.request<Gallery, any>({
+      this.request<GalleryType, any>({
         path: `/galleries/${galleryId}`,
         method: 'GET',
         format: 'json',
@@ -1710,9 +1815,72 @@ export class Api<
      * @request GET:/tables/{tableId}/views
      */
     viewsList: (tableId: string, params: RequestParams = {}) =>
-      this.request<ViewList, any>({
+      this.request<ViewListType, any>({
         path: `/tables/${tableId}/views`,
         method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name CommentList
+     * @request GET:/audits/comments
+     */
+    commentList: (query: CommentListParamsType, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/audits/comments`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name CommentRow
+     * @request POST:/audits/comments
+     */
+    commentRow: (data: CommentRowPayloadType, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/audits/comments`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name CommentCount
+     * @request GET:/audits/comments/count
+     */
+    commentCount: (query: CommentCountParamsType, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/audits/comments/count`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name AuditList
+     * @request GET:/audits
+     */
+    auditList: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/audits`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
   };
@@ -1854,7 +2022,11 @@ export class Api<
      * @name Create
      * @request POST:/data/{tableId}
      */
-    create: (tableId: string, data: any, params: RequestParams = {}) =>
+    create: (
+      tableId: string,
+      data: CreatePayloadType,
+      params: RequestParams = {}
+    ) =>
       this.request<any, any>({
         path: `/data/${tableId}`,
         method: 'POST',
@@ -1907,7 +2079,7 @@ export class Api<
     update: (
       tableId: string,
       rowId: string,
-      data: any,
+      data: UpdatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1962,8 +2134,8 @@ export class Api<
      * @request POST:public/data/{uuid}/list
      */
     dataList: (
-      { uuid, ...query }: DataListParams,
-      data: { password?: string; sorts?: string; filters?: string },
+      { uuid, ...query }: DataListParamsType,
+      data: DataListPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1985,7 +2157,7 @@ export class Api<
      */
     dataCreate: (
       uuid: string,
-      data: { data?: any; password?: string },
+      data: DataCreatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -2005,8 +2177,8 @@ export class Api<
      * @request POST:public/data/{uuid}/relationTable/{relationColumnId}
      */
     dataRelationList: (
-      { uuid, relationColumnId, ...query }: DataRelationListParams,
-      data: { password?: string },
+      { uuid, relationColumnId, ...query }: DataRelationListParamsType,
+      data: DataRelationListPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -2028,7 +2200,7 @@ export class Api<
      */
     sharedViewMetaGet: (
       uuid: string,
-      data: { password?: string },
+      data: SharedViewMetaGetPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<object, any>({

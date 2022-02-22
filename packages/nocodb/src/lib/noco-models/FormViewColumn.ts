@@ -1,8 +1,8 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
-import { FormColumn } from 'nc-common';
+import { FormColumnType } from 'nc-common';
 
-export default class FormViewColumn implements FormColumn {
+export default class FormViewColumn implements FormColumnType {
   id?: string;
   label?: string;
   help?: string;

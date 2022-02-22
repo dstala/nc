@@ -3,7 +3,12 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import { Table, TableList, TableListParams, TableReq } from 'nc-common';
+import {
+  TableListParamsType,
+  TableListType,
+  TableReqType,
+  TableType
+} from 'nc-common';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
@@ -11,17 +16,17 @@ import Project from '../../../noco-models/Project';
 import catchError from './helpers/catchError';
 
 // @ts-ignore
-export async function webhookGet(req: Request, res: Response<Table>) {}
+export async function webhookGet(req: Request, res: Response<TableType>) {}
 
 // @ts-ignore
 export async function webhookList(
-  _req: Request<any, any, any, TableListParams>,
-  _res: Response<TableList>
+  _req: Request<any, any, any, TableListParamsType>,
+  _res: Response<TableListType>
 ) {}
 
 // @ts-ignore
 export async function webhookCreate(
-  _req: Request<any, any, TableReq>,
+  _req: Request<any, any, TableReqType>,
   _res,
   _next
 ) {}

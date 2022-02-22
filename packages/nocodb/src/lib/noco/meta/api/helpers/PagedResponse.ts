@@ -1,7 +1,7 @@
-import { Paginated } from 'nc-common';
+import { PaginatedType } from 'nc-common';
 
 export class PagedResponseImpl<T> {
-  constructor(list: T[], pageInfo?: Paginated) {
+  constructor(list: T[], pageInfo?: PaginatedType) {
     this.list = list;
     this.pageInfo = pageInfo;
     if (pageInfo) {
@@ -13,5 +13,5 @@ export class PagedResponseImpl<T> {
   }
 
   list: Array<T>;
-  pageInfo: Paginated;
+  pageInfo: PaginatedType;
 }

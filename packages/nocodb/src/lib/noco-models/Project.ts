@@ -1,6 +1,6 @@
 import Base, { BaseBody } from '../noco-models/Base';
 import Noco from '../noco/Noco';
-import { Project as ProjectType } from 'nc-common';
+import { ProjectType } from 'nc-common';
 import { MetaTable } from '../utils/globals';
 
 export default class Project implements ProjectType {

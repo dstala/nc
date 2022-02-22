@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Project from '../../../noco-models/Project';
-import { ProjectList, ProjectListParams } from 'nc-common';
+import { ProjectListParamsType, ProjectListType } from 'nc-common';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 // import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import syncMigration from './helpers/syncMigration';
@@ -18,7 +18,7 @@ import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordC
 // // Project CRUD
 
 export async function projectGet(
-  req: Request<any, any, any, ProjectListParams>,
+  req: Request<any, any, any, ProjectListParamsType>,
   res: Response<Project>
 ) {
   console.log(req.query.page);
@@ -27,8 +27,8 @@ export async function projectGet(
   res.json(project);
 }
 export async function projectList(
-  req: Request<any, any, any, ProjectListParams>,
-  res: Response<ProjectList>,
+  req: Request<any, any, any, ProjectListParamsType>,
+  res: Response<ProjectListType>,
   next
 ) {
   try {

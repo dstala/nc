@@ -364,7 +364,7 @@ export default {
     },
     groupedAggCount() {
       // eslint-disable-next-line camelcase
-      return this.aggCount ? this.aggCount.reduce((o, { model_id, count }) => ({ ...o, [model_id]: count }), {}) : {}
+      return this.aggCount ? this.aggCount.reduce((o, { row_id, count }) => ({ ...o, [row_id]: count }), {}) : {}
     },
     style() {
       let style = ''
@@ -447,9 +447,9 @@ export default {
         'LastModifiedTime'].includes(col.uidt)
     },
     async xcAuditModelCommentsCount() {
-      // if (this.isPublicView || !this.data || !this.data.length) {
-      //   return
-      // }
+      if (this.isPublicView || !this.data || !this.data.length) {
+        return
+      }
       // const aggCount = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   dbAlias: this.nodes.dbAlias
       // }, 'xcAuditModelCommentsCount', {
@@ -459,7 +459,13 @@ export default {
       //   })
       // }])
       //
-      // this.aggCount = aggCount
+
+      this.aggCount = (await this.$api.meta.commentCount({
+        ids: this.data.map(({ row: r }) => {
+          return this.meta.columns.filter(c => c.pk).map(c => r[c._cn]).join('___')
+        }),
+        fk_model_id: this.meta.id
+      })).data
     },
 
     async onKeyDown(e) {

@@ -6,13 +6,13 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
-import { isVirtualCol, Table, TableReq, ViewTypes } from 'nc-common';
+import { isVirtualCol, TableReqType, TableType, ViewTypes } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
 import { MetaTable } from '../utils/globals';
 import View from './View';
 import { Transaction } from 'knex';
 
-export default class Model implements Table {
+export default class Model implements TableType {
   copy_enabled: boolean;
   created_at: Date | number | string;
   base_id: 'db' | string;
@@ -83,7 +83,7 @@ export default class Model implements Table {
   public static async insert(
     projectId,
     baseId,
-    model: TableReq,
+    model: TableReqType,
     _trx?: Transaction
   ) {
     const { id } = await Noco.ncMeta.metaInsert2(

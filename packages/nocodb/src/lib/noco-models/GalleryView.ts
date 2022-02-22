@@ -1,10 +1,10 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
-import { Gallery, GalleryColumn } from 'nc-common';
+import { GalleryColumnType, GalleryType } from 'nc-common';
 import View from './View';
 import UITypes from '../sqlUi/UITypes';
 
-export default class GalleryView implements Gallery {
+export default class GalleryView implements GalleryType {
   fk_view_id?: string;
   title?: string;
   deleted?: boolean;
@@ -19,7 +19,7 @@ export default class GalleryView implements Gallery {
   public?: boolean;
   password?: string;
   show_all_fields?: boolean;
-  columns?: GalleryColumn[];
+  columns?: GalleryColumnType[];
   fk_model_id?: string;
   fk_cover_image_col_id?: string;
 

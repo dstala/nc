@@ -622,6 +622,36 @@ const up = async knex => {
     table.foreign('user_id').references(`${MetaTable.USERS}.id`);
     table.timestamps(true, true);
   });
+
+  await knex.schema.createTable(MetaTable.AUDIT, table => {
+    table
+      .string('id', 20)
+      .primary()
+      .notNullable();
+
+    table.string('user');
+
+    table.string('ip');
+
+    table.string('base_id', 20);
+    table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
+    table.string('fk_model_id', 20);
+    table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
+
+    table.string('row_id').index();
+
+    /* op_type - AUTH, DATA, SQL, META */
+    table.string('op_type');
+    table.string('op_sub_type');
+    table.string('status');
+    table.text('description');
+    table.text('details');
+
+    table.timestamps(false, true);
+  });
 };
 
 const down = async knex => {

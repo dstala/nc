@@ -3,7 +3,7 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from './helpers/PagedResponse';
-import { Form, ViewTypes } from 'nc-common';
+import { FormType, ViewTypes } from 'nc-common';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
@@ -13,7 +13,7 @@ import catchError from './helpers/catchError';
 import FormView from '../../../noco-models/FormView';
 
 // @ts-ignore
-export async function formViewGet(req: Request, res: Response<Form>) {
+export async function formViewGet(req: Request, res: Response<FormType>) {
   res.json(await FormView.getWithInfo(req.params.formViewId));
 }
 

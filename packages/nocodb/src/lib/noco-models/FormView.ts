@@ -1,9 +1,9 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
-import { Form } from 'nc-common';
+import { FormType } from 'nc-common';
 import FormViewColumn from './FormViewColumn';
 
-export default class FormView implements Form {
+export default class FormView implements FormType {
   show: boolean;
   is_default: boolean;
   order: number;

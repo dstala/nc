@@ -2517,6 +2517,171 @@
           "Data"
         ]
       }
+    },
+    "/audits/comments": {
+      "parameters": [],
+      "get": {
+        "summary": "",
+        "operationId": "comment-list",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "row_id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fk_model_id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "comments_only"
+          }
+        ],
+        "tags": [
+          "Meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "comment-row",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "row_id": {
+                    "type": "string"
+                  },
+                  "fk_model_id": {
+                    "type": "string"
+                  },
+                  "comment": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "row_id",
+                  "fk_model_id",
+                  "comment"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/audits/comments/count": {
+      "parameters": [],
+      "get": {
+        "summary": "",
+        "operationId": "comment-count",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "parameters": [
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "ids",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fk_model_id",
+            "required": true
+          }
+        ],
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/audits": {
+      "parameters": [],
+      "get": {
+        "summary": "",
+        "operationId": "audit-list",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "parameters": [],
+        "tags": [
+          "Meta"
+        ]
+      }
     }
   },
   "components": {
@@ -2628,6 +2793,27 @@
           "users"
         ]
       },
+      "ProjectReq": {
+        "title": "Project",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "bases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BaseReq"
+            }
+          }
+        }
+      },
       "Project": {
         "title": "Project",
         "type": "object",
@@ -2666,27 +2852,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Base"
-            }
-          }
-        }
-      },
-      "ProjectReq": {
-        "title": "Project",
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "color": {
-            "type": "string"
-          },
-          "bases": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BaseReq"
             }
           }
         }
@@ -3897,7 +4062,8 @@
           "order": {
             "type": "number"
           }
-        }
+        },
+        "description": ""
       },
       "Gallery": {
         "title": "Gallery",
@@ -4426,6 +4592,45 @@
             "type": "string"
           },
           "type": {
+            "type": "string"
+          }
+        }
+      },
+      "Audit": {
+        "title": "AuditType",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "base_id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "row_id": {
+            "type": "string"
+          },
+          "op_type": {
+            "type": "string"
+          },
+          "op_sub_type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "details": {
             "type": "string"
           }
         }

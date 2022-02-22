@@ -9,7 +9,7 @@ import SingleSelectColumn from './SingleSelectColumn';
 import MultiSelectColumn from './MultiSelectColumn';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
-import { Column as ColumnType } from 'nc-common';
+import { ColumnType } from 'nc-common';
 import { MetaTable } from '../utils/globals';
 import View from './View';
 

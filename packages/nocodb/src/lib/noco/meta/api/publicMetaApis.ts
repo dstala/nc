@@ -3,7 +3,7 @@ import catchError from './helpers/catchError';
 import View from '../../../noco-models/View';
 import Model from '../../../noco-models/Model';
 import UITypes from '../../../sqlUi/UITypes';
-import { ErrorMessages, LinkToAnotherRecord } from 'nc-common';
+import { ErrorMessages, LinkToAnotherRecordType } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import Base from '../../../noco-models/Base';
 
@@ -47,7 +47,7 @@ export async function viewMetaGet(req: Request, res: Response, next) {
   // load related table metas
   for (const col of view.model.columns) {
     if (UITypes.LinkToAnotherRecord === col.uidt) {
-      const colOpt = await col.getColOptions<LinkToAnotherRecord>();
+      const colOpt = await col.getColOptions<LinkToAnotherRecordType>();
       relatedMetas[colOpt.fk_related_model_id] = await Model.getWithInfo({
         id: colOpt.fk_related_model_id
       });
