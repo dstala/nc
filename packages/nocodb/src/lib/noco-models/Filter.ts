@@ -200,7 +200,13 @@ export default class Filter {
     const deleteRecursively = async filter => {
       if (!filter) return;
       for (const f of filter?.children || []) await deleteRecursively(f);
-      await Noco.ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
+      if (filter.id)
+        await Noco.ncMeta.metaDelete(
+          null,
+          null,
+          MetaTable.FILTER_EXP,
+          filter.id
+        );
     };
     await deleteRecursively(filter);
   }

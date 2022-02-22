@@ -42,10 +42,7 @@ export async function viewUpdate(req, res) {
 
 // @ts-ignore
 export async function viewDelete(req: Request, res: Response, next) {
-  // @ts-ignore
-  export async function viewDelete(req, res) {
-    res.json(await View.delete(req.params.viewId));
-  }
+  res.json(await View.delete(req.params.viewId));
 }
 
 const router = Router({ mergeParams: true });
@@ -54,7 +51,7 @@ router.get('/tables/:tableId/views', catchError(viewList));
 // router.get('/views/:viewId', viewGet);
 router.post('/views/:viewId/share', catchError(shareView));
 
-async function shareViewPasswqordUpdate(req: Request<any, any>, res) {
+async function shareViewPasswordUpdate(req: Request<any, any>, res) {
   res.json(await View.passwordUpdate(req.params.viewId, req.body));
 }
 
@@ -62,8 +59,8 @@ async function shareViewDelete(req: Request<any, any>, res) {
   res.json(await View.sharedViewDelete(req.params.viewId));
 }
 
-router.put('/views/:viewId/share', catchError(shareViewPasswqordUpdate));
+router.put('/views/:viewId/share', catchError(shareViewPasswordUpdate));
 router.delete('/views/:viewId/share', catchError(shareViewDelete));
-router.put('/views/:viewId', viewUpdate);
-router.delete('/views/:viewId', viewDelete);
+router.put('/views/:viewId', catchError(viewUpdate));
+router.delete('/views/:viewId', catchError(viewDelete));
 export default router;

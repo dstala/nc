@@ -1014,12 +1014,46 @@ export class Api<
      * No description
      *
      * @tags Meta
+     * @name ViewUpdate
+     * @request PUT:/views/{viewId}
+     */
+    viewUpdate: (
+      viewId: string,
+      data: { order?: string; title?: string },
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name ViewDelete
+     * @request DELETE:/views/{viewId}
+     */
+    viewDelete: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
      * @name FilterRead
-     * @request GET:/views/{viewId}/filters
+     * @request GET:/views/{viewId}/filters - copy
      */
     filterRead: (viewId: string, params: RequestParams = {}) =>
       this.request<FilterList, any>({
-        path: `/views/${viewId}/filters`,
+        path: `/views/${viewId}/filters - copy`,
         method: 'GET',
         ...params,
       }),
@@ -1029,11 +1063,11 @@ export class Api<
      *
      * @tags Meta
      * @name FilterCreate
-     * @request POST:/views/{viewId}/filters
+     * @request POST:/views/{viewId}/filters - copy
      */
     filterCreate: (viewId: string, data: Filter, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/views/${viewId}/filters`,
+        path: `/views/${viewId}/filters - copy`,
         method: 'POST',
         body: data,
         type: ContentType.Json,

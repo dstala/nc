@@ -25,7 +25,7 @@
               >
                 <transition-group type="transition" :name="!drag ? 'flip-list' : null">
                   <v-list-item
-                    v-for="(view, i) in views"
+                    v-for="(view, i) in viewsList"
                     :key="view.id"
                     dense
                     :value="view.id"
@@ -82,7 +82,7 @@
                     <template v-if="_isUIAllowed('virtualViewsCreateOrEdit')">
                       <!-- Copy view -->
                       <x-icon
-                        v-if="view.type === 'vtable' && !view.edit"
+                        v-if="!view.edit"
                         :tooltip="$t('nav_drawer.virtual_views.action.copy')"
                         x-small
                         color="primary"
@@ -93,7 +93,7 @@
                       </x-icon>
                       <!-- Rename view -->
                       <x-icon
-                        v-if="view.type === 'vtable' && !view.edit"
+                        v-if="!view.edit"
                         :tooltip="$t('nav_drawer.virtual_views.action.rename')"
                         x-small
                         color="primary"
@@ -104,7 +104,6 @@
                       </x-icon>
                       <!-- Delete view" -->
                       <x-icon
-                        v-if="view.type === 'vtable'"
                         :tooltip="$t('nav_drawer.virtual_views.action.delete')"
                         small
                         color="error"
@@ -576,7 +575,6 @@ export default {
     sharedViewPassword: '',
     overAdvShieldIcon: false,
     overShieldIcon: false,
-    viewsList: [],
     viewIcons,
     copyViewRef: null,
     shareLink: {},
@@ -585,6 +583,14 @@ export default {
     loading: false
   }),
   computed: {
+    viewsList: {
+      set(v) {
+        this.$emit('update:views', v)
+      },
+      get() {
+        return this.views
+      }
+    },
     viewTypes() {
       return ViewTypes
     },
@@ -654,19 +660,24 @@ export default {
   methods: {
     async onMove(event) {
       if (this.viewsList.length - 1 === event.moved.newIndex) {
-        this.$set(this.viewsList[event.moved.newIndex], 'view_order', this.viewsList[event.moved.newIndex - 1].view_order + 1)
+        this.$set(this.viewsList[event.moved.newIndex], 'order', this.viewsList[event.moved.newIndex - 1].order + 1)
       } else if (event.moved.newIndex === 0) {
-        this.$set(this.viewsList[event.moved.newIndex], 'view_order', this.viewsList[1].view_order / 2)
+        this.$set(this.viewsList[event.moved.newIndex], 'order', this.viewsList[1].order / 2)
       } else {
-        this.$set(this.viewsList[event.moved.newIndex], 'view_order', (this.viewsList[event.moved.newIndex - 1].view_order + this.viewsList[event.moved.newIndex + 1].view_order) / 2)
+        this.$set(this.viewsList[event.moved.newIndex], 'order', (this.viewsList[event.moved.newIndex - 1].order + this.viewsList[event.moved.newIndex + 1].order) / 2)
       }
 
       console.log(this.viewsList)
 
-      await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'xcModelViewOrderSet', {
-        id: this.viewsList[event.moved.newIndex].id,
-        view_order: this.viewsList[event.moved.newIndex].view_order
-      }])
+      // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'xcModelViewOrderSet', {
+      //   id: this.viewsList[event.moved.newIndex].id,
+      //   order: this.viewsList[event.moved.newIndex].view_order
+      // }])
+      //
+      await this.$api.meta.viewUpdate(this.viewsList[event.moved.newIndex].id, {
+        title: this.viewsList[event.moved.newIndex].title,
+        order: this.viewsList[event.moved.newIndex].order
+      })
     },
     onViewIdChange(id) {
       const selectedView = this.views && this.views.find(v => v.id === id)
@@ -796,7 +807,7 @@ export default {
         return
       }
 
-      const oldTitle = view.title
+      // const oldTitle = view.title
 
       this.$set(view, 'edit', false)
       if (view.title_temp === view.title) {
@@ -816,12 +827,16 @@ export default {
           })
         }
         this.$set(view, 'title', view.title_temp)
-        await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableRename', {
-          id: view.id,
-          old_title: oldTitle,
-          title: view.title_temp,
-          alias: view.alias,
-          parent_model_title: this.meta.tn
+        // await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableRename', {
+        //   id: view.id,
+        //   old_title: oldTitle,
+        //   title: view.title_temp,
+        //   alias: view.alias,
+        //   parent_model_title: this.meta.tn
+        // })
+        await this.$api.meta.viewUpdate(view.id, {
+          title: view.title,
+          order: view.order
         })
         this.$toast.success('View renamed successfully').goAway(3000)
       } catch (e) {
@@ -839,12 +854,13 @@ export default {
     },
     async deleteView(view) {
       try {
-        await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableDelete', {
-          id: view.id,
-          title: view.alias || view.title,
-          view_name: view.alias || view.title,
-          parent_model_title: this.table
-        })
+        // await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableDelete', {
+        //   id: view.id,
+        //   title: view.alias || view.title,
+        //   view_name: view.alias || view.title,
+        //   parent_model_title: this.table
+        // })
+        await this.$api.meta.viewDelete(view.id)
         this.$toast.success('View deleted successfully').goAway(3000)
         await this.loadViews()
       } catch (e) {

@@ -12,6 +12,7 @@ import Filter from './Filter';
 import { View as ViewType, ViewTypes } from 'nc-common';
 import GalleryViewColumn from './GalleryViewColumn';
 import FormViewColumn from './FormViewColumn';
+import { NcError } from '../noco/meta/api/helpers/catchError';
 
 const { v4: uuidv4 } = require('uuid');
 export default class View implements ViewType {
@@ -367,21 +368,7 @@ export default class View implements ViewType {
   ): Promise<Array<GridViewColumn | any>> {
     const columns: Array<GridViewColumn | any> = [];
     const view = await this.get(viewId);
-    let table;
-    switch (view.type) {
-      case ViewTypes.GRID:
-        table = MetaTable.GRID_VIEW_COLUMNS;
-        break;
-      case ViewTypes.GALLERY:
-        table = MetaTable.GALLERY_VIEW_COLUMNS;
-        break;
-      case ViewTypes.KANBAN:
-        table = MetaTable.KANBAN_VIEW_COLUMNS;
-        break;
-      case ViewTypes.FORM:
-        table = MetaTable.FORM_VIEW_COLUMNS;
-        break;
-    }
+    const table = this.extractViewColumnsTableName(view);
 
     const existingCol = await Noco.ncMeta.metaGet2(null, null, table, {
       fk_view_id: viewId,
@@ -485,6 +472,57 @@ export default class View implements ViewType {
 
   // @ts-ignore
   static async delete(viewId) {
-    // todo:
+    const view = await this.get(viewId);
+
+    if (view.is_default) NcError.badRequest("Default view can't be deleted");
+
+    await Sort.deleteAll(viewId);
+    await Filter.deleteAll(viewId);
+    const table = this.extractViewTableName(view);
+    const columnTable = this.extractViewColumnsTableName(view);
+    await Noco.ncMeta.metaDelete(null, null, columnTable, {
+      fk_view_id: viewId
+    });
+    await Noco.ncMeta.metaDelete(null, null, table, {
+      fk_view_id: viewId
+    });
+    await Noco.ncMeta.metaDelete(null, null, MetaTable.VIEWS, viewId);
+  }
+
+  private static extractViewColumnsTableName(view: View) {
+    let table;
+    switch (view.type) {
+      case ViewTypes.GRID:
+        table = MetaTable.GRID_VIEW_COLUMNS;
+        break;
+      case ViewTypes.GALLERY:
+        table = MetaTable.GALLERY_VIEW_COLUMNS;
+        break;
+      case ViewTypes.KANBAN:
+        table = MetaTable.KANBAN_VIEW_COLUMNS;
+        break;
+      case ViewTypes.FORM:
+        table = MetaTable.FORM_VIEW_COLUMNS;
+        break;
+    }
+    return table;
+  }
+  private static extractViewTableName(view: View) {
+    let table;
+    switch (view.type) {
+      case ViewTypes.GRID:
+        table = MetaTable.GRID_VIEW;
+        break;
+      case ViewTypes.GALLERY:
+        table = MetaTable.GALLERY_VIEW;
+        break;
+      case ViewTypes.KANBAN:
+        table = MetaTable.KANBAN_VIEW;
+        break;
+      case ViewTypes.FORM:
+        table = MetaTable.FORM_VIEW;
+        break;
+    }
+    return table;
   }
 }

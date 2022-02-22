@@ -886,7 +886,60 @@
         }
       }
     },
-    "/views/{viewId}/filters": {
+    "/views/{viewId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "view-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "view-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/views/{viewId}/filters - copy": {
       "parameters": [
         {
           "schema": {

@@ -14,9 +14,9 @@ export default class Sort {
     Object.assign(this, data);
   }
 
-  public static async deleteAll(modelId: string) {
+  public static async deleteAll(viewId: string) {
     await Noco.ncMeta.metaDelete(null, null, MetaTable.SORT, {
-      fk_view_id: modelId
+      fk_view_id: viewId
     });
   }
 
