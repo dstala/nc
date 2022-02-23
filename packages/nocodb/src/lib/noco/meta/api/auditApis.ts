@@ -1,12 +1,17 @@
 import catchError from './helpers/catchError';
-import { Request, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import Audit from '../../../noco-models/Audit';
 import {
+  AuditOperationSubTypes,
   AuditOperationTypes,
+  AuditRowUpdatePayloadType,
   CommentCountParamsType,
   CommentListParamsType,
-  CommentRowPayloadType
+  CommentRowPayloadType,
+  ProjectAuditListParamsType
 } from 'nc-common';
+import Model from '../../../noco-models/Model';
+import { PagedResponseImpl } from './helpers/PagedResponse';
 
 export async function commentRow(
   req: Request<any, any, CommentRowPayloadType>,
@@ -19,12 +24,48 @@ export async function commentRow(
     })
   );
 }
+
+export async function auditRowUpdate(
+  req: Request<any, any, AuditRowUpdatePayloadType>,
+  res
+) {
+  const model = await Model.get({ id: req.body.fk_model_id });
+  res.json(
+    await Audit.insert({
+      fk_model_id: req.body.fk_model_id,
+      row_id: req.body.row_id,
+      op_type: AuditOperationTypes.DATA,
+      op_sub_type: AuditOperationSubTypes.UPDATE,
+      description: `Table ${model.tn} : field ${req.body.column_name} got changed from  ${req.body.prev_value} to ${req.body.value}`,
+      details: `<span class="">${req.body.column_name}</span>
+  : <span class="text-decoration-line-through red px-2 lighten-4 black--text">${req.body.prev_value}</span>
+  <span class="black--text green lighten-4 px-2">${req.body.value}</span>`,
+      ip: (req as any).clientIp,
+      user: (req as any).user?.email
+    })
+  );
+}
+
 export async function commentList(
   req: Request<any, any, any, CommentListParamsType>,
   res
 ) {
   res.json(await Audit.commentsList(req.query));
 }
+export async function auditList(
+  req: Request<ProjectAuditListParamsType>,
+  res: Response
+) {
+  res.json({
+    audits: new PagedResponseImpl(
+      await Audit.projectAuditList(req.params.projectId),
+      {
+        totalRows: await Audit.projectAuditCount(req.params.projectId)
+      }
+    )
+  });
+}
+
 export async function commentsCount(
   req: Request<any, any, any, CommentCountParamsType>,
   res
@@ -39,6 +80,8 @@ export async function commentsCount(
 
 const router = Router({ mergeParams: true });
 router.get('/audits/comments', catchError(commentList));
+router.post('/audits/rowUpdate', catchError(auditRowUpdate));
 router.post('/audits/comments', catchError(commentRow));
 router.get('/audits/comments/count', catchError(commentsCount));
+router.get('/project/:projectId/audits', catchError(auditList));
 export default router;

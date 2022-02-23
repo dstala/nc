@@ -1288,19 +1288,19 @@ class BaseModelSqlv2 {
 
   public async afterInsert(data: any, _trx: any, req): Promise<void> {
     await this.handleHooks('After.insert', data, req);
-    if (req?.headers?.['xc-gui']) {
-      const id = this._extractPksValues(data);
-      Audit.insert({
-        fk_model_id: this.model.id,
-        row_id: id,
-        op_type: AuditOperationTypes.DATA,
-        op_sub_type: AuditOperationSubTypes.INSERT,
-        description: `${id} inserted into ${this.model._tn}`,
-        // details: JSON.stringify(data),
-        ip: req?.clientIp,
-        user: req?.user?.email
-      });
-    }
+    // if (req?.headers?.['xc-gui']) {
+    const id = this._extractPksValues(data);
+    Audit.insert({
+      fk_model_id: this.model.id,
+      row_id: id,
+      op_type: AuditOperationTypes.DATA,
+      op_sub_type: AuditOperationSubTypes.INSERT,
+      description: `${id} inserted into ${this.model._tn}`,
+      // details: JSON.stringify(data),
+      ip: req?.clientIp,
+      user: req?.user?.email
+    });
+    // }
   }
 
   public async beforeUpdate(data: any, _trx: any, req): Promise<void> {
@@ -1316,19 +1316,19 @@ class BaseModelSqlv2 {
   }
 
   public async afterDelete(data: any, _trx: any, req): Promise<void> {
-    if (req?.headers?.['xc-gui']) {
-      const id = req?.params?.id;
-      Audit.insert({
-        fk_model_id: this.model.id,
-        row_id: id,
-        op_type: AuditOperationTypes.DATA,
-        op_sub_type: AuditOperationSubTypes.DELETE,
-        description: `${id} deleted from ${this.model._tn}`,
-        // details: JSON.stringify(data),
-        ip: req?.clientIp,
-        user: req?.user?.email
-      });
-    }
+    // if (req?.headers?.['xc-gui']) {
+    const id = req?.params?.id;
+    Audit.insert({
+      fk_model_id: this.model.id,
+      row_id: id,
+      op_type: AuditOperationTypes.DATA,
+      op_sub_type: AuditOperationSubTypes.DELETE,
+      description: `${id} deleted from ${this.model._tn}`,
+      // details: JSON.stringify(data),
+      ip: req?.clientIp,
+      user: req?.user?.email
+    });
+    // }
     await this.handleHooks('After.delete', data, req);
   }
 

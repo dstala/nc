@@ -17,6 +17,7 @@ import publicDataApis from './publicDataApis';
 import publicMetaApis from './publicMetaApis';
 import exportApis from './exportApis';
 import auditApis from './auditApis';
+import hookApis from './hookApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -37,4 +38,5 @@ export default function(router: Router) {
   router.use('/public/meta/:uuid', publicMetaApis);
   router.use('/', exportApis);
   router.use('/', auditApis);
+  router.use('/', hookApis);
 }

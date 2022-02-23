@@ -2,6 +2,8 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import {
+  AuditOperationSubTypes,
+  AuditOperationTypes,
   TableListParamsType,
   TableListType,
   TableReqType,
@@ -9,6 +11,7 @@ import {
 } from 'nc-common';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
+import Audit from '../../../noco-models/Audit';
 
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
@@ -55,6 +58,15 @@ export async function tableCreate(
       base_id: base.id
     });
 
+    Audit.insert({
+      project_id: project.id,
+      op_type: AuditOperationTypes.TABLE,
+      op_sub_type: AuditOperationSubTypes.CREATED,
+      user: (req as any)?.user?.email,
+      description: `created table ${req.body.tn} with alias ${req.body._tn}  `,
+      ip: (req as any).clientIp
+    }).then(() => {});
+
     res.json(
       await Model.insert(project.id, base.id, {
         ...req.body,
@@ -83,6 +95,15 @@ export async function tableDelete(req: Request, res: Response, next) {
     const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
 
     await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
+
+    Audit.insert({
+      project_id: project.id,
+      op_type: AuditOperationTypes.TABLE,
+      op_sub_type: AuditOperationSubTypes.DELETED,
+      user: (req as any)?.user?.email,
+      description: `Deleted table ${table.tn} with alias ${table._tn}  `,
+      ip: (req as any).clientIp
+    }).then(() => {});
 
     res.json(table.delete());
   } catch (e) {

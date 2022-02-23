@@ -13,7 +13,13 @@ import {
   getUniqueColumnAliasName,
   getUniqueColumnName
 } from './helpers/getUniqueName';
-import { LinkToAnotherRecordType, TableType } from 'nc-common';
+import {
+  AuditOperationSubTypes,
+  AuditOperationTypes,
+  LinkToAnotherRecordType,
+  TableType
+} from 'nc-common';
+import Audit from '../../../noco-models/Audit';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
@@ -392,6 +398,14 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
 
     await table.getColumns(true);
 
+    Audit.insert({
+      project_id: base.project_id,
+      op_type: AuditOperationTypes.TABLE_COLUMN,
+      op_sub_type: AuditOperationSubTypes.CREATED,
+      user: (req as any)?.user?.email,
+      description: `created column ${colBody.cn} with alias ${colBody._cn} from table ${table.tn}`,
+      ip: (req as any).clientIp
+    }).then(() => {});
     res.json(table);
   } catch (e) {
     console.log(e);
@@ -448,6 +462,15 @@ export async function columnUpdate(
     ...colBody
   });
 
+  Audit.insert({
+    project_id: base.project_id,
+    op_type: AuditOperationTypes.TABLE_COLUMN,
+    op_sub_type: AuditOperationSubTypes.UPDATED,
+    user: (req as any)?.user?.email,
+    description: `updated column ${column.cn} with alias ${column._cn} from table ${table.tn}`,
+    ip: (req as any).clientIp
+  }).then(() => {});
+
   await table.getColumns(true);
 
   res.json(table);
@@ -472,12 +495,13 @@ export async function columnDelete(
     case UITypes.ForeignKey:
       return next(new Error('Not implemented'));
   }
-
+  let column: Column;
   const tableUpdateBody = {
     ...table,
     originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),
     columns: table.columns.map(c => {
       if (c.id === req.params.columnId) {
+        column = c;
         return { ...c, cno: c.cn, altered: Altered.DELETE_COLUMN };
       }
       return c;
@@ -488,6 +512,15 @@ export async function columnDelete(
   await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
 
   await Column.delete(req.params.columnId);
+
+  Audit.insert({
+    project_id: base.project_id,
+    op_type: AuditOperationTypes.TABLE_COLUMN,
+    op_sub_type: AuditOperationSubTypes.DELETED,
+    user: (req as any)?.user?.email,
+    description: `deleted column ${column.cn} with alias ${column._cn} from table ${table.tn}`,
+    ip: (req as any).clientIp
+  }).then(() => {});
 
   await table.getColumns(true);
 

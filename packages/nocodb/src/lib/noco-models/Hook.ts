@@ -68,4 +68,72 @@ export default class Hook implements HookType {
     });
     return hooks?.map(h => new Hook(h));
   }
+
+  public static async insert(hook: Partial<Hook>) {
+    const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.HOOKS, {
+      fk_model_id: hook.fk_model_id,
+      title: hook.title,
+      description: hook.description,
+      env: hook.env,
+      type: hook.type,
+      event: hook.event,
+      operation: hook.operation,
+      async: hook.async,
+      payload: !!hook.payload,
+      url: hook.url,
+      headers: hook.headers,
+      condition:
+        hook.condition && typeof hook.condition === 'object'
+          ? JSON.stringify(hook.condition)
+          : hook.condition,
+      notification:
+        hook.notification && typeof hook.notification === 'object'
+          ? JSON.stringify(hook.notification)
+          : hook.notification,
+      retries: hook.retries,
+      retry_interval: hook.retry_interval,
+      timeout: hook.timeout,
+      active: hook.active
+    });
+
+    return this.get(id);
+  }
+  public static async update(hookId: string, hook: Partial<Hook>) {
+    await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.HOOKS,
+      {
+        title: hook.title,
+        description: hook.description,
+        env: hook.env,
+        type: hook.type,
+        event: hook.event,
+        operation: hook.operation,
+        async: hook.async,
+        payload: !!hook.payload,
+        url: hook.url,
+        headers: hook.headers,
+        condition:
+          hook.condition && typeof hook.condition === 'object'
+            ? JSON.stringify(hook.condition)
+            : hook.condition,
+        notification:
+          hook.notification && typeof hook.notification === 'object'
+            ? JSON.stringify(hook.notification)
+            : hook.notification,
+        retries: hook.retries,
+        retry_interval: hook.retry_interval,
+        timeout: hook.timeout,
+        active: hook.active
+      },
+      hookId
+    );
+
+    return this.get(hookId);
+  }
+
+  static async delete(hookId: any) {
+    return await Noco.ncMeta.metaDelete(null, null, MetaTable.HOOKS, hookId);
+  }
 }

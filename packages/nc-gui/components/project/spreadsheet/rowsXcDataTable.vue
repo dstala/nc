@@ -1130,9 +1130,19 @@ export default {
           const newData = (await this.$api.data.update(this.meta.id, id, {
             [column._cn]: rowObj[column._cn]
           })).data// { [column._cn]: oldRow[column._cn] })
+
+          // audit
+          this.$api.meta.auditRowUpdate({
+            fk_model_id: this.meta.id,
+            column_name: column._cn,
+            row_id: id,
+            value: rowObj[column._cn],
+            prev_value: oldRow[column._cn]
+          }).then(() => {})
+
           this.$set(this.data[row], 'row', { ...rowObj, ...newData })
 
-            .this.$set(oldRow, column._cn, rowObj[column._cn])
+          this.$set(oldRow, column._cn, rowObj[column._cn])
           /*    this.$toast.success(`${rowObj[this.primaryValueColumn] ? `${rowObj[this.primaryValueColumn]}'s c` : 'C'}olumn '${column.cn}' updated successfully.`, {
             position: 'bottom-center'
           }).goAway(3000) */

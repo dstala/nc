@@ -260,7 +260,7 @@
 <script>
 
 import dayjs from 'dayjs'
-import { isVirtualCol, UITypes } from 'nc-common'
+import { AuditOperationSubTypes, AuditOperationTypes, isVirtualCol, UITypes } from 'nc-common'
 import form from '../mixins/form'
 import HeaderCell from '@/components/project/spreadsheet/components/headerCell'
 import EditableCell from '@/components/project/spreadsheet/components/editableCell'
@@ -437,6 +437,16 @@ export default {
           }
           // await this.api.update(id, updatedObj, this.oldRow)
           await this.$api.data.update(this.viewId || this.meta.id, id, updatedObj)
+          for (const key of Object.keys(updatedObj)) {
+            // audit
+            this.$api.meta.auditRowUpdate({
+              fk_model_id: this.meta.id,
+              column_name: key,
+              row_id: id,
+              value: updatedObj[key],
+              prev_value: this.oldRow[key]
+            }).then(() => {})
+          }
         } else {
           return this.$toast.info('No columns to update').goAway(3000)
         }

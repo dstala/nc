@@ -202,6 +202,7 @@
                     <column-filter
                       v-if="enableCondition && _isEE"
                       v-model="hook.condition"
+                      :shared="true"
                       :meta="meta"
                       :field-list="fieldList"
                       dense
@@ -570,24 +571,42 @@ export default {
       }
       this.loading = true
       try {
-        const res = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-          {
-            env: this.nodes.env,
-            dbAlias: this.nodes.dbAlias
-          }, 'tableXcHooksSet', {
-            tn: this.nodes.tn,
-            data: {
-              ...this.hook,
-              notification: {
-                ...this.hook.notification,
-                payload: this.notification
-              }
+        // const res = await this.$store.dispatch('sqlMgr/ActSqlOp', [
+        //   {
+        //     env: this.nodes.env,
+        //     dbAlias: this.nodes.dbAlias
+        //   }, 'tableXcHooksSet', {
+        //     tn: this.nodes.tn,
+        //     data: {
+        //       ...this.hook,
+        //       notification: {
+        //         ...this.hook.notification,
+        //         payload: this.notification
+        //       }
+        //     }
+        //   }
+        // ])
+        let res
+        if (this.hook.id) {
+          res = await this.$api.meta.hookUpdate(this.hook.id, {
+            ...this.hook,
+            notification: {
+              ...this.hook.notification,
+              payload: this.notification
             }
-          }
-        ])
+          })
+        } else {
+          res = await this.$api.meta.hookCreate(this.meta.id, {
+            ...this.hook,
+            notification: {
+              ...this.hook.notification,
+              payload: this.notification
+            }
+          })
+        }
 
         if (!this.hook.id && res) {
-          this.hook.id = Array.isArray(res) ? res[0] : res
+          this.hook.id = res.data.id
         }
 
         this.$toast.success('Webhook details updated successfully').goAway(3000)
@@ -599,25 +618,28 @@ export default {
     },
     async loadMeta() {
       this.loadingMeta = true
-      const tableMeta = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'tableXcModelGet', {
-        tn: this.nodes.tn
-      }])
-      this.meta = JSON.parse(tableMeta.meta)
+      // const tableMeta = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias
+      // }, 'tableXcModelGet', {
+      //   tn: this.nodes.tn
+      // }] )
+      this.meta = await this.$store.dispatch('meta/ActLoadMeta', { tn: this.nodes.tn })// JSON.parse(tableMeta.meta)
       this.fieldList = this.meta.columns.map(c => c.cn)
       this.loadingMeta = false
     },
     async loadHooksList() {
       this.loading = true
-      const hooks = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'tableXcHooksList', {
-        tn: this.nodes.tn
-      }])
-      this.hooks = hooks.data.list.map((h) => {
+      // const hooks = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   env: this.nodes.env,
+      //   dbAlias: this.nodes.dbAlias
+      // }, 'tableXcHooksList', {
+      //   tn: this.nodes.tn
+      // }])
+
+      const hooks = await this.$api.meta.hookList(this.meta.id)
+
+      this.hooks = hooks.data.hooks.list.map((h) => {
         h.notification = h.notification && JSON.parse(h.notification)
         h.condition = h.condition && JSON.parse(h.condition)
 

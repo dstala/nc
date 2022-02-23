@@ -2654,14 +2654,23 @@
         ]
       }
     },
-    "/audits": {
-      "parameters": [],
+    "project/{projectId}/audits": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
       "get": {
         "summary": "",
-        "operationId": "audit-list",
+        "operationId": "project-audit-list",
         "responses": {
-          "201": {
-            "description": "Created",
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2688,45 +2697,104 @@
                       ]
                     }
                   }
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "audits": {
+                        "list": [
+                          {
+                            "id": "string",
+                            "user": "string",
+                            "ip": "string",
+                            "base_id": "string",
+                            "project_id": "string",
+                            "fk_model_id": "string",
+                            "row_id": "string",
+                            "op_type": "string",
+                            "op_sub_type": "string",
+                            "status": "string",
+                            "description": "string",
+                            "details": "string"
+                          }
+                        ],
+                        "pageInfo": {
+                          "pageSize": 0,
+                          "totalRows": 0,
+                          "sort": "string",
+                          "isFirstPage": true,
+                          "isLastPage": true,
+                          "page": 0
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           }
         },
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "offset"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "limit"
+          }
+        ],
         "tags": [
           "Meta"
         ]
-      },
+      }
+    },
+    "/audits/rowUpdate": {
+      "parameters": [],
       "post": {
         "summary": "",
-        "operationId": "audit-create",
+        "operationId": "audit-row-update",
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Audit"
-                }
-              }
-            }
+            "description": "OK"
           }
         },
-        "description": "",
+        "tags": [
+          "Meta"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Audit"
+                "type": "object",
+                "properties": {
+                  "fk_model_id": {
+                    "type": "string"
+                  },
+                  "column_name": {
+                    "type": "string"
+                  },
+                  "row_id": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "prev_value": {
+                    "type": "string"
+                  }
+                }
               }
             }
           }
-        },
-        "tags": [
-          "Meta"
-        ]
+        }
       }
     },
     "/tables/{tableId}/hooks": {
@@ -2860,12 +2928,28 @@
         "operationId": "hook-update",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Hook"
+                }
+              }
+            }
           }
         },
         "tags": [
           "meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Hook"
+              }
+            }
+          }
+        }
       },
       "delete": {
         "summary": "",

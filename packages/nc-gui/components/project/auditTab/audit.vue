@@ -95,12 +95,20 @@ export default {
   },
   methods: {
     async loadAudits() {
-      const { list, count } = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcAuditList', {
-        limit: this.limit,
-        offset: this.limit * (this.page - 1)
-      }])
+      // const { list, count } = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcAuditList', {
+      //   limit: this.limit,
+      //   offset: this.limit * (this.page - 1)
+      // }])
+      const {
+        audits: {
+          list, pageInfo
+        }
+      } = (await this.$api.meta.projectAuditList({
+        projectId: this.$store.state.project.projectId
+      })).data
+
       this.audits = list
-      this.count = count
+      this.count = pageInfo.totalRows
     },
     calculateDiff(date) {
       return dayjs.utc(date).fromNow()

@@ -654,7 +654,10 @@ const up = async knex => {
   });
 
   await knex.schema.createTable(MetaTable.HOOKS, table => {
-    table.increments();
+    table
+      .string('id', 20)
+      .primary()
+      .notNullable();
 
     table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);

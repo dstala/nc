@@ -5,6 +5,7 @@ import {
 } from 'nc-common';
 import { MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
+import Model from './Model';
 
 export default class Audit implements AuditType {
   id?: string;
@@ -35,6 +36,11 @@ export default class Audit implements AuditType {
   }
 
   public static async insert(audit: Partial<Audit>) {
+    if (!audit.project_id && audit.fk_model_id) {
+      audit.project_id = (
+        await Model.get({ id: audit.fk_model_id })
+      ).project_id;
+    }
     const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.AUDIT, {
       user: audit.user,
       ip: audit.ip,
@@ -62,6 +68,7 @@ export default class Audit implements AuditType {
       .select('row_id')
       .whereIn('row_id', args.ids)
       .where('fk_model_id', args.fk_model_id)
+      .where('op_type', AuditOperationTypes.COMMENT)
       .groupBy('row_id');
 
     return audits?.map(a => new Audit(a));
@@ -72,10 +79,27 @@ export default class Audit implements AuditType {
       .where('row_id', args.row_id)
       .where('fk_model_id', args.fk_model_id);
 
-    if (args.comments_only) query.where('op_type', AuditOperationTypes.COMMENT);
+    if ((args.comments_only as any) == 'true')
+      query.where('op_type', AuditOperationTypes.COMMENT);
+
+    console.log(query.toQuery());
 
     const audits = await query;
 
     return audits?.map(a => new Audit(a));
+  }
+
+  static async projectAuditList(projectId: string) {
+    return await Noco.ncMeta.metaList2(null, null, MetaTable.AUDIT, {
+      condition: { project_id: projectId }
+    });
+  }
+  static async projectAuditCount(projectId: string): Promise<number> {
+    return (
+      await Noco.ncMeta
+        .knex(MetaTable.AUDIT)
+        .where({ project_id: projectId })
+        .count('id', { as: 'count' })
+    )?.count;
   }
 }

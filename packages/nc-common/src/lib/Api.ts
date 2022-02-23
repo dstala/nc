@@ -572,6 +572,20 @@ export interface CommentCountParamsType {
   fk_model_id: string;
 }
 
+export interface ProjectAuditListParamsType {
+  offset?: string;
+  limit?: string;
+  projectId: string;
+}
+
+export interface AuditRowUpdatePayloadType {
+  fk_model_id?: string;
+  column_name?: string;
+  row_id?: string;
+  value?: string;
+  prev_value?: string;
+}
+
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -1895,16 +1909,20 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name AuditList
-     * @request GET:/audits
+     * @name ProjectAuditList
+     * @request GET:project/{projectId}/audits
      */
-    auditList: (params: RequestParams = {}) =>
+    projectAuditList: (
+      { projectId, ...query }: ProjectAuditListParamsType,
+      params: RequestParams = {}
+    ) =>
       this.request<
         { audits?: { list: AuditType[]; pageInfo: PaginatedType } },
         any
       >({
-        path: `/audits`,
+        path: `project/${projectId}/audits`,
         method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),
@@ -1913,16 +1931,18 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name AuditCreate
-     * @request POST:/audits
+     * @name AuditRowUpdate
+     * @request POST:/audits/rowUpdate
      */
-    auditCreate: (data: AuditType, params: RequestParams = {}) =>
-      this.request<AuditType, any>({
-        path: `/audits`,
+    auditRowUpdate: (
+      data: AuditRowUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/audits/rowUpdate`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
-        format: 'json',
         ...params,
       }),
 
@@ -1986,10 +2006,13 @@ export class Api<
      * @name HookUpdate
      * @request PUT:/hooks/{hookId}
      */
-    hookUpdate: (hookId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    hookUpdate: (hookId: string, data: HookType, params: RequestParams = {}) =>
+      this.request<HookType, any>({
         path: `/hooks/${hookId}`,
         method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 

@@ -335,7 +335,7 @@ export default {
 <style scoped>
 .grid {
   display: grid;
-  grid-template-columns:22px 120px 110px auto;
+  grid-template-columns:22px auto auto auto;
   column-gap: 6px;
   row-gap: 6px
 }
