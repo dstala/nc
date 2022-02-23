@@ -59,3 +59,8 @@ export enum AuditOperationSubTypes {
   INVITE = 'INVITE',
   RESEND_INVITE = 'RESEND_INVITE',
 }
+
+export enum PluginCategory {
+  STORAGE='Storage',
+  EMAIL='Email'
+}

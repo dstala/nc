@@ -33,6 +33,7 @@ import ejs from 'ejs';
 import Audit from '../../../noco-models/Audit';
 import FormView from '../../../noco-models/FormView';
 import Hook from '../../../noco-models/Hook';
+import NcPluginMgrv2 from '../../../noco/meta/api/helpers/NcPluginMgrv2';
 
 /**
  * Base class for models
@@ -1426,28 +1427,46 @@ class BaseModelSqlv2 {
             this.handleHttpWebHook(notification?.payload, req, data);
             break;
           default:
-            if (
-              this.webhookNotificationAdapters &&
-              notification?.type &&
-              notification?.type in this.webhookNotificationAdapters
-            ) {
-              this.webhookNotificationAdapters[notification.type].sendMessage(
-                this.parseBody(
-                  notification?.payload?.body,
-                  req,
-                  data,
-                  notification?.payload
-                ),
-                JSON.parse(
-                  JSON.stringify(notification?.payload),
-                  (_key, value) => {
-                    return typeof value === 'string'
-                      ? this.parseBody(value, req, data, notification?.payload)
-                      : value;
-                  }
-                )
-              );
-            }
+            // if (
+            //   this.webhookNotificationAdapters &&
+            //   notification?.type &&
+            //   notification?.type in this.webhookNotificationAdapters
+            // ) {
+            //   this.webhookNotificationAdapters[notification.type].sendMessage(
+            //     this.parseBody(
+            //       notification?.payload?.body,
+            //       req,
+            //       data,
+            //       notification?.payload
+            //     ),
+            //     JSON.parse(
+            //       JSON.stringify(notification?.payload),
+            //       (_key, value) => {
+            //         return typeof value === 'string'
+            //           ? this.parseBody(value, req, data, notification?.payload)
+            //           : value;
+            //       }
+            //     )
+            //   );
+            (
+              await NcPluginMgrv2.webhookNotificationAdapters(notification.type)
+            ).sendMessage(
+              this.parseBody(
+                notification?.payload?.body,
+                req,
+                data,
+                notification?.payload
+              ),
+              JSON.parse(
+                JSON.stringify(notification?.payload),
+                (_key, value) => {
+                  return typeof value === 'string'
+                    ? this.parseBody(value, req, data, notification?.payload)
+                    : value;
+                }
+              )
+            );
+            // }
             break;
         }
 
@@ -1457,7 +1476,7 @@ class BaseModelSqlv2 {
       }
       // }
     } catch (e) {
-      console.log('hooks :: error', hookName, e.message);
+      console.log('hooks :: error', hookName, e);
     }
   }
 

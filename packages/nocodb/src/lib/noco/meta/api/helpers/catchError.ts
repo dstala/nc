@@ -46,7 +46,7 @@ export class NcError {
   static internalServerError(message) {
     throw new InternalServerError(message);
   }
-  static notImplemented(message) {
+  static notImplemented(message = 'Not implemented') {
     throw new NotImplemented(message);
   }
 }

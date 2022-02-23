@@ -122,9 +122,9 @@
                             <x-icon small color="error" @click.stop="deleteHook(item, i)">
                               mdi-delete
                             </x-icon>
-                            <!--              <x-icon small :color="loading || !valid || !hook.event ?  'grey' : 'primary'"
-                                                  @click.stop="(!loading && valid && hook.event) && saveHooks()">save
-                                          </x-icon>-->
+                          <!--              <x-icon small :color="loading || !valid || !hook.event ?  'grey' : 'primary'"
+                                                @click.stop="(!loading && valid && hook.event) && saveHooks()">save
+                                        </x-icon>-->
                           </td>
                         </tr>
                       </template>
@@ -368,6 +368,7 @@ export default {
   },
   props: ['nodes'],
   data: () => ({
+    apps: {},
     slackChannels: null,
     teamsChannels: null,
     discordChannels: null,
@@ -491,10 +492,27 @@ export default {
   async created() {
     await this.loadMeta()
     await this.loadHooksList()
+    // todo: load only necessary plugins
+    await this.loadPluginList()
     this.selectedHook = 0
     this.onEventChange()
   },
   methods: {
+    async loadPluginList() {
+      try {
+        // const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
+        const plugins = (await this.$api.meta.pluginList()).data.plugins.list
+        // plugins.push(...plugins.splice(0, 3))
+        this.apps = plugins.reduce((o, p) => {
+          p.tags = p.tags ? p.tags.split(',') : []
+          p.parsedInput = p.input && JSON.parse(p.input)
+          o[p.title] = p
+          return o
+        }, {})
+      } catch (e) {
+
+      }
+    },
     checkConditionAvail() {
       if (!process.env.EE) {
         this.enableCondition = false
@@ -517,10 +535,10 @@ export default {
         this.teamsChannels = JSON.parse(plugin.input) || []
       }
       if (this.hook.notification.type === 'Discord') {
-        const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
-          title: 'Discord'
-        }])
-        this.discordChannels = JSON.parse(plugin.input) || []
+        // const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
+        //   title: 'Discord'
+        // }])
+        this.discordChannels = (this.apps && this.apps.Discord && this.apps.Discord.parsedInput) || []
       }
       if (this.hook.notification.type === 'Mattermost') {
         const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
@@ -533,7 +551,13 @@ export default {
       if (!this.hooks || !this.hooks.length) {
         return
       }
-      const { notification: { payload, type } = {}, ...hook } = this.hooks[this.selectedHook] || {}
+      const {
+        notification: {
+          payload,
+          type
+        } = {},
+        ...hook
+      } = this.hooks[this.selectedHook] || {}
 
       this.hook = {
         ...hook,

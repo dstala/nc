@@ -36,6 +36,7 @@ import NcUpgrader from './upgrader/NcUpgrader';
 import NcMetaMgrv2 from './meta/NcMetaMgrv2';
 import NocoCache from '../noco-cache/NocoCache';
 import registerMetaApis from './meta/api';
+import NcPluginMgrv2 from './meta/api/helpers/NcPluginMgrv2';
 
 const log = debug('nc:app');
 require('dotenv').config();
@@ -233,7 +234,10 @@ export default class Noco {
     this.metaMgrv2.setListener(runTimeHandler);
     await this.metaMgr.initHandler(this.router);
     await this.metaMgrv2.initHandler(this.router);
+
+    await NcPluginMgrv2.init(Noco.ncMeta);
     registerMetaApis(this.router);
+
     this.router.use(
       this.config.dashboardPath,
       await this.ncToolApi.expressMiddleware()

@@ -462,6 +462,27 @@ export interface HookType {
   active?: boolean;
 }
 
+export interface PluginType {
+  id?: string;
+  title?: string;
+  description?: string;
+  active?: boolean;
+  rating?: number;
+  version?: string;
+  docs?: string;
+  status?: string;
+  status_details?: string;
+  logo?: string;
+  icon?: string;
+  tags?: string;
+  category?: string;
+  input_schema?: string;
+  input?: string;
+  creator?: string;
+  creator_website?: string;
+  price?: string;
+}
+
 export interface UploadPayloadType {
   files?: any;
   json?: string;
@@ -750,6 +771,7 @@ export class Api<
      * @name Signup
      * @summary Signup
      * @request POST:/auth/user/signup
+     * @response `200` `{ email: string, password: string }` OK
      */
     signup: (
       data: { email?: boolean; password?: string },
@@ -770,6 +792,7 @@ export class Api<
      * @name Me
      * @summary User Info
      * @request GET:/auth/user/me
+     * @response `200` `UserType` OK
      */
     me: (params: RequestParams = {}) =>
       this.request<UserType, any>({
@@ -786,6 +809,7 @@ export class Api<
      * @name Signin
      * @summary Signin
      * @request POST:/auth/user/signin
+     * @response `200` `void` OK
      */
     signin: (data: SigninPayloadType, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -803,6 +827,7 @@ export class Api<
      * @name PasswordForgot
      * @summary Password Forgot
      * @request POST:/auth/password/forgot
+     * @response `200` `void` OK
      */
     passwordForgot: (
       data: PasswordForgotPayloadType,
@@ -823,6 +848,7 @@ export class Api<
      * @name PasswordChange
      * @summary Password Change
      * @request POST:/auth/password/change
+     * @response `200` `void` OK
      */
     passwordChange: (
       data: PasswordChangePayloadType,
@@ -843,6 +869,7 @@ export class Api<
      * @name PasswordReset
      * @summary Password Reset
      * @request POST:/auth/password/reset
+     * @response `200` `void` OK
      */
     passwordReset: (
       data: PasswordResetPayloadType,
@@ -863,6 +890,7 @@ export class Api<
      * @name TokenVerify
      * @summary Password Verify
      * @request POST:/auth/token/verify
+     * @response `200` `void` OK
      */
     tokenVerify: (data: TokenVerifyPayloadType, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -880,6 +908,7 @@ export class Api<
      * @name TokenRefresh
      * @summary Password Refresh
      * @request POST:/auth/token/refresh
+     * @response `200` `void` OK
      */
     tokenRefresh: (params: RequestParams = {}) =>
       this.request<void, any>({
@@ -917,6 +946,7 @@ export class Api<
      * @tags Meta
      * @name ProjectList
      * @request GET:/projects/
+     * @response `201` `ProjectListType`
      */
     projectList: (
       query: ProjectListParamsType,
@@ -937,6 +967,7 @@ export class Api<
      * @tags Meta
      * @name ProjectCreate
      * @request POST:/projects/
+     * @response `200` `ProjectType` OK
      */
     projectCreate: (data: ProjectType, params: RequestParams = {}) =>
       this.request<ProjectType, any>({
@@ -954,6 +985,8 @@ export class Api<
      * @tags Meta
      * @name ProjectRead
      * @request GET:/projects/{projectId}
+     * @response `200` `object` OK
+     * @response `0` `ProjectType`
      */
     projectRead: (projectId: string, params: RequestParams = {}) =>
       this.request<object, ProjectType>({
@@ -969,6 +1002,7 @@ export class Api<
      * @tags Meta
      * @name TableCreate
      * @request POST:/projects/{projectId}/{baseId}/tables
+     * @response `200` `TableType` OK
      */
     tableCreate: (
       projectId: string,
@@ -991,6 +1025,7 @@ export class Api<
      * @tags Meta
      * @name TableList
      * @request GET:/projects/{projectId}/{baseId}/tables
+     * @response `200` `TableListType`
      */
     tableList: (
       { projectId, baseId, ...query }: TableListParamsType,
@@ -1009,6 +1044,7 @@ export class Api<
      * @tags Meta
      * @name TableRead
      * @request GET:/tables/{tableId}
+     * @response `200` `TableInfoType` OK
      */
     tableRead: (tableId: string, params: RequestParams = {}) =>
       this.request<TableInfoType, any>({
@@ -1024,6 +1060,7 @@ export class Api<
      * @tags Meta
      * @name TableUpdate
      * @request PUT:/tables/{tableId}
+     * @response `200` `void` OK
      */
     tableUpdate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1038,6 +1075,7 @@ export class Api<
      * @tags Meta
      * @name TableDelete
      * @request DELETE:/tables/{tableId}
+     * @response `200` `void` OK
      */
     tableDelete: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1053,6 +1091,8 @@ export class Api<
      * @name ColumnList
      * @summary Column List
      * @request GET:/tables/{tableId}/columns
+     * @response `200` `ColumnListType`
+     * @response `201` `ColumnType` Created
      */
     columnList: (tableId: string, params: RequestParams = {}) =>
       this.request<ColumnListType, any>({
@@ -1068,6 +1108,7 @@ export class Api<
      * @name ColumnCreate
      * @summary Column create
      * @request POST:/tables/{tableId}/columns
+     * @response `200` `void` OK
      */
     columnCreate: (
       tableId: string,
@@ -1089,6 +1130,7 @@ export class Api<
      * @name ColumnRead
      * @summary Column Read
      * @request GET:/tables/{tableId}/columns/{columnId}
+     * @response `200` `ColumnType` OK
      */
     columnRead: (
       tableId: string,
@@ -1109,6 +1151,7 @@ export class Api<
      * @name ColumnUpdate
      * @summary Column Update
      * @request PUT:/tables/{tableId}/columns/{columnId}
+     * @response `200` `ColumnType` OK
      */
     columnUpdate: (
       tableId: string,
@@ -1131,6 +1174,7 @@ export class Api<
      * @tags Meta
      * @name ColumnDelete
      * @request DELETE:/tables/{tableId}/columns/{columnId}
+     * @response `200` `void` OK
      */
     columnDelete: (
       tableId: string,
@@ -1149,6 +1193,7 @@ export class Api<
      * @tags Meta
      * @name ViewUpdate
      * @request PUT:/views/{viewId}
+     * @response `200` `void` OK
      */
     viewUpdate: (
       viewId: string,
@@ -1169,6 +1214,7 @@ export class Api<
      * @tags meta
      * @name ViewDelete
      * @request DELETE:/views/{viewId}
+     * @response `200` `void` OK
      */
     viewDelete: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1183,6 +1229,7 @@ export class Api<
      * @tags Meta
      * @name FilterRead
      * @request GET:/views/{viewId}/filters - copy
+     * @response `200` `FilterListType`
      */
     filterRead: (viewId: string, params: RequestParams = {}) =>
       this.request<FilterListType, any>({
@@ -1197,6 +1244,7 @@ export class Api<
      * @tags Meta
      * @name FilterCreate
      * @request POST:/views/{viewId}/filters - copy
+     * @response `200` `void` OK
      */
     filterCreate: (
       viewId: string,
@@ -1217,6 +1265,7 @@ export class Api<
      * @tags Meta
      * @name ViewColumnList
      * @request GET:/views/{viewId}/columns
+     * @response `200` `void`
      */
     viewColumnList: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1231,6 +1280,7 @@ export class Api<
      * @tags Meta
      * @name ViewColumnCreate
      * @request POST:/views/{viewId}/columns
+     * @response `200` `void` OK
      */
     viewColumnCreate: (
       viewId: string,
@@ -1251,6 +1301,7 @@ export class Api<
      * @tags Meta
      * @name ViewColumnRead
      * @request GET:/views/{viewId}/columns/{columnId}
+     * @response `200` `any` OK
      */
     viewColumnRead: (
       viewId: string,
@@ -1270,6 +1321,7 @@ export class Api<
      * @tags Meta
      * @name ViewColumnUpdate
      * @request PUT:/views/{viewId}/columns/{columnId}
+     * @response `200` `void` OK
      */
     viewColumnUpdate: (
       viewId: string,
@@ -1291,6 +1343,8 @@ export class Api<
      * @tags Meta
      * @name SortList
      * @request GET:/views/{viewId}/sorts
+     * @response `200` `SortListType`
+     * @response `0` `{ uuid?: string, url?: string }`
      */
     sortList: (viewId: string, params: RequestParams = {}) =>
       this.request<SortListType, { uuid?: string; url?: string }>({
@@ -1305,6 +1359,7 @@ export class Api<
      * @tags Meta
      * @name SortCreate
      * @request POST:/views/{viewId}/sorts
+     * @response `200` `void` OK
      */
     sortCreate: (viewId: string, data: SortType, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1321,6 +1376,7 @@ export class Api<
      * @tags Meta
      * @name ShareView
      * @request POST:/views/{viewId}/share
+     * @response `200` `{ uuid?: string }` OK
      */
     shareView: (viewId: string, params: RequestParams = {}) =>
       this.request<{ uuid?: string }, any>({
@@ -1336,6 +1392,7 @@ export class Api<
      * @tags meta
      * @name SetSharedViewPassword
      * @request PUT:/views/{viewId}/share
+     * @response `200` `SharedViewType` OK
      */
     setSharedViewPassword: (
       viewId: string,
@@ -1357,6 +1414,7 @@ export class Api<
      * @tags meta
      * @name DeleteSharedView
      * @request DELETE:/views/{viewId}/share
+     * @response `200` `void` OK
      */
     deleteSharedView: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1371,6 +1429,7 @@ export class Api<
      * @tags Meta
      * @name SortGet
      * @request GET:/views/{viewId}/sorts/{sortId}
+     * @response `200` `SortType` OK
      */
     sortGet: (viewId: string, sortId: string, params: RequestParams = {}) =>
       this.request<SortType, any>({
@@ -1386,6 +1445,7 @@ export class Api<
      * @tags Meta
      * @name SortUpdate
      * @request PUT:/views/{viewId}/sorts/{sortId}
+     * @response `200` `void` OK
      */
     sortUpdate: (
       viewId: string,
@@ -1407,6 +1467,7 @@ export class Api<
      * @tags Meta
      * @name SortDelete
      * @request DELETE:/views/{viewId}/sorts/{sortId}
+     * @response `200` `void` OK
      */
     sortDelete: (viewId: string, sortId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1421,6 +1482,7 @@ export class Api<
      * @tags Meta
      * @name FilterGet
      * @request GET:/views/{viewId}/filters/{filterId}
+     * @response `200` `FilterType` OK
      */
     filterGet: (viewId: string, filterId: string, params: RequestParams = {}) =>
       this.request<FilterType, any>({
@@ -1436,6 +1498,7 @@ export class Api<
      * @tags Meta
      * @name FilterUpdate
      * @request PUT:/views/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
      */
     filterUpdate: (
       viewId: string,
@@ -1457,6 +1520,7 @@ export class Api<
      * @tags Meta
      * @name FilterDelete
      * @request DELETE:/views/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
      */
     filterDelete: (
       viewId: string,
@@ -1475,6 +1539,7 @@ export class Api<
      * @tags Meta
      * @name FilterChildrenRead
      * @request GET:/views/{viewId}/filters/{filterParentId}/children
+     * @response `200` `FilterType` OK
      */
     filterChildrenRead: (
       viewId: string,
@@ -1494,6 +1559,7 @@ export class Api<
      * @tags Meta
      * @name WebhookGet
      * @request GET:/tables/{tableId}/webhooks/{webhookId}
+     * @response `200` `void` OK
      */
     webhookGet: (
       tableId: string,
@@ -1512,6 +1578,7 @@ export class Api<
      * @tags Meta
      * @name WebhookUpdate
      * @request PUT:/tables/{tableId}/webhooks/{webhookId}
+     * @response `200` `void` OK
      */
     webhookUpdate: (
       tableId: string,
@@ -1530,6 +1597,7 @@ export class Api<
      * @tags Meta
      * @name WebhookDelete
      * @request DELETE:/tables/{tableId}/webhooks/{webhookId}
+     * @response `200` `void` OK
      */
     webhookDelete: (
       tableId: string,
@@ -1548,6 +1616,7 @@ export class Api<
      * @tags Meta
      * @name WebhookList
      * @request GET:/tables/{tableId}/webhooks
+     * @response `200` `(WebhookType)[]` OK
      */
     webhookList: (tableId: string, params: RequestParams = {}) =>
       this.request<WebhookType[], any>({
@@ -1563,6 +1632,7 @@ export class Api<
      * @tags Meta
      * @name WebhookCreate
      * @request POST:/tables/{tableId}/webhooks
+     * @response `200` `void` OK
      */
     webhookCreate: (
       tableId: string,
@@ -1583,6 +1653,7 @@ export class Api<
      * @tags Meta
      * @name GridCreate
      * @request POST:/tables/{tableId}/grids
+     * @response `200` `GridType` OK
      */
     gridCreate: (tableId: string, data: GridType, params: RequestParams = {}) =>
       this.request<GridType, any>({
@@ -1600,6 +1671,7 @@ export class Api<
      * @tags Meta
      * @name GridUpdate
      * @request PUT:/tables/{tableId}/grids/{gridId}
+     * @response `200` `void` OK
      */
     gridUpdate: (tableId: string, gridId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1614,6 +1686,7 @@ export class Api<
      * @tags Meta
      * @name GridDelete
      * @request DELETE:/tables/{tableId}/grids/{gridId}
+     * @response `200` `void` OK
      */
     gridDelete: (tableId: string, gridId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1628,6 +1701,7 @@ export class Api<
      * @tags Meta
      * @name GridRead
      * @request GET:/tables/{tableId}/grids/{gridId}
+     * @response `200` `void` OK
      */
     gridRead: (tableId: string, gridId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1642,6 +1716,7 @@ export class Api<
      * @tags Meta
      * @name FormCreate
      * @request POST:/tables/{tableId}/forms
+     * @response `200` `FormType` OK
      */
     formCreate: (tableId: string, data: FormType, params: RequestParams = {}) =>
       this.request<FormType, any>({
@@ -1659,6 +1734,7 @@ export class Api<
      * @tags Meta
      * @name FormUpdate
      * @request PUT:/forms/{formId}
+     * @response `200` `void` OK
      */
     formUpdate: (formId: string, data: FormType, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1675,6 +1751,7 @@ export class Api<
      * @tags Meta
      * @name FormRead
      * @request GET:/forms/{formId}
+     * @response `200` `FormType` OK
      */
     formRead: (formId: string, params: RequestParams = {}) =>
       this.request<FormType, any>({
@@ -1690,6 +1767,7 @@ export class Api<
      * @tags Meta
      * @name FormColumnUpdate
      * @request PUT:/formColumns/{columnId}
+     * @response `200` `any` OK
      */
     formColumnUpdate: (
       columnId: string,
@@ -1711,6 +1789,7 @@ export class Api<
      * @tags Meta
      * @name GalleryCreate
      * @request POST:/tables/{tableId}/galleries
+     * @response `200` `object` OK
      */
     galleryCreate: (
       tableId: string,
@@ -1732,6 +1811,7 @@ export class Api<
      * @tags Meta
      * @name GalleryUpdate
      * @request PUT:/galleries/{galleryId}
+     * @response `200` `void` OK
      */
     galleryUpdate: (
       galleryId: string,
@@ -1752,6 +1832,7 @@ export class Api<
      * @tags Meta
      * @name GalleryDelete
      * @request DELETE:/galleries/{galleryId}
+     * @response `200` `void` OK
      */
     galleryDelete: (galleryId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1766,6 +1847,7 @@ export class Api<
      * @tags Meta
      * @name GalleryRead
      * @request GET:/galleries/{galleryId}
+     * @response `200` `GalleryType` OK
      */
     galleryRead: (galleryId: string, params: RequestParams = {}) =>
       this.request<GalleryType, any>({
@@ -1781,6 +1863,7 @@ export class Api<
      * @tags Meta
      * @name KanbanCreate
      * @request POST:/tables/{tableId}/kanbans
+     * @response `200` `void` OK
      */
     kanbanCreate: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1795,6 +1878,7 @@ export class Api<
      * @tags Meta
      * @name KanbanUpdate
      * @request PUT:/tables/{tableId}/kanbans/{kanbanId}
+     * @response `200` `void` OK
      */
     kanbanUpdate: (
       tableId: string,
@@ -1813,6 +1897,7 @@ export class Api<
      * @tags Meta
      * @name KanbanDelete
      * @request DELETE:/tables/{tableId}/kanbans/{kanbanId}
+     * @response `200` `void` OK
      */
     kanbanDelete: (
       tableId: string,
@@ -1831,6 +1916,7 @@ export class Api<
      * @tags Meta
      * @name KanbanRead
      * @request GET:/tables/{tableId}/kanbans/{kanbanId}
+     * @response `200` `void` OK
      */
     kanbanRead: (
       tableId: string,
@@ -1849,6 +1935,7 @@ export class Api<
      * @tags Meta
      * @name ViewsList
      * @request GET:/tables/{tableId}/views
+     * @response `200` `ViewListType`
      */
     viewsList: (tableId: string, params: RequestParams = {}) =>
       this.request<ViewListType, any>({
@@ -1863,6 +1950,8 @@ export class Api<
      * @tags Meta
      * @name CommentList
      * @request GET:/audits/comments
+     * @response `201` `any` Created
+     * @response `0` `any`
      */
     commentList: (query: CommentListParamsType, params: RequestParams = {}) =>
       this.request<any, any>({
@@ -1879,6 +1968,7 @@ export class Api<
      * @tags Meta
      * @name CommentRow
      * @request POST:/audits/comments
+     * @response `200` `void` OK
      */
     commentRow: (data: CommentRowPayloadType, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -1895,6 +1985,8 @@ export class Api<
      * @tags Meta
      * @name CommentCount
      * @request GET:/audits/comments/count
+     * @response `201` `any` Created
+     * @response `0` `any`
      */
     commentCount: (query: CommentCountParamsType, params: RequestParams = {}) =>
       this.request<any, any>({
@@ -1911,6 +2003,7 @@ export class Api<
      * @tags Meta
      * @name ProjectAuditList
      * @request GET:project/{projectId}/audits
+     * @response `200` `{ audits?: { list: (AuditType)[], pageInfo: PaginatedType } }` OK
      */
     projectAuditList: (
       { projectId, ...query }: ProjectAuditListParamsType,
@@ -1933,6 +2026,7 @@ export class Api<
      * @tags Meta
      * @name AuditRowUpdate
      * @request POST:/audits/rowUpdate
+     * @response `200` `void` OK
      */
     auditRowUpdate: (
       data: AuditRowUpdatePayloadType,
@@ -1952,6 +2046,8 @@ export class Api<
      * @tags Meta
      * @name HookList
      * @request GET:/tables/{tableId}/hooks
+     * @response `200` `{ hooks?: { list: (HookType)[], pageInfo: PaginatedType } }` OK
+     * @response `0` `any`
      */
     hookList: (tableId: string, params: RequestParams = {}) =>
       this.request<
@@ -1970,6 +2066,7 @@ export class Api<
      * @tags Meta
      * @name HookCreate
      * @request POST:/tables/{tableId}/hooks
+     * @response `200` `AuditType` OK
      */
     hookCreate: (
       tableId: string,
@@ -1991,6 +2088,7 @@ export class Api<
      * @tags meta
      * @name HookTest
      * @request POST:/tables/{tableId}/hooks/test
+     * @response `200` `void` OK
      */
     hookTest: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2005,6 +2103,7 @@ export class Api<
      * @tags meta
      * @name HookUpdate
      * @request PUT:/hooks/{hookId}
+     * @response `200` `HookType` OK
      */
     hookUpdate: (hookId: string, data: HookType, params: RequestParams = {}) =>
       this.request<HookType, any>({
@@ -2022,11 +2121,70 @@ export class Api<
      * @tags meta
      * @name HookDelete
      * @request DELETE:/hooks/{hookId}
+     * @response `200` `void` OK
      */
     hookDelete: (hookId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/hooks/${hookId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name PluginList
+     * @request GET:/plugins
+     * @response `200` `{ plugins?: { list: (PluginType)[], pageInfo: PaginatedType } }` OK
+     * @response `0` `any`
+     */
+    pluginList: (params: RequestParams = {}) =>
+      this.request<
+        { plugins?: { list: PluginType[]; pageInfo: PaginatedType } },
+        any
+      >({
+        path: `/plugins`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name PluginUpdate
+     * @request PUT:/plugins/{pluginId}
+     * @response `200` `PluginType` OK
+     */
+    pluginUpdate: (
+      pluginId: string,
+      data: PluginType,
+      params: RequestParams = {}
+    ) =>
+      this.request<PluginType, any>({
+        path: `/plugins/${pluginId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name PluginRead
+     * @request GET:/plugins/{pluginId}
+     * @response `200` `PluginType` OK
+     */
+    pluginRead: (pluginId: string, params: RequestParams = {}) =>
+      this.request<PluginType, any>({
+        path: `/plugins/${pluginId}`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
   };
@@ -2036,6 +2194,7 @@ export class Api<
      *
      * @name PutProjectsCopy
      * @request PUT:/projects/{projectId}
+     * @response `200` `void` OK
      */
     putProjectsCopy: (projectId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2049,6 +2208,7 @@ export class Api<
      *
      * @name DeleteProjectsCopy
      * @request DELETE:/projects/{projectId}
+     * @response `200` `void` OK
      */
     deleteProjectsCopy: (projectId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2062,6 +2222,7 @@ export class Api<
      *
      * @name ProjectReorder
      * @request POST:/projects/{projectId}/reorder
+     * @response `200` `void` OK
      */
     projectReorder: (projectId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2076,6 +2237,7 @@ export class Api<
      *
      * @name TableReorder
      * @request POST:/tables/{tableId}/reorder
+     * @response `200` `void` OK
      */
     tableReorder: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2089,6 +2251,7 @@ export class Api<
      *
      * @name ColumnReorder
      * @request POST:/tables/{tableId}/columns/reorder
+     * @response `200` `void` OK
      */
     columnReorder: (tableId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2102,6 +2265,7 @@ export class Api<
      *
      * @name WebhookReorder
      * @request POST:/tables/{tableId}/webhooks/{webhookId}/reorder
+     * @response `200` `void` OK
      */
     webhookReorder: (
       tableId: string,
@@ -2120,6 +2284,7 @@ export class Api<
      *
      * @name FilterReorder
      * @request POST:/views/{viewsId}/filters/{filterId}/reorder
+     * @response `200` `void` OK
      */
     filterReorder: (
       filterId: string,
@@ -2137,6 +2302,7 @@ export class Api<
      *
      * @name SortReorder
      * @request POST:/views/{viewId}/sorts/{sortId}/reorder
+     * @response `200` `void` OK
      */
     sortReorder: (sortId: string, viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2152,6 +2318,7 @@ export class Api<
      * @tags Data
      * @name List
      * @request GET:/data/{tableId}
+     * @response `200` `any` OK
      */
     list: (tableId: string, params: RequestParams = {}) =>
       this.request<any, any>({
@@ -2167,6 +2334,7 @@ export class Api<
      * @tags Data
      * @name Create
      * @request POST:/data/{tableId}
+     * @response `200` `any` OK
      */
     create: (
       tableId: string,
@@ -2188,6 +2356,7 @@ export class Api<
      * @tags Data
      * @name CsvExport
      * @request GET:/data/{tableId}/export/{type}
+     * @response `200` `any` OK
      */
     csvExport: (
       tableId: string,
@@ -2206,6 +2375,7 @@ export class Api<
      * @tags Data
      * @name Read
      * @request GET:/data/{tableId}/{rowId}
+     * @response `201` `any` Created
      */
     read: (tableId: string, rowId: string, params: RequestParams = {}) =>
       this.request<any, any>({
@@ -2221,6 +2391,7 @@ export class Api<
      * @tags Data
      * @name Update
      * @request PUT:/data/{tableId}/{rowId}
+     * @response `200` `any` OK
      */
     update: (
       tableId: string,
@@ -2243,6 +2414,7 @@ export class Api<
      * @tags Data
      * @name Delete
      * @request DELETE:/data/{tableId}/{rowId}
+     * @response `200` `void` OK
      */
     delete: (tableId: string, rowId: string, params: RequestParams = {}) =>
       this.request<void, any>({
@@ -2257,6 +2429,8 @@ export class Api<
      * @tags Data
      * @name MmList
      * @request GET:/data/{tableId}/{rowId}/mm/{colId}
+     * @response `201` `any` Created
+     * @response `0` `any`
      */
     mmList: (
       tableId: string,
@@ -2278,6 +2452,7 @@ export class Api<
      * @tags Public
      * @name DataList
      * @request POST:public/data/{uuid}/list
+     * @response `200` `any` OK
      */
     dataList: (
       { uuid, ...query }: DataListParamsType,
@@ -2300,6 +2475,7 @@ export class Api<
      * @tags Public
      * @name DataCreate
      * @request POST:public/data/{uuid}/create
+     * @response `200` `any` OK
      */
     dataCreate: (
       uuid: string,
@@ -2321,6 +2497,7 @@ export class Api<
      * @tags Public
      * @name DataRelationList
      * @request POST:public/data/{uuid}/relationTable/{relationColumnId}
+     * @response `200` `any` OK
      */
     dataRelationList: (
       { uuid, relationColumnId, ...query }: DataRelationListParamsType,
@@ -2343,6 +2520,7 @@ export class Api<
      * @tags
      * @name SharedViewMetaGet
      * @request POST:public/meta/{uuid}
+     * @response `200` `object` OK
      */
     sharedViewMetaGet: (
       uuid: string,

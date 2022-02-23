@@ -2963,6 +2963,118 @@
           "meta"
         ]
       }
+    },
+    "/plugins": {
+      "parameters": [],
+      "get": {
+        "summary": "",
+        "operationId": "plugin-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plugins": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 1,
+                          "items": {
+                            "$ref": "#/components/schemas/Plugin"
+                          }
+                        },
+                        "pageInfo": {
+                          "$ref": "#/components/schemas/Paginated"
+                        }
+                      },
+                      "required": [
+                        "list",
+                        "pageInfo"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "parameters": [],
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/plugins/{pluginId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "pluginId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "plugin-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plugin"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Plugin"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "plugin-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plugin"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      }
     }
   },
   "components": {
@@ -4985,6 +5097,66 @@
           },
           "active": {
             "type": "boolean"
+          }
+        }
+      },
+      "Plugin": {
+        "title": "Plugin",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "version": {
+            "type": "string"
+          },
+          "docs": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "status_details": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "input_schema": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          },
+          "creator": {
+            "type": "string"
+          },
+          "creator_website": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
           }
         }
       }

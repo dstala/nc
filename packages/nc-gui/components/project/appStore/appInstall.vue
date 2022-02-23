@@ -96,7 +96,7 @@ import FormInput from '@/components/project/appStore/FormInput'
 export default {
   name: 'AppInstall',
   components: { FormInput },
-  props: ['title', 'defaultConfig'],
+  props: ['id', 'defaultConfig'],
   data: () => ({
     plugin: null,
     formDetails: null,
@@ -153,11 +153,15 @@ export default {
     },
     async saveSettings() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginSet', {
-          input: this.settings,
-          id: this.pluginId,
-          title: this.plugin.title
-        }])
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginSet', {
+        //   input: this.settings,
+        //   id: this.pluginId,
+        //   title: this.plugin.title
+        // }])
+        await this.$api.meta.pluginUpdate(this.id, {
+          input: JSON.stringify(this.settings),
+          active: 1
+        })
 
         this.$emit('saved')
         this.$toast.success(this.formDetails.msgOnInstall || 'Plugin settings saved successfully').goAway(5000)
@@ -199,9 +203,10 @@ export default {
     },
     async readPluginDetails() {
       try {
-        this.plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
-          title: this.title
-        }])
+        // this.plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
+        //   title: this.title
+        // }])
+        this.plugin = (await this.$api.meta.pluginRead(this.id)).data
         this.formDetails = JSON.parse(this.plugin.input_schema)
         this.pluginId = this.plugin.id
         this.settings = JSON.parse(this.plugin.input) || (this.formDetails.array ? [{}] : {})

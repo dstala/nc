@@ -37,7 +37,7 @@
     "version": "standard-version",
     "reset-hard": "git clean -dfx && git reset --hard && npm i",
     "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish",
-    "generate:sdk": "npx swagger-typescript-api -p ../../scripts/sdk/swagger.json -o ./src/lib/  --axios --extract-request-params --extract-request-body  --module-name-first-tag --type-suffix=Type"
+    "generate:sdk": "npx swagger-typescript-api -r -p ../../scripts/sdk/swagger.json -o ./src/lib/  --axios --extract-request-params --extract-request-body  --module-name-first-tag --type-suffix=Type"
   },
   "engines": {
     "node": ">=10"

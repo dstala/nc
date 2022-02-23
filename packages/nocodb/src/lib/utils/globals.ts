@@ -27,5 +27,6 @@ export enum MetaTable {
   TEAM_USERS = 'nc_team_users_v2',
   VIEWS = 'nc_views_v2',
   AUDIT = 'nc_audit_v2',
-  HOOKS = 'nc_hooks_v2'
+  HOOKS = 'nc_hooks_v2',
+  PLUGIN = 'nc_plugins_v2'
 }

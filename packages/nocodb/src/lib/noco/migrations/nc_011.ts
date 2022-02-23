@@ -1,4 +1,7 @@
 import { MetaTable } from '../../utils/globals';
+// import googleAuth from '../plugins/googleAuth';
+// import ses from '../plugins/ses';
+// import cache from '../plugins/cache';
 
 const up = async knex => {
   await knex.schema.createTable(MetaTable.PROJECT, table => {
@@ -687,6 +690,40 @@ const up = async knex => {
 
     table.timestamps();
   });
+
+  await knex.schema.createTable(MetaTable.PLUGIN, table => {
+    table
+      .string('id', 20)
+      .primary()
+      .notNullable();
+
+    table.string('title', 45);
+    table.text('description');
+    table.boolean('active').defaultTo(false);
+    table.float('rating');
+    table.string('version');
+    table.string('docs');
+    table.string('status').defaultTo('install');
+    table.string('status_details');
+    table.string('logo');
+    table.string('icon');
+    table.string('tags');
+    table.string('category');
+    table.text('input_schema');
+    table.text('input');
+    table.string('creator');
+    table.string('creator_website');
+    table.string('price');
+    table.timestamps();
+  });
+
+  // await knex('nc_plugins').insert([
+  //   googleAuth,
+  //   ses,
+  //   cache
+  //   // ee,
+  //   // brand,
+  // ]);
 };
 
 const down = async knex => {

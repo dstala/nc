@@ -6,7 +6,7 @@
         :dark="$store.state.windows.darkTheme"
         :light="!$store.state.windows.darkTheme"
       >
-        <app-install :title="installPlugin.title" :default-config="defaultConfig" @close="pluginInstallOverlay = false" @saved="saved()" />
+        <app-install :id="installPlugin.id" :default-config="defaultConfig" @close="pluginInstallOverlay = false" @saved="saved()" />
       </v-card>
     </v-dialog>
 
@@ -245,8 +245,9 @@ export default {
     },
     async loadPluginList() {
       try {
-        const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
-        plugins.push(...plugins.splice(0, 3))
+        // const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
+        const plugins = (await this.$api.meta.pluginList()).data.plugins.list
+        // plugins.push(...plugins.splice(0, 3))
         this.apps = plugins.map((p) => {
           p.tags = p.tags ? p.tags.split(',') : []
           p.parsedInput = p.input && JSON.parse(p.input)
