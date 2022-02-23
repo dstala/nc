@@ -10,7 +10,6 @@ import { isVirtualCol, TableReqType, TableType, ViewTypes } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
 import { MetaTable } from '../utils/globals';
 import View from './View';
-import { Transaction } from 'knex';
 
 export default class Model implements TableType {
   copy_enabled: boolean;
@@ -52,11 +51,17 @@ export default class Model implements TableType {
     Object.assign(this, data);
   }
 
-  // @ts-ignore
-  public async getColumns(force = false): Promise<Column[]> {
-    this.columns = await Column.list({
-      fk_model_id: this.id
-    });
+  public async getColumns(
+    // @ts-ignore
+    force = false,
+    ncMeta = Noco.ncMeta
+  ): Promise<Column[]> {
+    this.columns = await Column.list(
+      {
+        fk_model_id: this.id
+      },
+      ncMeta
+    );
     return this.columns;
   }
 
@@ -84,9 +89,9 @@ export default class Model implements TableType {
     projectId,
     baseId,
     model: TableReqType,
-    _trx?: Transaction
+    ncMeta = Noco.ncMeta
   ) {
-    const { id } = await Noco.ncMeta.metaInsert2(
+    const { id } = await ncMeta.metaInsert2(
       projectId,
       baseId,
       MetaTable.MODELS,
@@ -95,7 +100,7 @@ export default class Model implements TableType {
         _tn: model._tn,
         order:
           model.order ||
-          (await Noco.ncMeta.metaGetNextOrder(MetaTable.FORM_VIEW_COLUMNS, {
+          (await ncMeta.metaGetNextOrder(MetaTable.FORM_VIEW_COLUMNS, {
             project_id: projectId,
             base_id: baseId
           }))
@@ -109,11 +114,11 @@ export default class Model implements TableType {
         is_default: true,
         type: ViewTypes.GRID
       },
-      _trx
+      ncMeta
     );
 
     for (const column of model?.columns || []) {
-      await Column.insert({ ...column, fk_model_id: id, view });
+      await Column.insert({ ...column, fk_model_id: id, view }, ncMeta);
     }
 
     return this.getWithInfo({ id });
@@ -175,16 +180,19 @@ export default class Model implements TableType {
     await Column.clearList({ fk_model_id: id });
   }
 
-  public static async get({
-    tn,
-    id
-  }: {
-    tn?: string;
-    id?: string;
-  }): Promise<Model> {
+  public static async get(
+    {
+      tn,
+      id
+    }: {
+      tn?: string;
+      id?: string;
+    },
+    ncMeta = Noco.ncMeta
+  ): Promise<Model> {
     let modelData = null; //id && (await NocoCache.get(id));
     if (!modelData) {
-      modelData = await Noco.ncMeta.metaGet2(
+      modelData = await ncMeta.metaGet2(
         null,
         null,
         MetaTable.MODELS,
@@ -287,7 +295,7 @@ export default class Model implements TableType {
     });
   }
 
-  async delete(): Promise<boolean> {
+  async delete(ncMeta = Noco.ncMeta): Promise<boolean> {
     // todo: delete
     //  sort, filters - done
     //  views
@@ -298,10 +306,10 @@ export default class Model implements TableType {
     //  columns - done
     //  table - done
 
-    await Sort.deleteAll(this.id);
-    await Filter.deleteAll(this.id);
+    await Sort.deleteAll(this.id, ncMeta);
+    await Filter.deleteAll(this.id, ncMeta);
 
-    for (const col of await this.getColumns()) {
+    for (const col of await this.getColumns(false, ncMeta)) {
       let colOptionTableName = null;
       switch (col.uidt) {
         case UITypes.Rollup:
@@ -323,17 +331,17 @@ export default class Model implements TableType {
           break;
       }
       if (colOptionTableName) {
-        await Noco.ncMeta.metaDelete(null, null, colOptionTableName, {
+        await ncMeta.metaDelete(null, null, colOptionTableName, {
           fk_column_id: col.id
         });
       }
     }
 
-    await Noco.ncMeta.metaDelete(null, null, MetaTable.COLUMNS, {
+    await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, {
       fk_model_id: this.id
     });
 
-    await Noco.ncMeta.metaDelete(null, null, MetaTable.MODELS, this.id);
+    await ncMeta.metaDelete(null, null, MetaTable.MODELS, this.id);
 
     return true;
   }

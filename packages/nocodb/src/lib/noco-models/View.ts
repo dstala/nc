@@ -5,7 +5,6 @@ import FormView from './FormView';
 import GridView from './GridView';
 import KanbanView from './KanbanView';
 import GalleryView from './GalleryView';
-import { Transaction } from 'knex';
 import GridViewColumn from './GridViewColumn';
 import Sort from './Sort';
 import Filter from './Filter';
@@ -122,11 +121,11 @@ export default class View implements ViewType {
       Partial<FormView | GridView | GalleryView | KanbanView> & {
         copy_from_id?: string;
       },
-    _trx?: Transaction
+    ncMeta = Noco.ncMeta
   ) {
     const order =
       (+(
-        await Noco.ncMeta
+        await ncMeta
           .knex(MetaTable.VIEWS)
           .max('order', { as: 'order' })
           .where({
@@ -138,7 +137,7 @@ export default class View implements ViewType {
     const copyFormView =
       view.copy_from_id && (await View.get(view.copy_from_id));
 
-    const { id: view_id } = await Noco.ncMeta.metaInsert2(
+    const { id: view_id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.VIEWS,
@@ -223,27 +222,36 @@ export default class View implements ViewType {
     return View.get(view_id);
   }
 
-  static async insertColumnToAllViews(param: {
-    fk_column_id: any;
-    fk_model_id: any;
-    order;
-    show;
-  }) {
+  static async insertColumnToAllViews(
+    param: {
+      fk_column_id: any;
+      fk_model_id: any;
+      order;
+      show;
+    },
+    ncMeta = Noco.ncMeta
+  ) {
     const views = await this.list(param.fk_model_id);
 
     for (const view of views) {
       switch (view.type) {
         case ViewTypes.GRID:
-          await GridViewColumn.insert({
-            ...param,
-            fk_view_id: view.id
-          });
+          await GridViewColumn.insert(
+            {
+              ...param,
+              fk_view_id: view.id
+            },
+            ncMeta
+          );
           break;
         case ViewTypes.GALLERY:
-          await GalleryViewColumn.insert({
-            ...param,
-            fk_view_id: view.id
-          });
+          await GalleryViewColumn.insert(
+            {
+              ...param,
+              fk_view_id: view.id
+            },
+            ncMeta
+          );
           break;
       }
     }
@@ -324,7 +332,8 @@ export default class View implements ViewType {
     colData: {
       order: number;
       show: boolean;
-    }
+    },
+    ncMeta = Noco.ncMeta
   ): Promise<Array<GridViewColumn | any>> {
     const columns: Array<GridViewColumn | any> = [];
     const view = await this.get(viewId);
@@ -344,7 +353,7 @@ export default class View implements ViewType {
         break;
     }
 
-    await Noco.ncMeta.metaUpdate(
+    await ncMeta.metaUpdate(
       null,
       null,
       table,
@@ -364,19 +373,20 @@ export default class View implements ViewType {
     colData: {
       order: number;
       show: boolean;
-    }
+    },
+    ncMeta = Noco.ncMeta
   ): Promise<Array<GridViewColumn | any>> {
     const columns: Array<GridViewColumn | any> = [];
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);
 
-    const existingCol = await Noco.ncMeta.metaGet2(null, null, table, {
+    const existingCol = await ncMeta.metaGet2(null, null, table, {
       fk_view_id: viewId,
       fk_column_id: fkColId
     });
 
     if (existingCol) {
-      await Noco.ncMeta.metaUpdate(
+      await ncMeta.metaUpdate(
         null,
         null,
         table,
@@ -387,7 +397,7 @@ export default class View implements ViewType {
         existingCol.id
       );
     } else {
-      await Noco.ncMeta.metaInsert2(null, null, table, {
+      await ncMeta.metaInsert2(null, null, table, {
         fk_view_id: viewId,
         fk_column_id: fkColId,
         order: colData.order,
@@ -398,19 +408,19 @@ export default class View implements ViewType {
     return columns;
   }
 
-  static async getByUUID(uuid: string) {
-    const view = await Noco.ncMeta.metaGet2(null, null, MetaTable.VIEWS, {
+  static async getByUUID(uuid: string, ncMeta = Noco.ncMeta) {
+    const view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, {
       uuid
     });
 
     return view && new View(view);
   }
 
-  static async share(viewId) {
+  static async share(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
     if (!view.uuid) {
       view.uuid = uuidv4();
-      await Noco.ncMeta.metaUpdate(
+      await ncMeta.metaUpdate(
         null,
         null,
         MetaTable.VIEWS,
@@ -426,9 +436,10 @@ export default class View implements ViewType {
 
   static async passwordUpdate(
     viewId: string,
-    { password }: { password: string }
+    { password }: { password: string },
+    ncMeta = Noco.ncMeta
   ) {
-    await Noco.ncMeta.metaUpdate(
+    await ncMeta.metaUpdate(
       null,
       null,
       MetaTable.VIEWS,
@@ -439,8 +450,8 @@ export default class View implements ViewType {
     );
   }
 
-  static async sharedViewDelete(viewId) {
-    await Noco.ncMeta.metaUpdate(
+  static async sharedViewDelete(viewId, ncMeta = Noco.ncMeta) {
+    await ncMeta.metaUpdate(
       null,
       null,
       MetaTable.VIEWS,
@@ -456,9 +467,10 @@ export default class View implements ViewType {
     body: {
       title: string;
       order: number;
-    }
+    },
+    ncMeta = Noco.ncMeta
   ) {
-    await Noco.ncMeta.metaUpdate(
+    await ncMeta.metaUpdate(
       null,
       null,
       MetaTable.VIEWS,
@@ -471,7 +483,7 @@ export default class View implements ViewType {
   }
 
   // @ts-ignore
-  static async delete(viewId) {
+  static async delete(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
 
     if (view.is_default) NcError.badRequest("Default view can't be deleted");
@@ -480,13 +492,13 @@ export default class View implements ViewType {
     await Filter.deleteAll(viewId);
     const table = this.extractViewTableName(view);
     const columnTable = this.extractViewColumnsTableName(view);
-    await Noco.ncMeta.metaDelete(null, null, columnTable, {
+    await ncMeta.metaDelete(null, null, columnTable, {
       fk_view_id: viewId
     });
-    await Noco.ncMeta.metaDelete(null, null, table, {
+    await ncMeta.metaDelete(null, null, table, {
       fk_view_id: viewId
     });
-    await Noco.ncMeta.metaDelete(null, null, MetaTable.VIEWS, viewId);
+    await ncMeta.metaDelete(null, null, MetaTable.VIEWS, viewId);
   }
 
   private static extractViewColumnsTableName(view: View) {

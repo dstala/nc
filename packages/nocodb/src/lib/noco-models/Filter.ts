@@ -142,19 +142,17 @@ export default class Filter {
   //   return filterObj && new Filter(filterObj);
   // }
 
-  public static async getFilterObject({
-    viewId
-  }: {
-    viewId: string;
-  }): Promise<FilterObject> {
-    const filters = await Noco.ncMeta.metaList2(
-      null,
-      null,
-      MetaTable.FILTER_EXP,
-      {
-        condition: { fk_view_id: viewId }
-      }
-    );
+  public static async getFilterObject(
+    {
+      viewId
+    }: {
+      viewId: string;
+    },
+    ncMeta = Noco.ncMeta
+  ): Promise<FilterObject> {
+    const filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
+      condition: { fk_view_id: viewId }
+    });
 
     const result: FilterObject = {
       is_group: true,
@@ -194,30 +192,22 @@ export default class Filter {
     return result;
   }
 
-  static async deleteAll(viewId: string) {
-    const filter = await this.getFilterObject({ viewId });
+  static async deleteAll(viewId: string, ncMeta = Noco.ncMeta) {
+    const filter = await this.getFilterObject({ viewId }, ncMeta);
 
     const deleteRecursively = async filter => {
       if (!filter) return;
       for (const f of filter?.children || []) await deleteRecursively(f);
       if (filter.id)
-        await Noco.ncMeta.metaDelete(
-          null,
-          null,
-          MetaTable.FILTER_EXP,
-          filter.id
-        );
+        await ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
     };
     await deleteRecursively(filter);
   }
 
-  private static async get(id: string) {
-    const filterObj = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.FILTER_EXP,
-      { id }
-    );
+  private static async get(id: string, ncMeta = Noco.ncMeta) {
+    const filterObj = await ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
+      id
+    });
     return filterObj && new Filter(filterObj);
   }
 

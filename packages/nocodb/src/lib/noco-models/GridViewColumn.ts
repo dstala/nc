@@ -31,15 +31,15 @@ export default class GridViewColumn {
     return views?.map(v => new GridViewColumn(v));
   }
 
-  static async insert(column: Partial<GridViewColumn>) {
-    const { id } = await Noco.ncMeta.metaInsert2(
+  static async insert(column: Partial<GridViewColumn>, ncMeta = Noco.ncMeta) {
+    const { id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GRID_VIEW_COLUMNS,
       {
         fk_view_id: column.fk_view_id,
         fk_column_id: column.fk_column_id,
-        order: await Noco.ncMeta.metaGetNextOrder(MetaTable.GRID_VIEW_COLUMNS, {
+        order: await ncMeta.metaGetNextOrder(MetaTable.GRID_VIEW_COLUMNS, {
           fk_view_id: column.fk_view_id
         }),
         show: column.show

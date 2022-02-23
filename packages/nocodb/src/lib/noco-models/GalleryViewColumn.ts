@@ -26,20 +26,20 @@ export default class GalleryViewColumn {
 
     return view && new GalleryViewColumn(view);
   }
-  static async insert(column: Partial<GalleryViewColumn>) {
-    const { id } = await Noco.ncMeta.metaInsert2(
+  static async insert(
+    column: Partial<GalleryViewColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const { id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GALLERY_VIEW_COLUMNS,
       {
         fk_view_id: column.fk_view_id,
         fk_column_id: column.fk_column_id,
-        order: await Noco.ncMeta.metaGetNextOrder(
-          MetaTable.GALLERY_VIEW_COLUMNS,
-          {
-            fk_view_id: column.fk_view_id
-          }
-        ),
+        order: await ncMeta.metaGetNextOrder(MetaTable.GALLERY_VIEW_COLUMNS, {
+          fk_view_id: column.fk_view_id
+        }),
         show: column.show
       }
     );
