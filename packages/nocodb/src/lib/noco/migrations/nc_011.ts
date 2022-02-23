@@ -653,7 +653,7 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable(MetaTable.AUDIT, table => {
+  await knex.schema.createTable(MetaTable.HOOKS, table => {
     table.increments();
 
     table.string('fk_model_id', 20);
