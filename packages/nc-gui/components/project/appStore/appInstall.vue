@@ -173,12 +173,18 @@ export default {
     async testSettings() {
       this.testing = true
       try {
-        const res = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginTest', {
+        // const res = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginTest', {
+        //   input: this.settings,
+        //   id: this.pluginId,
+        //   category: this.plugin.category,
+        //   title: this.plugin.title
+        // }])
+        const res = (await this.$api.meta.pluginTest({
           input: this.settings,
           id: this.pluginId,
           category: this.plugin.category,
           title: this.plugin.title
-        }])
+        })).data
         if (res) {
           this.$toast.success('Successfully tested plugin settings').goAway(3000)
         } else {

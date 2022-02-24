@@ -30,7 +30,7 @@ import SESPluginConfig from '../../../../../plugins/ses';
 import Noco from '../../../Noco';
 import Local from '../../../plugins/adapters/storage/Local';
 import { MetaTable } from '../../../../utils/globals';
-import { PluginCategory } from 'nc-common';
+import { PluginCategory, PluginTestPayloadType } from 'nc-common';
 
 const defaultPlugins = [
   SlackPluginConfig,
@@ -176,7 +176,9 @@ class NcPluginMgrv2 {
     // }, {});
   }
 
-  public async test(args: any): Promise<boolean> {
+  public static async test(args: PluginTestPayloadType): Promise<boolean> {
+    args.input =
+      typeof args?.input === 'string' ? JSON.parse(args?.input) : args?.input;
     switch (args.category) {
       case 'Storage':
         {
@@ -198,8 +200,14 @@ class NcPluginMgrv2 {
           return tempPlugin?.getAdapter()?.test?.();
         }
         break;
-      default:
-        throw new Error('Test not implemented');
+      default: {
+        const plugin = defaultPlugins.find(
+          pluginConfig => pluginConfig?.title === args.title
+        );
+        const tempPlugin = new plugin.builder(Noco.ncMeta, plugin);
+        await tempPlugin.init(args?.input);
+        return tempPlugin?.getAdapter()?.test?.();
+      }
     }
   }
 }

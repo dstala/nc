@@ -607,6 +607,13 @@ export interface AuditRowUpdatePayloadType {
   prev_value?: string;
 }
 
+export interface PluginTestPayloadType {
+  id?: string;
+  title?: string;
+  input?: any;
+  category?: string;
+}
+
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -2146,6 +2153,27 @@ export class Api<
       >({
         path: `/plugins`,
         method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name PluginTest
+     * @request POST:/plugins/test
+     * @response `200` `any` OK
+     * @response `400` `void` Bad Request
+     * @response `401` `void` Unauthorized
+     * @response `0` `any`
+     */
+    pluginTest: (data: PluginTestPayloadType, params: RequestParams = {}) =>
+      this.request<any, void>({
+        path: `/plugins/test`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),

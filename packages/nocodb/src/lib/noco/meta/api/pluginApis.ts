@@ -2,7 +2,8 @@ import catchError from './helpers/catchError';
 import { Request, Response, Router } from 'express';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import Plugin from '../../../noco-models/Plugin';
-import { PluginType } from 'nc-common';
+import { PluginTestPayloadType, PluginType } from 'nc-common';
+import NcPluginMgrv2 from './helpers/NcPluginMgrv2';
 
 export async function pluginList(_req: Request, res: Response) {
   res.json({
@@ -11,6 +12,14 @@ export async function pluginList(_req: Request, res: Response) {
     })
   });
 }
+
+export async function pluginTest(
+  req: Request<any, any, PluginTestPayloadType>,
+  res: Response
+) {
+  res.json(await NcPluginMgrv2.test(req.body));
+}
+
 export async function pluginRead(req: Request, res: Response) {
   res.json(await Plugin.get(req.params.pluginId));
 }
@@ -23,6 +32,7 @@ export async function pluginUpdate(
 
 const router = Router({ mergeParams: true });
 router.get('/plugins', catchError(pluginList));
+router.post('/plugins/test', catchError(pluginTest));
 router.get('/plugins/:pluginId', catchError(pluginRead));
 router.put('/plugins/:pluginId', catchError(pluginUpdate));
 export default router;
