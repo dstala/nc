@@ -166,7 +166,8 @@ export default {
         this.$emit('saved')
         this.$toast.success(this.formDetails.msgOnInstall || 'Plugin settings saved successfully').goAway(5000)
         this.simpleAnim()
-      } catch (e) {
+      } catch (_e) {
+        const e = await this._extractSdkResponseError(_e)
         this.$toast.error(e.message).goAway(3000)
       }
     },
@@ -190,7 +191,8 @@ export default {
         } else {
           this.$toast.info('Invalid credentials').goAway(3000)
         }
-      } catch (e) {
+      } catch (_e) {
+        const e = await this._extractSdkResponseError(_e)
         this.$toast[e.message === 'Not implemented' ? 'info' : 'error'](e.message).goAway(3000)
       }
       this.testing = false
