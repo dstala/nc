@@ -607,6 +607,11 @@ export interface AuditRowUpdatePayloadType {
   prev_value?: string;
 }
 
+export interface HookTestPayloadType {
+  payload?: { data?: any; user?: any };
+  hook?: HookType;
+}
+
 export interface PluginTestPayloadType {
   id?: string;
   title?: string;
@@ -2095,12 +2100,19 @@ export class Api<
      * @tags meta
      * @name HookTest
      * @request POST:/tables/{tableId}/hooks/test
-     * @response `200` `void` OK
+     * @response `200` `any` OK
      */
-    hookTest: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    hookTest: (
+      tableId: string,
+      data: HookTestPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
         path: `/tables/${tableId}/hooks/test`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
@@ -2152,6 +2164,26 @@ export class Api<
         any
       >({
         path: `/plugins`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name SampleDataGet
+     * @request GET:/tables/{tableId}/sample
+     * @response `200` `{ plugins?: { list: (PluginType)[], pageInfo: PaginatedType } }` OK
+     * @response `0` `any`
+     */
+    sampleDataGet: (tableId: string, params: RequestParams = {}) =>
+      this.request<
+        { plugins?: { list: PluginType[]; pageInfo: PaginatedType } },
+        any
+      >({
+        path: `/tables/${tableId}/sample`,
         method: 'GET',
         format: 'json',
         ...params,

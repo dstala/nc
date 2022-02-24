@@ -12,7 +12,6 @@ import galleryViewApis from './galleryViewApis';
 import formViewApis from './formViewApis';
 import formViewColumnApis from './formViewColumnApis';
 import attachmentApis from './attachmentApis';
-import webhookApis from './webhookApis';
 import publicDataApis from './publicDataApis';
 import publicMetaApis from './publicMetaApis';
 import exportApis from './exportApis';
@@ -34,7 +33,6 @@ export default function(router: Router) {
   router.use('/', formViewApis);
   router.use('/', viewApis);
   router.use('/', attachmentApis);
-  router.use('/', webhookApis);
   router.use('/public/data/:uuid', publicDataApis);
   router.use('/public/meta/:uuid', publicMetaApis);
   router.use('/', exportApis);

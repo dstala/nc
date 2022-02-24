@@ -1,8 +1,10 @@
 import catchError from './helpers/catchError';
 import { Request, Response, Router } from 'express';
 import Hook from '../../../noco-models/Hook';
-import { HookListType, HookType } from 'nc-common';
+import { HookListType, HookTestPayloadType, HookType } from 'nc-common';
 import { PagedResponseImpl } from './helpers/PagedResponse';
+import { invokeWebhook } from './helpers/webhookHelpers';
+import Model from '../../../noco-models/Model';
 
 export async function hookList(
   req: Request<any, any, any>,
@@ -41,8 +43,24 @@ export async function hookUpdate(
   res.json(await Hook.update(req.params.hookId, req.body));
 }
 
+export async function hookTest(
+  req: Request<any, any, HookTestPayloadType>,
+  res: Response
+) {
+  const model = await Model.get({ id: req.params.modelId });
+
+  const {
+    hook,
+    payload: { data, user }
+  } = req.body;
+  await invokeWebhook(hook, model, data, user);
+
+  res.json({ msg: 'Success' });
+}
+
 const router = Router({ mergeParams: true });
 router.get('/tables/:modelId/hooks', catchError(hookList));
+router.post('/tables/:modelId/hooks/test', catchError(hookTest));
 router.post('/tables/:modelId/hooks', catchError(hookCreate));
 router.delete('/hooks/:hookId', catchError(hookDelete));
 router.put('/hooks/:hookId', catchError(hookUpdate));

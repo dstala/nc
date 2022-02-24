@@ -2904,12 +2904,38 @@
         "operationId": "hook-test",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           }
         },
         "tags": [
           "meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payload": {
+                    "type": "object",
+                    "properties": {
+                      "data": {},
+                      "user": {}
+                    }
+                  },
+                  "hook": {
+                    "$ref": "#/components/schemas/Hook"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/hooks/{hookId}": {
@@ -2969,6 +2995,68 @@
       "get": {
         "summary": "",
         "operationId": "plugin-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plugins": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 1,
+                          "items": {
+                            "$ref": "#/components/schemas/Plugin"
+                          }
+                        },
+                        "pageInfo": {
+                          "$ref": "#/components/schemas/Paginated"
+                        }
+                      },
+                      "required": [
+                        "list",
+                        "pageInfo"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "parameters": [],
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/tables/{tableId}/sample": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "sample-data-get",
         "responses": {
           "200": {
             "description": "OK",

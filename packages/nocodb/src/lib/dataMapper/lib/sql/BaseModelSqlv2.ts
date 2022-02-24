@@ -26,14 +26,16 @@ import {
   ViewTypes
 } from 'nc-common';
 import formSubmissionEmailTemplate from '../../../noco/common/formSubmissionEmailTemplate';
-import IEmailAdapter from '../../../../interface/IEmailAdapter';
-import { IWebhookNotificationAdapter } from 'nc-plugin';
-import Handlebars from 'handlebars';
 import ejs from 'ejs';
 import Audit from '../../../noco-models/Audit';
 import FormView from '../../../noco-models/FormView';
 import Hook from '../../../noco-models/Hook';
 import NcPluginMgrv2 from '../../../noco/meta/api/helpers/NcPluginMgrv2';
+import {
+  _transformSubmittedFormDataForEmail,
+  invokeWebhook,
+  parseBody
+} from '../../../noco/meta/api/helpers/webhookHelpers';
 
 /**
  * Base class for models
@@ -1346,15 +1348,15 @@ class BaseModelSqlv2 {
           .filter(a => a[1])
           .map(a => a[0]);
         if (emails?.length) {
-          const transformedData = this._transformSubmittedFormDataForEmail(
+          const transformedData = _transformSubmittedFormDataForEmail(
             data,
             formView,
             await this.model.getColumns()
           );
           // todo: notification template
-          this.emailAdapter?.mailSend({
+          (await NcPluginMgrv2.emailAdapter())?.mailSend({
             to: emails.join(','),
-            subject: this.parseBody('NocoDB Form', req, data, {}),
+            subject: parseBody('NocoDB Form', req, data, {}),
             html: ejs.render(formSubmissionEmailTemplate, {
               data: transformedData,
               tn: this.model.tn,
@@ -1389,86 +1391,87 @@ class BaseModelSqlv2 {
                 }*/
 
       for (const hook of hooks) {
-        const notification = JSON.parse(hook.notification);
-        if (!hook.active) {
-          continue;
-        }
-        console.log('Hook handler ::::' + this.model.tn + '::::', hook);
-        console.log('Hook handler ::::' + this.model.tn + '::::', data);
-
-        if (!this.validateCondition(hook.condition, data, req)) {
-          continue;
-        }
-
-        switch (notification?.type) {
-          case 'Email':
-            this.emailAdapter?.mailSend({
-              to: this.parseBody(
-                notification?.payload?.to,
-                req,
-                data,
-                notification?.payload
-              ),
-              subject: this.parseBody(
-                notification?.payload?.subject,
-                req,
-                data,
-                notification?.payload
-              ),
-              html: this.parseBody(
-                notification?.payload?.body,
-                req,
-                data,
-                notification?.payload
-              )
-            });
-            break;
-          case 'URL':
-            this.handleHttpWebHook(notification?.payload, req, data);
-            break;
-          default:
-            // if (
-            //   this.webhookNotificationAdapters &&
-            //   notification?.type &&
-            //   notification?.type in this.webhookNotificationAdapters
-            // ) {
-            //   this.webhookNotificationAdapters[notification.type].sendMessage(
-            //     this.parseBody(
-            //       notification?.payload?.body,
-            //       req,
-            //       data,
-            //       notification?.payload
-            //     ),
-            //     JSON.parse(
-            //       JSON.stringify(notification?.payload),
-            //       (_key, value) => {
-            //         return typeof value === 'string'
-            //           ? this.parseBody(value, req, data, notification?.payload)
-            //           : value;
-            //       }
-            //     )
-            //   );
-            (
-              await NcPluginMgrv2.webhookNotificationAdapters(notification.type)
-            ).sendMessage(
-              this.parseBody(
-                notification?.payload?.body,
-                req,
-                data,
-                notification?.payload
-              ),
-              JSON.parse(
-                JSON.stringify(notification?.payload),
-                (_key, value) => {
-                  return typeof value === 'string'
-                    ? this.parseBody(value, req, data, notification?.payload)
-                    : value;
-                }
-              )
-            );
-            // }
-            break;
-        }
+        invokeWebhook(hook, this.model, data, req?.user);
+        // const notification = JSON.parse(hook.notification);
+        // if (!hook.active) {
+        //   continue;
+        // }
+        // console.log('Hook handler ::::' + this.model.tn + '::::', hook);
+        // console.log('Hook handler ::::' + this.model.tn + '::::', data);
+        //
+        // if (!this.validateCondition(hook.condition, data, req)) {
+        //   continue;
+        // }
+        //
+        // switch (notification?.type) {
+        //   case 'Email':
+        //     this.emailAdapter?.mailSend({
+        //       to: this.parseBody(
+        //         notification?.payload?.to,
+        //         req,
+        //         data,
+        //         notification?.payload
+        //       ),
+        //       subject: this.parseBody(
+        //         notification?.payload?.subject,
+        //         req,
+        //         data,
+        //         notification?.payload
+        //       ),
+        //       html: this.parseBody(
+        //         notification?.payload?.body,
+        //         req,
+        //         data,
+        //         notification?.payload
+        //       )
+        //     });
+        //     break;
+        //   case 'URL':
+        //     this.handleHttpWebHook(notification?.payload, req, data);
+        //     break;
+        //   default:
+        //     // if (
+        //     //   this.webhookNotificationAdapters &&
+        //     //   notification?.type &&
+        //     //   notification?.type in this.webhookNotificationAdapters
+        //     // ) {
+        //     //   this.webhookNotificationAdapters[notification.type].sendMessage(
+        //     //     this.parseBody(
+        //     //       notification?.payload?.body,
+        //     //       req,
+        //     //       data,
+        //     //       notification?.payload
+        //     //     ),
+        //     //     JSON.parse(
+        //     //       JSON.stringify(notification?.payload),
+        //     //       (_key, value) => {
+        //     //         return typeof value === 'string'
+        //     //           ? this.parseBody(value, req, data, notification?.payload)
+        //     //           : value;
+        //     //       }
+        //     //     )
+        //     //   );
+        //     (
+        //       await NcPluginMgrv2.webhookNotificationAdapters(notification.type)
+        //     ).sendMessage(
+        //       this.parseBody(
+        //         notification?.payload?.body,
+        //         req,
+        //         data,
+        //         notification?.payload
+        //       ),
+        //       JSON.parse(
+        //         JSON.stringify(notification?.payload),
+        //         (_key, value) => {
+        //           return typeof value === 'string'
+        //             ? this.parseBody(value, req, data, notification?.payload)
+        //             : value;
+        //         }
+        //       )
+        //     );
+        //     // }
+        //     break;
+        // }
 
         // await axios.post(this.builder.hooks[this.tn][hookName].url, {data}, {
         //   headers: req?.headers
@@ -1480,275 +1483,275 @@ class BaseModelSqlv2 {
     }
   }
 
-  private _transformSubmittedFormDataForEmail(
-    data,
-    // @ts-ignore
-    formView,
-    // @ts-ignore
-    columns: Column[]
-  ) {
-    const transformedData = { ...data };
-    /* todo:
-
-  for (const col of columns) {
-      if (!formView.query_params?.showFields?.[col._cn]) {
-        delete transformedData[col._cn];
-        continue;
-      }
-
-      if (col.uidt === 'Attachment') {
-        if (typeof transformedData[col._cn] === 'string') {
-          transformedData[col._cn] = JSON.parse(transformedData[col._cn]);
-        }
-        transformedData[col._cn] = (transformedData[col._cn] || [])
-          .map(attachment => {
-            if (
-              [
-                'jpeg',
-                'gif',
-                'png',
-                'apng',
-                'svg',
-                'bmp',
-                'ico',
-                'jpg'
-              ].includes(attachment.title.split('.').pop())
-            ) {
-              return `<a href="${attachment.url}" target="_blank"><img height="50px" src="${attachment.url}"/></a>`;
-            }
-            return `<a href="${attachment.url}" target="_blank">${attachment.title}</a>`;
-          })
-          .join('&nbsp;');
-      } else if (
-        transformedData[col._cn] &&
-        typeof transformedData[col._cn] === 'object'
-      ) {
-        transformedData[col._cn] = JSON.stringify(transformedData[col._cn]);
-      }
-    }
-
-    for (const virtual of this.virtualColumns) {
-      const hidden = !formView.query_params?.showFields?.[virtual._cn];
-
-      if (virtual.bt) {
-        const prop = `${virtual.bt._rtn}Read`;
-        if (hidden) {
-          delete transformedData[prop];
-        } else {
-          transformedData[prop] =
-            transformedData?.[prop]?.[
-              this.builder
-                .getMeta(virtual.bt.rtn)
-                ?.columns?.find(c => c.pv)?._cn
-            ];
-        }
-      } else if (virtual.hm) {
-        const prop = `${virtual.hm._tn}List`;
-        if (hidden) {
-          delete transformedData[prop];
-        } else {
-          transformedData[prop] = transformedData?.[prop]
-            ?.map(
-              r =>
-                r[
-                  this.builder.getMeta(virtual.hm.tn)?.columns?.find(c => c.pv)
-                    ?._cn
-                ]
-            )
-            .join(', ');
-        }
-      } else if (virtual.mm) {
-        const prop = `${virtual.mm._rtn}MMList`;
-        if (hidden) {
-          delete transformedData[prop];
-        } else {
-          transformedData[prop] = transformedData?.[prop]
-            ?.map(
-              r =>
-                r[
-                  this.builder.getMeta(virtual.mm.tn)?.columns?.find(c => c.pv)
-                    ?._cn
-                ]
-            )
-            .join(', ');
-        }
-      }
-    }*/
-
-    return transformedData;
-  }
-
-  private async handleHttpWebHook(apiMeta, apiReq, data) {
-    try {
-      const req = this.axiosRequestMake(apiMeta, apiReq, data);
-      await require('axios')(req);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  private axiosRequestMake(_apiMeta, apiReq, data) {
-    const apiMeta = { ..._apiMeta };
-    if (apiMeta.body) {
-      try {
-        apiMeta.body = JSON.parse(apiMeta.body, (_key, value) => {
-          return typeof value === 'string'
-            ? this.parseBody(value, apiReq, data, apiMeta)
-            : value;
-        });
-      } catch (e) {
-        apiMeta.body = this.parseBody(apiMeta.body, apiReq, data, apiMeta);
-        console.log(e);
-      }
-    }
-    if (apiMeta.auth) {
-      try {
-        apiMeta.auth = JSON.parse(apiMeta.auth, (_key, value) => {
-          return typeof value === 'string'
-            ? this.parseBody(value, apiReq, data, apiMeta)
-            : value;
-        });
-      } catch (e) {
-        apiMeta.auth = this.parseBody(apiMeta.auth, apiReq, data, apiMeta);
-        console.log(e);
-      }
-    }
-    apiMeta.response = {};
-    const req = {
-      params: apiMeta.parameters
-        ? apiMeta.parameters.reduce((paramsObj, param) => {
-            if (param.name && param.enabled) {
-              paramsObj[param.name] = this.parseBody(
-                param.value,
-                apiReq,
-                data,
-                apiMeta
-              );
-            }
-            return paramsObj;
-          }, {})
-        : {},
-      url: this.parseBody(apiMeta.path, apiReq, data, apiMeta),
-      method: apiMeta.method,
-      data: apiMeta.body,
-      headers: apiMeta.headers
-        ? apiMeta.headers.reduce((headersObj, header) => {
-            if (header.name && header.enabled) {
-              headersObj[header.name] = this.parseBody(
-                header.value,
-                apiReq,
-                data,
-                apiMeta
-              );
-            }
-            return headersObj;
-          }, {})
-        : {},
-      withCredentials: true
-    };
-    return req;
-  }
-
-  // @ts-ignore
-  private get emailAdapter(): IEmailAdapter {
-    // todo:
-    // return this.builder?.app?.metaMgr?.emailAdapter;
-  }
-
-  // @ts-ignore
-  private get webhookNotificationAdapters(): {
-    [key: string]: IWebhookNotificationAdapter;
-  } {
-    // todo:
-    // return this.builder?.app?.metaMgr?.webhookNotificationAdapters;
-  }
-
-  private validateCondition(condition: any, data: any, _req: any) {
-    if (!condition || !condition.length) {
-      return true;
-    }
-
-    const isValid = condition.reduce((valid, con) => {
-      let res;
-      const field = con.field;
-      let val = data[field];
-      switch (typeof con.value) {
-        case 'boolean':
-          val = !!data[field];
-          break;
-        case 'number':
-          val = !!data[field];
-          break;
-      }
-      switch (con.op as string) {
-        case 'is equal':
-          res = val === con.value;
-          break;
-        case 'is not equal':
-          res = val !== con.value;
-          break;
-        case 'is like':
-          res =
-            data[field]?.toLowerCase()?.indexOf(con.value?.toLowerCase()) > -1;
-          break;
-        case 'is not like':
-          res =
-            data[field]?.toLowerCase()?.indexOf(con.value?.toLowerCase()) ===
-            -1;
-          break;
-        case 'is empty':
-          res =
-            data[field] === '' ||
-            data[field] === null ||
-            data[field] === undefined;
-          break;
-        case 'is not empty':
-          res = !(
-            data[field] === '' ||
-            data[field] === null ||
-            data[field] === undefined
-          );
-          break;
-        case 'is null':
-          res = res = data[field] === null;
-          break;
-        case 'is not null':
-          res = data[field] !== null;
-          break;
-
-        /*   todo:     case '<':
-                  return condition + `~not(${filt.field},lt,${filt.value})`;
-                case '<=':
-                  return condition + `~not(${filt.field},le,${filt.value})`;
-                case '>':
-                  return condition + `~not(${filt.field},gt,${filt.value})`;
-                case '>=':
-                  return condition + `~not(${filt.field},ge,${filt.value})`;*/
-      }
-
-      return con.logicOp === 'or' ? valid || res : valid && res;
-    }, true);
-
-    return isValid;
-  }
-
-  private parseBody(
-    template: string,
-    req: any,
-    data: any,
-    payload: any
-  ): string {
-    if (!template) {
-      return template;
-    }
-
-    return Handlebars.compile(template, { noEscape: true })({
-      data,
-      user: req?.user,
-      payload,
-      env: process.env
-    });
-  }
+  // private _transformSubmittedFormDataForEmail(
+  //   data,
+  //   // @ts-ignore
+  //   formView,
+  //   // @ts-ignore
+  //   columns: Column[]
+  // ) {
+  //   const transformedData = { ...data };
+  //   /* todo:
+  //
+  // for (const col of columns) {
+  //     if (!formView.query_params?.showFields?.[col._cn]) {
+  //       delete transformedData[col._cn];
+  //       continue;
+  //     }
+  //
+  //     if (col.uidt === 'Attachment') {
+  //       if (typeof transformedData[col._cn] === 'string') {
+  //         transformedData[col._cn] = JSON.parse(transformedData[col._cn]);
+  //       }
+  //       transformedData[col._cn] = (transformedData[col._cn] || [])
+  //         .map(attachment => {
+  //           if (
+  //             [
+  //               'jpeg',
+  //               'gif',
+  //               'png',
+  //               'apng',
+  //               'svg',
+  //               'bmp',
+  //               'ico',
+  //               'jpg'
+  //             ].includes(attachment.title.split('.').pop())
+  //           ) {
+  //             return `<a href="${attachment.url}" target="_blank"><img height="50px" src="${attachment.url}"/></a>`;
+  //           }
+  //           return `<a href="${attachment.url}" target="_blank">${attachment.title}</a>`;
+  //         })
+  //         .join('&nbsp;');
+  //     } else if (
+  //       transformedData[col._cn] &&
+  //       typeof transformedData[col._cn] === 'object'
+  //     ) {
+  //       transformedData[col._cn] = JSON.stringify(transformedData[col._cn]);
+  //     }
+  //   }
+  //
+  //   for (const virtual of this.virtualColumns) {
+  //     const hidden = !formView.query_params?.showFields?.[virtual._cn];
+  //
+  //     if (virtual.bt) {
+  //       const prop = `${virtual.bt._rtn}Read`;
+  //       if (hidden) {
+  //         delete transformedData[prop];
+  //       } else {
+  //         transformedData[prop] =
+  //           transformedData?.[prop]?.[
+  //             this.builder
+  //               .getMeta(virtual.bt.rtn)
+  //               ?.columns?.find(c => c.pv)?._cn
+  //           ];
+  //       }
+  //     } else if (virtual.hm) {
+  //       const prop = `${virtual.hm._tn}List`;
+  //       if (hidden) {
+  //         delete transformedData[prop];
+  //       } else {
+  //         transformedData[prop] = transformedData?.[prop]
+  //           ?.map(
+  //             r =>
+  //               r[
+  //                 this.builder.getMeta(virtual.hm.tn)?.columns?.find(c => c.pv)
+  //                   ?._cn
+  //               ]
+  //           )
+  //           .join(', ');
+  //       }
+  //     } else if (virtual.mm) {
+  //       const prop = `${virtual.mm._rtn}MMList`;
+  //       if (hidden) {
+  //         delete transformedData[prop];
+  //       } else {
+  //         transformedData[prop] = transformedData?.[prop]
+  //           ?.map(
+  //             r =>
+  //               r[
+  //                 this.builder.getMeta(virtual.mm.tn)?.columns?.find(c => c.pv)
+  //                   ?._cn
+  //               ]
+  //           )
+  //           .join(', ');
+  //       }
+  //     }
+  //   }*/
+  //
+  //   return transformedData;
+  // }
+  //
+  // private async handleHttpWebHook(apiMeta, apiReq, data) {
+  //   try {
+  //     const req = this.axiosRequestMake(apiMeta, apiReq, data);
+  //     await require('axios')(req);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+  //
+  // private axiosRequestMake(_apiMeta, apiReq, data) {
+  //   const apiMeta = { ..._apiMeta };
+  //   if (apiMeta.body) {
+  //     try {
+  //       apiMeta.body = JSON.parse(apiMeta.body, (_key, value) => {
+  //         return typeof value === 'string'
+  //           ? this.parseBody(value, apiReq, data, apiMeta)
+  //           : value;
+  //       });
+  //     } catch (e) {
+  //       apiMeta.body = this.parseBody(apiMeta.body, apiReq, data, apiMeta);
+  //       console.log(e);
+  //     }
+  //   }
+  //   if (apiMeta.auth) {
+  //     try {
+  //       apiMeta.auth = JSON.parse(apiMeta.auth, (_key, value) => {
+  //         return typeof value === 'string'
+  //           ? this.parseBody(value, apiReq, data, apiMeta)
+  //           : value;
+  //       });
+  //     } catch (e) {
+  //       apiMeta.auth = this.parseBody(apiMeta.auth, apiReq, data, apiMeta);
+  //       console.log(e);
+  //     }
+  //   }
+  //   apiMeta.response = {};
+  //   const req = {
+  //     params: apiMeta.parameters
+  //       ? apiMeta.parameters.reduce((paramsObj, param) => {
+  //           if (param.name && param.enabled) {
+  //             paramsObj[param.name] = this.parseBody(
+  //               param.value,
+  //               apiReq,
+  //               data,
+  //               apiMeta
+  //             );
+  //           }
+  //           return paramsObj;
+  //         }, {})
+  //       : {},
+  //     url: this.parseBody(apiMeta.path, apiReq, data, apiMeta),
+  //     method: apiMeta.method,
+  //     data: apiMeta.body,
+  //     headers: apiMeta.headers
+  //       ? apiMeta.headers.reduce((headersObj, header) => {
+  //           if (header.name && header.enabled) {
+  //             headersObj[header.name] = this.parseBody(
+  //               header.value,
+  //               apiReq,
+  //               data,
+  //               apiMeta
+  //             );
+  //           }
+  //           return headersObj;
+  //         }, {})
+  //       : {},
+  //     withCredentials: true
+  //   };
+  //   return req;
+  // }
+  //
+  // // @ts-ignore
+  // private get emailAdapter(): IEmailAdapter {
+  //   // todo:
+  //   // return this.builder?.app?.metaMgr?.emailAdapter;
+  // }
+  //
+  // // @ts-ignore
+  // private get webhookNotificationAdapters(): {
+  //   [key: string]: IWebhookNotificationAdapter;
+  // } {
+  //   // todo:
+  //   // return this.builder?.app?.metaMgr?.webhookNotificationAdapters;
+  // }
+  //
+  // private validateCondition(condition: any, data: any, _req: any) {
+  //   if (!condition || !condition.length) {
+  //     return true;
+  //   }
+  //
+  //   const isValid = condition.reduce((valid, con) => {
+  //     let res;
+  //     const field = con.field;
+  //     let val = data[field];
+  //     switch (typeof con.value) {
+  //       case 'boolean':
+  //         val = !!data[field];
+  //         break;
+  //       case 'number':
+  //         val = !!data[field];
+  //         break;
+  //     }
+  //     switch (con.op as string) {
+  //       case 'is equal':
+  //         res = val === con.value;
+  //         break;
+  //       case 'is not equal':
+  //         res = val !== con.value;
+  //         break;
+  //       case 'is like':
+  //         res =
+  //           data[field]?.toLowerCase()?.indexOf(con.value?.toLowerCase()) > -1;
+  //         break;
+  //       case 'is not like':
+  //         res =
+  //           data[field]?.toLowerCase()?.indexOf(con.value?.toLowerCase()) ===
+  //           -1;
+  //         break;
+  //       case 'is empty':
+  //         res =
+  //           data[field] === '' ||
+  //           data[field] === null ||
+  //           data[field] === undefined;
+  //         break;
+  //       case 'is not empty':
+  //         res = !(
+  //           data[field] === '' ||
+  //           data[field] === null ||
+  //           data[field] === undefined
+  //         );
+  //         break;
+  //       case 'is null':
+  //         res = res = data[field] === null;
+  //         break;
+  //       case 'is not null':
+  //         res = data[field] !== null;
+  //         break;
+  //
+  //       /*   todo:     case '<':
+  //                 return condition + `~not(${filt.field},lt,${filt.value})`;
+  //               case '<=':
+  //                 return condition + `~not(${filt.field},le,${filt.value})`;
+  //               case '>':
+  //                 return condition + `~not(${filt.field},gt,${filt.value})`;
+  //               case '>=':
+  //                 return condition + `~not(${filt.field},ge,${filt.value})`;*/
+  //     }
+  //
+  //     return con.logicOp === 'or' ? valid || res : valid && res;
+  //   }, true);
+  //
+  //   return isValid;
+  // }
+  //
+  // private parseBody(
+  //   template: string,
+  //   req: any,
+  //   data: any,
+  //   payload: any
+  // ): string {
+  //   if (!template) {
+  //     return template;
+  //   }
+  //
+  //   return Handlebars.compile(template, { noEscape: true })({
+  //     data,
+  //     user: req?.user,
+  //     payload,
+  //     env: process.env
+  //   });
+  // }
 
   // @ts-ignore
   protected async errorInsert(e, data, trx, cookie) {}

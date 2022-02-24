@@ -343,6 +343,17 @@
                     </span>
                   </v-tooltip>
                 </span>
+
+                <webhooks-test
+                  :model-id="meta.id"
+                  :hook="{
+                    ...hook,
+                    notification: {
+                      ...hook.notification,
+                      payload: notification
+                    }
+                  }"
+                />
               </v-card-text>
             </v-card>
           </v-col>
@@ -357,10 +368,12 @@ import HttpWebhook from './webhook/httpWebhook'
 import ColumnFilter from '~/components/project/spreadsheet/components/columnFilter'
 // import FormInput from '~/components/project/appStore/FormInput'
 import WebhookEvent from '~/components/project/tableTabs/webhookEvent'
+import WebhooksTest from '~/components/project/tableTabs/webhooksTest'
 
 export default {
   name: 'Webhooks',
   components: {
+    WebhooksTest,
     HttpWebhook,
     WebhookEvent,
     // FormInput,
