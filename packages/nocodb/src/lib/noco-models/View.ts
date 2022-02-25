@@ -12,6 +12,8 @@ import { ViewType, ViewTypes } from 'nc-common';
 import GalleryViewColumn from './GalleryViewColumn';
 import FormViewColumn from './FormViewColumn';
 import { NcError } from '../noco/meta/api/helpers/catchError';
+import UITypes from '../sqlUi/UITypes';
+import Column from './Column';
 
 const { v4: uuidv4 } = require('uuid');
 export default class View implements ViewType {
@@ -184,7 +186,7 @@ export default class View implements ViewType {
       //   break;
     }
 
-    let columns = await (
+    let columns: any[] = await (
       await Model.get({ id: view.fk_model_id })
     ).getColumns();
 
@@ -209,12 +211,21 @@ export default class View implements ViewType {
     }
     {
       let order = 1;
-      for (const col of columns) {
+      for (const vCol of columns) {
+        let show = vCol.show;
+        const col = await Column.get({ colId: vCol.fk_col_id || vCol.id });
+        if (
+          col.uidt === UITypes.ForeignKey ||
+          col.cn === 'created_at' ||
+          col.cn === 'updated_at' ||
+          (col.pk && (col.ai || col.cdf))
+        )
+          show = false;
         await View.insertColumn({
           view_id,
-          show: true,
           order: order++,
-          ...col
+          ...col,
+          show
         });
       }
     }

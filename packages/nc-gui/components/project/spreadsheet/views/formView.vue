@@ -535,7 +535,7 @@ export default {
     },
     hiddenColumns: {
       get() {
-        return this.fields.filter(f => !f.show)
+        return this.fields.filter(f => !f.show && f.uidt !== UITypes.ForeignKey)
         // return this.allColumns.filter(c => !this.showFields[c.alias] && !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && !(this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn))
       }
     },
