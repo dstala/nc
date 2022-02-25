@@ -20,6 +20,7 @@ import {
   TableType
 } from 'nc-common';
 import Audit from '../../../noco-models/Audit';
+import catchError, { NcError } from './helpers/catchError';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
@@ -413,55 +414,68 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
   }
 }
 
-export async function columnUpdate(
-  req: Request,
-  res: Response<TableType>,
-  next
-) {
+export async function columnUpdate(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
   const base = await Base.get(table.base_id);
 
   const column = table.columns.find(c => c.id === req.params.columnId);
-
-  switch (column.uidt) {
-    case UITypes.Lookup:
-    case UITypes.Rollup:
-    case UITypes.LinkToAnotherRecord:
-    case UITypes.Formula:
-    case UITypes.ForeignKey:
-      return next(new Error('Not implemented'));
-  }
-
   const colBody = req.body;
-  switch (colBody.uidt) {
-    case UITypes.Lookup:
-    case UITypes.Rollup:
-    case UITypes.LinkToAnotherRecord:
-    case UITypes.Formula:
-    case UITypes.ForeignKey:
-      return next(new Error('Not implemented'));
+  if (
+    [
+      UITypes.Lookup,
+      UITypes.Rollup,
+      UITypes.LinkToAnotherRecord,
+      UITypes.Formula,
+      UITypes.ForeignKey
+    ].includes(column.uidt)
+  ) {
+    if (column.uidt === colBody.uidt) {
+      await Column.updateAlias(req.params.columnId, {
+        _cn: column._cn
+      });
+    } else {
+      NcError.notImplemented(
+        `Updating ${colBody.uidt} => ${colBody.uidt} is not implemented`
+      );
+    }
+  } else if (
+    [
+      UITypes.Lookup,
+      UITypes.Rollup,
+      UITypes.LinkToAnotherRecord,
+      UITypes.Formula,
+      UITypes.ForeignKey
+    ].includes(colBody.uidt)
+  ) {
+    NcError.notImplemented(
+      `Updating ${colBody.uidt} => ${colBody.uidt} is not implemented`
+    );
+  } else {
+    const tableUpdateBody = {
+      ...table,
+      originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),
+      columns: table.columns.map(c => {
+        if (c.id === req.params.columnId) {
+          return {
+            ...c,
+            ...colBody,
+            cno: c.cn,
+            altered: Altered.UPDATE_COLUMN
+          };
+        }
+        return c;
+      })
+    };
+
+    const sqlMgr = await ProjectMgrv2.getSqlMgr({ id: base.project_id });
+    await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+
+    await Column.update(req.params.columnId, {
+      ...colBody
+    });
   }
-
-  const tableUpdateBody = {
-    ...table,
-    originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),
-    columns: table.columns.map(c => {
-      if (c.id === req.params.columnId) {
-        return { ...c, ...colBody, cno: c.cn, altered: Altered.UPDATE_COLUMN };
-      }
-      return c;
-    })
-  };
-
-  const sqlMgr = await ProjectMgrv2.getSqlMgr({ id: base.project_id });
-  await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
-
-  await Column.update(req.params.columnId, {
-    ...colBody
-  });
-
   Audit.insert({
     project_id: base.project_id,
     op_type: AuditOperationTypes.TABLE_COLUMN,
@@ -528,7 +542,7 @@ export async function columnDelete(
 }
 
 const router = Router({ mergeParams: true });
-router.post('/', columnAdd);
-router.put('/:columnId', columnUpdate);
-router.delete('/:columnId', columnDelete);
+router.post('/', catchError(columnAdd));
+router.put('/:columnId', catchError(columnUpdate));
+router.delete('/:columnId', catchError(columnDelete));
 export default router;

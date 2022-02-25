@@ -560,4 +560,20 @@ export default class Column implements ColumnType {
     );
     await this.insertColOption(column, colId, ncMeta);
   }
+
+  static async updateAlias(
+    colId: string,
+    { _cn }: { _cn: string },
+    ncMeta = Noco.ncMeta
+  ) {
+    await ncMeta.metaUpdate(
+      null, //column.project_id || column.base_id,
+      null, //column.db_alias,
+      MetaTable.COLUMNS,
+      {
+        _cn
+      },
+      colId
+    );
+  }
 }
