@@ -536,16 +536,19 @@ export default {
     async onNotTypeChange() {
       this.notification = {}
       if (this.hook.notification.type === 'Slack') {
-        const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
-          title: 'Slack'
-        }])
-        this.slackChannels = JSON.parse(plugin.input) || []
+        // const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
+        //   title: 'Slack'
+        // }])
+        // this.slackChannels = JSON.parse(plugin.input) || []
+
+        this.slackChannels = (this.apps && this.apps.Slack && this.apps.Slack.parsedInput) || []
       }
       if (this.hook.notification.type === 'Microsoft Teams') {
-        const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
-          title: 'Microsoft Teams'
-        }])
-        this.teamsChannels = JSON.parse(plugin.input) || []
+        // const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
+        //   title: 'Microsoft Teams'
+        // }])
+        // this.teamsChannels = JSON.parse(plugin.input) || []
+        this.teamsChannels = (this.apps && this.apps['Microsoft Teams'] && this.apps['Microsoft Teams'].parsedInput) || []
       }
       if (this.hook.notification.type === 'Discord') {
         // const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
@@ -554,10 +557,11 @@ export default {
         this.discordChannels = (this.apps && this.apps.Discord && this.apps.Discord.parsedInput) || []
       }
       if (this.hook.notification.type === 'Mattermost') {
-        const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
-          title: 'Mattermost'
-        }])
-        this.mattermostChannels = JSON.parse(plugin.input) || []
+        // const plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
+        //   title: 'Mattermost'
+        // }])
+        // this.mattermostChannels = JSON.parse(plugin.input) || []
+        this.mattermostChannels = (this.apps && this.apps.Mattermost && this.apps.Mattermost.parsedInput) || []
       }
     },
     async onEventChange() {
@@ -697,14 +701,15 @@ export default {
     async deleteHook(item, i) {
       try {
         if (item.id) {
-          await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-            env: this.nodes.env,
-            dbAlias: this.nodes.dbAlias
-          }, 'tableXcHooksDelete', {
-            id: item.id,
-            title: item.title,
-            tn: this.nodes.tn
-          }])
+          // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+          //   env: this.nodes.env,
+          //   dbAlias: this.nodes.dbAlias
+          // }, 'tableXcHooksDelete', {
+          //   id: item.id,
+          //   title: item.title,
+          //   tn: this.nodes.tn
+          // }])
+          await this.$api.meta.hookDelete(item.id)
           this.hooks.splice(i, 1)
         } else {
           this.hooks.splice(i, 1)
