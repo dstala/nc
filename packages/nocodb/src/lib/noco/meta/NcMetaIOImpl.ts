@@ -73,7 +73,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
   // todo: need to fix
   private trx: Knex.Transaction;
 
-  constructor(app: Noco, config: NcConfig) {
+  constructor(app: Noco, config: NcConfig, trx = null) {
     super(app, config);
 
     if (this.config?.meta?.db?.client === 'sqlite3') {
@@ -81,7 +81,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
     }
 
     if (this.config?.meta?.db) {
-      this.connection = XKnex(this.config?.meta?.db);
+      this.connection = trx || XKnex(this.config?.meta?.db);
     } else {
       let dbIndex = this.config.envs?.[this.config.workingEnv]?.db.findIndex(
         c => c.meta.dbAlias === this.config?.auth?.jwt?.dbAlias
@@ -91,6 +91,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
         this.config.envs?.[this.config.workingEnv]?.db[dbIndex] as any
       );
     }
+    this.trx = trx;
     NcConnectionMgr.setXcMeta(this);
   }
 
@@ -431,10 +432,9 @@ export default class NcMetaIOImpl extends NcMetaIO {
     this.trx = null;
   }
 
-  async startTransaction() {
-    if (!this.trx) {
-      this.trx = await this.connection.transaction();
-    }
+  async startTransaction(): Promise<NcMetaIO> {
+    const trx = await this.connection.transaction();
+    return new NcMetaIOImpl(this.app, this.config, trx);
   }
 
   async metaReset(

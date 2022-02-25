@@ -41,7 +41,7 @@ export default class KnexMigratorv2 {
     this.projectId = project.id;
   }
 
-  get metaDb(): XKnex {
+  protected get metaDb(): XKnex {
     return Noco.ncMeta.knex;
   }
 
@@ -382,7 +382,7 @@ export default class KnexMigratorv2 {
   // }
 
   async _initDbWithSql(base: Base) {
-    const sqlClient = NcConnectionMgrv2.getSqlClient(base);
+    const sqlClient = this.getSqlClient(base);
     const connectionConfig = base.getConnectionConfig();
     if (connectionConfig.client === 'oracledb') {
       this.emit(
@@ -426,6 +426,10 @@ export default class KnexMigratorv2 {
     //                     END;
     //                     $$ LANGUAGE plpgsql;`);
     // }
+  }
+
+  protected getSqlClient(base: Base) {
+    return NcConnectionMgrv2.getSqlClient(base);
   }
 
   async _cleanDbWithSql(connectionConfig) {
@@ -580,7 +584,7 @@ export default class KnexMigratorv2 {
       //   args.dbAlias,
       //   args.env
       // );
-      const sqlClient = NcConnectionMgrv2.getSqlClient(base);
+      const sqlClient = this.getSqlClient(base);
 
       let migrations = await sqlClient.selectAll(
         // todo: replace
@@ -748,7 +752,9 @@ export default class KnexMigratorv2 {
           } else {
             const vm = this;
 
-            const trx = await sqlClient.knex.transaction();
+            const trx = sqlClient.knex.isTransaction
+              ? sqlClient.knex
+              : await sqlClient.knex.transaction();
             try {
               for (const query of upStatements) {
                 await trx.raw(query);
@@ -760,11 +766,11 @@ export default class KnexMigratorv2 {
                   `'${data.title}' : Updating bookkeeping of SQL UP migration - done`
                 );
               }
-              await trx.commit();
+              if (!sqlClient.knex.isTransaction) await trx.commit();
 
-              //console.log('========== success ')
+              console.log('========== success ');
             } catch (error) {
-              await trx.rollback();
+              if (!sqlClient.knex.isTransaction) await trx.rollback();
               vm.emitW(
                 `Migration operation failed, Database restored to previous state`
               );
@@ -845,7 +851,7 @@ export default class KnexMigratorv2 {
       //   args.dbAlias,
       //   args.env
       // );
-      const sqlClient = NcConnectionMgrv2.getSqlClient(base); // SqlClientFactory.create(connection);
+      const sqlClient = this.getSqlClient(base); // SqlClientFactory.create(connection);
       const migrations = await sqlClient.selectAll(
         sqlClient.getTnPath('nc_evolutions')
       );
@@ -915,7 +921,9 @@ export default class KnexMigratorv2 {
 
           const vm = this;
 
-          const trx = await sqlClient.knex.transaction();
+          const trx = sqlClient.knex.isTransaction
+            ? sqlClient.knex
+            : await sqlClient.knex.transaction();
           try {
             for (const query of downStatements) {
               await trx.raw(query).transacting(trx);
@@ -929,11 +937,10 @@ export default class KnexMigratorv2 {
                 .where(condition)
                 .del();
             }
-
-            await trx.commit();
-            //console.log('========== success ');
+            if (!sqlClient.knex.isTransaction) await trx.commit();
+            console.log('========== success ');
           } catch (error) {
-            await trx.rollback();
+            if (!sqlClient.knex.isTransaction) await trx.rollback();
             vm.emitW(
               `Migration operation failed, Database restored to previous state`
             );

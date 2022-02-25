@@ -233,7 +233,7 @@ export default abstract class NcMetaIO {
   public abstract projectDelete(title: string): Promise<any>;
   public abstract projectDeleteById(id: string): Promise<any>;
 
-  public abstract startTransaction();
+  public abstract startTransaction(): Promise<NcMetaIO>;
 
   public abstract commit();
 

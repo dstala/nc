@@ -21,6 +21,9 @@ import {
 } from 'nc-common';
 import Audit from '../../../noco-models/Audit';
 import catchError, { NcError } from './helpers/catchError';
+import SqlMgrv2 from '../../../sqlMgr/v2/SqlMgrv2';
+import Noco from '../../Noco';
+import NcMetaIO from '../NcMetaIO';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
@@ -490,43 +493,143 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   res.json(table);
 }
 
-export async function columnDelete(
-  req: Request,
-  res: Response<TableType>,
-  next
-) {
+export async function columnDelete(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
   const base = await Base.get(table.base_id);
 
+  // const ncMeta = await Noco.ncMeta.startTransaction();
+  // const sqlMgr = await ProjectMgrv2.getSqlMgrTrans(
+  //   { id: base.project_id },
+  //   ncMeta,
+  //   base
+  // );
+
+  const sqlMgr = await ProjectMgrv2.getSqlMgr({ id: base.project_id });
+
+  // try {
+  const column: Column = table.columns.find(c => c.id === req.params.columnId);
+
   const colBody = req.body;
   switch (colBody.uidt) {
     case UITypes.Lookup:
     case UITypes.Rollup:
-    case UITypes.LinkToAnotherRecord:
     case UITypes.Formula:
-    case UITypes.ForeignKey:
-      return next(new Error('Not implemented'));
-  }
-  let column: Column;
-  const tableUpdateBody = {
-    ...table,
-    originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),
-    columns: table.columns.map(c => {
-      if (c.id === req.params.columnId) {
-        column = c;
-        return { ...c, cno: c.cn, altered: Altered.DELETE_COLUMN };
+      await Column.delete(req.params.columnId);
+      break;
+    case UITypes.LinkToAnotherRecord:
+      {
+        const relationColOpt = await column.getColOptions<
+          LinkToAnotherRecordColumn
+        >();
+        const childColumn = await relationColOpt.getChildColumn();
+        const childTable = await childColumn.getModel();
+
+        const parentColumn = await relationColOpt.getParentColumn();
+        const parentTable = await parentColumn.getModel();
+
+        switch (relationColOpt.type) {
+          case 'bt':
+          case 'hm':
+            {
+              await deleteHmOrBtRelation({
+                relationColOpt,
+                base,
+                childColumn,
+                childTable,
+                parentColumn,
+                parentTable,
+                sqlMgr
+                // ncMeta
+              });
+            }
+            break;
+          case 'mm':
+            {
+              const mmTable = await relationColOpt.getMMModel();
+              const mmParentCol = await relationColOpt.getMMParentColumn();
+              const mmChildCol = await relationColOpt.getMMChildColumn();
+
+              await deleteHmOrBtRelation({
+                relationColOpt: null,
+                parentColumn: parentColumn,
+                childTable: mmTable,
+                sqlMgr,
+                parentTable: parentTable,
+                childColumn: mmParentCol,
+                base
+                // ncMeta
+              });
+
+              await deleteHmOrBtRelation({
+                relationColOpt: null,
+                parentColumn: childColumn,
+                childTable: mmTable,
+                sqlMgr,
+                parentTable: childTable,
+                childColumn: mmChildCol,
+                base
+                // ncMeta
+              });
+
+              const columnsInRelatedTable: Column[] = await relationColOpt
+                .getRelatedTable()
+                .then(m => m.getColumns());
+              let columnInRelatedTable: Column;
+
+              for (const c of columnsInRelatedTable) {
+                if (c.uidt !== UITypes.LinkToAnotherRecord) continue;
+                const colOpt = await c.getColOptions<
+                  LinkToAnotherRecordColumn
+                >();
+                if (
+                  colOpt.fk_parent_column_id === childColumn.id &&
+                  colOpt.fk_child_column_id === parentColumn.id &&
+                  colOpt.type === 'mm' &&
+                  colOpt.fk_mm_model_id === mmTable.id &&
+                  colOpt.fk_mm_parent_column_id === mmChildCol.id &&
+                  colOpt.fk_mm_child_column_id === mmParentCol.id
+                ) {
+                  columnInRelatedTable = c;
+                  break;
+                }
+              }
+
+              await Column.delete(relationColOpt.fk_column_id);
+              await Column.delete(columnInRelatedTable.id);
+
+              await mmTable.getColumns();
+
+              // ignore deleting table if it have more than 2 columns
+              if (mmTable.columns.length === 2) {
+                await sqlMgr.sqlOpPlus(base, 'tableDelete', mmTable);
+              }
+            }
+            break;
+        }
       }
-      return c;
-    })
-  };
+      break;
+    case UITypes.ForeignKey:
+      NcError.notImplemented();
+      break;
+    default: {
+      const tableUpdateBody = {
+        ...table,
+        originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),
+        columns: table.columns.map(c => {
+          if (c.id === req.params.columnId) {
+            return { ...c, cno: c.cn, altered: Altered.DELETE_COLUMN };
+          }
+          return c;
+        })
+      };
 
-  const sqlMgr = await ProjectMgrv2.getSqlMgr({ id: base.project_id });
-  await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+      await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
 
-  await Column.delete(req.params.columnId);
-
+      await Column.delete(req.params.columnId);
+    }
+  }
   Audit.insert({
     project_id: base.project_id,
     op_type: AuditOperationTypes.TABLE_COLUMN,
@@ -538,8 +641,66 @@ export async function columnDelete(
 
   await table.getColumns(true);
 
+  // await ncMeta.commit();
+  // await sqlMgr.commit();
+
   res.json(table);
+  // } catch (e) {
+  //   sqlMgr.rollback();
+  //   ncMeta.rollback();
+  //   throw e;
+  // }
 }
+
+const deleteHmOrBtRelation = async ({
+  relationColOpt,
+  base,
+  childColumn,
+  childTable,
+  parentColumn,
+  parentTable,
+  sqlMgr,
+  ncMeta = Noco.ncMeta
+}: {
+  relationColOpt: LinkToAnotherRecordColumn;
+  base: Base;
+  childColumn: Column;
+  childTable: Model;
+  parentColumn: Column;
+  parentTable: Model;
+  sqlMgr: SqlMgrv2;
+  ncMeta?: NcMetaIO;
+}) => {
+  await sqlMgr.sqlOpPlus(base, 'relationDelete', {
+    childColumn: childColumn.cn,
+    childTable: childTable.tn,
+    parentTable: parentTable.tn,
+    parentColumn: parentColumn.cn
+    // foreignKeyName: relation.fkn
+  });
+
+  if (!relationColOpt) return;
+  const columnsInRelatedTable: Column[] = await relationColOpt
+    .getRelatedTable()
+    .then(m => m.getColumns());
+  let columnInRelatedTable: Column;
+  const relType = relationColOpt.type === 'bt' ? 'hm' : 'bt';
+  for (const c of columnsInRelatedTable) {
+    if (c.uidt !== UITypes.LinkToAnotherRecord) continue;
+    const colOpt = await c.getColOptions<LinkToAnotherRecordColumn>();
+    if (
+      colOpt.fk_parent_column_id === parentColumn.id &&
+      colOpt.fk_child_column_id === childColumn.id &&
+      colOpt.type === relType
+    ) {
+      columnInRelatedTable = c;
+      break;
+    }
+  }
+
+  await Column.delete(relationColOpt.fk_column_id, ncMeta);
+  await Column.delete(columnInRelatedTable.id, ncMeta);
+};
 
 const router = Router({ mergeParams: true });
 router.post('/', catchError(columnAdd));

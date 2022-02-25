@@ -31,7 +31,7 @@ class InternalServerError extends Error {}
 class NotImplemented extends Error {}
 
 export class NcError {
-  static notFound(message) {
+  static notFound(message = 'Not found') {
     throw new NotFound(message);
   }
   static badRequest(message) {
@@ -43,7 +43,7 @@ export class NcError {
   static forbidden(message) {
     throw new Forbidden(message);
   }
-  static internalServerError(message) {
+  static internalServerError(message = 'Internal server error') {
     throw new InternalServerError(message);
   }
   static notImplemented(message = 'Not implemented') {

@@ -9,7 +9,8 @@ import KnexMigratorv2 from '../../migrator/SqlMigrator/lib/KnexMigratorv2';
 import Base from '../../noco-models/Base';
 
 export default class SqlMgrv2 {
-  private _migrator: KnexMigratorv2;
+  protected _migrator: KnexMigratorv2;
+  // @ts-ignore
   private currentProjectFolder: any;
 
   /**
@@ -27,7 +28,7 @@ export default class SqlMgrv2 {
     return this;
   }
 
-  public migrator() {
+  public migrator(_base: Base) {
     return this._migrator;
   }
   public async testConnection(args = {}) {
@@ -52,7 +53,7 @@ export default class SqlMgrv2 {
     console.log(base);
 
     // create sql client for this operation
-    const client = NcConnectionMgrv2.getSqlClient(base);
+    const client = this.getSqlClient(base);
 
     // do sql operation
     const data = await client[op](opArgs);
@@ -77,7 +78,7 @@ export default class SqlMgrv2 {
     console.log(base);
 
     // create sql client for this operation
-    const sqlClient = NcConnectionMgrv2.getSqlClient(base); //await this.projectGetSqlClient(args);
+    const sqlClient = this.getSqlClient(base); //await this.projectGetSqlClient(args);
 
     // do sql operation
     const sqlMigrationStatements = await sqlClient[op](opArgs);
@@ -86,8 +87,8 @@ export default class SqlMgrv2 {
       sqlMigrationStatements.data.object
     );
 
-    // create sql migration files
-    const sqlMigrationFiles = await this.migrator().migrationsCreate(base);
+    /* // create sql migration files
+    const sqlMigrationFiles = await this.migrator(base).migrationsCreate(base);
     console.log(`Sql Migration Files for '${op}'`, sqlMigrationFiles);
 
     // write sql statements to migration files
@@ -95,7 +96,7 @@ export default class SqlMgrv2 {
       `Write sql migration files for '${op}' with`,
       sqlMigrationStatements
     );
-    await this.migrator().migrationsWrite({
+    await this.migrator(base).migrationsWrite({
       base,
       ...sqlMigrationStatements.data.object,
       folder: this.currentProjectFolder,
@@ -116,8 +117,12 @@ export default class SqlMgrv2 {
       sqlClient
     };
     // console.log(`Migration up args for '${op}'`, migrationArgs);
-    await this.migrator().migrationsUp(migrationArgs);
-
+    await this.migrator(base).migrationsUp(migrationArgs);
+*/
     return sqlMigrationStatements;
+  }
+
+  protected getSqlClient(base: Base) {
+    return NcConnectionMgrv2.getSqlClient(base);
   }
 }

@@ -384,7 +384,7 @@ export default class Column implements ColumnType {
   id: string;
 
   static async delete(id, ncMeta = Noco.ncMeta) {
-    const col = await this.get({ colId: id });
+    const col = await this.get({ colId: id }, ncMeta);
     let colOptionTableName = null;
     switch (col.uidt) {
       case UITypes.Rollup:
@@ -410,6 +410,18 @@ export default class Column implements ColumnType {
         fk_column_id: col.id
       });
     }
+    await ncMeta.metaDelete(null, null, MetaTable.GRID_VIEW_COLUMNS, {
+      fk_column_id: col.id
+    });
+    await ncMeta.metaDelete(null, null, MetaTable.FORM_VIEW_COLUMNS, {
+      fk_column_id: col.id
+    });
+    await ncMeta.metaDelete(null, null, MetaTable.KANBAN_VIEW_COLUMNS, {
+      fk_column_id: col.id
+    });
+    await ncMeta.metaDelete(null, null, MetaTable.GALLERY_VIEW_COLUMNS, {
+      fk_column_id: col.id
+    });
     await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, col.id);
   }
 
