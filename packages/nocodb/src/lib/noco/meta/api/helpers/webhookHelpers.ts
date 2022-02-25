@@ -105,11 +105,11 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
     try {
       apiMeta.body = JSON.parse(apiMeta.body, (_key, value) => {
         return typeof value === 'string'
-          ? this.parseBody(value, apiReq, data, apiMeta)
+          ? parseBody(value, apiReq, data, apiMeta)
           : value;
       });
     } catch (e) {
-      apiMeta.body = this.parseBody(apiMeta.body, apiReq, data, apiMeta);
+      apiMeta.body = parseBody(apiMeta.body, apiReq, data, apiMeta);
       console.log(e);
     }
   }
@@ -117,11 +117,11 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
     try {
       apiMeta.auth = JSON.parse(apiMeta.auth, (_key, value) => {
         return typeof value === 'string'
-          ? this.parseBody(value, apiReq, data, apiMeta)
+          ? parseBody(value, apiReq, data, apiMeta)
           : value;
       });
     } catch (e) {
-      apiMeta.auth = this.parseBody(apiMeta.auth, apiReq, data, apiMeta);
+      apiMeta.auth = parseBody(apiMeta.auth, apiReq, data, apiMeta);
       console.log(e);
     }
   }
@@ -130,7 +130,7 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
     params: apiMeta.parameters
       ? apiMeta.parameters.reduce((paramsObj, param) => {
           if (param.name && param.enabled) {
-            paramsObj[param.name] = this.parseBody(
+            paramsObj[param.name] = parseBody(
               param.value,
               apiReq,
               data,
@@ -146,7 +146,7 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
     headers: apiMeta.headers
       ? apiMeta.headers.reduce((headersObj, header) => {
           if (header.name && header.enabled) {
-            headersObj[header.name] = this.parseBody(
+            headersObj[header.name] = parseBody(
               header.value,
               apiReq,
               data,
@@ -172,7 +172,7 @@ export async function invokeWebhook(hook: HookType, model: Model, data, user) {
   console.log('Hook handler ::::' + model.tn + ':: Data ::', data);
 
   /* todo:
-      if (!this.validateCondition(hook.condition, data, req)) {
+      if (!validateCondition(hook.condition, data, req)) {
         continue;
       }*/
 
