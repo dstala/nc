@@ -679,6 +679,8 @@ const deleteHmOrBtRelation = async ({
     // foreignKeyName: relation.fkn
   });
 
+  await Column.delete(childColumn.id, ncMeta);
+
   if (!relationColOpt) return;
   const columnsInRelatedTable: Column[] = await relationColOpt
     .getRelatedTable()
