@@ -21,13 +21,18 @@ export default {
   data: () => ({
     sampleData: null
   }),
+  watch: {
+    async 'hook.operation'() {
+      await this.loadSampleData()
+    }
+  },
   created() {
     this.loadSampleData()
   },
   methods: {
     async   loadSampleData() {
       this.sampleData = {
-        data: (await this.$api.meta.sampleDataGet(this.modelId)).data,
+        data: (await this.$api.meta.hooksSamplePayloadGet(this.modelId, this.hook.operation)).data,
         user: this.$store.state.users.user
       }
     },

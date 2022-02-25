@@ -188,7 +188,7 @@
                   :operation.sync="hook.operation"
                 />
 
-                <v-card class="mb-8">
+                <!--                <v-card class="mb-8">
                   <v-card-text>
                     <v-checkbox
                       v-model="enableCondition"
@@ -209,7 +209,7 @@
                       style="max-width: 100%"
                     />
                   </v-card-text>
-                </v-card>
+                </v-card>-->
 
                 <v-select
                   v-model="hook.notification.type"

@@ -2173,17 +2173,21 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name SampleDataGet
-     * @request GET:/tables/{tableId}/sample
+     * @name HooksSamplePayloadGet
+     * @request GET:/tables/{tableId}/hooks/samplePayload/{operation}
      * @response `200` `{ plugins?: { list: (PluginType)[], pageInfo: PaginatedType } }` OK
      * @response `0` `any`
      */
-    sampleDataGet: (tableId: string, params: RequestParams = {}) =>
+    hooksSamplePayloadGet: (
+      tableId: string,
+      operation: 'update' | 'delete' | 'insert',
+      params: RequestParams = {}
+    ) =>
       this.request<
         { plugins?: { list: PluginType[]; pageInfo: PaginatedType } },
         any
       >({
-        path: `/tables/${tableId}/sample`,
+        path: `/tables/${tableId}/hooks/samplePayload/${operation}`,
         method: 'GET',
         format: 'json',
         ...params,

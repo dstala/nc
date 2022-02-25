@@ -3043,7 +3043,7 @@
         ]
       }
     },
-    "/tables/{tableId}/sample": {
+    "/tables/{tableId}/hooks/samplePayload/{operation}": {
       "parameters": [
         {
           "schema": {
@@ -3052,11 +3052,24 @@
           "name": "tableId",
           "in": "path",
           "required": true
+        },
+        {
+          "schema": {
+            "type": "string",
+            "enum": [
+              "update",
+              "delete",
+              "insert"
+            ]
+          },
+          "name": "operation",
+          "in": "path",
+          "required": true
         }
       ],
       "get": {
         "summary": "",
-        "operationId": "sample-data-get",
+        "operationId": "hooks-sample-payload-get",
         "responses": {
           "200": {
             "description": "OK",

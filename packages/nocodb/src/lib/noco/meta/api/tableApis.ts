@@ -12,7 +12,6 @@ import {
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';
-import populateSamplePayload from './helpers/populateSamplePayload';
 import catchError from './helpers/catchError';
 
 export async function tableGet(req: Request, res: Response<TableType>) {
@@ -39,13 +38,6 @@ export async function tableList(
         page: 1
       })
     });
-}
-
-export async function tableSampleData(req: Request, res: Response) {
-  const model = await Model.get({ id: req.params.tableId });
-
-  res // todo: pagination
-    .json(await populateSamplePayload(model, true));
 }
 
 export async function tableCreate(
@@ -127,5 +119,4 @@ router.post('/projects/:projectId/:baseId/tables', catchError(tableCreate));
 router.get('/tables/:tableId', catchError(tableGet));
 router.put('/tables/:tableId', catchError(tableUpdate));
 router.delete('/tables/:tableId', catchError(tableDelete));
-router.get('/tables/:tableId/sample', catchError(tableSampleData));
 export default router;

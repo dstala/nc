@@ -5,6 +5,7 @@ import { HookListType, HookTestPayloadType, HookType } from 'nc-common';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import { invokeWebhook } from './helpers/webhookHelpers';
 import Model from '../../../noco-models/Model';
+import populateSamplePayload from './helpers/populateSamplePayload';
 
 export async function hookList(
   req: Request<any, any, any>,
@@ -57,6 +58,12 @@ export async function hookTest(
 
   res.json({ msg: 'Success' });
 }
+export async function tableSampleData(req: Request, res: Response) {
+  const model = await Model.get({ id: req.params.tableId });
+
+  res // todo: pagination
+    .json(await populateSamplePayload(model, true, req.params.operation));
+}
 
 const router = Router({ mergeParams: true });
 router.get('/tables/:modelId/hooks', catchError(hookList));
@@ -64,4 +71,8 @@ router.post('/tables/:modelId/hooks/test', catchError(hookTest));
 router.post('/tables/:modelId/hooks', catchError(hookCreate));
 router.delete('/hooks/:hookId', catchError(hookDelete));
 router.put('/hooks/:hookId', catchError(hookUpdate));
+router.get(
+  '/tables/:tableId/hooks/samplePayload/:operation',
+  catchError(tableSampleData)
+);
 export default router;
