@@ -1839,6 +1839,87 @@
         }
       }
     },
+    "/grid/{gidId}/gridColumns": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "gidId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "grid-columns-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GridColumn"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/gridColumns/{columnId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "columnId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "grid-column-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": ""
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GridColumn"
+              }
+            }
+          }
+        }
+      }
+    },
     "/tables/{tableId}/galleries": {
       "parameters": [
         {
@@ -4710,6 +4791,9 @@
             "type": "string"
           },
           "fk_gallery_id": {
+            "type": "string"
+          },
+          "width": {
             "type": "string"
           }
         }

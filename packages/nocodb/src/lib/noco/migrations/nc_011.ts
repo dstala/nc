@@ -523,6 +523,7 @@ const up = async knex => {
     // todo:  type
     table.string('label');
     table.string('help');
+    table.string('width').defaultTo('200px');
 
     table.boolean('show');
     table.float('order');

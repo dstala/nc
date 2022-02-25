@@ -330,6 +330,7 @@ export interface GridColumnType {
   help?: string;
   fk_col_id?: string;
   fk_gallery_id?: string;
+  width?: string;
 }
 
 export interface KanbanColumnType {
@@ -1788,6 +1789,45 @@ export class Api<
     ) =>
       this.request<any, any>({
         path: `/formColumns/${columnId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name GridColumnsList
+     * @request GET:/grid/{gidId}/gridColumns
+     * @response `200` `(GridColumnType)[]` OK
+     */
+    gridColumnsList: (gidId: string, params: RequestParams = {}) =>
+      this.request<GridColumnType[], any>({
+        path: `/grid/${gidId}/gridColumns`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name GridColumnUpdate
+     * @request PUT:/gridColumns/{columnId}
+     * @response `200` `any` OK
+     * @response `0` `any`
+     */
+    gridColumnUpdate: (
+      columnId: string,
+      data: GridColumnType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/gridColumns/${columnId}`,
         method: 'PUT',
         body: data,
         type: ContentType.Json,

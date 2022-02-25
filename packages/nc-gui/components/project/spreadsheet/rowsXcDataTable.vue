@@ -319,6 +319,7 @@
               :is-virtual="selectedView && selectedView.type === 'vtable'"
               :api="api"
               :is-pk-avail="isPkAvail"
+              :view-id="selectedViewId"
               @drop="onFileDrop"
               @onNewColCreation="onNewColCreation"
               @onCellValueChange="onCellValueChange"

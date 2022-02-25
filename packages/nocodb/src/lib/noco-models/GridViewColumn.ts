@@ -1,10 +1,13 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
+import { GridColumnType } from 'nc-common';
+import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
 
-export default class GridViewColumn {
+export default class GridViewColumn implements GridColumnType {
   id: string;
   show: boolean;
   order: number;
+  width?: string;
 
   fk_view_id: string;
   fk_column_id: string;
@@ -52,5 +55,21 @@ export default class GridViewColumn {
       order: column.order,
       show: column.show
     });
+  }
+
+  static async update(
+    columnId: string,
+    body: Partial<GridViewColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const updateBody = extractDefinedProps(body, ['order', 'show', 'width']);
+
+    await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.GRID_VIEW_COLUMNS,
+      updateBody,
+      columnId
+    );
   }
 }

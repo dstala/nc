@@ -40,7 +40,7 @@
             class="grey-border caption font-wight-regular  nc-grid-header-cell"
             :class="$store.state.windows.darkTheme ? 'grey darken-3 grey--text text--lighten-1' : 'grey lighten-4  grey--text text--darken-2'"
             :data-col="col.alias"
-            @xcresize="onresize(col.alias,$event), log('xcresize')"
+            @xcresize="onresize(col.id,$event), log('xcresize')"
             @xcresizing="onXcResizing(col.alias,$event)"
             @xcresized="resizingCol = null"
           >
@@ -313,7 +313,7 @@ export default {
     table: String,
     isVirtual: Boolean,
     isLocked: Boolean,
-    columnsWidth: { type: Object },
+    // columnsWidth: { type: Object },
     isPkAvail: Boolean,
     password: String,
     viewId: String
@@ -334,7 +334,8 @@ export default {
       col: null
     },
     aggCount: [],
-    dragOver: false
+    dragOver: false,
+    gridViewCols: {}
   }),
   computed: {
     selectAll: {
@@ -364,12 +365,21 @@ export default {
     },
     groupedAggCount() {
       // eslint-disable-next-line camelcase
-      return this.aggCount ? this.aggCount.reduce((o, { row_id, count }) => ({ ...o, [row_id]: count }), {}) : {}
+      return this.aggCount
+        ? this.aggCount.reduce((o, {
+          row_id,
+          count
+        }) => ({
+          ...o,
+          [row_id]: count
+        }), {})
+        : {}
     },
     style() {
       let style = ''
       for (const c of this.availableColumns) {
-        const val = (this.columnsWidth && this.columnsWidth[c.alias]) || (c.virtual ? '200px' : ((columnStyling[c.uidt] && columnStyling[c.uidt].w) || '150px'))
+        const val = (this.gridViewCols && this.gridViewCols[c.id] && this.gridViewCols[c.id].width) || '200px'
+
         if (val && c.key !== this.resizingCol) {
           style += `[data-col="${c.alias}"]{min-width:${val};max-width:${val};width: ${val};}`
         }
@@ -384,19 +394,35 @@ export default {
   watch: {
     data() {
       this.xcAuditModelCommentsCount()
+    },
+    viewId(v, o) {
+      if (v !== o) {
+        this.loadGridViewCols()
+      }
     }
   },
   mounted() {
-    this.calculateColumnWidth()
+    // this.calculateColumnWidth()
   },
   created() {
     document.addEventListener('keydown', this.onKeyDown)
+    this.loadGridViewCols()
     this.xcAuditModelCommentsCount()
   },
   beforeDestroy() {
     document.removeEventListener('keydown', this.onKeyDown)
   },
   methods: {
+    async loadGridViewCols() {
+      if (!this.viewId) {
+        return
+      }
+      const colsData = (await this.$api.meta.gridColumnsList(this.viewId))?.data
+      this.gridViewCols = colsData.reduce((o, col) => ({
+        ...o,
+        [col.fk_column_id]: col
+      }), {})
+    },
     onFileDrop(event) {
       this.$emit('drop', event)
     },
@@ -477,7 +503,10 @@ export default {
         // tab
         case 9:
           e.preventDefault()
-          this.editEnabled = { col: null, row: null }
+          this.editEnabled = {
+            col: null,
+            row: null
+          }
           if (e.shiftKey) {
             if (this.selected.col > 0) {
               this.selected.col--
@@ -553,12 +582,12 @@ export default {
               case 67:
                 copyTextToClipboard(rowObj[columnObj._cn] || '')
                 break
-                // // paste ctrl/cmd + v
-                // case 86: {
-                //   const text = await navigator.clipboard.readText()
-                //   this.$set(rowObj, columnObj._cn, text)
-                // }
-                // break
+              // // paste ctrl/cmd + v
+              // case 86: {
+              //   const text = await navigator.clipboard.readText()
+              //   this.$set(rowObj, columnObj._cn, text)
+              // }
+              // break
             }
           }
 
@@ -622,7 +651,10 @@ export default {
     },
     makeSelected(col, row) {
       if (this.selected.col !== col || this.selected.row !== row) {
-        this.selected = { col, row }
+        this.selected = {
+          col,
+          row
+        }
         this.editEnabled = {}
       }
     },
@@ -641,7 +673,10 @@ export default {
         return this.$toast.info('Editing primary key not supported').goAway(3000)
       }
       if (this.editEnabled.col !== col || this.editEnabled.row !== row) {
-        this.editEnabled = { col, row }
+        this.editEnabled = {
+          col,
+          row
+        }
       }
     },
     enableEditable(column) {
@@ -657,8 +692,16 @@ export default {
     insertNewRow(atEnd = false, expand = false) {
       this.$emit('insertNewRow', atEnd, expand)
     },
-    onresize(col, size) {
-      this.$emit('update:columnsWidth', { ...this.columnsWidth, [col]: size })
+    async onresize(colId, size) {
+      const gridColId = this.gridViewCols && this.gridViewCols[colId] && this.gridViewCols[colId].id
+      if (!gridColId) {
+        return
+      }
+      this.$set(this.gridViewCols[colId], 'width', size)
+      await this.$api.meta.gridColumnUpdate(gridColId, {
+        width: size
+      })
+      // this.$emit('update:columnsWidth', { ...this.columnsWidth, [col]: size })
     },
     onXcResizing(_cn, width) {
       this.resizingCol = _cn

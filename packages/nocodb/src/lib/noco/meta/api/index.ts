@@ -18,25 +18,28 @@ import exportApis from './exportApis';
 import auditApis from './auditApis';
 import hookApis from './hookApis';
 import pluginApis from './pluginApis';
+import gridViewColumnApis from './gridViewColumnApis';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
   router.use('/tables/:tableId/columns', columnApis);
-  router.use('/', tableApis);
   router.use('/data/:viewId', dataApis);
   router.use('/views/:viewId/sorts', sortApis);
   router.use('/views/:viewId/filters', filterApis);
   router.use('/views/:viewId/columns', viewColumnApis);
   router.use('/tables/:tableId/grids', gridViewApis);
   router.use('/formColumns', formViewColumnApis);
-  router.use('/', galleryViewApis);
-  router.use('/', formViewApis);
-  router.use('/', viewApis);
-  router.use('/', attachmentApis);
   router.use('/public/data/:uuid', publicDataApis);
   router.use('/public/meta/:uuid', publicMetaApis);
-  router.use('/', exportApis);
-  router.use('/', auditApis);
-  router.use('/', hookApis);
-  router.use('/', pluginApis);
+
+  router.use(gridViewColumnApis);
+  router.use(tableApis);
+  router.use(galleryViewApis);
+  router.use(formViewApis);
+  router.use(viewApis);
+  router.use(attachmentApis);
+  router.use(exportApis);
+  router.use(auditApis);
+  router.use(hookApis);
+  router.use(pluginApis);
 }
