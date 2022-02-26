@@ -317,6 +317,7 @@
           >
             <rows-xc-data-table
               ref="tabs7"
+              :is-view="isView"
               :is-active="isActive"
               :tab-id="tabId"
               :show-tabs="relationTabs && relationTabs.length"
@@ -652,7 +653,13 @@ export default {
   head() {
     return {}
   },
-  props: ['nodes', 'hideLogWindows', 'tabId', 'isActive']
+  props: {
+    nodes: Object,
+    hideLogWindows: Boolean,
+    tabId: String,
+    isActive: Boolean,
+    isView: Boolean
+  }
 }
 </script>
 

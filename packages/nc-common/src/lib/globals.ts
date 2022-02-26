@@ -64,3 +64,8 @@ export enum PluginCategory {
   STORAGE='Storage',
   EMAIL='Email'
 }
+
+export enum ModelTypes {
+  TABLE='table',
+  VIEW='view'
+}

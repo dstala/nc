@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Project from '../../../noco-models/Project';
-import { ProjectListParamsType, ProjectListType } from 'nc-common';
+import { ModelTypes, ProjectListParamsType, ProjectListType } from 'nc-common';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 // import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import syncMigration from './helpers/syncMigration';
@@ -89,6 +89,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
     ?.filter(({ tn }) => !IGNORE_TABLES.includes(tn))
     ?.map(t => {
       t.order = ++order;
+      t._tn = getTableNameAlias(t.tn, project.prefix);
       return t;
     });
 
@@ -110,7 +111,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
 
   // await this.syncRelations();
 
-  const tableRoutes = tables.map(table => {
+  const tableMetasInsert = tables.map(table => {
     return async () => {
       /* filter relation where this table is present */
       const tableRelations = relations.filter(
@@ -241,10 +242,72 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
   });
 
   /* handle xc_tables update in parallel */
-  await NcHelp.executeOperations(tableRoutes, base.type);
+  await NcHelp.executeOperations(tableMetasInsert, base.type);
   await getManyToManyRelations(metasArr);
   await NcHelp.executeOperations(virtualColumnsInsert, base.type);
 
+  // views
+
+  const views = (await sqlClient.viewList())?.data?.list
+    // ?.filter(({ tn }) => !IGNORE_TABLES.includes(tn))
+    ?.map(v => {
+      v.order = ++order;
+      v.tn = v.view_name;
+      v._tn = getTableNameAlias(v.tn, project.prefix);
+      return v;
+    });
+  const viewMetasInsert = views.map(table => {
+    return async () => {
+      const columns = (await sqlClient.columnList({ tn: table.tn }))?.data
+        ?.list;
+
+      const hasMany = [];
+      const belongsTo = [];
+
+      const ctx = {
+        dbType: base.type,
+        ...table,
+        columns,
+        relations,
+        hasMany,
+        belongsTo,
+        project_id: project.id
+      };
+
+      /* create models from table metadata */
+      const meta = ModelXcMetaFactory.create(
+        { client: base.type },
+        {
+          dir: '',
+          ctx,
+          filename: ''
+        }
+      ).getObject();
+      metasArr.push(meta);
+
+      // await Model.insert(project.id, base.id, meta);
+
+      /* create nc_models and its rows if it doesn't exists  */
+      models2[table.tn] = await Model.insert(project.id, base.id, {
+        tn: table.tn,
+        _tn: meta._tn,
+        type: ModelTypes.VIEW,
+        order: table.order
+      });
+
+      let colOrder = 1;
+
+      for (const column of meta.columns) {
+        await Column.insert({
+          fk_model_id: models2[table.tn].id,
+          ...column,
+          order: colOrder++
+        });
+      }
+    };
+  });
+
+  await NcHelp.executeOperations(viewMetasInsert, base.type);
   // this.baseModels2 = (
   //   await Model.list({ project_id: this.projectId, db_alias: this.dbAlias })
   // ).reduce((models, m) => {

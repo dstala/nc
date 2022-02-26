@@ -272,6 +272,7 @@
               >
                 <template #activator="{ on }">
                   <v-list-item
+                    v-if="!isView"
                     dense
                     class="body-2 nc-create-form-view"
                     v-on="on"
@@ -529,6 +530,7 @@ export default {
   props: {
     extraViewParams: Object,
     showAdvanceOptions: Boolean,
+    isView: Boolean,
     hideViews: Boolean,
     primaryValueColumn: [Number, String],
     toggleDrawer: {

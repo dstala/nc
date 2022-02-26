@@ -71,7 +71,15 @@
           </div>
           <div v-else-if="tab._nodes.type === 'view'" style="height:100%">
             <!--            <sqlLogAndOutput>-->
-            <ViewTab :ref="'tabs'+index" :nodes="tab._nodes" />
+            <!--            <ViewTab :ref="'tabs'+index" :nodes="tab._nodes" />-->
+            <TableView
+              :ref="'tabs'+index"
+              :is-active="activeTab === `${(tab._nodes && tab._nodes).type || ''}||${(tab._nodes && tab._nodes.dbAlias) || ''}||${tab.name}`"
+              :tab-id="`${pid}||${(tab._nodes && tab._nodes).type || ''}||${(tab._nodes && tab._nodes.dbAlias) || ''}||${tab.name}`"
+              :hide-log-windows.sync="hideLogWindows"
+              :nodes="tab._nodes"
+              is-view
+            />
             <!--            </sqlLogAndOutput>-->
           </div>
           <div v-else-if="tab._nodes.type === 'function'" style="height:100%">

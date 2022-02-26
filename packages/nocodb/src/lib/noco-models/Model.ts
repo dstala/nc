@@ -6,7 +6,13 @@ import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
 import Filter from './Filter';
 import Sort from './Sort';
-import { isVirtualCol, TableReqType, TableType, ViewTypes } from 'nc-common';
+import {
+  isVirtualCol,
+  ModelTypes,
+  TableReqType,
+  TableType,
+  ViewTypes
+} from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
 import { MetaTable } from '../utils/globals';
 import View from './View';
@@ -104,7 +110,8 @@ export default class Model implements TableType {
           (await ncMeta.metaGetNextOrder(MetaTable.FORM_VIEW_COLUMNS, {
             project_id: projectId,
             base_id: baseId
-          }))
+          })),
+        type: model.type || ModelTypes.TABLE
       }
     );
 

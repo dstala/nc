@@ -115,6 +115,7 @@
             showFields
           }"
           :selected-view="selectedView"
+          :is-view="isView"
           @showAdditionalFeatOverlay="showAdditionalFeatOverlay($event)"
           @webhook="showAdditionalFeatOverlay('webhooks')"
         />
@@ -173,7 +174,7 @@
         <!--          @click="insertNewRow(true,true)"-->
         <!--        >-->
         <x-icon
-          v-if="isEditable && relationType !== 'bt'"
+          v-if="!isView &&isEditable && relationType !== 'bt'"
           icon.class="nc-add-new-row-btn mx-1"
           tooltip="Add new row"
           :disabled="isLocked"
@@ -300,6 +301,7 @@
           <template v-if=" selectedView.type === viewTypes.GRID">
             <xc-grid-view
               ref="ncgridview"
+              :is-view="isView"
               droppable
               :relation-type="relationType"
               :columns-width.sync="columnsWidth"
@@ -422,6 +424,7 @@
       <spreadsheet-nav-drawer
         v-if="meta"
         ref="drawer"
+        :is-view="isView"
         :current-api-url="currentApiUrl"
         :toggle-drawer="toggleDrawer"
         :nodes="nodes"
@@ -697,6 +700,7 @@ export default {
   },
   mixins: [spreadsheet],
   props: {
+    isView: Boolean,
     isActive: Boolean,
     tabId: String,
     env: String,

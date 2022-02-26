@@ -203,6 +203,7 @@
             <editable-cell
               v-else-if="
                 (isPkAvail ||rowMeta.new) &&
+                  !isView &&
                   !isLocked
                   && !isPublicView
                   && (editEnabled.col === col && editEnabled.row === row)
@@ -239,7 +240,7 @@
             />
           </td>
         </tr>
-        <tr v-if="isPkAvail && !isLocked && !isPublicView && isEditable && relationType !== 'bt'">
+        <tr v-if="!isView && isPkAvail && !isLocked && !isPublicView && isEditable && relationType !== 'bt'">
           <td :colspan="visibleColLength + 1" class="text-left pointer nc-grid-add-new-cell" @click="insertNewRow(true)">
             <v-tooltip top>
               <template #activator="{on}">
@@ -272,7 +273,7 @@ import { isVirtualCol } from 'nc-common'
 import HeaderCell from '../components/headerCell'
 import EditableCell from '../components/editableCell'
 import EditColumn from '../components/editColumn'
-import columnStyling from '../helpers/columnStyling'
+// import columnStyling from '../helpers/columnStyling'
 import VirtualCell from '../components/virtualCell'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import colors from '@/mixins/colors'
@@ -295,6 +296,7 @@ export default {
   mixins: [colors],
   props: {
     droppable: Boolean,
+    isView: Boolean,
     metas: Object,
     relationType: String,
     availableColumns: [Object, Array],
@@ -659,7 +661,7 @@ export default {
       }
     },
     makeEditable(col, row, _, rowMeta) {
-      if (this.isPublicView || !this.isEditable) {
+      if (this.isPublicView || !this.isEditable || this.isView) {
         return
       }
 
