@@ -577,7 +577,7 @@ export default {
         }, {
           password: this.password,
           sorts: this.sortList && this.sortList.map(({ fk_column_id, direction }) => ({ direction, fk_column_id })),
-          filters: JSON.stringify(this.filters)
+          filters: this.filters
         }
         )).data
 
