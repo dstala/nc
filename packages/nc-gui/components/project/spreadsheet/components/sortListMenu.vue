@@ -37,7 +37,7 @@
             :key="i + 'sel1'"
             v-model="sort.fk_column_id"
             class="caption nc-sort-field-select"
-            :items="meta.columns"
+            :items="columns"
             item-value="id"
             item-text="_cn"
             label="Field"
@@ -82,6 +82,8 @@
 </template>
 
 <script>
+import { RelationTypes, UITypes } from 'nc-common'
+
 export default {
   name: 'SortListMenu',
   props: {
@@ -95,6 +97,12 @@ export default {
   data: () => ({
     sortList: []
   }),
+  computed: {
+    columns() {
+      if (!this.meta || !this.meta.columns) { return [] }
+      return this.meta.columns.filter(c => !(c.uidt === UITypes.LinkToAnotherRecord && c.colOptions.type !== RelationTypes.BELONGS_TO))
+    }
+  },
   watch: {
     value(v) {
       this.sortList = v || []
