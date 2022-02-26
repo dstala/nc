@@ -904,11 +904,11 @@ export default {
       // ) {
       //   return this.$toast.info('Please delete relations before deleting table.').goAway(3000)
       // }
-      // this.deleteTable('showDialog')
+      this.deleteTable('showDialog', this.meta.id)
 
-      if (confirm('Do you want to delete the table?')) {
-        await this.$api.meta.tableDelete(this.meta.id)
-      }
+      // if (confirm('Do you want to delete the table?')) {
+      //   await this.$api.meta.tableDelete(this.meta.id)
+      // }
     },
     async reload() {
       this.$store.dispatch('meta/ActLoadMeta', {
