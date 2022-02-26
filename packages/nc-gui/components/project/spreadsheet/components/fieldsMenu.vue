@@ -313,6 +313,7 @@ export default {
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     showAll() {
+      // this.$api.meta
       // eslint-disable-next-line no-return-assign,no-sequences
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = true, o), {})
     },

@@ -11,9 +11,14 @@ export default {
   },
   computed: {
     $api() {
-      return new Api({
+      const api = new Api({
         baseURL: 'http://localhost:8080'
       })
+
+      // overwrite with nuxt axios instance
+      api.instance = this.$axios
+
+      return api
     },
     dashboardUrl() {
       return `${location.origin}${location.pathname || ''}`
