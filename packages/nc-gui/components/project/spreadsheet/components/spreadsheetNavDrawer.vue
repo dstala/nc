@@ -759,7 +759,7 @@ export default {
         //     password: this.shareLink.password
         //   }
         // ])
-          .this.$toast.success('Successfully updated').goAway(3000)
+        this.$toast.success('Successfully updated').goAway(3000)
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
