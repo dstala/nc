@@ -7,7 +7,8 @@ import {
   TableListParamsType,
   TableListType,
   TableReqType,
-  TableType
+  TableType,
+  TableUpdatePayloadType
 } from 'nc-common';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
@@ -80,8 +81,13 @@ export async function tableCreate(
   }
 }
 
-export async function tableUpdate(req, res) {
+export async function tableUpdate(
+  req: Request<any, any, TableUpdatePayloadType>,
+  res
+) {
   console.log(req.params);
+
+  await Model.updateAlias(req.params.tableId, req.body._tn);
 
   res.json({ msg: 'success' });
 }

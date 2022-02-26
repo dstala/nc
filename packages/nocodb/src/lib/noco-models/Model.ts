@@ -10,6 +10,7 @@ import { isVirtualCol, TableReqType, TableType, ViewTypes } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
 import { MetaTable } from '../utils/globals';
 import View from './View';
+import { NcError } from '../noco/meta/api/helpers/catchError';
 
 export default class Model implements TableType {
   copy_enabled: boolean;
@@ -354,5 +355,18 @@ export default class Model implements TableType {
       if (val !== undefined) insertObj[col.cn] = val;
     }
     return insertObj;
+  }
+
+  static async updateAlias(tableId, _tn: string, ncMeta = Noco.ncMeta) {
+    if (!_tn) NcError.badRequest("Missing '_tn' property in body");
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.MODELS,
+      {
+        _tn
+      },
+      tableId
+    );
   }
 }

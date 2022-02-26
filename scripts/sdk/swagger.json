@@ -687,12 +687,31 @@
         "operationId": "table-update",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           }
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_tn": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       "delete": {
         "summary": "",

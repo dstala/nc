@@ -528,6 +528,10 @@ export interface TableListParamsType {
   baseId: string;
 }
 
+export interface TableUpdatePayloadType {
+  _tn?: string;
+}
+
 export interface ViewUpdatePayloadType {
   order?: string;
   title?: string;
@@ -1073,12 +1077,19 @@ export class Api<
      * @tags Meta
      * @name TableUpdate
      * @request PUT:/tables/{tableId}
-     * @response `200` `void` OK
+     * @response `200` `any` OK
      */
-    tableUpdate: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    tableUpdate: (
+      tableId: string,
+      data: TableUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
         path: `/tables/${tableId}`,
         method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
