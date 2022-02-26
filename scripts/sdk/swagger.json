@@ -939,7 +939,7 @@
         ]
       }
     },
-    "/views/{viewId}/filters - copy": {
+    "/views/{viewId}/filters": {
       "parameters": [
         {
           "schema": {

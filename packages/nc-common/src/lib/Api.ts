@@ -1241,12 +1241,12 @@ export class Api<
      *
      * @tags Meta
      * @name FilterRead
-     * @request GET:/views/{viewId}/filters - copy
+     * @request GET:/views/{viewId}/filters
      * @response `200` `FilterListType`
      */
     filterRead: (viewId: string, params: RequestParams = {}) =>
       this.request<FilterListType, any>({
-        path: `/views/${viewId}/filters - copy`,
+        path: `/views/${viewId}/filters`,
         method: 'GET',
         ...params,
       }),
@@ -1256,7 +1256,7 @@ export class Api<
      *
      * @tags Meta
      * @name FilterCreate
-     * @request POST:/views/{viewId}/filters - copy
+     * @request POST:/views/{viewId}/filters
      * @response `200` `void` OK
      */
     filterCreate: (
@@ -1265,7 +1265,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/views/${viewId}/filters - copy`,
+        path: `/views/${viewId}/filters`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
