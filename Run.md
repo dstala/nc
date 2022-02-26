@@ -18,12 +18,13 @@ npm run build
 # build backend
 cd ../nocodb
 npm install
+# require sqlite3
 npm run watch:run
+# if you have mysql, then use 
+# npm run watch:run:mysql
 
 # build frontend
 cd ../nc-gui
 npm install
 npm run dev
-
-
 ```
