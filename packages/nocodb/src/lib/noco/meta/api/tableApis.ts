@@ -4,6 +4,7 @@ import { PagedResponseImpl } from './helpers/PagedResponse';
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
+  ModelTypes,
   TableListParamsType,
   TableListType,
   TableReqType,
@@ -101,14 +102,20 @@ export async function tableDelete(req: Request, res: Response, next) {
     const base = project.bases.find(b => b.id === table.base_id);
     const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
 
-    await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
+    if (table.type === ModelTypes.TABLE)
+      await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
+    else if (table.type === ModelTypes.VIEW)
+      await sqlMgr.sqlOpPlus(base, 'viewDelete', {
+        ...table,
+        view_name: table.tn
+      });
 
     Audit.insert({
       project_id: project.id,
       op_type: AuditOperationTypes.TABLE,
       op_sub_type: AuditOperationSubTypes.DELETED,
       user: (req as any)?.user?.email,
-      description: `Deleted table ${table.tn} with alias ${table._tn}  `,
+      description: `Deleted ${table.type} ${table.tn} with alias ${table._tn}  `,
       ip: (req as any).clientIp
     }).then(() => {});
 

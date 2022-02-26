@@ -34,7 +34,7 @@ export default class Model implements TableType {
   schema: any;
   show_all_fields: boolean;
   tags: string;
-  type: 'table' | 'view' | 'grid' | 'form' | 'kanban' | 'calendar' | 'gantt';
+  type: ModelTypes;
   updated_at: Date | number | string;
 
   tn: string;
