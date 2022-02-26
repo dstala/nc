@@ -1057,7 +1057,7 @@
       ],
       "post": {
         "summary": "",
-        "operationId": "view-hide-all-column",
+        "operationId": "view-show-all-column",
         "responses": {
           "200": {
             "description": "OK"

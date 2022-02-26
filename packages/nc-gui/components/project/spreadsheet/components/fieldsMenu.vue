@@ -312,14 +312,25 @@ export default {
       this.$emit('input', this.fields.reduce((o, c) => ({ ...o, [c._cn]: c.show }), {}))
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
-    showAll() {
-      // this.$api.meta
+    async showAll() {
+      await this.$api.meta.viewHideAllColumn(this.viewId)
+      for (const f of this.fields) {
+        f.show = true
+      }
       // eslint-disable-next-line no-return-assign,no-sequences
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = true, o), {})
+
+      this.$emit('updated')
     },
-    hideAll() {
+    async hideAll() {
+      await this.$api.meta.viewShowAllColumn(this.viewId)
+      for (const f of this.fields) {
+        f.show = false
+      }
       // eslint-disable-next-line no-return-assign,no-sequences
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = false, o), {})
+
+      this.$emit('updated')
     },
     onMove(event) {
       if (this.fields.length - 1 === event.moved.newIndex) {

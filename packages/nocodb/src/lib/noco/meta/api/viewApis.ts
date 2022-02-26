@@ -58,9 +58,17 @@ async function shareViewPasswordUpdate(req: Request<any, any>, res) {
 async function shareViewDelete(req: Request<any, any>, res) {
   res.json(await View.sharedViewDelete(req.params.viewId));
 }
+async function showAllColumns(req: Request<any, any>, res) {
+  res.json(await View.showAllColumns(req.params.viewId));
+}
+async function hideAllColumns(req: Request<any, any>, res) {
+  res.json(await View.hideAllColumns(req.params.viewId));
+}
 
 router.put('/views/:viewId/share', catchError(shareViewPasswordUpdate));
 router.delete('/views/:viewId/share', catchError(shareViewDelete));
 router.put('/views/:viewId', catchError(viewUpdate));
 router.delete('/views/:viewId', catchError(viewDelete));
+router.post('/views/:viewId/showAll', catchError(hideAllColumns));
+router.post('/views/:viewId/hideAll', catchError(showAllColumns));
 export default router;

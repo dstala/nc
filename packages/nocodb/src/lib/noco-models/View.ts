@@ -555,4 +555,31 @@ export default class View implements ViewType {
     }
     return table;
   }
+
+  static async showAllColumns(viewId, ncMeta = Noco.ncMeta) {
+    const view = await this.get(viewId);
+    const table = this.extractViewColumnsTableName(view);
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      table,
+      { show: true },
+      {
+        fk_view_id: viewId
+      }
+    );
+  }
+  static async hideAllColumns(viewId, ncMeta = Noco.ncMeta) {
+    const view = await this.get(viewId);
+    const table = this.extractViewColumnsTableName(view);
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      table,
+      { show: false },
+      {
+        fk_view_id: viewId
+      }
+    );
+  }
 }

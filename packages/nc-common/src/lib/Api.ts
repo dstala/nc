@@ -1323,11 +1323,11 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name ViewHideAllColumn
+     * @name ViewShowAllColumn
      * @request POST:/views/{viewId}/showAll
      * @response `200` `void` OK
      */
-    viewHideAllColumn: (viewId: string, params: RequestParams = {}) =>
+    viewShowAllColumn: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/showAll`,
         method: 'POST',
@@ -1338,13 +1338,11 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name ViewHideAllColumn2
+     * @name ViewHideAllColumn
      * @request POST:/views/{viewId}/hideAll
-     * @originalName viewHideAllColumn
-     * @duplicate
      * @response `200` `void` OK
      */
-    viewHideAllColumn2: (viewId: string, params: RequestParams = {}) =>
+    viewHideAllColumn: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/hideAll`,
         method: 'POST',
