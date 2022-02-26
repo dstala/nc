@@ -2,7 +2,7 @@
   <v-menu offset-y>
     <template #activator="{ on }">
       <v-badge
-        :value="sortList.length"
+        :value="sortList && sortList.length"
         color="primary"
         dot
         overlap
@@ -13,7 +13,7 @@
           small
           text
           outlined
-          :class=" { 'primary lighten-5 grey--text text--darken-3' : sortList.length}"
+          :class=" { 'primary lighten-5 grey--text text--darken-3' : sortList && sortList.length}"
           v-on="on"
         >
           <v-icon small class="mr-1" color="#777">
@@ -28,7 +28,7 @@
     </template>
     <div class="backgroundColor pa-2" style="min-width: 330px">
       <div class="sort-grid" @click.stop>
-        <template v-for="(sort,i) in sortList" dense>
+        <template v-for="(sort,i) in sortList||[]" dense>
           <v-icon :key="i + 'icon'" class="nc-sort-item-remove-btn" small @click.stop="deleteSort(sort)">
             mdi-close-box
           </v-icon>
@@ -106,7 +106,7 @@ export default {
     }
   },
   async created() {
-    this.sortList = this.value
+    this.sortList = this.value || []
     this.loadSortList()
   },
   methods: {
