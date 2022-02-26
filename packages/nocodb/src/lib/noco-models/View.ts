@@ -212,19 +212,21 @@ export default class View implements ViewType {
     {
       let order = 1;
       for (const vCol of columns) {
-        let show = vCol.show;
-        const col = await Column.get({ colId: vCol.fk_col_id || vCol.id });
+        let show = 'show' in vCol ? vCol.show : true;
+        const col = await Column.get({ colId: vCol.fk_column_id || vCol.id });
         if (
-          col.uidt === UITypes.ForeignKey ||
-          col.cn === 'created_at' ||
-          col.cn === 'updated_at' ||
-          (col.pk && (col.ai || col.cdf))
+          col &&
+          (col.uidt === UITypes.ForeignKey ||
+            col.cn === 'created_at' ||
+            col.cn === 'updated_at' ||
+            (col.pk && (col.ai || col.cdf)))
         )
           show = false;
         await View.insertColumn({
-          view_id,
           order: order++,
           ...col,
+          view_id,
+          fk_column_id: vCol.fk_column_id || vCol.id,
           show
         });
       }
@@ -268,7 +270,12 @@ export default class View implements ViewType {
     }
   }
 
-  static async insertColumn(param: { view_id: any; order; show }) {
+  static async insertColumn(param: {
+    view_id: any;
+    order;
+    show;
+    fk_column_id;
+  }) {
     const view = await this.get(param.view_id);
 
     let col;

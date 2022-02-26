@@ -4806,7 +4806,7 @@
           "help": {
             "type": "string"
           },
-          "fk_col_id": {
+          "fk_column_id": {
             "type": "string"
           },
           "fk_gallery_id": {

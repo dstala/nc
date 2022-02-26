@@ -328,7 +328,7 @@ export interface GridColumnType {
   id?: string;
   label?: string;
   help?: string;
-  fk_col_id?: string;
+  fk_column_id?: string;
   fk_gallery_id?: string;
   width?: string;
 }

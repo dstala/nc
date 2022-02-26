@@ -4,7 +4,7 @@
       <v-card-title class="grey darken-2 subheading" style="height:30px" />
       <v-card-text class="pt-4 pl-4">
         <p class="headline">
-          Create <span class="text-capitalize">{{ typeAlias[show_as] }}</span> View
+          Create <span class="text-capitalize">{{ typeAlias }}</span> View
         </p>
         <v-form ref="form" v-model="valid" @submit.prevent="createView">
           <v-text-field

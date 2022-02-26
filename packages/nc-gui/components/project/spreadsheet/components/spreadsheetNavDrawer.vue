@@ -899,7 +899,7 @@ export default {
       this.showShareModel = true
     },
     copyView(view, i) {
-      this.createViewType = view.show_as
+      this.createViewType = view.type
       this.showCreateView = true
       this.copyViewRef = view
     },
