@@ -434,7 +434,7 @@
       },
       "put": {
         "summary": "",
-        "operationId": "put-projects---copy",
+        "operationId": "project-update",
         "responses": {
           "200": {
             "description": "OK"
@@ -443,12 +443,15 @@
       },
       "delete": {
         "summary": "",
-        "operationId": "delete-projects---copy",
+        "operationId": "projects-delete",
         "responses": {
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "meta"
+        ]
       }
     },
     "/projects/{projectId}/reorder": {

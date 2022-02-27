@@ -12,7 +12,7 @@ const up = async knex => {
     table.text('description');
     table.text('meta');
     table.string('color');
-    table.boolean('deleted');
+    table.boolean('deleted').defaultTo(false);
     table.boolean('is_meta');
     table.float('order');
     table.timestamps(true, true);

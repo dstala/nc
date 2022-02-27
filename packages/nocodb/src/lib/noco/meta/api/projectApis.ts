@@ -14,6 +14,7 @@ import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import getTableNameAlias from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
+import catchError from './helpers/catchError';
 
 // // Project CRUD
 
@@ -47,6 +48,15 @@ export async function projectList(
     console.log(e);
     next(e);
   }
+}
+
+export async function projectDelete(
+  req: Request<any, any, any, ProjectListParamsType>,
+  res: Response<ProjectListType>
+) {
+  res // todo: pagination
+    // .json(await Project.delete(req.params.projectId));
+    .json(await Project.softDelete(req.params.projectId));
 }
 
 //
@@ -445,7 +455,8 @@ async function getManyToManyRelations(
 }
 
 const router = Router({ mergeParams: true });
-router.get('/:projectId', projectGet);
-router.post('/', projectCreate);
-router.get('/', projectList);
+router.get('/:projectId', catchError(projectGet));
+router.delete('/:projectId', catchError(projectDelete));
+router.post('/', catchError(projectCreate));
+router.get('/', catchError(projectList));
 export default router;

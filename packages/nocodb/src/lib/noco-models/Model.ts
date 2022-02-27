@@ -132,16 +132,19 @@ export default class Model implements TableType {
     return this.getWithInfo({ id });
   }
 
-  public static async list({
-    project_id,
-    base_id
-  }: {
-    project_id: string;
-    base_id: string;
-  }): Promise<Model[]> {
+  public static async list(
+    {
+      project_id,
+      base_id
+    }: {
+      project_id: string;
+      base_id: string;
+    },
+    ncMeta = Noco.ncMeta
+  ): Promise<Model[]> {
     let modelList = []; //await NocoCache.getv2(project_id);
     if (!modelList.length) {
-      modelList = await Noco.ncMeta.metaList2(
+      modelList = await ncMeta.metaList2(
         project_id,
         base_id,
         MetaTable.MODELS,
@@ -304,6 +307,7 @@ export default class Model implements TableType {
   }
 
   async delete(ncMeta = Noco.ncMeta): Promise<boolean> {
+    // todo: table delete
     // todo: delete
     //  sort, filters - done
     //  views

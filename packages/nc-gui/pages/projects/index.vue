@@ -347,6 +347,17 @@
                       </div>
                     </td>
                     <td style="width:150px;min-width:150px;max-width:150px">
+                      <x-icon
+                        :tooltip="
+                          $t('projects.delete_project')
+                        "
+                        class="pointer mr-2"
+                        color="red grey"
+                        @click.stop="deleteProject(props.item)"
+                      >
+                        mdi-delete-circle-outline
+                      </x-icon>
+
                       <div
                         v-if="props.item.allowed && _isUIAllowed('projectActions',true) && props.item.is_creator"
                         :class="{
@@ -1014,10 +1025,12 @@ export default {
           this.statusUpdatingProjectId = projectId
           this.projectStatusUpdating = true
           try {
-            await this.$store.dispatch('sqlMgr/ActSqlOp', [
-              { project_id: projectId },
-              'projectDelete'
-            ])
+            // await this.$store.dispatch('sqlMgr/ActSqlOp', [
+            //   { project_id: projectId },
+            //   'projectDelete'
+            // ])
+
+            await this.$api.meta.projectsDelete(projectId)
             this.$toast
               .success(`Project '${project.title}' deleted successfully`)
               .goAway(3000)

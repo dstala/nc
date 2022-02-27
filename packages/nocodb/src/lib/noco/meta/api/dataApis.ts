@@ -20,6 +20,7 @@ export async function dataList(req: Request, res: Response, next) {
 
     console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
+
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,

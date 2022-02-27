@@ -41,24 +41,24 @@ const dbTypes = [
 ];
 
 export class MysqlUi {
-  static getNewTableColumns(): any[] {
+  static getNewTableColumns(): readonly any[] {
     return [
       {
         cn: 'id',
-        dt: 'int',
-        dtx: 'integer',
-        ct: 'int(11)',
-        nrqd: false,
-        rqd: true,
+        dt: 'varchar',
+        dtx: 'specificType',
+        ct: 'varchar(45)',
+        nrqd: true,
+        rqd: false,
         ck: false,
         pk: true,
         un: true,
-        ai: true,
-        cdf: null,
-        clen: null,
-        np: 11,
-        ns: 0,
-        dtxp: '11',
+        ai: false,
+        cdf: 'UUID()',
+        clen: 45,
+        np: null,
+        ns: null,
+        dtxp: '45',
         dtxs: '',
         altered: 1,
         uidt: 'ID',

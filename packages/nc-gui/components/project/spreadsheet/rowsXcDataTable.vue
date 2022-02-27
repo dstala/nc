@@ -657,7 +657,7 @@
 
 import { mapActions } from 'vuex'
 import debounce from 'debounce'
-import { ViewTypes } from 'nc-common'
+import { SqlUiFactory, ViewTypes } from 'nc-common'
 import FormView from './views/formView'
 import XcGridView from './views/xcGridView'
 import spreadsheet from './mixins/spreadsheet'
@@ -673,7 +673,6 @@ import SpreadsheetNavDrawer from '@/components/project/spreadsheet/components/sp
 import LockMenu from '@/components/project/spreadsheet/components/lockMenu'
 import ExpandedForm from '@/components/project/spreadsheet/components/expandedForm'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
-import { SqlUI } from '~/helpers/sqlUi'
 import ColumnFilter from '~/components/project/spreadsheet/components/columnFilterMenu'
 import MoreActions from '~/components/project/spreadsheet/components/moreActions'
 import ShareViewMenu from '~/components/project/spreadsheet/components/shareViewMenu'
@@ -1575,7 +1574,8 @@ export default {
       return this._isUIAllowed('xcDatatableEditable')
     },
     sqlUi() {
-      return SqlUI.create(this.nodes.dbConnection)
+      // return SqlUI.create(this.nodes.dbConnection)
+      return SqlUiFactory.create(this.nodes.dbConnection)
     },
     api() {
       return this.meta && this.$ncApis.get({

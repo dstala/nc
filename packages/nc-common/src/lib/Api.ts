@@ -1016,6 +1016,21 @@ export class Api<
     /**
      * No description
      *
+     * @tags meta
+     * @name ProjectsDelete
+     * @request DELETE:/projects/{projectId}
+     * @response `200` `void` OK
+     */
+    projectsDelete: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Meta
      * @name TableCreate
      * @request POST:/projects/{projectId}/{baseId}/tables
@@ -2337,28 +2352,14 @@ export class Api<
     /**
      * No description
      *
-     * @name PutProjectsCopy
+     * @name ProjectUpdate
      * @request PUT:/projects/{projectId}
      * @response `200` `void` OK
      */
-    putProjectsCopy: (projectId: string, params: RequestParams = {}) =>
+    projectUpdate: (projectId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/projects/${projectId}`,
         method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name DeleteProjectsCopy
-     * @request DELETE:/projects/{projectId}
-     * @response `200` `void` OK
-     */
-    deleteProjectsCopy: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}`,
-        method: 'DELETE',
         ...params,
       }),
 
