@@ -1,5 +1,5 @@
 import { mapGetters } from 'vuex'
-import { Api } from 'nc-common'
+import { getApi } from '~/plugins/api'
 
 export default {
   data() {
@@ -11,14 +11,7 @@ export default {
   },
   computed: {
     $api() {
-      const api = new Api({
-        baseURL: 'http://localhost:8080'
-      })
-
-      // overwrite with nuxt axios instance
-      api.instance = this.$axios
-
-      return api
+      return getApi(this.$store, this.$axios)
     },
     dashboardUrl() {
       return `${location.origin}${location.pathname || ''}`

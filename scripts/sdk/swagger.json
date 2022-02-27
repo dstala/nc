@@ -14,36 +14,7 @@
       "post": {
         "summary": "Signup",
         "operationId": "signup",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "email": {
-                      "type": "string"
-                    },
-                    "password": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "email",
-                    "password"
-                  ]
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
+        "responses": {},
         "tags": [
           "AUTH"
         ],
@@ -3403,27 +3374,28 @@
             "signUpDate": "2019-08-24"
           }
         ],
+        "x-internal": false,
         "properties": {
           "id": {
             "type": "integer",
             "description": "Unique identifier for the given user."
           },
-          "firstName": {
+          "firstname": {
             "type": "string"
           },
-          "lastName": {
+          "lastname": {
             "type": "string"
           },
           "email": {
             "type": "string",
             "format": "email"
           },
-          "dateOfBirth": {
+          "date_of_birth": {
             "type": "string",
             "format": "date",
             "example": "1997-10-31"
           },
-          "emailVerified": {
+          "email_verified": {
             "type": "boolean",
             "description": "Set to true if the user's email has been verified."
           },
@@ -3435,12 +3407,11 @@
         },
         "required": [
           "id",
-          "firstName",
-          "lastName",
+          "firstname",
+          "lastname",
           "email",
-          "emailVerified"
-        ],
-        "x-internal": false
+          "email_verified"
+        ]
       },
       "UserList": {
         "description": "",
@@ -4235,8 +4206,8 @@
         ]
       },
       "Filter": {
-        "title": "Filter",
         "type": "object",
+        "title": "Filter",
         "properties": {
           "id": {
             "type": "string"
@@ -4270,8 +4241,23 @@
             "items": {
               "$ref": "#/components/schemas/Filter"
             }
+          },
+          "project_id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "base_id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fk_parent_id": {
+            "type": "string"
+          },
+          "fk_view_id": {
+            "type": "string"
           }
-        }
+        },
+        "readOnly": true
       },
       "FilterList": {
         "description": "",
@@ -4345,6 +4331,14 @@
           },
           "order": {
             "type": "number"
+          },
+          "project_id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "base_id": {
+            "type": "string",
+            "readOnly": true
           }
         }
       },
@@ -5871,6 +5865,13 @@
             }
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "xc-auth": {
+        "name": "API Key",
+        "type": "apiKey",
+        "in": "header"
       }
     }
   }

@@ -1,6 +1,7 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
 import GridViewColumn from './GridViewColumn';
+import View from './View';
 
 export default class GridView {
   title: string;
@@ -11,6 +12,9 @@ export default class GridView {
   fk_view_id: string;
 
   columns?: GridViewColumn[];
+
+  project_id?: string;
+  base_id?: string;
 
   constructor(data: GridView) {
     Object.assign(this, data);
@@ -29,13 +33,22 @@ export default class GridView {
   }
 
   static async insert(view: Partial<GridView>) {
+    const insertObj = {
+      fk_view_id: view.fk_view_id,
+      project_id: view.project_id,
+      base_id: view.base_id
+    };
+    if (!(view.project_id && view.base_id)) {
+      const viewRef = await View.get(view.fk_view_id);
+      insertObj.project_id = viewRef.project_id;
+      insertObj.base_id = viewRef.base_id;
+    }
+
     await Noco.ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GRID_VIEW,
-      {
-        fk_view_id: view.fk_view_id
-      },
+      insertObj,
       true
     );
 

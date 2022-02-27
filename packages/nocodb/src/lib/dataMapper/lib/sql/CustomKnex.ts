@@ -5,7 +5,7 @@ const types = require('pg').types;
 types.setTypeParser(1082, val => val);
 
 import { BaseModelSql } from './BaseModelSql';
-import Filter, { FilterObject } from '../../../noco-models/Filter';
+import Filter from '../../../noco-models/Filter';
 
 const opMappingGen = {
   eq: '=',
@@ -492,7 +492,7 @@ declare module 'knex' {
     ): Knex.QueryBuilder<TRecord, TResult>;
 
     conditionv2<TRecord, TResult>(
-      conditionObj: FilterObject
+      conditionObj: Filter
     ): Knex.QueryBuilder<TRecord, TResult>;
 
     concat<TRecord, TResult>(
@@ -1213,7 +1213,7 @@ Knex.QueryBuilder.extend('conditionv2', function(conditionObj: Filter) {
   return parseConditionv2(conditionObj, this);
 } as any);
 
-const parseConditionv2 = (obj: FilterObject, qb: QueryBuilder) => {
+const parseConditionv2 = (obj: Filter, qb: QueryBuilder) => {
   if (obj.is_group) {
     qb = qb.where(function() {
       const children = obj.children;

@@ -23,6 +23,9 @@ export default class GalleryView implements GalleryType {
   fk_model_id?: string;
   fk_cover_image_col_id?: string;
 
+  project_id?: string;
+  base_id?: string;
+
   constructor(data: GalleryView) {
     Object.assign(this, data);
   }
@@ -45,15 +48,24 @@ export default class GalleryView implements GalleryType {
       .then(v => v?.getModel())
       .then(m => m.getColumns());
 
+    const insertObj = {
+      project_id: view.project_id,
+      base_id: view.base_id,
+      fk_view_id: view.fk_view_id,
+      fk_cover_image_col_id: columns?.find(c => c.uidt === UITypes.Attachment)
+        ?.id
+    };
+    if (!(view.project_id && view.base_id)) {
+      const viewRef = await View.get(view.fk_view_id);
+      insertObj.project_id = viewRef.project_id;
+      insertObj.base_id = viewRef.base_id;
+    }
+
     await Noco.ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GALLERY_VIEW,
-      {
-        fk_view_id: view.fk_view_id,
-        fk_cover_image_col_id: columns?.find(c => c.uidt === UITypes.Attachment)
-          ?.id
-      },
+      insertObj,
       true
     );
 

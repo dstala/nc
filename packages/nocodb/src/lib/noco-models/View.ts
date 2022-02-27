@@ -33,6 +33,8 @@ export default class View implements ViewType {
 
   sorts: Sort[];
   filter: Filter;
+  project_id?: string;
+  base_id?: string;
 
   constructor(data: View) {
     Object.assign(this, data);
@@ -136,6 +138,22 @@ export default class View implements ViewType {
           .first()
       )?.order || 0) + 1;
 
+    const insertObj = {
+      title: view.title,
+      show: true,
+      is_default: view.is_default,
+      order,
+      type: view.type,
+      fk_model_id: view.fk_model_id,
+      project_id: view.project_id,
+      base_id: view.base_id
+    };
+    if (!(view.project_id && view.base_id)) {
+      const model = await Model.get({ id: view.fk_model_id });
+      insertObj.project_id = model.project_id;
+      insertObj.base_id = model.base_id;
+    }
+
     const copyFormView =
       view.copy_from_id && (await View.get(view.copy_from_id));
 
@@ -143,14 +161,7 @@ export default class View implements ViewType {
       null,
       null,
       MetaTable.VIEWS,
-      {
-        title: view.title,
-        show: true,
-        is_default: view.is_default,
-        order,
-        type: view.type,
-        fk_model_id: view.fk_model_id
-      }
+      insertObj
     );
 
     switch (view.type) {

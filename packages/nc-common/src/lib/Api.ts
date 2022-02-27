@@ -12,8 +12,8 @@
 export interface UserType {
   /** Unique identifier for the given user. */
   id: number;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
 
   /** @format email */
   email: string;
@@ -22,10 +22,10 @@ export interface UserType {
    * @format date
    * @example 1997-10-31
    */
-  dateOfBirth?: string;
+  date_of_birth?: string;
 
   /** Set to true if the user's email has been verified. */
-  emailVerified: boolean;
+  email_verified: boolean;
 
   /**
    * The date that the user was created.
@@ -168,6 +168,10 @@ export interface FilterType {
   value?: string | number | number | boolean | null;
   is_group?: boolean;
   children?: FilterType[];
+  project_id?: string;
+  base_id?: string;
+  fk_parent_id?: string;
+  fk_view_id?: string;
 }
 
 export interface FilterListType {
@@ -180,6 +184,8 @@ export interface SortType {
   fk_column_id?: string;
   direction?: string;
   order?: number;
+  project_id?: string;
+  base_id?: string;
 }
 
 export interface SortListType {
@@ -788,17 +794,15 @@ export class Api<
      * @name Signup
      * @summary Signup
      * @request POST:/auth/user/signup
-     * @response `200` `{ email: string, password: string }` OK
      */
     signup: (
       data: { email?: boolean; password?: string },
       params: RequestParams = {}
     ) =>
-      this.request<{ email: string; password: string }, any>({
+      this.request<any, any>({
         path: `/auth/user/signup`,
         method: 'POST',
         body: data,
-        format: 'json',
         ...params,
       }),
 

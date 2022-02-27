@@ -19,6 +19,7 @@ import auditApis from './auditApis';
 import hookApis from './hookApis';
 import pluginApis from './pluginApis';
 import gridViewColumnApis from './gridViewColumnApis';
+import { userApis } from './userApi';
 
 export default function(router: Router) {
   router.use('/projects', projectApis);
@@ -42,4 +43,5 @@ export default function(router: Router) {
   router.use(auditApis);
   router.use(hookApis);
   router.use(pluginApis);
+  router.use(userApis);
 }
