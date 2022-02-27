@@ -31,7 +31,7 @@ export default class SqlMgrv2 {
   public migrator(_base: Base) {
     return this._migrator;
   }
-  public async testConnection(args = {}) {
+  public static async testConnection(args = {}) {
     const client = SqlClientFactory.create(args);
     return client.testConnection();
   }

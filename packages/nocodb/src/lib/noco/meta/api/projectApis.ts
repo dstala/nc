@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import Project from '../../../noco-models/Project';
 import { ModelTypes, ProjectListParamsType, ProjectListType } from 'nc-common';
 import { PagedResponseImpl } from './helpers/PagedResponse';
@@ -14,7 +14,8 @@ import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import getTableNameAlias from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import catchError from './helpers/catchError';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ProjectUser from '../../../noco-models/ProjectUser';
 
 // // Project CRUD
 
@@ -66,6 +67,11 @@ async function projectCreate(req, res, next) {
   console.log(req.body);
   try {
     const project = await Project.createProject(req.body);
+    await ProjectUser.insert({
+      fk_user_id: req.user.id,
+      project_id: project.id,
+      roles: 'creator'
+    });
 
     // await ProjectMgrv2.getSqlMgr(project).projectOpenByWeb();
     await syncMigration(project);
@@ -454,9 +460,9 @@ async function getManyToManyRelations(
   }
 }
 
-const router = Router({ mergeParams: true });
-router.get('/:projectId', catchError(projectGet));
-router.delete('/:projectId', catchError(projectDelete));
-router.post('/', catchError(projectCreate));
-router.get('/', catchError(projectList));
-export default router;
+export default router => {
+  router.get('/projects/:projectId', ncMetaAclMw(projectGet));
+  router.delete('/projects/:projectId', ncMetaAclMw(projectDelete));
+  router.post('/projects', ncMetaAclMw(projectCreate));
+  router.get('/projects', ncMetaAclMw(projectList));
+};

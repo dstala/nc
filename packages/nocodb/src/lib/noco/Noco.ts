@@ -117,11 +117,11 @@ export default class Noco {
     // }
 
     const NcMetaImpl = process.env.EE ? NcMetaImplEE : NcMetaImplCE;
-    const NcMetaMgr = process.env.EE ? NcMetaMgrEE : NcMetaMgrCE;
+    // const NcMetaMgr = process.env.EE ? NcMetaMgrEE : NcMetaMgrCE;
 
     Noco._ncMeta = new NcMetaImpl(this, this.config);
-    this.metaMgr = new NcMetaMgr(this, this.config, Noco._ncMeta);
-    this.metaMgrv2 = new NcMetaMgrv2(this, this.config, Noco._ncMeta);
+    // this.metaMgr = new NcMetaMgr(this, this.config, Noco._ncMeta);
+    // this.metaMgrv2 = new NcMetaMgrv2(this, this.config, Noco._ncMeta);
 
     /******************* setup : end *******************/
 
@@ -150,6 +150,7 @@ export default class Noco {
     registerContext?: Function;
     afterMetaMigrationInit?: Function;
   }) {
+    // @ts-ignore
     const {
       progressCallback
       // registerRoutes,
@@ -225,15 +226,15 @@ export default class Noco {
 
     /******************* Middlewares : end *******************/
 
-    await this.initProjectBuilders();
+    // await this.initProjectBuilders();
 
-    const runTimeHandler = this.handleRuntimeChanges(progressCallback);
+    // const runTimeHandler = this.handleRuntimeChanges(progressCallback);
 
-    this.ncToolApi.addListener(runTimeHandler);
-    this.metaMgr.setListener(runTimeHandler);
-    this.metaMgrv2.setListener(runTimeHandler);
-    await this.metaMgr.initHandler(this.router);
-    await this.metaMgrv2.initHandler(this.router);
+    // this.ncToolApi.addListener(runTimeHandler);
+    // this.metaMgr.setListener(runTimeHandler);
+    // this.metaMgrv2.setListener(runTimeHandler);
+    // await this.metaMgr.initHandler(this.router);
+    // await this.metaMgrv2.initHandler(this.router);
 
     await NcPluginMgrv2.init(Noco.ncMeta);
     registerMetaApis(this.router);
@@ -292,7 +293,7 @@ export default class Noco {
     this.requestContext = context;
   }
 
-  private handleRuntimeChanges(_progressCallback: Function) {
+  protected handleRuntimeChanges(_progressCallback: Function) {
     return async (data): Promise<any> => {
       switch (data?.req?.api) {
         case 'projectCreateByWeb':
@@ -373,18 +374,19 @@ export default class Noco {
     };
   }
 
-  private async initProjectBuilders() {
+  protected async initProjectBuilders() {
+    // @ts-ignore
     const RestAuthCtrl = process.env.EE ? RestAuthCtrlEE : RestAuthCtrlCE;
 
     this.projectBuilders.splice(0, this.projectBuilders.length);
 
-    await new RestAuthCtrl(
-      this as any,
-      Noco._ncMeta?.knex,
-      this.config?.meta?.db,
-      this.config,
-      Noco._ncMeta
-    ).init();
+    // await new RestAuthCtrl(
+    //   this as any,
+    //   Noco._ncMeta?.knex,
+    //   this.config?.meta?.db,
+    //   this.config,
+    //   Noco._ncMeta
+    // ).init();
 
     this.router.use(this.projectRouter);
     const projects = await Noco._ncMeta.projectList();

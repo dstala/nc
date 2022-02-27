@@ -14,8 +14,7 @@ import {
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';
-import catchError from './helpers/catchError';
-import ncMetaAclMiddleware from './helpers/ncMetaAclMiddleware';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
@@ -128,29 +127,9 @@ export async function tableDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get(
-  '/projects/:projectId/:baseId/tables',
-  ncMetaAclMiddleware('tableList'),
-  catchError(tableList)
-);
-router.post(
-  '/projects/:projectId/:baseId/tables',
-  ncMetaAclMiddleware('tableCreate'),
-  catchError(tableCreate)
-);
-router.get(
-  '/tables/:tableId',
-  ncMetaAclMiddleware('tableXcModelGet'),
-  catchError(tableGet)
-);
-router.put(
-  '/tables/:tableId',
-  ncMetaAclMiddleware('xcModelSet'),
-  catchError(tableUpdate)
-);
-router.delete(
-  '/tables/:tableId',
-  ncMetaAclMiddleware('tableDelete'),
-  catchError(tableDelete)
-);
+router.get('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableList));
+router.post('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableCreate));
+router.get('/tables/:tableId', ncMetaAclMw(tableGet));
+router.put('/tables/:tableId', ncMetaAclMw(tableUpdate));
+router.delete('/tables/:tableId', ncMetaAclMw(tableDelete));
 export default router;

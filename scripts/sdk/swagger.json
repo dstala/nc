@@ -3355,6 +3355,65 @@
           "meta"
         ]
       }
+    },
+    "/testConnection": {
+      "parameters": [],
+      "post": {
+        "summary": "",
+        "operationId": "test-connection",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "description": ""
+      }
+    },
+    "/appInfo": {
+      "parameters": [],
+      "get": {
+        "summary": "",
+        "operationId": "app-info",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ],
+        "description": ""
+      }
     }
   },
   "components": {

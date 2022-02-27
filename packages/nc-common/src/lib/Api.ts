@@ -630,6 +630,10 @@ export interface PluginTestPayloadType {
   category?: string;
 }
 
+export type TestConnectionPayloadType = any;
+
+export type AppInfoPayloadType = any;
+
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -2348,6 +2352,46 @@ export class Api<
       this.request<PluginType, any>({
         path: `/plugins/${pluginId}`,
         method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name TestConnection
+     * @request POST:/testConnection
+     * @response `200` `{ code?: number, message?: string }` OK
+     */
+    testConnection: (
+      data: TestConnectionPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<{ code?: number; message?: string }, any>({
+        path: `/testConnection`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name AppInfo
+     * @request GET:/appInfo
+     * @response `200` `{ code?: number, message?: string }` OK
+     * @response `0` `any`
+     */
+    appInfo: (data: AppInfoPayloadType, params: RequestParams = {}) =>
+      this.request<{ code?: number; message?: string }, any>({
+        path: `/appInfo`,
+        method: 'GET',
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),

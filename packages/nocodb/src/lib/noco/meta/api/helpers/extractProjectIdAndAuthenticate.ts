@@ -9,11 +9,11 @@ export default async (req, res, next) => {
   if (params.projectId) {
     req.ncProjectId = params.projectId;
   } else if (params.tableId) {
-    const model = await Model.get({ id: params.tabletId });
-    req.ncProjectId = model.project_id;
+    const model = await Model.get({ id: params.tableId });
+    req.ncProjectId = model?.project_id;
   } else if (params.viewId) {
     const view = await View.get(params.viewId);
-    req.ncProjectId = view.project_id;
+    req.ncProjectId = view?.project_id;
   }
 
   const user = await new Promise(resolve => {

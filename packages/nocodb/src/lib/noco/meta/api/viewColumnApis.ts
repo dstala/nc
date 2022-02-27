@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import View from '../../../noco-models/View';
-import catchError from './helpers/catchError';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function columnList(req: Request, res: Response) {
   res.json(await View.getColumns(req.params.viewId));
@@ -25,7 +25,7 @@ export async function columnUpdate(req: Request, res: Response) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', catchError(columnList));
-router.post('/', catchError(columnAdd));
-router.put('/:columnId', catchError(columnUpdate));
+router.get('/views/:viewId/columns/', ncMetaAclMw(columnList));
+router.post('/views/:viewId/columns/', ncMetaAclMw(columnAdd));
+router.put('/views/:viewId/columns/:columnId', ncMetaAclMw(columnUpdate));
 export default router;

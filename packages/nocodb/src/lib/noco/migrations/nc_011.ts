@@ -659,7 +659,7 @@ const up = async knex => {
   await knex.schema.createTable(MetaTable.PROJECT_USERS, table => {
     table.string('project_id', 128);
     table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
-    table.string('fk_user_id', 128);
+    table.string('fk_user_id', 20);
     table.foreign('fk_user_id').references(`${MetaTable.USERS}.id`);
     // todo
     table.text('roles');

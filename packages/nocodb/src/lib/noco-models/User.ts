@@ -62,7 +62,7 @@ export default class User implements UserType {
       'email_verified',
       'roles'
     ]);
-    return await ncMeta.metaUpdate(null, null, MetaTable.USERS, id, insertObj);
+    return await ncMeta.metaUpdate(null, null, MetaTable.USERS, insertObj, id);
   }
   public static async getByEmail(email, ncMeta = Noco.ncMeta) {
     return await ncMeta.metaGet2(null, null, MetaTable.USERS, {

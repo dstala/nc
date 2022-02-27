@@ -14,6 +14,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
 import Sort from '../../../noco-models/Sort';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // @ts-ignore
 export async function sortGet(req: Request, res: Response<TableType>) {}
@@ -72,9 +73,9 @@ export async function sortDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', sortList);
-router.post('/', sortCreate);
-router.get('/:sortId', sortGet);
-router.put('/:sortId', sortUpdate);
-router.delete('/:sortId', sortDelete);
+router.get('/views/:viewId/sorts/', ncMetaAclMw(sortList));
+router.post('/views/:viewId/sorts/', ncMetaAclMw(sortCreate));
+router.get('/views/:viewId/sorts/:sortId', ncMetaAclMw(sortGet));
+router.put('/views/:viewId/sorts/:sortId', ncMetaAclMw(sortUpdate));
+router.delete('/views/:viewId/sorts/:sortId', ncMetaAclMw(sortDelete));
 export default router;
