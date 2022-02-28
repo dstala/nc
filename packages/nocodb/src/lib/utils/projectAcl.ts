@@ -14,7 +14,11 @@ export default {
     tableCreate: false,
     tableGet: true,
     tableUpdate: false,
-    tableDelete: false
+    tableDelete: false,
+
+    // data
+    dataList: true,
+    commentsCount: true
 
     /* // old
     xcTableAndViewList: true,
@@ -180,6 +184,18 @@ export default {
     xcExportAsCsv: true*/
   },
   commenter: {
+    // project
+    projectGet: true,
+
+    //table
+    tableGet: true,
+    // sort & filter
+    sortList: true,
+
+    // data
+    dataList: true,
+    commentsCount: true,
+
     xcTableAndViewList: true,
     xcVirtualTableList: true,
     projectList: true,
@@ -205,6 +221,17 @@ export default {
     xcExportAsCsv: true
   },
   viewer: {
+    // project
+    projectGet: true,
+    //table
+    tableGet: true,
+    // data
+    dataList: true,
+    commentsCount: true,
+
+    // sort & filter
+    sortList: true,
+
     xcTableAndViewList: true,
     xcVirtualTableList: true,
     projectList: true,

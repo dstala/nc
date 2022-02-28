@@ -19,13 +19,16 @@ import auditApis from './auditApis';
 import hookApis from './hookApis';
 import pluginApis from './pluginApis';
 import gridViewColumnApis from './gridViewColumnApis';
-import { initJwtStrategy, userApis } from './userApi';
+import { userApis } from './userApi';
 // import extractProjectIdAndAuthenticate from './helpers/extractProjectIdAndAuthenticate';
 import utilApis from './utilApis';
 import projectUserApis from './projectUserApis';
+import sharedBaseApis from './sharedBaseApis';
+import { initStrategies } from './userApi/initStrategies';
 
 export default function(router: Router) {
-  initJwtStrategy(router);
+  initStrategies(router);
+
   projectApis(router);
   utilApis(router);
 
@@ -50,5 +53,6 @@ export default function(router: Router) {
   router.use(hookApis);
   router.use(pluginApis);
   router.use(projectUserApis);
+  router.use(sharedBaseApis);
   userApis(router);
 }

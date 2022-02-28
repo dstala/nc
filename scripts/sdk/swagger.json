@@ -558,6 +558,164 @@
         ]
       }
     },
+    "/projects/{projectId}/sharedBase": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "shared-base-get",
+        "description": "Read project details",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "xc-auth",
+            "description": "Auth token"
+          }
+        ],
+        "tags": [
+          "Meta"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "shared-base-disable",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "shared-base-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roles": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/sharedBase/{sharedBaseUuid}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "sharedBaseUuid",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "shared-base-get",
+        "description": "Read project details",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "project_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "public"
+        ]
+      }
+    },
     "/projects/{projectId}/views/{viewId}/upload": {
       "post": {
         "summary": "Attachment",
@@ -6107,7 +6265,14 @@
       "xc-auth": {
         "name": "API Key",
         "type": "apiKey",
-        "in": "header"
+        "in": "header",
+        "description": "JWT access token"
+      },
+      "xc-shared-base-id": {
+        "name": "API Key",
+        "type": "apiKey",
+        "in": "header",
+        "description": "Shared base uuid"
       }
     }
   }

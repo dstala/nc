@@ -5,7 +5,7 @@
     </v-icon>
     <span class="grey--text caption">Shared base link</span>
     <div class="nc-container">
-      <v-chip v-if="base.enabled" :color="colors[4]" style="" class="rounded pl-1 pr-0 d-100 nc-url-chip pr-3">
+      <v-chip v-if="base.uuid" :color="colors[4]" style="" class="rounded pl-1 pr-0 d-100 nc-url-chip pr-3">
         <div class="nc-url-wrapper d-flex mx-1 align-center d-100">
           <span class="nc-url flex-grow-1 caption ">{{ url }}</span>
           <v-spacer />
@@ -31,7 +31,7 @@
             <template #activator="{on}">
               <div class="my-2" v-on="on">
                 <div class="font-weight-bold nc-disable-shared-base">
-                  <span v-if="base.enabled">Anyone with the link</span>
+                  <span v-if="base.uuid">Anyone with the link</span>
                   <span v-else>Disabled shared base</span>
                   <v-icon small>
                     mdi-menu-down-outline
@@ -59,7 +59,7 @@
             </v-list>
           </v-menu>
           <div class=" caption">
-            <template v-if="base.enabled">
+            <template v-if="base.uuid">
               <span v-if="base.roles === 'editor'">Anyone on the internet with this link can edit</span>
               <span v-else-if="base.roles === 'viewer'">Anyone on the internet with this link can view</span>
             </template>
@@ -70,9 +70,12 @@
         </div>
         <v-spacer />
         <div class="d-flex justify-center" style="width:120px">
-          <v-menu v-if="base.enabled" offset-y>
+          <v-menu v-if="base.uuid" offset-y>
             <template #activator="{on}">
-              <div class="text-capitalize my-2   font-weight-bold backgroundColorDefault py-2 px-4 rounded nc-shared-base-role" v-on="on">
+              <div
+                class="text-capitalize my-2   font-weight-bold backgroundColorDefault py-2 px-4 rounded nc-shared-base-role"
+                v-on="on"
+              >
                 {{ base.roles || 'Viewer' }}
 
                 <v-icon small>
@@ -114,7 +117,7 @@ export default {
   }),
   computed: {
     url() {
-      return this.base && this.base.shared_base_id ? `${this.dashboardUrl}#/nc/base/${this.base.shared_base_id}` : null
+      return this.base && this.base.uuid ? `${this.dashboardUrl}#/nc/base/${this.base.uuid}` : null
     }
   },
   mounted() {
@@ -123,8 +126,10 @@ export default {
   methods: {
     async loadSharedBase() {
       try {
-        const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-          { dbAlias: 'db' }, 'getSharedBaseLink'])
+        // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [
+        //   { dbAlias: 'db' }, 'getSharedBaseLink'])
+        const sharedBase = (await this.$api.meta.sharedBaseGet(this.$store.state.project.projectId)).data
+
         this.base = sharedBase || {}
       } catch (e) {
         console.log(e)
@@ -132,7 +137,9 @@ export default {
     },
     async createSharedBase(roles = 'viewer') {
       try {
-        const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink', { roles }])
+        // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink', { roles }])
+        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles })).data
+
         this.base = sharedBase || {}
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
@@ -140,7 +147,8 @@ export default {
     },
     async disableSharedBase() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
+        await this.$api.meta.sharedBaseDisable(this.$store.state.project.projectId)
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
         this.base = {}
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
@@ -148,8 +156,9 @@ export default {
     },
     async recreate() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
-        const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink'])
+        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles })).data
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
+        // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink'])
         this.base = sharedBase || {}
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
@@ -195,5 +204,8 @@ style="background: transparent; border: 1px solid #ddd"></iframe>`)
   background: var(--v-backgroundColor-base);
   padding: 20px 20px;
 }
-/deep/ .nc-url-chip .v-chip__content{width: 100%}
+
+/deep/ .nc-url-chip .v-chip__content {
+  width: 100%
+}
 </style>

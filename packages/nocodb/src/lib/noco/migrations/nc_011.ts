@@ -12,6 +12,11 @@ const up = async knex => {
     table.text('description');
     table.text('meta');
     table.string('color');
+
+    table.string('uuid');
+    table.string('password');
+    table.string('roles');
+
     table.boolean('deleted').defaultTo(false);
     table.boolean('is_meta');
     table.float('order');
