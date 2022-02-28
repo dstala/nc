@@ -82,7 +82,7 @@ export default class LinkToAnotherRecordColumn {
         MetaTable.COL_RELATIONS,
         { fk_column_id: columnId }
       );
-      await NocoCache.setv2(colData?.id, columnId, colData);
+      // await NocoCache.setv2(colData?.id, columnId, colData);
     }
     return colData ? new LinkToAnotherRecordColumn(colData) : null;
   }

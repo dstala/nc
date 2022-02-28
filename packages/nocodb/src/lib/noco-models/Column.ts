@@ -303,7 +303,7 @@ export default class Column implements ColumnType {
         }
       });
       for (const column of columnsList) {
-        await NocoCache.setv2(column?.id, fk_model_id, column);
+        // await NocoCache.setv2(column?.id, fk_model_id, column);
       }
     }
     return Promise.all(

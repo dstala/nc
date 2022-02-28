@@ -145,7 +145,7 @@ export default class Model implements TableType {
       );
 
       for (const model of modelList) {
-        await NocoCache.setv2(model.id, project_id, model);
+        // await NocoCache.setv2(model.id, project_id, model);
       }
     }
 
@@ -200,7 +200,7 @@ export default class Model implements TableType {
           tn
         }
       );
-      await NocoCache.setv2(id, modelData?.base_id, modelData);
+      // await NocoCache.setv2(id, modelData?.base_id, modelData);
       // if (
       //   this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
       //     modelData.title
@@ -243,7 +243,7 @@ export default class Model implements TableType {
           tn
         }
       );
-      await NocoCache.setv2(id, modelData?.base_id, modelData);
+      // await NocoCache.setv2(id, modelData?.base_id, modelData);
       // modelData.filters = await Filter.getFilterObject({
       //   viewId: modelData.id
       // });

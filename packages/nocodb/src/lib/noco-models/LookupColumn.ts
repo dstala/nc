@@ -45,7 +45,7 @@ export default class LookupColumn {
         MetaTable.COL_LOOKUP,
         { fk_column_id: columnId }
       );
-      await NocoCache.setv2(colData.id, columnId, colData);
+      // await NocoCache.setv2(colData.id, columnId, colData);
     }
     return colData ? new LookupColumn(colData) : null;
   }
