@@ -13,9 +13,9 @@ import {
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
-import catchError from './helpers/catchError';
 import View from '../../../noco-models/View';
 import GalleryView from '../../../noco-models/GalleryView';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // @ts-ignore
 export async function galleryViewGet(req: Request, res: Response<GalleryType>) {
@@ -48,9 +48,9 @@ export async function galleyViewDelete(req: Request, res: Response, next) {}
 
 const router = Router({ mergeParams: true });
 // router.get('/', galleyViewList);
-router.post('/tables/:tableId/galleries', catchError(galleryViewCreate));
+router.post('/tables/:tableId/galleries', ncMetaAclMw(galleryViewCreate));
 // router.get('/:galleyViewId', galleyViewGet);
-router.put('/galleries/:galleyViewId', catchError(galleryViewUpdate));
-router.get('/galleries/:galleyViewId', catchError(galleryViewGet));
+router.put('/galleries/:galleyViewId', ncMetaAclMw(galleryViewUpdate));
+router.get('/galleries/:galleyViewId', ncMetaAclMw(galleryViewGet));
 // router.delete('/:galleyViewId', galleyViewDelete);
 export default router;

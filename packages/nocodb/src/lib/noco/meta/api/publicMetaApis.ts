@@ -11,7 +11,7 @@ export async function viewMetaGet(req: Request, res: Response, next) {
   const view: View & {
     relatedMetas?: { [ket: string]: Model };
     client?: string;
-  } = await View.getByUUID(req.params.uuid);
+  } = await View.getByUUID(req.params.publicDataUuid);
 
   if (!view) return next(new Error('Not found'));
 

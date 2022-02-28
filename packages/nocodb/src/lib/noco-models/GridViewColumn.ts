@@ -37,6 +37,19 @@ export default class GridViewColumn implements GridColumnType {
     return views?.map(v => new GridViewColumn(v));
   }
 
+  public static async get(viewId: string) {
+    const view = await Noco.ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.GRID_VIEW_COLUMNS,
+      {
+        fk_view_id: viewId
+      }
+    );
+
+    return view && new GridViewColumn(view);
+  }
+
   static async insert(column: Partial<GridViewColumn>, ncMeta = Noco.ncMeta) {
     const insertObj = {
       fk_view_id: column.fk_view_id,

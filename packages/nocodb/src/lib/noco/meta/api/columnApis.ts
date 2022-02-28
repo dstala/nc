@@ -20,10 +20,11 @@ import {
   TableType
 } from 'nc-common';
 import Audit from '../../../noco-models/Audit';
-import catchError, { NcError } from './helpers/catchError';
 import SqlMgrv2 from '../../../sqlMgr/v2/SqlMgrv2';
 import Noco from '../../Noco';
 import NcMetaIO from '../NcMetaIO';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { NcError } from './helpers/catchError';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
@@ -705,7 +706,7 @@ const deleteHmOrBtRelation = async ({
 };
 
 const router = Router({ mergeParams: true });
-router.post('/', catchError(columnAdd));
-router.put('/:columnId', catchError(columnUpdate));
-router.delete('/:columnId', catchError(columnDelete));
+router.post('/', ncMetaAclMw(columnAdd));
+router.put('/:columnId', ncMetaAclMw(columnUpdate));
+router.delete('/:columnId', ncMetaAclMw(columnDelete));
 export default router;

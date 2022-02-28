@@ -14,7 +14,23 @@
       "post": {
         "summary": "Signup",
         "operationId": "signup",
-        "responses": {},
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "tags": [
           "AUTH"
         ],
@@ -23,79 +39,25 @@
         }
       }
     },
-    "/projects/{projectId}/views/{viewId}/upload": {
-      "post": {
-        "summary": "Attachment",
-        "operationId": "upload",
-        "responses": {},
-        "tags": [
-          "Meta"
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "files": {},
-                  "json": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "description": ""
-        }
-      },
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "viewId",
-          "in": "path",
-          "required": true
-        }
-      ]
-    },
-    "/auth/user/me": {
-      "parameters": [],
-      "get": {
-        "summary": "User Info",
-        "operationId": "me",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "AUTH"
-        ]
-      }
-    },
     "/auth/user/signin": {
       "post": {
         "summary": "Signin",
         "operationId": "signin",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -124,6 +86,28 @@
         }
       },
       "parameters": []
+    },
+    "/auth/user/me": {
+      "parameters": [],
+      "get": {
+        "summary": "User Info",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "AUTH"
+        ]
+      }
     },
     "/auth/password/forgot": {
       "post": {
@@ -273,6 +257,138 @@
         ]
       },
       "parameters": []
+    },
+    "/projects/{projectId}/users": {
+      "get": {
+        "summary": "Password Refresh",
+        "operationId": "project-user-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 1,
+                          "items": {
+                            "$ref": "#/components/schemas/User"
+                          }
+                        },
+                        "pageInfo": {
+                          "$ref": "#/components/schemas/Paginated"
+                        }
+                      },
+                      "required": [
+                        "list",
+                        "pageInfo"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "project-user-add",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/users - copy": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "project-user-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "project-user-remove",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
     },
     "/projects/": {
       "parameters": [],
@@ -424,6 +540,50 @@
           "meta"
         ]
       }
+    },
+    "/projects/{projectId}/views/{viewId}/upload": {
+      "post": {
+        "summary": "Attachment",
+        "operationId": "upload",
+        "responses": {},
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {},
+                  "json": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ]
     },
     "/projects/{projectId}/reorder": {
       "parameters": [

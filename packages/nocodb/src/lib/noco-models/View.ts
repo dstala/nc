@@ -41,7 +41,7 @@ export default class View implements ViewType {
   }
 
   async getModel(): Promise<Model> {
-    return (this.model = await Model.get({ id: this.fk_model_id }));
+    return (this.model = await Model.getByIdOrName({ id: this.fk_model_id }));
   }
 
   async getModelWithInfo(): Promise<Model> {
@@ -149,7 +149,7 @@ export default class View implements ViewType {
       base_id: view.base_id
     };
     if (!(view.project_id && view.base_id)) {
-      const model = await Model.get({ id: view.fk_model_id });
+      const model = await Model.getByIdOrName({ id: view.fk_model_id });
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
@@ -198,7 +198,7 @@ export default class View implements ViewType {
     }
 
     let columns: any[] = await (
-      await Model.get({ id: view.fk_model_id })
+      await Model.getByIdOrName({ id: view.fk_model_id })
     ).getColumns();
 
     if (copyFormView) {

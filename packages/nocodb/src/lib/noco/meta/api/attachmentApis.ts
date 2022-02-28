@@ -1,12 +1,12 @@
 // @ts-ignore
 import { Request, Response, Router } from 'express';
-import catchError from './helpers/catchError';
 import multer from 'multer';
 import { nanoid } from 'nanoid';
 import path from 'path';
 import slash from 'slash';
 import mimetypes, { mimeIcons } from '../../../utils/mimeTypes';
 import Local from '../../plugins/adapters/storage/Local';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // todo:  use plugin manager
 const storageAdapter = new Local();
@@ -77,7 +77,7 @@ router.post(
   multer({
     storage: multer.diskStorage({})
   }).any(),
-  catchError(upload)
+  ncMetaAclMw(upload)
 );
-router.get('/download/:projectId/:viewId/:fileName', catchError(fileRead));
+router.get('/download/:projectId/:viewId/:fileName', ncMetaAclMw(fileRead));
 export default router;

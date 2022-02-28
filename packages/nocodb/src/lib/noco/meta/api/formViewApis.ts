@@ -9,8 +9,8 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
 import View from '../../../noco-models/View';
-import catchError from './helpers/catchError';
 import FormView from '../../../noco-models/FormView';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // @ts-ignore
 export async function formViewGet(req: Request, res: Response<FormType>) {
@@ -34,8 +34,8 @@ export async function formViewUpdate(req, res) {
 export async function formViewDelete(req: Request, res: Response, next) {}
 
 const router = Router({ mergeParams: true });
-router.post('/tables/:tableId/forms', catchError(formViewCreate));
-router.get('/forms/:formViewId', catchError(formViewGet));
-router.put('/forms/:formViewId', catchError(formViewUpdate));
-router.delete('/forms/:formViewId', catchError(formViewDelete));
+router.post('/tables/:tableId/forms', ncMetaAclMw(formViewCreate));
+router.get('/forms/:formViewId', ncMetaAclMw(formViewGet));
+router.put('/forms/:formViewId', ncMetaAclMw(formViewUpdate));
+router.delete('/forms/:formViewId', ncMetaAclMw(formViewDelete));
 export default router;

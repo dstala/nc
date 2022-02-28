@@ -242,7 +242,9 @@ export default {
     projectRestart: false,
     projectStart: false,
     xcMetaTablesImportZipToLocalFsAndDb: true,
-    xcMetaTablesExportDbToZip: true
+    xcMetaTablesExportDbToZip: true,
+
+    auditRowUpdate: true
   }
 };
 

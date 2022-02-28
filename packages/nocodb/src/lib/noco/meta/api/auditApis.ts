@@ -1,4 +1,3 @@
-import catchError from './helpers/catchError';
 import { Request, Response, Router } from 'express';
 import Audit from '../../../noco-models/Audit';
 import {
@@ -12,6 +11,7 @@ import {
 } from 'nc-common';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from './helpers/PagedResponse';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function commentRow(
   req: Request<any, any, CommentRowPayloadType>,
@@ -29,7 +29,7 @@ export async function auditRowUpdate(
   req: Request<any, any, AuditRowUpdatePayloadType>,
   res
 ) {
-  const model = await Model.get({ id: req.body.fk_model_id });
+  const model = await Model.getByIdOrName({ id: req.body.fk_model_id });
   res.json(
     await Audit.insert({
       fk_model_id: req.body.fk_model_id,
@@ -79,9 +79,9 @@ export async function commentsCount(
 }
 
 const router = Router({ mergeParams: true });
-router.get('/audits/comments', catchError(commentList));
-router.post('/audits/rowUpdate', catchError(auditRowUpdate));
-router.post('/audits/comments', catchError(commentRow));
-router.get('/audits/comments/count', catchError(commentsCount));
-router.get('/project/:projectId/audits', catchError(auditList));
+router.get('/audits/comments', ncMetaAclMw(commentList));
+router.post('/audits/rowUpdate', ncMetaAclMw(auditRowUpdate, 'auditRowUpdate'));
+router.post('/audits/comments', ncMetaAclMw(commentRow));
+router.get('/audits/comments/count', ncMetaAclMw(commentsCount));
+router.get('/project/:projectId/audits', ncMetaAclMw(auditList));
 export default router;

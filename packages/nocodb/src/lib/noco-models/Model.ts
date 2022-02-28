@@ -191,14 +191,18 @@ export default class Model implements TableType {
     await Column.clearList({ fk_model_id: id });
   }
 
-  public static async get(
-    {
-      tn,
-      id
-    }: {
-      tn?: string;
-      id?: string;
-    },
+  public static async get(id: string, ncMeta = Noco.ncMeta): Promise<Model> {
+    const modelData = await ncMeta.metaGet2(null, null, MetaTable.MODELS, id);
+    return modelData && new Model(modelData);
+  }
+  public static async getByIdOrName(
+    args:
+      | {
+          tn?: string;
+        }
+      | {
+          id?: string;
+        },
     ncMeta = Noco.ncMeta
   ): Promise<Model> {
     let modelData = null; //id && (await NocoCache.get(id));
@@ -207,11 +211,9 @@ export default class Model implements TableType {
         null,
         null,
         MetaTable.MODELS,
-        id || {
-          tn
-        }
+        'id' in args ? args?.id : args
       );
-      await NocoCache.setv2(id, modelData?.base_id, modelData);
+      await NocoCache.setv2(modelData.id, modelData?.base_id, modelData);
       // if (
       //   this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
       //     modelData.title
@@ -279,7 +281,7 @@ export default class Model implements TableType {
   }): Promise<BaseModelSqlv2> {
     const model =
       args?.model ||
-      (await this.get({
+      (await this.getByIdOrName({
         id: args.id,
         tn: args.tn
       }));

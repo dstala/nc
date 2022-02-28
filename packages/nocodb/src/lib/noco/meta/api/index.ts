@@ -22,6 +22,7 @@ import gridViewColumnApis from './gridViewColumnApis';
 import { initJwtStrategy, userApis } from './userApi';
 // import extractProjectIdAndAuthenticate from './helpers/extractProjectIdAndAuthenticate';
 import utilApis from './utilApis';
+import projectUserApis from './projectUserApis';
 
 export default function(router: Router) {
   initJwtStrategy(router);
@@ -35,8 +36,8 @@ export default function(router: Router) {
   router.use(viewColumnApis);
   router.use('/tables/:tableId/grids', gridViewApis);
   router.use('/formColumns', formViewColumnApis);
-  router.use('/public/data/:uuid', publicDataApis);
-  router.use('/public/meta/:uuid', publicMetaApis);
+  router.use('/public/data/:publicDataUuid', publicDataApis);
+  router.use('/public/meta/:publicDataUuid', publicMetaApis);
 
   router.use(gridViewColumnApis);
   router.use(tableApis);
@@ -48,5 +49,6 @@ export default function(router: Router) {
   router.use(auditApis);
   router.use(hookApis);
   router.use(pluginApis);
+  router.use(projectUserApis);
   userApis(router);
 }

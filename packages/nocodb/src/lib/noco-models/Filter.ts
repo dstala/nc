@@ -31,7 +31,7 @@ export default class Filter {
   public async getModel(): Promise<Model> {
     return this.fk_view_id
       ? (await View.get(this.fk_view_id)).getModel()
-      : Model.get({
+      : Model.getByIdOrName({
           id: this.fk_model_id
         });
   }

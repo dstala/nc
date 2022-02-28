@@ -10,10 +10,11 @@ import multer from 'multer';
 import { ErrorMessages, UITypes, ViewTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function dataList(req: Request, res: Response, next) {
   try {
-    const view = await View.getByUUID(req.params.uuid);
+    const view = await View.getByUUID(req.params.publicDataUuid);
 
     if (!view) return next(new Error('Not found'));
     if (view.type !== ViewTypes.GRID) return next(new Error('Not found'));
@@ -22,7 +23,7 @@ export async function dataList(req: Request, res: Response, next) {
       return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
     }
 
-    const model = await Model.get({
+    const model = await Model.getByIdOrName({
       id: view?.fk_model_id
     });
 
@@ -102,7 +103,7 @@ async function dataInsert(
   //   res.status(500).json({ msg: e.message });
   // }
 
-  const view = await View.getByUUID(req.params.uuid);
+  const view = await View.getByUUID(req.params.publicDataUuid);
 
   if (!view) return next(new Error('Not found'));
   if (view.type !== ViewTypes.FORM) return next(new Error('Not found'));
@@ -111,7 +112,7 @@ async function dataInsert(
     return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
-  const model = await Model.get({
+  const model = await Model.getByIdOrName({
     id: view?.fk_model_id
   });
   const base = await Base.get(model.base_id);
@@ -182,7 +183,7 @@ async function dataInsert(
 }
 
 async function relDataList(req, res, next) {
-  const view = await View.getByUUID(req.params.uuid);
+  const view = await View.getByUUID(req.params.publicDataUuid);
 
   if (!view) return next(new Error('Not found'));
   if (view.type !== ViewTypes.FORM) return next(new Error('Not found'));
@@ -191,7 +192,7 @@ async function relDataList(req, res, next) {
     return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
-  const column = await Column.get({ colId: req.params.relationColumnId });
+  const column = await Column.get({ colId: req.params.tableId });
   const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
 
   const model = await colOptions.getRelatedTable();
@@ -267,8 +268,8 @@ async function relDataList(req, res, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.post('/list', catchError(dataList));
-router.post('/relationTable/:relationColumnId', catchError(relDataList));
+router.post('/list', ncMetaAclMw(dataList));
+router.post('/relationTable/:tableId', ncMetaAclMw(relDataList));
 router.post(
   '/create',
   multer({

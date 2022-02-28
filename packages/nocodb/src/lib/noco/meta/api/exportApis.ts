@@ -1,5 +1,4 @@
 import { Request, Response, Router } from 'express';
-import catchError from './helpers/catchError';
 import View from '../../../noco-models/View';
 import Model from '../../../noco-models/Model';
 import Base from '../../../noco-models/Base';
@@ -10,6 +9,7 @@ import { UITypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 async function exportCsv(req: Request, res: Response, next) {
   // // get all nested props by default
@@ -177,5 +177,5 @@ async function serializeCellValue({
 }
 
 const router = Router({ mergeParams: true });
-router.get('/data/:viewId/export/csv', catchError(exportCsv));
+router.get('/data/:viewId/export/csv', ncMetaAclMw(exportCsv));
 export default router;

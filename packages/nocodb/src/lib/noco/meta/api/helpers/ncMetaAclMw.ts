@@ -2,7 +2,7 @@ import projectAcl from '../../../../utils/projectAcl';
 import { NextFunction, Request, Response } from 'express';
 import catchError, { NcError } from './catchError';
 import extractProjectIdAndAuthenticate from './extractProjectIdAndAuthenticate';
-export default function(handlerFn, handlerName = handlerFn.name) {
+export default function(handlerFn, permissionName = handlerFn.name) {
   return [
     extractProjectIdAndAuthenticate,
     // @ts-ignore
@@ -40,17 +40,36 @@ export default function(handlerFn, handlerName = handlerFn.name) {
             return (
               hasRole &&
               projectAcl[name] &&
-              (projectAcl[name] === '*' || projectAcl[name][handlerName])
+              (projectAcl[name] === '*' || projectAcl[name][permissionName])
             );
           });
         if (!isAllowed) {
-          NcError.forbidden('Not allowed');
+          NcError.forbidden(`'${permissionName}' - Not allowed`);
         }
         //   }
         // }
         next();
       }
     ),
+    catchError((req, _res, next) => {
+      const roles = req?.session?.passport?.user?.roles;
+      if (
+        !(
+          roles?.creator ||
+          roles?.owner ||
+          roles?.editor ||
+          roles?.viewer ||
+          roles?.commenter ||
+          roles?.user ||
+          roles?.user_new
+        )
+      ) {
+        NcError.unauthorized(
+          'Unauthorized access : xc-auth does not have admin permission'
+        );
+      }
+      next();
+    }),
     catchError(handlerFn)
   ];
 }

@@ -52,7 +52,7 @@ export default class Column implements ColumnType {
   }
 
   public async getModel(): Promise<Model> {
-    return Model.get({
+    return Model.getByIdOrName({
       id: this.fk_model_id
     });
   }
@@ -90,7 +90,7 @@ export default class Column implements ColumnType {
       base_id: column.base_id
     };
     if (!(column.project_id && column.base_id)) {
-      const model = await Model.get({ id: column.fk_model_id });
+      const model = await Model.getByIdOrName({ id: column.fk_model_id });
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
@@ -269,7 +269,7 @@ export default class Column implements ColumnType {
 
   async loadModel(force = false): Promise<Model> {
     if (!this.model || force) {
-      this.model = await Model.get({
+      this.model = await Model.getByIdOrName({
         // base_id: this.project_id,
         // db_alias: this.db_alias,
         id: this.fk_model_id

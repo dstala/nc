@@ -28,7 +28,7 @@ export default function registerRestCtrl(ctx: {
   router.get('/api/v2/:model_name', async (req: any, res) => {
     try {
       console.time('Model.get');
-      const model = await Model.get({
+      const model = await Model.getByIdOrName({
         id: req.params.model_id,
         tn: req.params.model_name
       });
@@ -76,7 +76,7 @@ export default function registerRestCtrl(ctx: {
   });
   router.get('/api/v2/:model_name/:id', async (req: any, res) => {
     try {
-      const model = await Model.get({
+      const model = await Model.getByIdOrName({
         id: req.params.model_id,
         tn: req.params.model_name
       });
@@ -109,10 +109,10 @@ export default function registerRestCtrl(ctx: {
 
   router.post('/generateLookup', async (_req: any, res) => {
     try {
-      let country = await Model.get({
+      let country = await Model.getByIdOrName({
         tn: 'country'
       });
-      let city = await Model.get({
+      let city = await Model.getByIdOrName({
         tn: 'city'
       });
 
@@ -161,14 +161,14 @@ export default function registerRestCtrl(ctx: {
       await Model.clear({ id: city.id });
       await Model.clear({ id: country.id });
 
-      country = await Model.get({
+      country = await Model.getByIdOrName({
         tn: 'country'
       });
-      city = await Model.get({
+      city = await Model.getByIdOrName({
         tn: 'city'
       });
 
-      let address = await Model.get({
+      let address = await Model.getByIdOrName({
         tn: 'address'
       });
 
@@ -205,10 +205,10 @@ export default function registerRestCtrl(ctx: {
       await Model.clear({ id: city.id });
       await Model.clear({ id: country.id });
 
-      country = await Model.get({
+      country = await Model.getByIdOrName({
         tn: 'country'
       });
-      city = await Model.get({
+      city = await Model.getByIdOrName({
         tn: 'city'
       });
 
@@ -285,13 +285,13 @@ export default function registerRestCtrl(ctx: {
       //   ]
       // });
 
-      let film = await Model.get({
+      let film = await Model.getByIdOrName({
         tn: 'film'
       });
-      let actor = await Model.get({
+      let actor = await Model.getByIdOrName({
         tn: 'actor'
       });
-      const category = await Model.get({
+      const category = await Model.getByIdOrName({
         tn: 'category'
       });
 
@@ -308,7 +308,7 @@ export default function registerRestCtrl(ctx: {
           c => c._cn === 'Film <=> Category'
         )?.id
       });
-      film = await Model.get({
+      film = await Model.getByIdOrName({
         tn: 'film'
       });
       await Column.insert<LookupColumn>({
@@ -324,7 +324,7 @@ export default function registerRestCtrl(ctx: {
           c => c._cn === 'Actor <=> Film'
         )?.id
       });
-      actor = await Model.get({
+      actor = await Model.getByIdOrName({
         tn: 'actor'
       });
       // film - filter
@@ -360,7 +360,7 @@ export default function registerRestCtrl(ctx: {
         )?.id
       });
 
-      address = await Model.get({
+      address = await Model.getByIdOrName({
         tn: 'address'
       });
       await Sort.insert({
@@ -391,7 +391,7 @@ export default function registerRestCtrl(ctx: {
                 body
               );
 
-              const model = await Model.get({
+              const model = await Model.getByIdOrName({
                 tn: body.table
               });
 
@@ -443,7 +443,7 @@ export default function registerRestCtrl(ctx: {
                 body
               );
 
-              const model = await Model.get({
+              const model = await Model.getByIdOrName({
                 tn: body.table
               });
 
@@ -490,7 +490,7 @@ export default function registerRestCtrl(ctx: {
           case UITypes.Formula:
             {
               validateParams(['table', 'formula', 'alias'], body);
-              const model = await Model.get({
+              const model = await Model.getByIdOrName({
                 tn: body.table
               });
               const columns = await model.getColumns();
@@ -536,7 +536,7 @@ export default function registerRestCtrl(ctx: {
           case 'DeleteAllSort':
             {
               validateParams(['table'], body);
-              const model = await Model.get({
+              const model = await Model.getByIdOrName({
                 tn: body.table
               });
               if (!model) {
@@ -548,7 +548,7 @@ export default function registerRestCtrl(ctx: {
           case 'Sort':
             {
               validateParams(['table', 'column', 'direction'], body);
-              const model = await Model.get({
+              const model = await Model.getByIdOrName({
                 tn: body.table
               });
               if (!model) {
@@ -574,7 +574,7 @@ export default function registerRestCtrl(ctx: {
           case 'DeleteAllFilter':
             {
               validateParams(['table'], body);
-              const model = await Model.get({
+              const model = await Model.getByIdOrName({
                 tn: body.table
               });
               if (!model) {
@@ -586,7 +586,7 @@ export default function registerRestCtrl(ctx: {
           case 'Filter':
             {
               validateParams(['table', 'filter'], body);
-              const model = await Model.get({
+              const model = await Model.getByIdOrName({
                 tn: body.table
               });
               if (!model) {

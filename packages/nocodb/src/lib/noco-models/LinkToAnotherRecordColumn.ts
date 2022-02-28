@@ -53,10 +53,12 @@ export default class LinkToAnotherRecordColumn {
     }));
   }
   public async getMMModel(): Promise<Model> {
-    return (this.mmModel = await Model.get({ id: this.fk_mm_model_id }));
+    return (this.mmModel = await Model.getByIdOrName({
+      id: this.fk_mm_model_id
+    }));
   }
   public async getRelatedTable(): Promise<Model> {
-    return (this.relatedTable = await Model.get({
+    return (this.relatedTable = await Model.getByIdOrName({
       id: this.fk_related_model_id
     }));
   }

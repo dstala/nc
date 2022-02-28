@@ -87,7 +87,7 @@ export default class Sort {
   }
 
   public async getModel(ncMeta = Noco.ncMeta): Promise<Model> {
-    return Model.get(
+    return Model.getByIdOrName(
       {
         id: this.fk_view_id
       },
