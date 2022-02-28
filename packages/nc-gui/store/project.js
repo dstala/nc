@@ -311,7 +311,7 @@ export const actions = {
         const baseData = (await this.$api.public.sharedBaseGet(this.$router.currentRoute.params.shared_base_id)).data// await this.dispatch('sqlMgr/ActSqlOp', [null, 'sharedBaseGet', {shared_base_id: this.$router.currentRoute.params.shared_base_id}]); // unsearialized data
         commit('MutProjectId', projectId = baseData.project_id)
         // data = await this.dispatch('sqlMgr/ActSqlOp', [{project_id: baseData.project_id}, 'PROJECT_READ_BY_WEB']); // unsearialized data
-        // await dispatch('users/ActGetBaseUserDetails', this.$router.currentRoute.params.shared_base_id, {root: true});
+        await dispatch('users/ActGetBaseUserDetails', this.$router.currentRoute.params.shared_base_id, {root: true});
       } else {
         commit('MutProjectId', null)
         return
