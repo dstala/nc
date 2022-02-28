@@ -33,5 +33,6 @@ export enum MetaTable {
 }
 
 export enum CacheScope {
-  BASES = 'Bases'
+  BASE = 'base',
+  MODEL = 'model'
 }
