@@ -1,12 +1,12 @@
 import CacheMgr from './CacheMgr';
-import { createClient, RedisClientType } from 'redis';
+import Redis from 'ioredis';
 
 export default class RedisCacheMgr extends CacheMgr {
-  client: RedisClientType<any, any>;
+  client: any;
 
   constructor(config: any) {
     super();
-    this.client = createClient(config);
+    this.client = new Redis(config);
   }
 
   async clear(): Promise<any> {
@@ -15,22 +15,22 @@ export default class RedisCacheMgr extends CacheMgr {
 
   // @ts-ignore
   async del(key: string): Promise<any> {
-    return Promise.resolve(undefined);
+    return this.client.del(key);
   }
 
   // @ts-ignore
   async get(key: string, config?: any): Promise<any> {
-    return Promise.resolve(undefined);
+    return this.client.get(key);
   }
 
   // @ts-ignore
   async set(key: string, value: any, config?: any): Promise<any> {
-    return Promise.resolve(undefined);
+    return this.client.set(key, value);
   }
 
   // @ts-ignore
   async getAll(pattern: string): Promise<any> {
-    return Promise.resolve(undefined);
+    return this.client.hgetall(pattern);
   }
 
   // @ts-ignore
@@ -41,14 +41,5 @@ export default class RedisCacheMgr extends CacheMgr {
   // @ts-ignore
   delAll(pattern: string): Promise<any[]> {
     return Promise.resolve([]);
-  }
-
-  setv2(
-    _key: string,
-    _secondaryKey: string,
-    _value: any,
-    _config?: any
-  ): Promise<any> {
-    return Promise.resolve(undefined);
   }
 }
