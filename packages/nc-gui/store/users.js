@@ -49,12 +49,8 @@ export const getters = {
     return state.paidUser
   },
 
-  GtrIsAuthenticated(state, getters, rootState) {
-    return rootState.project.projectInfo &&
-      (rootState.project.projectInfo.authType === 'none' ||
-        (rootState.project.projectInfo.authType === 'jwt' && state.user) ||
-        (rootState.project.projectInfo.authType === 'masterKey' && state.masterKey)
-      )
+  GtrIsAuthenticated(state) {
+    return state.user
   },
 
   GtrIsAdmin(state) {
