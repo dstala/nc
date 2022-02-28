@@ -1,7 +1,7 @@
 import CacheMgr from './CacheMgr';
 import RedisCacheMgr from './RedisCacheMgr';
-import MemCacheMgr from './MemCacheMgr';
-import DummyCacheMgr from './DummyCacheMgr';
+// import MemCacheMgr from './MemCacheMgr';
+// import DummyCacheMgr from './DummyCacheMgr';
 
 export default class NocoCache {
   private static client: CacheMgr;
@@ -11,7 +11,7 @@ export default class NocoCache {
 
   public static init(config: { driver: 'redis' | 'memory' }) {
     if (process.env.NC_DISABLE_CACHE) {
-      this.client = new DummyCacheMgr();
+      // this.client = new DummyCacheMgr();
       return;
     }
 
@@ -19,9 +19,9 @@ export default class NocoCache {
       case 'redis':
         this.client = new RedisCacheMgr({});
         break;
-      case 'memory':
-        this.client = new MemCacheMgr({});
-        break;
+      // case 'memory':
+      //   this.client = new MemCacheMgr({});
+      //   break;
     }
   }
 
@@ -38,8 +38,8 @@ export default class NocoCache {
   //   return this.client.set(secondaryKey, arr);
   // }
 
-  public static async get(key): Promise<any> {
-    return this.client.get(key);
+  public static async get(key, type): Promise<any> {
+    return this.client.get(key, type);
   }
 
   // TODO: remove it later
@@ -80,5 +80,20 @@ export default class NocoCache {
 
   public static async clear(): Promise<boolean> {
     return this.client.clear();
+  }
+
+  public static async getList(
+    scope: string,
+    subKeys: string[]
+  ): Promise<any[]> {
+    return this.client.getList(scope, subKeys);
+  }
+
+  public static async setList(
+    scope: string,
+    subListKeys: string[],
+    list: any[],
+  ): Promise<boolean> {
+    return this.client.setList(scope, subListKeys, list);
   }
 }
