@@ -292,7 +292,7 @@ export default class Column implements ColumnType {
     },
     ncMeta = Noco.ncMeta
   ): Promise<Column[]> {
-    let columnsList = null; // await NocoCache.getv2(fk_model_id);
+    let columnsList = null; // // await NocoCache.getv2(fk_model_id);
     if (!columnsList?.length) {
       columnsList = await ncMeta.metaList2(null, null, MetaTable.COLUMNS, {
         condition: {
@@ -302,9 +302,9 @@ export default class Column implements ColumnType {
           order: 'asc'
         }
       });
-      for (const column of columnsList) {
+      // for (const column of columnsList) {
         // await NocoCache.setv2(column?.id, fk_model_id, column);
-      }
+      // }
     }
     return Promise.all(
       columnsList.map(async m => {

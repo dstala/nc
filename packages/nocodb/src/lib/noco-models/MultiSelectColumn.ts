@@ -18,7 +18,7 @@ export default class MultiSelectColumn {
   }
 
   public static async read(columnId: string) {
-    let options = await NocoCache.getv2(columnId);
+    let options; // await NocoCache.getv2(columnId);
 
     if (!options.length) {
       options = await Noco.ncMeta.metaList2(

@@ -2,7 +2,7 @@ import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
 import Column from './Column';
 import Model from './Model';
-import NocoCache from '../noco-cache/NocoCache';
+// import NocoCache from '../noco-cache/NocoCache';
 import { MetaTable } from '../utils/globals';
 
 export default class LinkToAnotherRecordColumn {
@@ -74,7 +74,8 @@ export default class LinkToAnotherRecordColumn {
   }
 
   public static async read(columnId: string) {
-    let colData = (await NocoCache.getv2(columnId))?.[0];
+    let colData;
+    // let colData = await NocoCache.getv2(columnId))?.[0];
     if (!colData) {
       colData = await Noco.ncMeta.metaGet2(
         null, //,

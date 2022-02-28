@@ -131,7 +131,7 @@ export default class Model implements TableType {
     project_id: string;
     base_id: string;
   }): Promise<Model[]> {
-    let modelList = []; //await NocoCache.getv2(project_id);
+    let modelList = []; //// await NocoCache.getv2(project_id);
     if (!modelList.length) {
       modelList = await Noco.ncMeta.metaList2(
         project_id,
@@ -144,9 +144,9 @@ export default class Model implements TableType {
         }
       );
 
-      for (const model of modelList) {
+      // for (const model of modelList) {
         // await NocoCache.setv2(model.id, project_id, model);
-      }
+      // }
     }
 
     return modelList.map(m => new Model(m));
@@ -159,7 +159,7 @@ export default class Model implements TableType {
     project_id: string;
     db_alias: string;
   }): Promise<Model[]> {
-    let modelList = await NocoCache.getv2(project_id);
+    let modelList; // await NocoCache.getv2(project_id);
     if (!modelList.length) {
       modelList = await Noco.ncMeta.metaList2(
         project_id,
