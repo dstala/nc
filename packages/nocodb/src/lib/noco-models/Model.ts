@@ -14,7 +14,7 @@ import {
   ViewTypes
 } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
-import { MetaTable } from '../utils/globals';
+import { CacheScope, MetaTable } from '../utils/globals';
 import View from './View';
 import { NcError } from '../noco/meta/api/helpers/catchError';
 
@@ -142,7 +142,10 @@ export default class Model implements TableType {
     },
     ncMeta = Noco.ncMeta
   ): Promise<Model[]> {
-    let modelList = []; //await NocoCache.getv2(project_id);
+    let modelList = await NocoCache.getList(CacheScope.MODEL, [
+      project_id,
+      base_id
+    ]);
     if (!modelList.length) {
       modelList = await ncMeta.metaList2(
         project_id,
@@ -155,11 +158,12 @@ export default class Model implements TableType {
         }
       );
 
-      for (const model of modelList) {
-        // await NocoCache.setv2(model.id, project_id, model);
-      }
+      await NocoCache.setList(
+        CacheScope.MODEL,
+        [project_id, base_id],
+        modelList
+      );
     }
-
     return modelList.map(m => new Model(m));
   }
 
@@ -213,7 +217,7 @@ export default class Model implements TableType {
         MetaTable.MODELS,
         'id' in args ? args?.id : args
       );
-      await NocoCache.setv2(modelData.id, modelData?.base_id, modelData);
+      // await NocoCache.setv2(modelData.id, modelData?.base_id, modelData);
       // if (
       //   this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
       //     modelData.title
@@ -256,7 +260,7 @@ export default class Model implements TableType {
           tn
         }
       );
-      await NocoCache.setv2(id, modelData?.base_id, modelData);
+      // await NocoCache.setv2(id, modelData?.base_id, modelData);
       // modelData.filters = await Filter.getFilterObject({
       //   viewId: modelData.id
       // });
