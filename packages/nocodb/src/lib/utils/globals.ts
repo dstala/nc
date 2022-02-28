@@ -30,3 +30,7 @@ export enum MetaTable {
   HOOKS = 'nc_hooks_v2',
   PLUGIN = 'nc_plugins_v2'
 }
+
+export enum CacheScope {
+  BASES = 'Bases'
+}
