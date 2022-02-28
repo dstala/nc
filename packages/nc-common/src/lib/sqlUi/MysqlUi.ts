@@ -41,7 +41,7 @@ const dbTypes = [
 ];
 
 export class MysqlUi {
-  static getNewTableColumns(): any[] {
+  static getNewTableColumns(): readonly any[] {
     return [
       {
         cn: 'id',

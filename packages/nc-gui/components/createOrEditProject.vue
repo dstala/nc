@@ -1998,17 +1998,19 @@ export default {
               },
               client: db.client
             }
+            //
+            // // const result = await this.sqlMgr.testConnection(c1);
+            // const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [
+            //   {
+            //     query: {
+            //       skipProjectHasDb: 1
+            //     }
+            //   },
+            //   'testConnection',
+            //   c1
+            // ])
 
-            // const result = await this.sqlMgr.testConnection(c1);
-            const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-              {
-                query: {
-                  skipProjectHasDb: 1
-                }
-              },
-              'testConnection',
-              c1
-            ])
+            const result = (await this.$api.meta.testConnection(c1)).data
 
             console.log('test connection result', result)
             if (result.code === 0) {

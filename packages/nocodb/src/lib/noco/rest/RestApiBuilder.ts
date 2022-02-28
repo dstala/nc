@@ -600,7 +600,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               ...column
             });
           }
-          this.models2[table.tn] = await Model.get({
+          this.models2[table.tn] = await Model.getByIdOrName({
             tn: table.tn
           });
           virtualColumnsInsert.push(async () => {

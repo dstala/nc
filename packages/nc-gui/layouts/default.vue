@@ -712,18 +712,18 @@ export default {
       toggleTreeviewWindow: 'windows/MutToggleTreeviewWindow'
     }),
     async loadProjectInfo() {
-      if (this.$route.params.project_id) {
-        try {
-          const { info } = (await this.$axios.get(`/nc/${this.$route.params.project_id}/projectApiInfo`, {
-            headers: {
-              'xc-auth': this.$store.state.users.token
-            }
-          })).data
-          const obj = Object.values(info).find(v => v.apiType === 'rest' ? v.swaggerUrl : v.gqlApiUrl)
-          this.swaggerOrGraphiqlUrl = obj.apiType === 'rest' ? obj.swaggerUrl : obj.gqlApiUrl
-        } catch (e) {
-        }
-      }
+      // if (this.$route.params.project_id) {
+      //   try {
+      //     const { info } = (await this.$axios.get(`/nc/${this.$route.params.project_id}/projectApiInfo`, {
+      //       headers: {
+      //         'xc-auth': this.$store.state.users.token
+      //       }
+      //     })).data
+      //     const obj = Object.values(info).find(v => v.apiType === 'rest' ? v.swaggerUrl : v.gqlApiUrl)
+      //     this.swaggerOrGraphiqlUrl = obj.apiType === 'rest' ? obj.swaggerUrl : obj.gqlApiUrl
+      //   } catch (e) {
+      //   }
+      // }
     },
     setPreviewUSer(previewAs) {
       this.previewAs = previewAs

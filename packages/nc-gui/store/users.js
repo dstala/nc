@@ -64,6 +64,7 @@ export const getters = {
   },
 
   GtrIsUIAllowed(state) {
+    // eslint-disable-next-line no-unused-vars
     const rolePermissions = process.env.EE ? rolePermissionsEE : rolePermissionsCE
     return (page, ignorePreviewAs = false) => {
       const user = state.user
@@ -164,7 +165,7 @@ export const actions = {
       console.log('Poll section : ')
       if (getters.GtrUser) {
         try {
-          const res = await this.$axios.get('/user/me')
+          const res = await this.$api.auth.me() // this.$axios.get('/user/me')
           if (res.data === null || !res.data.email) {
             console.log('Setting user to null : no session available')
             commit('MutSetUser', null)
@@ -237,9 +238,10 @@ export const actions = {
       if (!data.ignore_subscribe) {
         delete data.ignore_subscribe
       }
-      const userPromise = await this.$axios.post('/auth/signup?tool=1', data)
-      // console.log(userPromise);
-      commit('MutSetToken', userPromise.data.token)
+      // const userRes = await this.$axios.post('/auth/signup?tool=1', data)
+      const userRes = await this.$api.auth.signup(data)
+      // console.log(userRes);
+      commit('MutSetToken', userRes.data.token)
       // await dispatch('ActGetUserUiAbility')
       await dispatch('ActGetUserDetails')
     } catch (e) {
@@ -254,7 +256,8 @@ export const actions = {
     // console.log('in action signin');
     let err = null
     try {
-      const userPromise = await this.$axios.post('/auth/signin?tool=1', data)
+      // const userPromise = await this.$axios.post('/auth/signin?tool=1', data)
+      const userPromise = await this.$api.auth.signin(data)
       // console.log(userPromise);
       commit('MutSetToken', userPromise.data.token)
       // await dispatch('ActGetUserUiAbility')
@@ -356,7 +359,7 @@ export const actions = {
 
   async ActGetUserDetails({ commit, state }) {
     try {
-      const user = await this.$axios.get('/user/me', {
+      const user = await this.$api.auth.me({ // await this.$axios.get('/user/me', {
         headers: {
           'xc-auth': state.token
         }
@@ -369,7 +372,7 @@ export const actions = {
 
   async ActGetProjectUserDetails({ commit, state }, projectId) {
     try {
-      const user = await this.$axios.get('/user/me?project_id=' + projectId, {
+      const user = await this.$api.auth.me({ // '/user/me?project_id=' + projectId, {
         headers: {
           'xc-auth': state.token
         }
@@ -382,7 +385,7 @@ export const actions = {
   async ActGetBaseUserDetails({ commit, state }, sharedBaseId) {
     try {
       try {
-        const user = await this.$axios.get('/user/me', {
+        const user = await this.$api.auth.me({ // '/user/me', {
           headers: {
             'xc-shared-base-id': sharedBaseId
           }
@@ -472,7 +475,7 @@ export const actions = {
     // console.log('in action signout');
   },
   async ActGetAuthType({ commit }) {
-    const { type, firstUser } = (await this.$axios.get('/auth/type')).data
+    const { type, firstUser } = (await this.$api.meta.appInfo()).data// (await this.$axios.get('/auth/type')).data
     commit('MutAuthType', type)
     return { type, firstUser }
   },

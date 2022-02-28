@@ -19,18 +19,25 @@ import auditApis from './auditApis';
 import hookApis from './hookApis';
 import pluginApis from './pluginApis';
 import gridViewColumnApis from './gridViewColumnApis';
+import { initJwtStrategy, userApis } from './userApi';
+// import extractProjectIdAndAuthenticate from './helpers/extractProjectIdAndAuthenticate';
+import utilApis from './utilApis';
+import projectUserApis from './projectUserApis';
 
 export default function(router: Router) {
-  router.use('/projects', projectApis);
+  initJwtStrategy(router);
+  projectApis(router);
+  utilApis(router);
+
   router.use('/tables/:tableId/columns', columnApis);
   router.use('/data/:viewId', dataApis);
-  router.use('/views/:viewId/sorts', sortApis);
-  router.use('/views/:viewId/filters', filterApis);
-  router.use('/views/:viewId/columns', viewColumnApis);
+  router.use(sortApis);
+  router.use(filterApis);
+  router.use(viewColumnApis);
   router.use('/tables/:tableId/grids', gridViewApis);
   router.use('/formColumns', formViewColumnApis);
-  router.use('/public/data/:uuid', publicDataApis);
-  router.use('/public/meta/:uuid', publicMetaApis);
+  router.use('/public/data/:publicDataUuid', publicDataApis);
+  router.use('/public/meta/:publicDataUuid', publicMetaApis);
 
   router.use(gridViewColumnApis);
   router.use(tableApis);
@@ -42,4 +49,6 @@ export default function(router: Router) {
   router.use(auditApis);
   router.use(hookApis);
   router.use(pluginApis);
+  router.use(projectUserApis);
+  userApis(router);
 }

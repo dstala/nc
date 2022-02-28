@@ -12,8 +12,8 @@
 export interface UserType {
   /** Unique identifier for the given user. */
   id: number;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
 
   /** @format email */
   email: string;
@@ -22,10 +22,10 @@ export interface UserType {
    * @format date
    * @example 1997-10-31
    */
-  dateOfBirth?: string;
+  date_of_birth?: string;
 
   /** Set to true if the user's email has been verified. */
-  emailVerified: boolean;
+  email_verified: boolean;
 
   /**
    * The date that the user was created.
@@ -168,6 +168,10 @@ export interface FilterType {
   value?: string | number | number | boolean | null;
   is_group?: boolean;
   children?: FilterType[];
+  project_id?: string;
+  base_id?: string;
+  fk_parent_id?: string;
+  fk_view_id?: string;
 }
 
 export interface FilterListType {
@@ -180,6 +184,8 @@ export interface SortType {
   fk_column_id?: string;
   direction?: string;
   order?: number;
+  project_id?: string;
+  base_id?: string;
 }
 
 export interface SortListType {
@@ -328,7 +334,7 @@ export interface GridColumnType {
   id?: string;
   label?: string;
   help?: string;
-  fk_col_id?: string;
+  fk_column_id?: string;
   fk_gallery_id?: string;
   width?: string;
 }
@@ -484,11 +490,6 @@ export interface PluginType {
   price?: string;
 }
 
-export interface UploadPayloadType {
-  files?: any;
-  json?: string;
-}
-
 export interface SigninPayloadType {
   email: string;
   password: string;
@@ -514,10 +515,19 @@ export interface TokenVerifyPayloadType {
   email?: string;
 }
 
+export type ProjectUserAddPayloadType = any;
+
+export type ProjectUserUpdatePayloadType = any;
+
 export interface ProjectListParamsType {
   page?: number;
   pageSize?: number;
   sort?: string;
+}
+
+export interface UploadPayloadType {
+  files?: any;
+  json?: string;
 }
 
 export interface TableListParamsType {
@@ -526,6 +536,10 @@ export interface TableListParamsType {
   sort?: string;
   projectId: string;
   baseId: string;
+}
+
+export interface TableUpdatePayloadType {
+  _tn?: string;
 }
 
 export interface ViewUpdatePayloadType {
@@ -619,6 +633,8 @@ export interface PluginTestPayloadType {
   input?: any;
   category?: string;
 }
+
+export type TestConnectionPayloadType = any;
 
 import axios, {
   AxiosInstance,
@@ -784,16 +800,35 @@ export class Api<
      * @name Signup
      * @summary Signup
      * @request POST:/auth/user/signup
-     * @response `200` `{ email: string, password: string }` OK
+     * @response `200` `{ token?: string }` OK
      */
     signup: (
       data: { email?: boolean; password?: string },
       params: RequestParams = {}
     ) =>
-      this.request<{ email: string; password: string }, any>({
+      this.request<{ token?: string }, any>({
         path: `/auth/user/signup`,
         method: 'POST',
         body: data,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags AUTH
+     * @name Signin
+     * @summary Signin
+     * @request POST:/auth/user/signin
+     * @response `200` `{ token?: string }` OK
+     */
+    signin: (data: SigninPayloadType, params: RequestParams = {}) =>
+      this.request<{ token?: string }, any>({
+        path: `/auth/user/signin`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),
@@ -812,24 +847,6 @@ export class Api<
         path: `/auth/user/me`,
         method: 'GET',
         format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags AUTH
-     * @name Signin
-     * @summary Signin
-     * @request POST:/auth/user/signin
-     * @response `200` `void` OK
-     */
-    signin: (data: SigninPayloadType, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/auth/user/signin`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
         ...params,
       }),
 
@@ -929,30 +946,115 @@ export class Api<
         method: 'POST',
         ...params,
       }),
-  };
-  meta = {
+
     /**
      * No description
      *
-     * @tags Meta
-     * @name Upload
-     * @summary Attachment
-     * @request POST:/projects/{projectId}/views/{viewId}/upload
+     * @tags AUTH
+     * @name ProjectUserList
+     * @summary Password Refresh
+     * @request GET:/projects/{projectId}/users
+     * @response `200` `{ users?: { list: (UserType)[], pageInfo: PaginatedType } }` OK
+     * @response `0` `(any)[]`
      */
-    upload: (
+    projectUserList: (projectId: string, params: RequestParams = {}) =>
+      this.request<
+        { users?: { list: UserType[]; pageInfo: PaginatedType } },
+        any[]
+      >({
+        path: `/projects/${projectId}/users`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+  };
+  projects = {
+    /**
+     * No description
+     *
+     * @name ProjectUserAdd
+     * @request POST:/projects/{projectId}/users
+     * @response `200` `any` OK
+     */
+    projectUserAdd: (
       projectId: string,
-      viewId: string,
-      data: UploadPayloadType,
+      data: ProjectUserAddPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/views/${viewId}/upload`,
+        path: `/projects/${projectId}/users`,
         method: 'POST',
         body: data,
-        type: ContentType.FormData,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
+    /**
+     * No description
+     *
+     * @name ProjectUserUpdate
+     * @request PUT:/projects/{projectId}/users - copy
+     * @response `200` `any` OK
+     */
+    projectUserUpdate: (
+      projectId: string,
+      data: ProjectUserUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/users - copy`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name ProjectUserRemove
+     * @request DELETE:/projects/{projectId}/users - copy
+     * @response `200` `any` OK
+     */
+    projectUserRemove: (projectId: string, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/users - copy`,
+        method: 'DELETE',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name ProjectUpdate
+     * @request PUT:/projects/{projectId}
+     * @response `200` `void` OK
+     */
+    projectUpdate: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}`,
+        method: 'PUT',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name ProjectReorder
+     * @request POST:/projects/{projectId}/reorder
+     * @response `200` `void` OK
+     */
+    projectReorder: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/reorder`,
+        method: 'POST',
+        ...params,
+      }),
+  };
+  meta = {
     /**
      * @description Read project details
      *
@@ -1006,6 +1108,43 @@ export class Api<
         path: `/projects/${projectId}`,
         method: 'GET',
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name ProjectsDelete
+     * @request DELETE:/projects/{projectId}
+     * @response `200` `void` OK
+     */
+    projectsDelete: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name Upload
+     * @summary Attachment
+     * @request POST:/projects/{projectId}/views/{viewId}/upload
+     */
+    upload: (
+      projectId: string,
+      viewId: string,
+      data: UploadPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/views/${viewId}/upload`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
         ...params,
       }),
 
@@ -1073,12 +1212,19 @@ export class Api<
      * @tags Meta
      * @name TableUpdate
      * @request PUT:/tables/{tableId}
-     * @response `200` `void` OK
+     * @response `200` `any` OK
      */
-    tableUpdate: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+    tableUpdate: (
+      tableId: string,
+      data: TableUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
         path: `/tables/${tableId}`,
         method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
@@ -1241,12 +1387,12 @@ export class Api<
      *
      * @tags Meta
      * @name FilterRead
-     * @request GET:/views/{viewId}/filters - copy
+     * @request GET:/views/{viewId}/filters
      * @response `200` `FilterListType`
      */
     filterRead: (viewId: string, params: RequestParams = {}) =>
       this.request<FilterListType, any>({
-        path: `/views/${viewId}/filters - copy`,
+        path: `/views/${viewId}/filters`,
         method: 'GET',
         ...params,
       }),
@@ -1256,7 +1402,7 @@ export class Api<
      *
      * @tags Meta
      * @name FilterCreate
-     * @request POST:/views/{viewId}/filters - copy
+     * @request POST:/views/{viewId}/filters
      * @response `200` `void` OK
      */
     filterCreate: (
@@ -1265,7 +1411,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/views/${viewId}/filters - copy`,
+        path: `/views/${viewId}/filters`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -1305,6 +1451,36 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name ViewShowAllColumn
+     * @request POST:/views/{viewId}/showAll
+     * @response `200` `void` OK
+     */
+    viewShowAllColumn: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/showAll`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name ViewHideAllColumn
+     * @request POST:/views/{viewId}/hideAll
+     * @response `200` `void` OK
+     */
+    viewHideAllColumn: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/hideAll`,
+        method: 'POST',
         ...params,
       }),
 
@@ -2291,47 +2467,41 @@ export class Api<
         format: 'json',
         ...params,
       }),
-  };
-  projects = {
-    /**
-     * No description
-     *
-     * @name PutProjectsCopy
-     * @request PUT:/projects/{projectId}
-     * @response `200` `void` OK
-     */
-    putProjectsCopy: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}`,
-        method: 'PUT',
-        ...params,
-      }),
 
     /**
      * No description
      *
-     * @name DeleteProjectsCopy
-     * @request DELETE:/projects/{projectId}
-     * @response `200` `void` OK
+     * @tags meta
+     * @name TestConnection
+     * @request POST:/testConnection
+     * @response `200` `{ code?: number, message?: string }` OK
      */
-    deleteProjectsCopy: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ProjectReorder
-     * @request POST:/projects/{projectId}/reorder
-     * @response `200` `void` OK
-     */
-    projectReorder: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/reorder`,
+    testConnection: (
+      data: TestConnectionPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<{ code?: number; message?: string }, any>({
+        path: `/testConnection`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name AppInfo
+     * @request GET:/appInfo
+     * @response `200` `any` OK
+     */
+    appInfo: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/appInfo`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
   };

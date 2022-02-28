@@ -2,6 +2,7 @@ import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
 import { FormType } from 'nc-common';
 import FormViewColumn from './FormViewColumn';
+import View from './View';
 
 export default class FormView implements FormType {
   show: boolean;
@@ -22,6 +23,9 @@ export default class FormView implements FormType {
   fk_view_id: string;
   columns?: FormViewColumn[];
 
+  project_id?: string;
+  base_id?: string;
+
   constructor(data: FormView) {
     Object.assign(this, data);
   }
@@ -35,13 +39,21 @@ export default class FormView implements FormType {
   }
 
   static async insert(view: Partial<FormView>) {
+    const insertObj = {
+      fk_view_id: view.fk_view_id,
+      project_id: view.project_id,
+      base_id: view.base_id
+    };
+    if (!(view.project_id && view.base_id)) {
+      const viewRef = await View.get(view.fk_view_id);
+      insertObj.project_id = viewRef.project_id;
+      insertObj.base_id = viewRef.base_id;
+    }
     await Noco.ncMeta.metaInsert2(
       null,
       null,
       MetaTable.FORM_VIEW,
-      {
-        fk_view_id: view.fk_view_id
-      },
+      insertObj,
       true
     );
 

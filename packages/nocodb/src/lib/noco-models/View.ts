@@ -33,13 +33,15 @@ export default class View implements ViewType {
 
   sorts: Sort[];
   filter: Filter;
+  project_id?: string;
+  base_id?: string;
 
   constructor(data: View) {
     Object.assign(this, data);
   }
 
   async getModel(): Promise<Model> {
-    return (this.model = await Model.get({ id: this.fk_model_id }));
+    return (this.model = await Model.getByIdOrName({ id: this.fk_model_id }));
   }
 
   async getModelWithInfo(): Promise<Model> {
@@ -136,6 +138,22 @@ export default class View implements ViewType {
           .first()
       )?.order || 0) + 1;
 
+    const insertObj = {
+      title: view.title,
+      show: true,
+      is_default: view.is_default,
+      order,
+      type: view.type,
+      fk_model_id: view.fk_model_id,
+      project_id: view.project_id,
+      base_id: view.base_id
+    };
+    if (!(view.project_id && view.base_id)) {
+      const model = await Model.getByIdOrName({ id: view.fk_model_id });
+      insertObj.project_id = model.project_id;
+      insertObj.base_id = model.base_id;
+    }
+
     const copyFormView =
       view.copy_from_id && (await View.get(view.copy_from_id));
 
@@ -143,14 +161,7 @@ export default class View implements ViewType {
       null,
       null,
       MetaTable.VIEWS,
-      {
-        title: view.title,
-        show: true,
-        is_default: view.is_default,
-        order,
-        type: view.type,
-        fk_model_id: view.fk_model_id
-      }
+      insertObj
     );
 
     switch (view.type) {
@@ -187,7 +198,7 @@ export default class View implements ViewType {
     }
 
     let columns: any[] = await (
-      await Model.get({ id: view.fk_model_id })
+      await Model.getByIdOrName({ id: view.fk_model_id })
     ).getColumns();
 
     if (copyFormView) {
@@ -212,19 +223,21 @@ export default class View implements ViewType {
     {
       let order = 1;
       for (const vCol of columns) {
-        let show = vCol.show;
-        const col = await Column.get({ colId: vCol.fk_col_id || vCol.id });
+        let show = 'show' in vCol ? vCol.show : true;
+        const col = await Column.get({ colId: vCol.fk_column_id || vCol.id });
         if (
-          col.uidt === UITypes.ForeignKey ||
-          col.cn === 'created_at' ||
-          col.cn === 'updated_at' ||
-          (col.pk && (col.ai || col.cdf))
+          col &&
+          (col.uidt === UITypes.ForeignKey ||
+            col.cn === 'created_at' ||
+            col.cn === 'updated_at' ||
+            (col.pk && (col.ai || col.cdf)))
         )
           show = false;
         await View.insertColumn({
-          view_id,
           order: order++,
           ...col,
+          view_id,
+          fk_column_id: vCol.fk_column_id || vCol.id,
           show
         });
       }
@@ -268,7 +281,12 @@ export default class View implements ViewType {
     }
   }
 
-  static async insertColumn(param: { view_id: any; order; show }) {
+  static async insertColumn(param: {
+    view_id: any;
+    order;
+    show;
+    fk_column_id;
+  }) {
     const view = await this.get(param.view_id);
 
     let col;
@@ -547,5 +565,32 @@ export default class View implements ViewType {
         break;
     }
     return table;
+  }
+
+  static async showAllColumns(viewId, ncMeta = Noco.ncMeta) {
+    const view = await this.get(viewId);
+    const table = this.extractViewColumnsTableName(view);
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      table,
+      { show: true },
+      {
+        fk_view_id: viewId
+      }
+    );
+  }
+  static async hideAllColumns(viewId, ncMeta = Noco.ncMeta) {
+    const view = await this.get(viewId);
+    const table = this.extractViewColumnsTableName(view);
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      table,
+      { show: false },
+      {
+        fk_view_id: viewId
+      }
+    );
   }
 }

@@ -6,6 +6,7 @@ import { PagedResponseImpl } from './helpers/PagedResponse';
 import { invokeWebhook } from './helpers/webhookHelpers';
 import Model from '../../../noco-models/Model';
 import populateSamplePayload from './helpers/populateSamplePayload';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function hookList(
   req: Request<any, any, any>,
@@ -48,7 +49,7 @@ export async function hookTest(
   req: Request<any, any, HookTestPayloadType>,
   res: Response
 ) {
-  const model = await Model.get({ id: req.params.modelId });
+  const model = await Model.getByIdOrName({ id: req.params.modelId });
 
   const {
     hook,
@@ -59,18 +60,18 @@ export async function hookTest(
   res.json({ msg: 'Success' });
 }
 export async function tableSampleData(req: Request, res: Response) {
-  const model = await Model.get({ id: req.params.tableId });
+  const model = await Model.getByIdOrName({ id: req.params.tableId });
 
   res // todo: pagination
     .json(await populateSamplePayload(model, true, req.params.operation));
 }
 
 const router = Router({ mergeParams: true });
-router.get('/tables/:modelId/hooks', catchError(hookList));
-router.post('/tables/:modelId/hooks/test', catchError(hookTest));
-router.post('/tables/:modelId/hooks', catchError(hookCreate));
-router.delete('/hooks/:hookId', catchError(hookDelete));
-router.put('/hooks/:hookId', catchError(hookUpdate));
+router.get('/tables/:modelId/hooks', ncMetaAclMw(hookList));
+router.post('/tables/:modelId/hooks/test', ncMetaAclMw(hookTest));
+router.post('/tables/:modelId/hooks', ncMetaAclMw(hookCreate));
+router.delete('/hooks/:hookId', ncMetaAclMw(hookDelete));
+router.put('/hooks/:hookId', ncMetaAclMw(hookUpdate));
 router.get(
   '/tables/:tableId/hooks/samplePayload/:operation',
   catchError(tableSampleData)

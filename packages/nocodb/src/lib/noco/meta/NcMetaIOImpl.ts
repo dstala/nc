@@ -739,10 +739,10 @@ export default class NcMetaIOImpl extends NcMetaIO {
     let prefix;
     switch (target) {
       case MetaTable.PROJECT:
-        prefix = 'bs_';
+        prefix = 'p_';
         break;
       case MetaTable.BASES:
-        prefix = 'bs_';
+        prefix = 'ds_';
         break;
       case MetaTable.MODELS:
         prefix = 'md_';

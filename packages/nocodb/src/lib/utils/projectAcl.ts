@@ -3,6 +3,20 @@ export default {
   creator: '*',
   guest: {},
   editor: {
+    // new permissions
+    // project
+    projectGet: true,
+    projectDelete: true,
+    projectCreate: false,
+    projectList: true,
+    //table
+    tableList: true,
+    tableCreate: false,
+    tableGet: true,
+    tableUpdate: false,
+    tableDelete: false
+
+    /* // old
     xcTableAndViewList: true,
     xcAuditCreate: true,
     xcAttachmentUpload: true,
@@ -10,9 +24,9 @@ export default {
     xcMetaTablesImportZipToLocalFsAndDb: false,
     // testConnection:true,
     projectCreateByWeb: false,
-    projectList: true,
+    // projectList: true,
     projectStop: false,
-    projectDelete: false,
+    // projectDelete: false,
     projectRestart: false,
     projectStart: false,
     tableXcHooksGet: false,
@@ -163,7 +177,7 @@ export default {
     xcModelRowAuditAndCommentList: true,
     xcAuditCommentInsert: true,
     xcAuditModelCommentsCount: true,
-    xcExportAsCsv: true
+    xcExportAsCsv: true*/
   },
   commenter: {
     xcTableAndViewList: true,
@@ -215,8 +229,10 @@ export default {
     projectList: true
   },
   user: {
-    handleAxiosCall: true,
+    projectCreate: true,
     projectList: true,
+
+    handleAxiosCall: true,
     testConnection: true,
     projectCreateByWeb: true,
     projectCreateByWebWithXCDB: true,
@@ -226,7 +242,9 @@ export default {
     projectRestart: false,
     projectStart: false,
     xcMetaTablesImportZipToLocalFsAndDb: true,
-    xcMetaTablesExportDbToZip: true
+    xcMetaTablesExportDbToZip: true,
+
+    auditRowUpdate: true
   }
 };
 

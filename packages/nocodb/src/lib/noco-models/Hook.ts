@@ -1,6 +1,7 @@
 import { HookType } from 'nc-common';
 import { MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
+import Model from './Model';
 
 export default class Hook implements HookType {
   id?: string;
@@ -21,6 +22,9 @@ export default class Hook implements HookType {
   retry_interval?: number;
   timeout?: number;
   active?: boolean;
+
+  project_id?: string;
+  base_id?: string;
 
   constructor(hook: Partial<Hook>) {
     Object.assign(this, hook);
@@ -70,7 +74,7 @@ export default class Hook implements HookType {
   }
 
   public static async insert(hook: Partial<Hook>) {
-    const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.HOOKS, {
+    const insertObj = {
       fk_model_id: hook.fk_model_id,
       title: hook.title,
       description: hook.description,
@@ -93,11 +97,27 @@ export default class Hook implements HookType {
       retries: hook.retries,
       retry_interval: hook.retry_interval,
       timeout: hook.timeout,
-      active: hook.active
-    });
+      active: hook.active,
+      project_id: hook.project_id,
+      base_id: hook.base_id
+    };
+
+    if (!(hook.project_id && hook.base_id)) {
+      const model = await Model.getByIdOrName({ id: hook.fk_model_id });
+      insertObj.project_id = model.project_id;
+      insertObj.base_id = model.base_id;
+    }
+
+    const { id } = await Noco.ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.HOOKS,
+      insertObj
+    );
 
     return this.get(id);
   }
+
   public static async update(hookId: string, hook: Partial<Hook>) {
     await Noco.ncMeta.metaUpdate(
       null,

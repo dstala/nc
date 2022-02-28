@@ -317,6 +317,7 @@
           >
             <rows-xc-data-table
               ref="tabs7"
+              :is-view="isView"
               :is-active="isActive"
               :tab-id="tabId"
               :show-tabs="relationTabs && relationTabs.length"
@@ -479,7 +480,8 @@ export default {
       loadConstraintList: false,
       loadRows: false,
       loadColumnsMock: false,
-      relationTabs: []
+      relationTabs: [],
+      deleteId: null
     }
   },
   methods: {
@@ -516,77 +518,87 @@ export default {
     mtdNewTableUpdate(value) {
       this.newTableCopy = value
     },
-    async deleteTable(action = '') {
+    async deleteTable(action = '', id) {
+      if (id) {
+        this.deleteId = id
+      }
       if (action === 'showDialog') {
         this.dialogShow = true
       } else if (action === 'hideDialog') {
         this.dialogShow = false
       } else {
-        let relationListAll = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'relationListAll'])
+        // todo : check relations and triggers
+        // let relationListAll = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'relationListAll'])
+        //
+        // relationListAll = relationListAll.data.list.filter(rel => rel.rtn === this.nodes.tn).map(({ tn }) => tn)
+        //
+        // if (relationListAll.length) {
+        //   this.$toast.info('Table can\'t be  deleted  since Table is being referred in following tables : ' + relationListAll.join(', ')).goAway(10000)
+        //   this.dialogShow = false
+        //   return
+        // }
+        //
+        // const triggerList = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'triggerList', {
+        //   tn: this.nodes.tn
+        // }])
+        //
+        // for (const trigger of triggerList.data.list) {
+        //   const result = await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
+        //     {
+        //       env: this.nodes.env,
+        //       dbAlias: this.nodes.dbAlias
+        //     },
+        //     'triggerDelete',
+        //     {
+        //       ...trigger,
+        //       tn: this.nodes.tn,
+        //       oldStatement: trigger.statement
+        //     }])
+        //
+        //   console.log('triggerDelete result ', result)
+        //
+        //   this.$toast.success('Trigger deleted successfully').goAway(1000)
+        // }
+        //
+        // let columns = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'columnList', {
+        //   tn: this.nodes.tn
+        // }])
+        //
+        // columns = columns.data.list
+        //
+        // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // },
+        // 'tableDelete',
+        // { tn: this.nodes.tn, columns }])
+        try {
+          await this.$api.meta.tableDelete(this.deleteId)
 
-        relationListAll = relationListAll.data.list.filter(rel => rel.rtn === this.nodes.tn).map(({ tn }) => tn)
+          this.removeTableTab({
+            env: this.nodes.env,
+            dbAlias: this.nodes.dbAlias,
+            tn: this.nodes.tn
+          })
 
-        if (relationListAll.length) {
-          this.$toast.info('Table can\'t be  deleted  since Table is being referred in following tables : ' + relationListAll.join(', ')).goAway(10000)
-          this.dialogShow = false
-          return
+          await this.loadTablesFromParentTreeNode({
+            _nodes: {
+              ...this.nodes
+            }
+          })
+        } catch (e) {
+          const msg = await this._extractSdkResponseErrorMsg(e)
+          this.$toast.error(msg).goAway(3000)
         }
-
-        const triggerList = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'triggerList', {
-          tn: this.nodes.tn
-        }])
-
-        for (const trigger of triggerList.data.list) {
-          const result = await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
-            {
-              env: this.nodes.env,
-              dbAlias: this.nodes.dbAlias
-            },
-            'triggerDelete',
-            {
-              ...trigger,
-              tn: this.nodes.tn,
-              oldStatement: trigger.statement
-            }])
-
-          console.log('triggerDelete result ', result)
-
-          this.$toast.success('Trigger deleted successfully').goAway(1000)
-        }
-
-        let columns = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'columnList', {
-          tn: this.nodes.tn
-        }])
-
-        columns = columns.data.list
-
-        await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        },
-        'tableDelete',
-        { tn: this.nodes.tn, columns }])
-
-        this.removeTableTab({
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias,
-          tn: this.nodes.tn
-        })
-
-        await this.loadTablesFromParentTreeNode({
-          _nodes: {
-            ...this.nodes
-          }
-        })
         this.dialogShow = false
       }
     },
@@ -641,7 +653,13 @@ export default {
   head() {
     return {}
   },
-  props: ['nodes', 'hideLogWindows', 'tabId', 'isActive']
+  props: {
+    nodes: Object,
+    hideLogWindows: Boolean,
+    tabId: String,
+    isActive: Boolean,
+    isView: Boolean
+  }
 }
 </script>
 

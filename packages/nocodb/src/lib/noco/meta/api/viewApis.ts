@@ -11,6 +11,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import catchError from './helpers/catchError';
 import View from '../../../noco-models/View';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // @ts-ignore
 export async function viewGet(req: Request, res: Response<Table>) {}
@@ -58,9 +59,17 @@ async function shareViewPasswordUpdate(req: Request<any, any>, res) {
 async function shareViewDelete(req: Request<any, any>, res) {
   res.json(await View.sharedViewDelete(req.params.viewId));
 }
+async function showAllColumns(req: Request<any, any>, res) {
+  res.json(await View.showAllColumns(req.params.viewId));
+}
+async function hideAllColumns(req: Request<any, any>, res) {
+  res.json(await View.hideAllColumns(req.params.viewId));
+}
 
-router.put('/views/:viewId/share', catchError(shareViewPasswordUpdate));
-router.delete('/views/:viewId/share', catchError(shareViewDelete));
-router.put('/views/:viewId', catchError(viewUpdate));
-router.delete('/views/:viewId', catchError(viewDelete));
+router.put('/views/:viewId/share', ncMetaAclMw(shareViewPasswordUpdate));
+router.delete('/views/:viewId/share', ncMetaAclMw(shareViewDelete));
+router.put('/views/:viewId', ncMetaAclMw(viewUpdate));
+router.delete('/views/:viewId', ncMetaAclMw(viewDelete));
+router.post('/views/:viewId/showAll', ncMetaAclMw(hideAllColumns));
+router.post('/views/:viewId/hideAll', ncMetaAclMw(showAllColumns));
 export default router;

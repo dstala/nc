@@ -182,7 +182,7 @@
                             icon-class="mt-n1"
                             color="primary"
                             small
-                            @click.prevent.stop="rensendInvite(item.id)"
+                            @click.prevent.stop="resendInvite(item.id)"
                           >
                             mdi-email-send-outline
                           </x-icon>
@@ -611,7 +611,7 @@ export default {
       document.execCommand('copy')
       document.body.removeChild(el)
     },
-    async rensendInvite(id) {
+    async resendInvite(id) {
       try {
         await this.$axios.post('/admin/resendInvite/' + id, {
           projectName: this.$store.getters['project/GtrProjectName']
@@ -632,19 +632,28 @@ export default {
     async loadUsers() {
       try {
         const { page = 1, itemsPerPage = 20 } = this.options
-        const data = (await this.$axios.get('/admin', {
-          headers: {
-            'xc-auth': this.$store.state.users.token
-          },
-          params: {
+        // const data = (await this.$axios.get('/admin', {
+        //   headers: {
+        //     'xc-auth': this.$store.state.users.token
+        //   },
+        //   params: {
+        //     limit: itemsPerPage,
+        //     offset: (page - 1) * itemsPerPage,
+        //     query: this.query,
+        //     project_id: this.$route.params.project_id
+        //   }
+        // })).data
+
+        const userData = (await this.$api.auth.projectUserList(this.$store.state.project.projectId, {
+          query: {
             limit: itemsPerPage,
             offset: (page - 1) * itemsPerPage,
-            query: this.query,
-            project_id: this.$route.params.project_id
+            query: this.query
           }
         })).data
-        this.count = data.count
-        this.users = data.list
+
+        this.count = userData.users.pageInfo.totalRows
+        this.users = userData.users.list
         if (!this.selectedUser && this.users && this.users[0]) {
           this.selectedUserIndex = 0
         }
@@ -654,17 +663,20 @@ export default {
     },
     async loadRoles() {
       try {
-        this.roles = (await this.$axios.get('/admin/roles', {
-          headers: {
-            'xc-auth': this.$store.state.users.token
-          },
-          params: {
-            project_id: this.$route.params.project_id
-          }
-        })).data.map((role) => {
-          this.roleDescriptions[role.title] = role.description
-          return role.title
-        }).filter(role => role !== 'guest')
+        this.roles = ['creator', 'editor', 'commenter']
+
+        // todo:
+        //   (await this.$axios.get('/admin/roles', {
+        //   headers: {
+        //     'xc-auth': this.$store.state.users.token
+        //   },
+        //   params: {
+        //     project_id: this.$route.params.project_id
+        //   }
+        // })).data.map((role) => {
+        //   this.roleDescriptions[role.title] = role.description
+        //   return role.title
+        // }).filter(role => role !== 'guest')
       } catch (e) {
         console.log(e)
       }

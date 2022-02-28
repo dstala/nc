@@ -272,6 +272,7 @@
               >
                 <template #activator="{ on }">
                   <v-list-item
+                    v-if="!isView"
                     dense
                     class="body-2 nc-create-form-view"
                     v-on="on"
@@ -529,6 +530,7 @@ export default {
   props: {
     extraViewParams: Object,
     showAdvanceOptions: Boolean,
+    isView: Boolean,
     hideViews: Boolean,
     primaryValueColumn: [Number, String],
     toggleDrawer: {
@@ -759,7 +761,7 @@ export default {
         //     password: this.shareLink.password
         //   }
         // ])
-          .this.$toast.success('Successfully updated').goAway(3000)
+        this.$toast.success('Successfully updated').goAway(3000)
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
@@ -899,7 +901,7 @@ export default {
       this.showShareModel = true
     },
     copyView(view, i) {
-      this.createViewType = view.show_as
+      this.createViewType = view.type
       this.showCreateView = true
       this.copyViewRef = view
     },

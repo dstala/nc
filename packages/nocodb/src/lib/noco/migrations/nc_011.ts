@@ -12,7 +12,7 @@ const up = async knex => {
     table.text('description');
     table.text('meta');
     table.string('color');
-    table.boolean('deleted');
+    table.boolean('deleted').defaultTo(false);
     table.boolean('is_meta');
     table.float('order');
     table.timestamps(true, true);
@@ -80,6 +80,11 @@ const up = async knex => {
       .primary()
       .notNullable();
 
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
     table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
 
@@ -124,10 +129,11 @@ const up = async knex => {
       .string('id', 20)
       .primary()
       .notNullable();
-
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
     table.string('project_id', 128);
-    table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
-    table.string('db_alias').defaultTo('db');
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
 
     table.string('fk_column_id',20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
@@ -287,6 +293,11 @@ const up = async knex => {
       .primary()
       .notNullable();
 
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
     table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
 
@@ -310,6 +321,11 @@ const up = async knex => {
       .primary()
       .notNullable();
 
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
     table.string('fk_view_id', 20);
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
     table.string('fk_column_id', 20);
@@ -332,6 +348,10 @@ const up = async knex => {
       .string('id', 20)
       .primary()
       .notNullable();
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
     table.string('fk_view_id', 20);
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
@@ -392,6 +412,10 @@ const up = async knex => {
     //   .string('id', 20)
     //   .primary()
     //   .notNullable();
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
     table.string('fk_view_id', 20).primary();
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
@@ -417,6 +441,11 @@ const up = async knex => {
       .primary()
       .notNullable();
 
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
     table.string('fk_view_id', 20);
     table.foreign('fk_view_id').references(`${MetaTable.FORM_VIEW}.fk_view_id`);
     table.string('fk_column_id', 20);
@@ -441,6 +470,11 @@ const up = async knex => {
     //   .string('id', 20)
     //   .primary()
     //   .notNullable();
+
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
     table.string('fk_view_id', 20).primary();
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
@@ -470,6 +504,11 @@ const up = async knex => {
       .primary()
       .notNullable();
 
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
     table.string('fk_view_id', 20);
     table
       .foreign('fk_view_id')
@@ -498,6 +537,11 @@ const up = async knex => {
     table.string('fk_view_id', 20).primary();
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
 
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
     table.string('uuid');
     table.string('tn');
     table.string('_tn');
@@ -518,6 +562,11 @@ const up = async knex => {
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
 
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
     table.string('uuid');
 
     // todo:  type
@@ -534,6 +583,11 @@ const up = async knex => {
   await knex.schema.createTable(MetaTable.KANBAN_VIEW, table => {
     table.string('fk_view_id', 20).primary();
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
+
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
     table.boolean('show');
     table.float('order');
@@ -556,6 +610,11 @@ const up = async knex => {
       .string('id', 20)
       .primary()
       .notNullable();
+
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
     table.string('fk_view_id', 20);
     table
@@ -595,6 +654,16 @@ const up = async knex => {
     table.boolean('email_verified');
     table.string('roles', 255).defaultTo('editor');
     table.timestamps(true, true);
+  });
+
+  await knex.schema.createTable(MetaTable.PROJECT_USERS, table => {
+    table.string('project_id', 128);
+    table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+    table.string('fk_user_id', 20);
+    table.foreign('fk_user_id').references(`${MetaTable.USERS}.id`);
+    // todo
+    table.text('roles');
+    table.timestamps();
   });
 
   await knex.schema.createTable(MetaTable.ORGS, table => {
@@ -662,6 +731,11 @@ const up = async knex => {
       .string('id', 20)
       .primary()
       .notNullable();
+
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
     table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);

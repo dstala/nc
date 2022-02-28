@@ -49,7 +49,23 @@ export default class Project implements ProjectType {
     const projectList = await Noco.ncMeta.metaList2(
       null,
       null,
-      MetaTable.PROJECT
+      MetaTable.PROJECT,
+      {
+        xcCondition: {
+          _or: [
+            {
+              deleted: {
+                eq: false
+              }
+            },
+            {
+              deleted: {
+                eq: null
+              }
+            }
+          ]
+        }
+      }
     );
 
     return projectList.map(m => new Project(m));
@@ -86,6 +102,25 @@ export default class Project implements ProjectType {
       return project;
     }
     return null;
+  }
+
+  // @ts-ignore
+  static async softDelete(projectId: string): Promise<any> {
+    return await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.PROJECT,
+      { deleted: true },
+      projectId
+    );
+  }
+
+  static async delete(projectId, ncMeta = Noco.ncMeta): Promise<any> {
+    const bases = await Base.list({ projectId });
+    for (const base of bases) {
+      await base.delete(ncMeta);
+    }
+    return await ncMeta.metaDelete(null, null, MetaTable.PROJECT, projectId);
   }
 }
 

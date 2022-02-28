@@ -4,15 +4,17 @@ import { PagedResponseImpl } from './helpers/PagedResponse';
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
+  ModelTypes,
   TableListParamsType,
   TableListType,
   TableReqType,
-  TableType
+  TableType,
+  TableUpdatePayloadType
 } from 'nc-common';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';
-import catchError from './helpers/catchError';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
@@ -80,8 +82,13 @@ export async function tableCreate(
   }
 }
 
-export async function tableUpdate(req, res) {
+export async function tableUpdate(
+  req: Request<any, any, TableUpdatePayloadType>,
+  res
+) {
   console.log(req.params);
+
+  await Model.updateAlias(req.params.tableId, req.body._tn);
 
   res.json({ msg: 'success' });
 }
@@ -89,20 +96,26 @@ export async function tableUpdate(req, res) {
 export async function tableDelete(req: Request, res: Response, next) {
   try {
     console.log(req.params);
-    const table = await Model.get({ id: req.params.tableId });
+    const table = await Model.getByIdOrName({ id: req.params.tableId });
 
     const project = await Project.getWithInfo(table.project_id);
     const base = project.bases.find(b => b.id === table.base_id);
     const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
 
-    await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
+    if (table.type === ModelTypes.TABLE)
+      await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
+    else if (table.type === ModelTypes.VIEW)
+      await sqlMgr.sqlOpPlus(base, 'viewDelete', {
+        ...table,
+        view_name: table.tn
+      });
 
     Audit.insert({
       project_id: project.id,
       op_type: AuditOperationTypes.TABLE,
       op_sub_type: AuditOperationSubTypes.DELETED,
       user: (req as any)?.user?.email,
-      description: `Deleted table ${table.tn} with alias ${table._tn}  `,
+      description: `Deleted ${table.type} ${table.tn} with alias ${table._tn}  `,
       ip: (req as any).clientIp
     }).then(() => {});
 
@@ -114,9 +127,9 @@ export async function tableDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/projects/:projectId/:baseId/tables', catchError(tableList));
-router.post('/projects/:projectId/:baseId/tables', catchError(tableCreate));
-router.get('/tables/:tableId', catchError(tableGet));
-router.put('/tables/:tableId', catchError(tableUpdate));
-router.delete('/tables/:tableId', catchError(tableDelete));
+router.get('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableList));
+router.post('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableCreate));
+router.get('/tables/:tableId', ncMetaAclMw(tableGet));
+router.put('/tables/:tableId', ncMetaAclMw(tableUpdate));
+router.delete('/tables/:tableId', ncMetaAclMw(tableDelete));
 export default router;

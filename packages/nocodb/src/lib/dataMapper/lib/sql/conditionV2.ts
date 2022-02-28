@@ -69,7 +69,7 @@ const parseConditionV2 = async (
     };
   } else {
     const column = await filter.getColumn();
-
+    if (!column) return () => {};
     if (column.uidt === UITypes.LinkToAnotherRecord) {
       const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
       const childColumn = await colOptions.getChildColumn();

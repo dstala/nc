@@ -5,14 +5,14 @@ import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import View from '../../../noco-models/View';
-import catchError from './helpers/catchError';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function dataList(req: Request, res: Response, next) {
   try {
     console.time('Model.get');
     const view = await View.get(req.params.viewId);
 
-    const model = await Model.get({
+    const model = await Model.getByIdOrName({
       id: view?.fk_model_id || req.params.viewId
     });
 
@@ -20,6 +20,7 @@ export async function dataList(req: Request, res: Response, next) {
 
     console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
+
     console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
@@ -72,7 +73,7 @@ export async function mmList(req: Request, res: Response, next) {
   console.time('Model.get');
   const view = await View.get(req.params.viewId);
 
-  const model = await Model.get({
+  const model = await Model.getByIdOrName({
     id: view?.fk_model_id || req.params.viewId
   });
 
@@ -136,7 +137,7 @@ export async function mmList(req: Request, res: Response, next) {
 
 async function dataRead(req: Request, res: Response, next) {
   try {
-    const model = await Model.get({
+    const model = await Model.getByIdOrName({
       id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
@@ -175,7 +176,7 @@ async function dataRead(req: Request, res: Response, next) {
 
 async function dataInsert(req: Request, res: Response, next) {
   try {
-    const model = await Model.get({
+    const model = await Model.getByIdOrName({
       id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
@@ -198,7 +199,7 @@ async function dataInsert(req: Request, res: Response, next) {
 
 async function dataUpdate(req: Request, res: Response, next) {
   try {
-    const model = await Model.get({
+    const model = await Model.getByIdOrName({
       id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
@@ -221,7 +222,7 @@ async function dataUpdate(req: Request, res: Response, next) {
 
 async function dataDelete(req: Request, res: Response, next) {
   try {
-    const model = await Model.get({
+    const model = await Model.getByIdOrName({
       id: req.params.viewId
     });
     if (!model) return next(new Error('Table not found'));
@@ -243,10 +244,10 @@ async function dataDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', dataList);
-router.post('/', dataInsert);
-router.get('/:rowId', dataRead);
-router.put('/:rowId', dataUpdate);
-router.delete('/:rowId', dataDelete);
-router.get('/:rowId/mm/:colId', catchError(mmList));
+router.get('/', ncMetaAclMw(dataList));
+router.post('/', ncMetaAclMw(dataInsert));
+router.get('/:rowId', ncMetaAclMw(dataRead));
+router.put('/:rowId', ncMetaAclMw(dataUpdate));
+router.delete('/:rowId', ncMetaAclMw(dataDelete));
+router.get('/:rowId/mm/:colId', ncMetaAclMw(mmList));
 export default router;

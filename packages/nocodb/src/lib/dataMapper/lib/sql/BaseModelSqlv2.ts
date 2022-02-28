@@ -421,7 +421,7 @@ class BaseModelSqlv2 {
       );
     }
 
-    qb.count(this.model.primaryKey.cn, {
+    qb.count(this.model.primaryKey?.cn || '*', {
       as: 'count'
     }).first();
 

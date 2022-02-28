@@ -9,6 +9,8 @@ export default class Sort {
   fk_view_id: string;
   fk_column_id?: string;
   direction?: 'asc' | 'desc';
+  project_id?: string;
+  base_id?: string;
 
   constructor(data: Sort | SortObject) {
     Object.assign(this, data);
@@ -20,12 +22,26 @@ export default class Sort {
     });
   }
 
-  public static async insert(model: Partial<SortObject>, ncMeta = Noco.ncMeta) {
-    const { id } = await ncMeta.metaInsert2(null, null, MetaTable.SORT, {
-      fk_view_id: model.fk_view_id,
-      fk_column_id: model.fk_column_id,
-      direction: model.direction
-    });
+  public static async insert(sortObj: Partial<Sort>, ncMeta = Noco.ncMeta) {
+    const insertObj = {
+      fk_view_id: sortObj.fk_view_id,
+      fk_column_id: sortObj.fk_column_id,
+      direction: sortObj.direction,
+      project_id: sortObj.project_id,
+      base_id: sortObj.base_id
+    };
+    if (!(sortObj.project_id && sortObj.base_id)) {
+      const model = await Column.get({ colId: sortObj.fk_column_id });
+      insertObj.project_id = model.project_id;
+      insertObj.base_id = model.base_id;
+    }
+
+    const { id } = await ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.SORT,
+      insertObj
+    );
 
     return this.get(id, ncMeta);
   }
@@ -71,7 +87,7 @@ export default class Sort {
   }
 
   public async getModel(ncMeta = Noco.ncMeta): Promise<Model> {
-    return Model.get(
+    return Model.getByIdOrName(
       {
         id: this.fk_view_id
       },

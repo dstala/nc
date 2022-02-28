@@ -2,9 +2,9 @@ import Noco from '../../lib/noco/Noco';
 import Model from './Model';
 import Column from './Column';
 import UITypes from '../sqlUi/UITypes';
-import LinkToAnotherRecordColumn from './LinkToAnotherRecordColumn';
 import { MetaTable } from '../utils/globals';
 import View from './View';
+import { FilterType } from 'nc-common';
 
 export default class Filter {
   id: string;
@@ -20,38 +20,51 @@ export default class Filter {
   logical_op?: string;
   is_group?: boolean;
   children?: Filter[];
+  project_id?: string;
+  base_id?: string;
+  column?: Column;
 
-  constructor(data: Filter | FilterObject) {
+  constructor(data: Filter | FilterType) {
     Object.assign(this, data);
   }
 
   public async getModel(): Promise<Model> {
     return this.fk_view_id
       ? (await View.get(this.fk_view_id)).getModel()
-      : Model.get({
+      : Model.getByIdOrName({
           id: this.fk_model_id
         });
   }
 
-  public static async insert(model: Partial<FilterObject>) {
+  public static async insert(filter: Partial<FilterType>) {
+    const insertObj = {
+      fk_view_id: filter.fk_view_id,
+      fk_column_id: filter.fk_column_id,
+      comparison_op: filter.comparison_op,
+      value: filter.value,
+      fk_parent_id: filter.fk_parent_id,
+
+      is_group: filter.is_group,
+      logical_op: filter.logical_op,
+
+      project_id: filter.project_id,
+      base_id: filter.base_id
+    };
+    if (!(filter.project_id && filter.base_id)) {
+      const model = await Column.get({ colId: filter.fk_column_id });
+      insertObj.project_id = model.project_id;
+      insertObj.base_id = model.base_id;
+    }
+
     const row = await Noco.ncMeta.metaInsert2(
       null,
       null,
       MetaTable.FILTER_EXP,
-      {
-        fk_view_id: model.fk_view_id,
-        fk_column_id: model.fk_column_id,
-        comparison_op: model.comparison_op,
-        value: model.value,
-        fk_parent_id: model.fk_parent_id,
-
-        is_group: model.is_group,
-        logical_op: model.logical_op
-      }
+      insertObj
     );
-    if (model?.children?.length) {
+    if (filter?.children?.length) {
       await Promise.all(
-        model.children.map(f => this.insert({ ...f, fk_parent_id: row.id }))
+        filter.children.map(f => this.insert({ ...f, fk_parent_id: row.id }))
       );
     }
 
@@ -149,12 +162,12 @@ export default class Filter {
       viewId: string;
     },
     ncMeta = Noco.ncMeta
-  ): Promise<FilterObject> {
+  ): Promise<FilterType> {
     const filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
       condition: { fk_view_id: viewId }
     });
 
-    const result: FilterObject = {
+    const result: FilterType = {
       is_group: true,
       children: [],
       logical_op: 'AND'
@@ -246,22 +259,4 @@ export default class Filter {
     );
     return filterOdjs?.map(f => new Filter(f));
   }
-}
-
-export interface FilterObject {
-  id?: string;
-  fk_view_id?: string;
-  fk_model_id?: string;
-  fk_column_id?: string;
-  fk_parent_id?: string;
-
-  comparison_op?: string;
-  value?: string;
-
-  logical_op?: string;
-  is_group?: boolean;
-  children?: FilterObject[];
-  column?: Column & {
-    colOptions?: LinkToAnotherRecordColumn;
-  };
 }

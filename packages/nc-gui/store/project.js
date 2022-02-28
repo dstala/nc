@@ -645,11 +645,12 @@ export const actions = {
 
 
   async ActLoadProjectInfo({commit}) {
-    const projectInfo = (await this.$axios({
-      url: '/auth/type',
-      baseURL: `${this.$axios.defaults.baseURL}/dashboard`,
-      method: 'get'
-    })).data;
+    const projectInfo = (await this.$api.meta.appInfo()).data
+    //   (await this.$axios({
+    //   url: '/auth/type',
+    //   baseURL: `${this.$axios.defaults.baseURL}/dashboard`,
+    //   method: 'get'
+    // })).data;
 
     commit('MutProjectInfo', projectInfo)
   }

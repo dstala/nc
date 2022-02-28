@@ -115,6 +115,7 @@
             showFields
           }"
           :selected-view="selectedView"
+          :is-view="isView"
           @showAdditionalFeatOverlay="showAdditionalFeatOverlay($event)"
           @webhook="showAdditionalFeatOverlay('webhooks')"
         />
@@ -173,7 +174,7 @@
         <!--          @click="insertNewRow(true,true)"-->
         <!--        >-->
         <x-icon
-          v-if="isEditable && relationType !== 'bt'"
+          v-if="!isView &&isEditable && relationType !== 'bt'"
           icon.class="nc-add-new-row-btn mx-1"
           tooltip="Add new row"
           :disabled="isLocked"
@@ -300,6 +301,7 @@
           <template v-if=" selectedView.type === viewTypes.GRID">
             <xc-grid-view
               ref="ncgridview"
+              :is-view="isView"
               droppable
               :relation-type="relationType"
               :columns-width.sync="columnsWidth"
@@ -422,6 +424,7 @@
       <spreadsheet-nav-drawer
         v-if="meta"
         ref="drawer"
+        :is-view="isView"
         :current-api-url="currentApiUrl"
         :toggle-drawer="toggleDrawer"
         :nodes="nodes"
@@ -654,7 +657,7 @@
 
 import { mapActions } from 'vuex'
 import debounce from 'debounce'
-import { ViewTypes } from 'nc-common'
+import { SqlUiFactory, ViewTypes } from 'nc-common'
 import FormView from './views/formView'
 import XcGridView from './views/xcGridView'
 import spreadsheet from './mixins/spreadsheet'
@@ -670,7 +673,6 @@ import SpreadsheetNavDrawer from '@/components/project/spreadsheet/components/sp
 import LockMenu from '@/components/project/spreadsheet/components/lockMenu'
 import ExpandedForm from '@/components/project/spreadsheet/components/expandedForm'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
-import { SqlUI } from '~/helpers/sqlUi'
 import ColumnFilter from '~/components/project/spreadsheet/components/columnFilterMenu'
 import MoreActions from '~/components/project/spreadsheet/components/moreActions'
 import ShareViewMenu from '~/components/project/spreadsheet/components/shareViewMenu'
@@ -697,6 +699,7 @@ export default {
   },
   mixins: [spreadsheet],
   props: {
+    isView: Boolean,
     isActive: Boolean,
     tabId: String,
     env: String,
@@ -904,11 +907,11 @@ export default {
       // ) {
       //   return this.$toast.info('Please delete relations before deleting table.').goAway(3000)
       // }
-      // this.deleteTable('showDialog')
+      this.deleteTable('showDialog', this.meta.id)
 
-      if (confirm('Do you want to delete the table?')) {
-        await this.$api.meta.tableDelete(this.meta.id)
-      }
+      // if (confirm('Do you want to delete the table?')) {
+      //   await this.$api.meta.tableDelete(this.meta.id)
+      // }
     },
     async reload() {
       this.$store.dispatch('meta/ActLoadMeta', {
@@ -1571,7 +1574,8 @@ export default {
       return this._isUIAllowed('xcDatatableEditable')
     },
     sqlUi() {
-      return SqlUI.create(this.nodes.dbConnection)
+      // return SqlUI.create(this.nodes.dbConnection)
+      return SqlUiFactory.create(this.nodes.dbConnection)
     },
     api() {
       return this.meta && this.$ncApis.get({

@@ -1,5 +1,6 @@
 import Noco from '../noco/Noco';
 import { MetaTable } from '../utils/globals';
+import View from './View';
 
 export default class GalleryViewColumn {
   id: string;
@@ -9,6 +10,8 @@ export default class GalleryViewColumn {
 
   fk_view_id: string;
   fk_column_id: string;
+  project_id?: string;
+  base_id?: string;
 
   constructor(data: GalleryViewColumn) {
     Object.assign(this, data);
@@ -30,18 +33,28 @@ export default class GalleryViewColumn {
     column: Partial<GalleryViewColumn>,
     ncMeta = Noco.ncMeta
   ) {
+    const insertObj = {
+      fk_view_id: column.fk_view_id,
+      fk_column_id: column.fk_column_id,
+      order: await ncMeta.metaGetNextOrder(MetaTable.GALLERY_VIEW_COLUMNS, {
+        fk_view_id: column.fk_view_id
+      }),
+      show: column.show,
+      project_id: column.project_id,
+      base_id: column.base_id
+    };
+
+    if (!(column.project_id && column.base_id)) {
+      const viewRef = await View.get(column.fk_view_id);
+      insertObj.project_id = viewRef.project_id;
+      insertObj.base_id = viewRef.base_id;
+    }
+
     const { id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GALLERY_VIEW_COLUMNS,
-      {
-        fk_view_id: column.fk_view_id,
-        fk_column_id: column.fk_column_id,
-        order: await ncMeta.metaGetNextOrder(MetaTable.GALLERY_VIEW_COLUMNS, {
-          fk_view_id: column.fk_view_id
-        }),
-        show: column.show
-      }
+      insertObj
     );
     return new GalleryViewColumn({
       id,

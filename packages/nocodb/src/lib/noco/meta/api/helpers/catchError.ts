@@ -1,9 +1,12 @@
-export default function(callback: (req: any, res: any, next?: any) => any) {
+export default function(
+  requestHandler: (req: any, res: any, next?: any) => any
+) {
   return async function(req: any, res: any, next: any) {
     try {
-      return await callback(req, res, next);
+      return await requestHandler(req, res, next);
     } catch (e) {
-      console.log(callback.name, '::', e);
+      // todo: error log
+      console.log(requestHandler.name, '::', e);
 
       if (e instanceof BasRequest) {
         return res.status(400).json({ msg: e.message });

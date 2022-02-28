@@ -10,6 +10,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
 import Filter from '../../../noco-models/Filter';
+import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // @ts-ignore
 export async function filterGet(req: Request, res: Response, next) {
@@ -101,10 +102,13 @@ export async function filterDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', filterList);
-router.post('/', filterCreate);
-router.get('/:filterId', filterGet);
-router.put('/:filterId', filterUpdate);
-router.delete('/:filterId', filterDelete);
-router.get('/:filterParentId/children', filterChildrenRead);
+router.get('/views/:viewId/filters/', ncMetaAclMw(filterList));
+router.post('/views/:viewId/filters/', ncMetaAclMw(filterCreate));
+router.get('/views/:viewId/filters/:filterId', ncMetaAclMw(filterGet));
+router.put('/views/:viewId/filters/:filterId', ncMetaAclMw(filterUpdate));
+router.delete('/views/:viewId/filters/:filterId', ncMetaAclMw(filterDelete));
+router.get(
+  '/views/:viewId/filters/:filterParentId/children',
+  ncMetaAclMw(filterChildrenRead)
+);
 export default router;

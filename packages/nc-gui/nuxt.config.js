@@ -45,6 +45,7 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+    { src: '~plugins/api.js' },
     '~/plugins/xutils.js',
     { src: '~plugins/localStorage.js', ssr: false },
     { src: '~plugins/confetti.js', ssr: false },
@@ -58,8 +59,7 @@ export default {
     '@/plugins/globalEventBus',
     '@/plugins/ncApis',
     '~/plugins/i18n.js',
-    { src: '~plugins/projectLoader.js', ssr: false },
-    { src: '~plugins/api.js' }
+    { src: '~plugins/projectLoader.js', ssr: false }
   ],
   /*
   ** Auto import components

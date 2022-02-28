@@ -22,23 +22,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "email": {
-                      "type": "string"
-                    },
-                    "password": {
+                    "token": {
                       "type": "string"
                     }
-                  },
-                  "required": [
-                    "email",
-                    "password"
-                  ]
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
+                  }
                 }
               }
             }
@@ -52,79 +39,25 @@
         }
       }
     },
-    "/projects/{projectId}/views/{viewId}/upload": {
-      "post": {
-        "summary": "Attachment",
-        "operationId": "upload",
-        "responses": {},
-        "tags": [
-          "Meta"
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "files": {},
-                  "json": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "description": ""
-        }
-      },
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "projectId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "viewId",
-          "in": "path",
-          "required": true
-        }
-      ]
-    },
-    "/auth/user/me": {
-      "parameters": [],
-      "get": {
-        "summary": "User Info",
-        "operationId": "me",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "AUTH"
-        ]
-      }
-    },
     "/auth/user/signin": {
       "post": {
         "summary": "Signin",
         "operationId": "signin",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -153,6 +86,28 @@
         }
       },
       "parameters": []
+    },
+    "/auth/user/me": {
+      "parameters": [],
+      "get": {
+        "summary": "User Info",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "AUTH"
+        ]
+      }
     },
     "/auth/password/forgot": {
       "post": {
@@ -303,6 +258,138 @@
       },
       "parameters": []
     },
+    "/projects/{projectId}/users": {
+      "get": {
+        "summary": "Password Refresh",
+        "operationId": "project-user-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 1,
+                          "items": {
+                            "$ref": "#/components/schemas/User"
+                          }
+                        },
+                        "pageInfo": {
+                          "$ref": "#/components/schemas/Paginated"
+                        }
+                      },
+                      "required": [
+                        "list",
+                        "pageInfo"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "project-user-add",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/users - copy": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "",
+        "operationId": "project-user-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "project-user-remove",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/projects/": {
       "parameters": [],
       "get": {
@@ -434,7 +521,7 @@
       },
       "put": {
         "summary": "",
-        "operationId": "put-projects---copy",
+        "operationId": "project-update",
         "responses": {
           "200": {
             "description": "OK"
@@ -443,13 +530,60 @@
       },
       "delete": {
         "summary": "",
-        "operationId": "delete-projects---copy",
+        "operationId": "projects-delete",
         "responses": {
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "tags": [
+          "meta"
+        ]
       }
+    },
+    "/projects/{projectId}/views/{viewId}/upload": {
+      "post": {
+        "summary": "Attachment",
+        "operationId": "upload",
+        "responses": {},
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {},
+                  "json": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ]
     },
     "/projects/{projectId}/reorder": {
       "parameters": [
@@ -687,12 +821,31 @@
         "operationId": "table-update",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           }
         },
         "tags": [
           "Meta"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_tn": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       "delete": {
         "summary": "",
@@ -939,7 +1092,7 @@
         ]
       }
     },
-    "/views/{viewId}/filters - copy": {
+    "/views/{viewId}/filters": {
       "parameters": [
         {
           "schema": {
@@ -1023,6 +1176,55 @@
             }
           }
         }
+      }
+    },
+    "/views/{viewId}/showAll": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "view-show-all-column",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "description": ""
+      }
+    },
+    "/views/{viewId}/hideAll": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "view-hide-all-column",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
       }
     },
     "/views/{viewId}/columns/{columnId}": {
@@ -3313,6 +3515,65 @@
           "meta"
         ]
       }
+    },
+    "/testConnection": {
+      "parameters": [],
+      "post": {
+        "summary": "",
+        "operationId": "test-connection",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "description": ""
+      }
+    },
+    "/appInfo": {
+      "parameters": [],
+      "get": {
+        "summary": "",
+        "operationId": "app-info",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ],
+        "description": ""
+      }
     }
   },
   "components": {
@@ -3332,27 +3593,28 @@
             "signUpDate": "2019-08-24"
           }
         ],
+        "x-internal": false,
         "properties": {
           "id": {
             "type": "integer",
             "description": "Unique identifier for the given user."
           },
-          "firstName": {
+          "firstname": {
             "type": "string"
           },
-          "lastName": {
+          "lastname": {
             "type": "string"
           },
           "email": {
             "type": "string",
             "format": "email"
           },
-          "dateOfBirth": {
+          "date_of_birth": {
             "type": "string",
             "format": "date",
             "example": "1997-10-31"
           },
-          "emailVerified": {
+          "email_verified": {
             "type": "boolean",
             "description": "Set to true if the user's email has been verified."
           },
@@ -3364,12 +3626,11 @@
         },
         "required": [
           "id",
-          "firstName",
-          "lastName",
+          "firstname",
+          "lastname",
           "email",
-          "emailVerified"
-        ],
-        "x-internal": false
+          "email_verified"
+        ]
       },
       "UserList": {
         "description": "",
@@ -4164,8 +4425,8 @@
         ]
       },
       "Filter": {
-        "title": "Filter",
         "type": "object",
+        "title": "Filter",
         "properties": {
           "id": {
             "type": "string"
@@ -4199,8 +4460,23 @@
             "items": {
               "$ref": "#/components/schemas/Filter"
             }
+          },
+          "project_id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "base_id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fk_parent_id": {
+            "type": "string"
+          },
+          "fk_view_id": {
+            "type": "string"
           }
-        }
+        },
+        "readOnly": true
       },
       "FilterList": {
         "description": "",
@@ -4274,6 +4550,14 @@
           },
           "order": {
             "type": "number"
+          },
+          "project_id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "base_id": {
+            "type": "string",
+            "readOnly": true
           }
         }
       },
@@ -4787,7 +5071,7 @@
           "help": {
             "type": "string"
           },
-          "fk_col_id": {
+          "fk_column_id": {
             "type": "string"
           },
           "fk_gallery_id": {
@@ -5800,6 +6084,13 @@
             }
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "xc-auth": {
+        "name": "API Key",
+        "type": "apiKey",
+        "in": "header"
       }
     }
   }

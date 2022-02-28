@@ -1,6 +1,7 @@
 import Noco from '../noco/Noco';
 import Project from './Project';
 import { MetaTable } from '../utils/globals';
+import Model from './Model';
 
 // todo: hide credentials
 export default class Base {
@@ -68,6 +69,20 @@ export default class Base {
   }
   getProject(): Promise<Project> {
     return Project.get(this.project_id);
+  }
+
+  async delete(ncMeta = Noco.ncMeta) {
+    const models = await Model.list(
+      {
+        base_id: this.id,
+        project_id: this.project_id
+      },
+      ncMeta
+    );
+    for (const model of models) {
+      await model.delete(ncMeta);
+    }
+    return await ncMeta.metaDelete(null, null, MetaTable.BASES, this.id);
   }
 }
 

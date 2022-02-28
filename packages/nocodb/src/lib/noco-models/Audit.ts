@@ -38,7 +38,7 @@ export default class Audit implements AuditType {
   public static async insert(audit: Partial<Audit>) {
     if (!audit.project_id && audit.fk_model_id) {
       audit.project_id = (
-        await Model.get({ id: audit.fk_model_id })
+        await Model.getByIdOrName({ id: audit.fk_model_id })
       ).project_id;
     }
     const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.AUDIT, {

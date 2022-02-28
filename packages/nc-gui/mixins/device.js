@@ -1,5 +1,5 @@
 import { mapGetters } from 'vuex'
-import { Api } from 'nc-common'
+import { getApi } from '~/plugins/api'
 
 export default {
   data() {
@@ -11,9 +11,7 @@ export default {
   },
   computed: {
     $api() {
-      return new Api({
-        baseURL: 'http://localhost:8080'
-      })
+      return getApi(this.$store, this.$axios)
     },
     dashboardUrl() {
       return `${location.origin}${location.pathname || ''}`
@@ -113,6 +111,20 @@ export default {
       const err = new Error(msg)
       err.response = e.response
       return err
+    },
+    async _extractSdkResponseErrorMsg(e) {
+      if (!e || !e.response) { return e.message }
+      let msg
+      if (e.response.data instanceof Blob) {
+        try {
+          msg = JSON.parse(await e.response.data.text()).msg
+        } catch {
+          msg = 'Some internal error occurred'
+        }
+      } else {
+        msg = e.response.data.msg || 'Some internal error occurred'
+      }
+      return msg || 'Some error occurred'
     }
   }
 }

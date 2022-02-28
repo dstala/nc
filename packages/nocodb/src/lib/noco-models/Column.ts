@@ -16,7 +16,7 @@ import Noco from '../noco/Noco';
 export default class Column implements ColumnType {
   public fk_model_id: string;
   public project_id: string;
-  public db_alias: string;
+  public base_id: string;
 
   public cn: string;
   public _cn: string;
@@ -52,7 +52,7 @@ export default class Column implements ColumnType {
   }
 
   public async getModel(): Promise<Model> {
-    return Model.get({
+    return Model.getByIdOrName({
       id: this.fk_model_id
     });
   }
@@ -61,38 +61,47 @@ export default class Column implements ColumnType {
     column: Partial<T> & { base_id?: string; [key: string]: any },
     ncMeta = Noco.ncMeta
   ) {
+    const insertObj = {
+      fk_model_id: column.fk_model_id,
+      cn: column.cn,
+      _cn: column._cn || column.cn,
+      uidt: column.uidt,
+      dt: column.dt,
+      np: column.np,
+      ns: column.ns,
+      clen: column.clen,
+      cop: column.cop,
+      pk: column.pk,
+      rqd: column.rqd,
+      un: column.un,
+      ct: column.ct,
+      ai: column.ai,
+      unique: column.unique,
+      cdf: column.cdf,
+      cc: column.cc,
+      csn: column.csn,
+      dtx: column.dtx,
+      dtxp: column.dtxp,
+      dtxs: column.dtxs,
+      au: column.au,
+      pv: column.pv,
+      order: column.order,
+      project_id: column.project_id,
+      base_id: column.base_id
+    };
+    if (!(column.project_id && column.base_id)) {
+      const model = await Model.getByIdOrName({ id: column.fk_model_id });
+      insertObj.project_id = model.project_id;
+      insertObj.base_id = model.base_id;
+    }
+
     if (!column.uidt) throw new Error('UI Datatype not found');
     const order = 1;
     const row = await ncMeta.metaInsert2(
       null, //column.project_id || column.base_id,
       null, //column.db_alias,
       MetaTable.COLUMNS,
-      {
-        fk_model_id: column.fk_model_id,
-        cn: column.cn,
-        _cn: column._cn || column.cn,
-        uidt: column.uidt,
-        dt: column.dt,
-        np: column.np,
-        ns: column.ns,
-        clen: column.clen,
-        cop: column.cop,
-        pk: column.pk,
-        rqd: column.rqd,
-        un: column.un,
-        ct: column.ct,
-        ai: column.ai,
-        unique: column.unique,
-        cdf: column.cdf,
-        cc: column.cc,
-        csn: column.csn,
-        dtx: column.dtx,
-        dtxp: column.dtxp,
-        dtxs: column.dtxs,
-        au: column.au,
-        pv: column.pv,
-        order: column.order
-      }
+      insertObj
     );
 
     await this.insertColOption(column, row.id, ncMeta);
@@ -260,7 +269,7 @@ export default class Column implements ColumnType {
 
   async loadModel(force = false): Promise<Model> {
     if (!this.model || force) {
-      this.model = await Model.get({
+      this.model = await Model.getByIdOrName({
         // base_id: this.project_id,
         // db_alias: this.db_alias,
         id: this.fk_model_id
