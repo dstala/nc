@@ -163,7 +163,7 @@ export default class Noco {
     mkdirp.sync(this.config.toolDir);
 
     this.initSentry();
-    NocoCache.init({ driver: 'memory' });
+    NocoCache.init({ driver: 'redis' });
 
     this.initWebSocket();
 
