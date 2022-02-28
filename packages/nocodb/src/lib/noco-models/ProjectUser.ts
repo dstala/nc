@@ -54,6 +54,7 @@ export default class ProjectUser {
     const queryBuilder = ncMeta
       .knex(MetaTable.USERS)
       .select(
+        `${MetaTable.USERS}.id`,
         `${MetaTable.USERS}.email`,
         `${MetaTable.USERS}.invite_token`,
         `${MetaTable.USERS}.roles as main_roles`,
@@ -99,5 +100,27 @@ export default class ProjectUser {
     }
 
     return (await qb.count('id', { as: 'count' }).first()).count;
+  }
+
+  static async update(projectId, userId, roles: string, ncMeta = Noco.ncMeta) {
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.PROJECT_USERS,
+      {
+        roles
+      },
+      {
+        fk_user_id: userId,
+        project_id: projectId
+      }
+    );
+  }
+
+  static async delete(projectId: string, userId, ncMeta = Noco.ncMeta) {
+    return await ncMeta.metaDelete(null, null, MetaTable.PROJECT_USERS, {
+      fk_user_id: userId,
+      project_id: projectId
+    });
   }
 }

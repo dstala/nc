@@ -8,6 +8,7 @@ import { NcError } from './helpers/catchError';
 import { v4 as uuidv4 } from 'uuid';
 import User from '../../../noco-models/User';
 import { Tele } from 'nc-help';
+import Audit from '../../../noco-models/Audit';
 
 async function userList(req, res) {
   res.json({
@@ -50,62 +51,60 @@ async function userInvite(req, res, next): Promise<any> {
         roles: 'user'
       });
 
-      if (
-        !(await this.xcMeta.isUserHaveAccessToProject(
-          req.body.project_id,
-          user.id
-        ))
-      ) {
-        await this.xcMeta.projectAddUser(
-          req.body.project_id,
-          user.id,
-          'editor'
-        );
+      if (!(await ProjectUser.get(req.params.projectId, user.id))) {
+        await ProjectUser.insert({
+          project_id: req.params.projectId,
+          fk_user_id: user.id,
+          roles: 'editor'
+        });
       }
-      this.xcMeta.audit(req.body.project_id, null, 'nc_audit', {
+      this.xcMeta.audit(req.params.projectId, null, 'nc_audit', {
         op_type: 'AUTHENTICATION',
         op_sub_type: 'INVITE',
         user: req.user.email,
-        description: `invited ${email} to ${req.body.project_id} project `,
+        description: `invited ${email} to ${req.params.projectId} project `,
         ip: req.clientIp
       });
     } else {
       try {
         // create new user with invite token
-        await this.users.insert({
+        const { id } = await User.insert({
           invite_token,
           invite_token_expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           email,
           roles: 'user'
         });
 
-        const { id } = await this.users.where({ email }).first();
-        const count = await this.users.count('id as count').first();
         // add user to project
-        await this.xcMeta.projectAddUser(
-          req.body.project_id,
-          id,
-          req.body.roles
-        );
+        await ProjectUser.insert({
+          project_id: req.params.projectId,
+          fk_user_id: id,
+          roles: 'editor'
+        });
 
-        Tele.emit('evt', { evt_type: 'project:invite', count: count?.count });
+        const count = await User.count();
+        Tele.emit('evt', { evt_type: 'project:invite', count });
 
-        this.xcMeta.audit(req.body.project_id, null, 'nc_audit', {
+        await Audit.insert({
+          project_id: req.params.projectId,
           op_type: 'AUTHENTICATION',
           op_sub_type: 'INVITE',
           user: req.user.email,
-          description: `invited ${email} to ${req.body.project_id} project `,
+          description: `invited ${email} to ${req.params.projectId} project `,
           ip: req.clientIp
         });
         // in case of single user check for smtp failure
         // and send back token if failed
         if (
-          emails.length === 1 &&
-          !(await this.sendInviteEmail(email, invite_token, req))
+          emails.length === 1
+          // todo: email
+          // &&
+          // !(await sendInviteEmail(email, invite_token, req))
         ) {
           return res.json({ invite_token, email });
         } else {
-          this.sendInviteEmail(email, invite_token, req);
+          // todo: email
+          // sendInviteEmail(email, invite_token, req);
         }
       } catch (e) {
         if (emails.length === 1) {
@@ -127,7 +126,7 @@ async function userInvite(req, res, next): Promise<any> {
 }
 
 // @ts-ignore
-async function updateAdmin(req, res, next): Promise<any> {
+async function projectUserUpdate(req, res, next): Promise<any> {
   if (!req?.body?.project_id) {
     return next(new Error('Missing project id in request body.'));
   }
@@ -137,17 +136,13 @@ async function updateAdmin(req, res, next): Promise<any> {
     req.session?.passport?.user?.id === +req.params.id &&
     req.body.roles.indexOf('owner') === -1
   ) {
-    return next(new Error("Super admin can't remove Super role themselves"));
+    NcError.badRequest("Super admin can't remove Super role themselves");
   }
   try {
-    const user = await this.users
-      .where({
-        id: req.params.id
-      })
-      .first();
+    const user = await User.get(req.params.userId);
 
     if (!user) {
-      return next(`User with id '${req.params.id}' doesn't exist`);
+      NcError.badRequest(`User with id '${req.params.id}' doesn't exist`);
     }
 
     // todo: handle roles which contains super
@@ -155,31 +150,18 @@ async function updateAdmin(req, res, next): Promise<any> {
       !req.session?.passport?.user?.roles?.owner &&
       req.body.roles.indexOf('owner') > -1
     ) {
-      return next(new Error('Insufficient privilege to add super admin role.'));
+      NcError.forbidden('Insufficient privilege to add super admin role.');
     }
 
-    // await this.users.update({
-    //   roles: req.body.roles
-    // }).where({
-    //   id: req.params.id
-    // });
-
-    await this.xcMeta.metaUpdate(
-      req?.body?.project_id,
-      null,
-      'nc_projects_users',
-      {
-        roles: req.body.roles
-      },
-      {
-        user_id: req.params.id
-        // email: req.body.email
-      }
+    await ProjectUser.update(
+      req.params.projectId,
+      req.params.userId,
+      req.body.roles
     );
 
     XcCache.del(`${req.body.email}___${req?.body?.project_id}`);
 
-    this.xcMeta.audit(null, null, 'nc_audit', {
+    Audit.insert({
       op_type: 'AUTHENTICATION',
       op_sub_type: 'ROLES_MANAGEMENT',
       user: req.user.email,
@@ -195,7 +177,73 @@ async function updateAdmin(req, res, next): Promise<any> {
   }
 }
 
+async function projectUserDelete(req, res): Promise<any> {
+  const project_id = req.params.projectId;
+
+  if (req.session?.passport?.user?.id === req.params.userId) {
+    NcError.badRequest("Admin can't delete themselves!");
+  }
+
+  if (!req.session?.passport?.user?.roles?.owner) {
+    // const deleteUser = await this.users
+    //   .where('id', req.params.id)
+    //   .andWhere('roles', 'like', '%super%')
+    //   .first();
+    // if (deleteUser) {
+    NcError.forbidden('Insufficient privilege to delete a super admin user.');
+    // }
+  }
+
+  XcCache.del(`${req?.query?.email}___${req?.req?.project_id}`);
+
+  // await this.users.where('id', req.params.id).del();
+  await ProjectUser.delete(project_id, req.params.userId);
+  res.json({
+    msg: 'success'
+  });
+}
+
+// todo: map api
+// @ts-ignore
+async function resendInvite(req, res, next): Promise<any> {
+  const user = await User.get(req.params.userId);
+
+  if (!user) {
+    NcError.badRequest(`User with id '${req.params.userId}' not found`);
+  }
+
+  req.body.roles = user.roles;
+  const invite_token = uuidv4();
+
+  await User.update(user.id, {
+    invite_token,
+    invite_token_expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
+  });
+
+  // todo:
+  // await sendInviteEmail(user.email, invite_token, req);
+
+  Audit.insert({
+    op_type: 'AUTHENTICATION',
+    op_sub_type: 'RESEND_INVITE',
+    user: user.email,
+    description: `resent a invite to ${user.email} `,
+    ip: req.clientIp,
+    project_id: req.params.projectId
+  });
+
+  res.json({ msg: 'success' });
+}
+
 const router = Router({ mergeParams: true });
 router.get('/projects/:projectId/users', ncMetaAclMw(userList));
 router.post('/projects/:projectId/users', ncMetaAclMw(userInvite));
+router.put(
+  '/projects/:projectId/users/:userId',
+  ncMetaAclMw(projectUserUpdate)
+);
+router.delete(
+  '/projects/:projectId/users/:userId',
+  ncMetaAclMw(projectUserDelete)
+);
 export default router;

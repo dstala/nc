@@ -967,11 +967,11 @@ export class Api<
         format: 'json',
         ...params,
       }),
-  };
-  projects = {
+
     /**
      * No description
      *
+     * @tags auth
      * @name ProjectUserAdd
      * @request POST:/projects/{projectId}/users
      * @response `200` `any` OK
@@ -993,17 +993,19 @@ export class Api<
     /**
      * No description
      *
+     * @tags auth
      * @name ProjectUserUpdate
-     * @request PUT:/projects/{projectId}/users - copy
+     * @request PUT:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
      */
     projectUserUpdate: (
       projectId: string,
+      userId: string,
       data: ProjectUserUpdatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/users - copy`,
+        path: `/projects/${projectId}/users/${userId}`,
         method: 'PUT',
         body: data,
         type: ContentType.Json,
@@ -1014,43 +1016,20 @@ export class Api<
     /**
      * No description
      *
+     * @tags auth
      * @name ProjectUserRemove
-     * @request DELETE:/projects/{projectId}/users - copy
+     * @request DELETE:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
      */
-    projectUserRemove: (projectId: string, params: RequestParams = {}) =>
+    projectUserRemove: (
+      projectId: string,
+      userId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/users - copy`,
+        path: `/projects/${projectId}/users/${userId}`,
         method: 'DELETE',
         format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ProjectUpdate
-     * @request PUT:/projects/{projectId}
-     * @response `200` `void` OK
-     */
-    projectUpdate: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}`,
-        method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ProjectReorder
-     * @request POST:/projects/{projectId}/reorder
-     * @response `200` `void` OK
-     */
-    projectReorder: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/reorder`,
-        method: 'POST',
         ...params,
       }),
   };
@@ -2502,6 +2481,35 @@ export class Api<
         path: `/appInfo`,
         method: 'GET',
         format: 'json',
+        ...params,
+      }),
+  };
+  projects = {
+    /**
+     * No description
+     *
+     * @name ProjectUpdate
+     * @request PUT:/projects/{projectId}
+     * @response `200` `void` OK
+     */
+    projectUpdate: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}`,
+        method: 'PUT',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name ProjectReorder
+     * @request POST:/projects/{projectId}/reorder
+     * @response `200` `void` OK
+     */
+    projectReorder: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/reorder`,
+        method: 'POST',
         ...params,
       }),
   };

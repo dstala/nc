@@ -340,16 +340,27 @@
               "schema": {}
             }
           }
-        }
+        },
+        "tags": [
+          "auth"
+        ]
       }
     },
-    "/projects/{projectId}/users - copy": {
+    "/projects/{projectId}/users/{userId}": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
           "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "userId",
           "in": "path",
           "required": true
         }
@@ -373,7 +384,10 @@
               "schema": {}
             }
           }
-        }
+        },
+        "tags": [
+          "auth"
+        ]
       },
       "delete": {
         "summary": "",
@@ -387,7 +401,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/projects/": {

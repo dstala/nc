@@ -683,15 +683,16 @@ export default {
     },
     async deleteUser(id) {
       try {
-        await this.$axios.delete('/admin/' + id, {
-          params: {
-            project_id: this.$route.params.project_id,
-            email: this.deleteItem.email
-          },
-          headers: {
-            'xc-auth': this.$store.state.users.token
-          }
-        })
+        // await this.$axios.delete('/admin/' + id, {
+        //   params: {
+        //     project_id: this.$route.params.project_id,
+        //     email: this.deleteItem.email
+        //   },
+        //   headers: {
+        //     'xc-auth': this.$store.state.users.token
+        //   }
+        // })
+        await this.$api.auth.projectUserRemove(this.$route.params.project_id, id)
         this.$toast.success('Successfully removed the user from project').goAway(3000)
         await this.loadUsers()
       } catch (e) {
@@ -745,26 +746,38 @@ export default {
       try {
         let data
         if (this.selectedUser.id) {
-          await this.$axios.put('/admin/' + this.selectedUser.id, {
+          // await this.$axios.put('/admin/' + this.selectedUser.id, {
+          //   roles: this.selectedUser.roles,
+          //   email: this.selectedUser.email,
+          //   project_id: this.$route.params.project_id,
+          //   projectName: this.$store.getters['project/GtrProjectName']
+          // }, {
+          //   headers: {
+          //     'xc-auth': this.$store.state.users.token
+          //   }
+          // })
+
+          await this.$api.auth.projectUserUpdate(this.$route.params.project_id, this.selectedUser.id, {
             roles: this.selectedUser.roles,
             email: this.selectedUser.email,
             project_id: this.$route.params.project_id,
             projectName: this.$store.getters['project/GtrProjectName']
-          }, {
-            headers: {
-              'xc-auth': this.$store.state.users.token
-            }
           })
         } else {
-          data = await this.$axios.post('/admin', {
+          // data = await this.$axios.post('/admin', {
+          //   ...this.selectedUser,
+          //   project_id: this.$route.params.project_id,
+          //   projectName: this.$store.getters['project/GtrProjectName']
+          // }, {
+          //   headers: {
+          //     'xc-auth': this.$store.state.users.token
+          //   }
+          // })
+          data = (await this.$api.auth.projectUserAdd(this.$route.params.project_id, {
             ...this.selectedUser,
             project_id: this.$route.params.project_id,
             projectName: this.$store.getters['project/GtrProjectName']
-          }, {
-            headers: {
-              'xc-auth': this.$store.state.users.token
-            }
-          })
+          }))
         }
         this.$toast.success('Successfully updated the user details').goAway(3000)
         await this.loadUsers()
