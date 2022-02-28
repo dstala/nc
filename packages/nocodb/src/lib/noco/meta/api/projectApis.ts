@@ -11,7 +11,7 @@ import Model from '../../../noco-models/Model';
 import NcHelp from '../../../utils/NcHelp';
 import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
-import getTableNameAlias from './helpers/getTableName';
+import getTableNameAlias, { getColumnNameAlias } from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
@@ -187,6 +187,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         await Column.insert({
           fk_model_id: models2[table.tn].id,
           ...column,
+          _cn: getColumnNameAlias(column.cn),
           order: colOrder++
         });
       }
