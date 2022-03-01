@@ -5,7 +5,7 @@ import UITypes from '../sqlUi/UITypes';
 import { CacheScope, MetaTable } from '../utils/globals';
 import View from './View';
 import { FilterType } from 'nc-common';
-import redisMgr from '../noco-cache/NocoCache';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class Filter {
   id: string;
@@ -79,25 +79,25 @@ export default class Filter {
       );
     }
     const key = `${CacheScope.FILTER_EXP}:${id}`;
-    let value = await redisMgr.get(key, 2);
+    let value = await NocoCache.get(key, 2);
     if (!value) {
       /* get from db */
       value = await Noco.ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, id);
 
       /* store in redis */
-      await redisMgr.set(key, value);
+      await NocoCache.set(key, value);
 
       /* append key to relevant lists */
-      await redisMgr.appendToList(
+      await NocoCache.appendToList(
         `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:list`,
         key
       );
       if (filter.fk_parent_id) {
-        await redisMgr.appendToList(
+        await NocoCache.appendToList(
           `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:${filter.fk_parent_id}:list`,
           key
         );
-        await redisMgr.appendToList(
+        await NocoCache.appendToList(
           `${CacheScope.FILTER_EXP}:${filter.fk_parent_id}:list`,
           key
         );
@@ -125,7 +125,7 @@ export default class Filter {
       },
       id
     );
-    await redisMgr.set(`${CacheScope.FILTER_EXP}:${id}`, filter);
+    await NocoCache.set(`${CacheScope.FILTER_EXP}:${id}`, filter);
   }
 
   static async delete(id: string) {
@@ -136,7 +136,7 @@ export default class Filter {
       for (const f of (await filter?.getChildren()) || [])
         await deleteRecursively(f);
       await Noco.ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
-      await redisMgr.deepDel(
+      await NocoCache.deepDel(
         CacheScope.FILTER_EXP,
         `${CacheScope.FILTER_EXP}:${filter.id}`
       );
@@ -153,7 +153,7 @@ export default class Filter {
 
   public async getGroup(): Promise<Filter> {
     if (!this.fk_parent_id) return null;
-    let filterObj = await redisMgr.get(
+    let filterObj = await NocoCache.get(
       `${CacheScope.FILTER_EXP}:${this.fk_parent_id}`,
       2
     );
@@ -161,7 +161,7 @@ export default class Filter {
       filterObj = await Noco.ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
         id: this.fk_parent_id
       });
-      await redisMgr.set(
+      await NocoCache.set(
         `${CacheScope.FILTER_EXP}:${this.fk_parent_id}`,
         filterObj
       );
@@ -172,7 +172,7 @@ export default class Filter {
   public async getChildren(): Promise<Filter[]> {
     if (this.children) return this.children;
     if (!this.is_group) return null;
-    let childFilters = await redisMgr.getList(CacheScope.FILTER_EXP, [this.id]);
+    let childFilters = await NocoCache.getList(CacheScope.FILTER_EXP, [this.id]);
     if (!childFilters.length) {
       childFilters = await Noco.ncMeta.metaList2(
         null,
@@ -185,7 +185,7 @@ export default class Filter {
         }
       );
       childFilters.length &&
-        (await redisMgr.setList(
+        (await NocoCache.setList(
           CacheScope.FILTER_EXP,
           [this.id],
           childFilters
@@ -218,13 +218,13 @@ export default class Filter {
     },
     ncMeta = Noco.ncMeta
   ): Promise<FilterType> {
-    let filters = await redisMgr.getList(CacheScope.FILTER_EXP, [viewId]);
+    let filters = await NocoCache.getList(CacheScope.FILTER_EXP, [viewId]);
     if (!filters.length) {
       filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
         condition: { fk_view_id: viewId }
       });
       filters.length &&
-        (await redisMgr.setList(CacheScope.FILTER_EXP, [viewId], filters));
+        (await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filters));
     }
 
     const result: FilterType = {
@@ -272,7 +272,7 @@ export default class Filter {
       for (const f of filter?.children || []) await deleteRecursively(f);
       if (filter.id) {
         await ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
-        await redisMgr.del(`${CacheScope.FILTER_EXP}:${filter.id}`);
+        await NocoCache.del(`${CacheScope.FILTER_EXP}:${filter.id}`);
       }
     };
     await deleteRecursively(filter);
@@ -280,18 +280,18 @@ export default class Filter {
 
   private static async get(id: string, ncMeta = Noco.ncMeta) {
     let filterObj =
-      id && (await redisMgr.get(`${CacheScope.FILTER_EXP}:${id}`, 2));
+      id && (await NocoCache.get(`${CacheScope.FILTER_EXP}:${id}`, 2));
     if (!filterObj) {
       filterObj = await ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
         id
       });
-      await redisMgr.set(`${CacheScope.FILTER_EXP}:${id}`, filterObj);
+      await NocoCache.set(`${CacheScope.FILTER_EXP}:${id}`, filterObj);
     }
     return filterObj && new Filter(filterObj);
   }
 
   static async rootFilterList({ viewId }: { viewId: any }) {
-    let filterObjs = await redisMgr.getList(CacheScope.FILTER_EXP, [viewId]);
+    let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [viewId]);
     if (!filterObjs.length) {
       filterObjs = await Noco.ncMeta.metaList2(
         null,
@@ -303,7 +303,7 @@ export default class Filter {
       );
 
       if (filterObjs.length)
-        await redisMgr.setList(CacheScope.FILTER_EXP, [viewId], filterObjs);
+        await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filterObjs);
     }
     return filterObjs?.map(f => new Filter(f));
   }
@@ -315,7 +315,7 @@ export default class Filter {
     viewId: any;
     parentId: any;
   }) {
-    let filterObjs = await redisMgr.getList(CacheScope.FILTER_EXP, [
+    let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [
       viewId,
       parentId
     ]);
@@ -332,7 +332,7 @@ export default class Filter {
         }
       );
       filterObjs.length &&
-        (await redisMgr.setList(
+        (await NocoCache.setList(
           CacheScope.FILTER_EXP,
           [viewId, parentId],
           filterObjs
