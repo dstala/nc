@@ -42,7 +42,8 @@ export default class RedisCacheMgr extends CacheMgr {
   async set(key: string, value: any): Promise<any> {
     console.log(`RedisCacheMgr::set: setting key ${key} with value ${value}`);
     if (typeof value === 'object') {
-      if (Array.isArray(value)) {
+      if (Array.isArray(value) && value.length) {
+        await this.client.del(key);
         return this.client.sadd(key, value);
       }
       return this.client.set(key, JSON.stringify(value));
@@ -61,10 +62,10 @@ export default class RedisCacheMgr extends CacheMgr {
   }
 
   // @ts-ignore
-  delAll(pattern: string): Promise<any[]> {
-    const keys = this.client.keys(pattern);
+  async delAll(pattern: string): Promise<any[]> {
+    const keys = await this.client.keys(pattern);
     console.log(`RedisCacheMgr::delAll: deleting all keys with ${keys}`);
-    return this.client.del(keys);
+    return Promise.all(keys.map(async k => await this.client.del(k)));
   }
 
   async getList(scope: string, subKeys: string[]): Promise<any[]> {
@@ -83,7 +84,13 @@ export default class RedisCacheMgr extends CacheMgr {
     subListKeys: string[],
     list: any[]
   ): Promise<boolean> {
-    const listOfGetKeys = [];
+    // remove null from arrays
+    subListKeys = subListKeys.filter(k => k);
+    // construct key for List
+    // e.g. <scope>:<project_id_1>:<base_id_1>:list
+    const listKey = `${scope}:${subListKeys.join(':')}:list`;
+    // fetch existing list
+    const listOfGetKeys = (await this.get(listKey, 1)) || [];
     for (const o of list) {
       // construct key for Get
       // e.g. <scope>:<model_id_1>
@@ -94,13 +101,39 @@ export default class RedisCacheMgr extends CacheMgr {
       // push Get Key to List
       listOfGetKeys.push(getKey);
     }
-    // remove null from arrays
-    subListKeys = subListKeys.filter(k => k);
-    // construct key for List
-    // e.g. <scope>:<project_id_1>:<base_id_1>:list
-    const listKey = `${scope}:${subListKeys.join(':')}:list`;
     // set List Key
     console.log(`RedisCacheMgr::setList: setting list with key ${listKey}`);
     return this.set(listKey, listOfGetKeys);
+  }
+
+  async deepDel(scope: string, key: string): Promise<boolean> {
+    const scopeList = await this.client.keys(`${scope}:*:list`);
+    for (const listKey of scopeList) {
+      // get target list
+      let list = (await this.get(listKey, 1)) || [];
+      if (!list.length) {
+        continue;
+      }
+      // remove target Key
+      list = list.filter(k => k !== key);
+      if (list.length) {
+        // set target list
+        console.log(`RedisCacheMgr::deepDel: set key ${listKey}`);
+        await this.set(listKey, list);
+      } else {
+        // delete list
+        console.log(`RedisCacheMgr::deepDel: remove listKey ${listKey}`);
+        await this.del(listKey);
+      }
+    }
+    console.log(`RedisCacheMgr::deepDel: remove key ${key}`);
+    return await this.del(key);
+  }
+
+  async appendToList(listKey: string, key: string): Promise<boolean> {
+    console.log(`RedisCacheMgr::appendToList: append key ${key} to ${listKey}`);
+    const list = (await this.get(listKey, 1)) || [];
+    list.push(key);
+    return this.set(listKey, list);
   }
 }
