@@ -68,8 +68,7 @@ export default class Filter {
         filter.children.map(f => this.insert({ ...f, fk_parent_id: row.id }))
       );
     }
-    const newFilter = await this.redisPostInsert(row.id, filter);
-    return newFilter;
+    return await this.redisPostInsert(row.id, filter);
   }
 
   static async redisPostInsert(id, filter: Partial<FilterType>) {
@@ -83,28 +82,32 @@ export default class Filter {
     if (!value) {
       /* get from db */
       value = await Noco.ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, id);
-
+      // pushing calls for Promise.all
+      const p = [];
       /* store in redis */
-      await NocoCache.set(key, value);
-
+      p.push(NocoCache.set(key, value));
       /* append key to relevant lists */
-      await NocoCache.appendToList(
-        `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:list`,
-        key
+      p.push(
+        NocoCache.appendToList(
+          `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:list`,
+          key
+        )
       );
       if (filter.fk_parent_id) {
-        await NocoCache.appendToList(
-          `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:${filter.fk_parent_id}:list`,
-          key
+        p.push(
+          NocoCache.appendToList(
+            `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:${filter.fk_parent_id}:list`,
+            key
+          )
         );
-        await NocoCache.appendToList(
-          `${CacheScope.FILTER_EXP}:${filter.fk_parent_id}:list`,
-          key
+        p.push(
+          NocoCache.appendToList(
+            `${CacheScope.FILTER_EXP}:${filter.fk_parent_id}:list`,
+            key
+          )
         );
-      } else {
-        // when parent Id is missing : what has to be done ?
       }
-      // todo : parallel insert of above 3 await statements will save us shage some time. Promise.all()
+      await Promise.all(p);
     }
     return new Filter(value);
   }
@@ -172,7 +175,9 @@ export default class Filter {
   public async getChildren(): Promise<Filter[]> {
     if (this.children) return this.children;
     if (!this.is_group) return null;
-    let childFilters = await NocoCache.getList(CacheScope.FILTER_EXP, [this.id]);
+    let childFilters = await NocoCache.getList(CacheScope.FILTER_EXP, [
+      this.id
+    ]);
     if (!childFilters.length) {
       childFilters = await Noco.ncMeta.metaList2(
         null,
@@ -223,8 +228,10 @@ export default class Filter {
       filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
         condition: { fk_view_id: viewId }
       });
-      filters.length &&
-        (await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filters));
+
+      if (filters.length) {
+        await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filters);
+      }
     }
 
     const result: FilterType = {
@@ -331,12 +338,13 @@ export default class Filter {
           }
         }
       );
-      filterObjs.length &&
-        (await NocoCache.setList(
+      if (filterObjs.length) {
+        await NocoCache.setList(
           CacheScope.FILTER_EXP,
           [viewId, parentId],
           filterObjs
-        ));
+        );
+      }
     }
     return filterObjs?.map(f => new Filter(f));
   }
