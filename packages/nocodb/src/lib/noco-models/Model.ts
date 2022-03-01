@@ -158,11 +158,12 @@ export default class Model implements TableType {
         }
       );
 
-      await NocoCache.setList(
-        CacheScope.MODEL,
-        [project_id, base_id],
-        modelList
-      );
+      modelList.length &&
+        (await NocoCache.setList(
+          CacheScope.MODEL,
+          [project_id, base_id],
+          modelList
+        ));
     }
     return modelList.map(m => new Model(m));
   }
@@ -185,11 +186,12 @@ export default class Model implements TableType {
         MetaTable.MODELS
       );
 
-      await NocoCache.setList(
-        CacheScope.MODEL,
-        [project_id, db_alias],
-        modelList
-      );
+      modelList.length &&
+        (await NocoCache.setList(
+          CacheScope.MODEL,
+          [project_id, db_alias],
+          modelList
+        ));
     }
 
     return modelList.map(m => new Model(m));
@@ -363,17 +365,23 @@ export default class Model implements TableType {
         await ncMeta.metaDelete(null, null, colOptionTableName, {
           fk_column_id: col.id
         });
-        await NocoCache.del(`${cacheScopeName}:${col.id}`);
+        await NocoCache.deepDel(
+          CacheScope.MODEL,
+          `${cacheScopeName}:${col.id}`
+        );
       }
     }
 
     await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, {
       fk_model_id: this.id
     });
-    await NocoCache.del(`${CacheScope.COLUMN}:${this.id}`);
+    await NocoCache.deepDel(
+      CacheScope.COLUMN,
+      `${CacheScope.COLUMN}:${this.id}`
+    );
 
     await ncMeta.metaDelete(null, null, MetaTable.MODELS, this.id);
-    await NocoCache.del(`${CacheScope.MODEL}:${this.id}`);
+    await NocoCache.deepDel(CacheScope.MODEL, `${CacheScope.MODEL}:${this.id}`);
 
     return true;
   }
@@ -390,6 +398,13 @@ export default class Model implements TableType {
 
   static async updateAlias(tableId, _tn: string, ncMeta = Noco.ncMeta) {
     if (!_tn) NcError.badRequest("Missing '_tn' property in body");
+    // get existing cache
+    const key = `${CacheScope.MODEL}:${tableId}`;
+    const o = await NocoCache.get(key, 2);
+    // update alias
+    o._tn = _tn;
+    // set cache
+    await NocoCache.set(key, o);
     return await ncMeta.metaUpdate(
       null,
       null,
