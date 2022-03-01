@@ -1,4 +1,5 @@
 import CacheMgr from './CacheMgr';
+// @ts-ignore
 import Redis from 'ioredis';
 
 export default class RedisCacheMgr extends CacheMgr {
