@@ -380,7 +380,7 @@ export default class Column implements ColumnType {
         MetaTable.COLUMNS,
         colId
       );
-      await NocoCache.set(colId, colData);
+      // await NocoCache.set(colId, colData);
     }
     if (colData) {
       const column = new Column(colData);

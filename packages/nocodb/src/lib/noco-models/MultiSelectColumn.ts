@@ -1,6 +1,6 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
-import NocoCache from '../noco-cache/NocoCache';
+// import NocoCache from '../noco-cache/NocoCache';
 import { MetaTable } from '../utils/globals';
 
 export default class MultiSelectColumn {
@@ -27,8 +27,8 @@ export default class MultiSelectColumn {
         MetaTable.COL_SELECT_OPTIONS,
         { condition: { fk_column_id: columnId } }
       );
-      for (const option of options)
-        await NocoCache.set(option.id, columnId, option);
+      // for (const option of options)
+      // await NocoCache.set(option.id, columnId, option);
     }
 
     return options?.length
