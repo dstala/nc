@@ -33,6 +33,35 @@ export enum MetaTable {
 }
 
 export enum CacheScope {
+  PROJECT = 'project',
   BASE = 'base',
-  MODEL = 'model'
+  MODEL = 'model',
+  COLUMN = 'column',
+  COL_PROP = 'colProp',
+  COL_RELATION = 'colRelation',
+  COL_SELECT_OPTION = 'colSelectOption',
+  COL_LOOKUP = 'colLookup',
+  COL_ROLLUP = 'colRollup',
+  COL_FORMULA = 'colFormula',
+  FILTER_EXP = 'filterExp',
+  SORT = 'sort',
+  SHARED_VIEW = 'sharedView',
+  ACL = 'acl',
+  FORM_VIEW = 'formView',
+  FORM_VIEW_COLUMN = 'formViewColumn',
+  GALLERY_VIEW = 'galleryView',
+  GALLERY_VIEW_COLUMN = 'galleryViewColumn',
+  GRID_VIEW = 'gridView',
+  GRID_VIEW_COLUMN = 'gridViewColumn',
+  KANBAN_VIEW = 'kanbanView',
+  KANBAN_VIEW_COLUMN = 'kanbanViewColumn',
+  USER = 'user',
+  ORGS = 'orgs',
+  TEAM = 'team',
+  TEAM_USERS = 'teamUser',
+  VIEWS = 'views',
+  AUDIT = 'audit',
+  HOOK = 'hook',
+  PLUGIN = 'plugin',
+  PROJECT_USER = 'projectUser'
 }
