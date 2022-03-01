@@ -49,12 +49,8 @@ export const getters = {
     return state.paidUser
   },
 
-  GtrIsAuthenticated(state, getters, rootState) {
-    return rootState.project.projectInfo &&
-      (rootState.project.projectInfo.authType === 'none' ||
-        (rootState.project.projectInfo.authType === 'jwt' && state.user) ||
-        (rootState.project.projectInfo.authType === 'masterKey' && state.masterKey)
-      )
+  GtrIsAuthenticated(state) {
+    return state.user
   },
 
   GtrIsAdmin(state) {
@@ -80,8 +76,8 @@ export const getters = {
       }
       return Object.entries(roles).some(([name, hasRole]) => {
         // todo : revert
-        return true
-        // return hasRole && rolePermissions[name] && (rolePermissions[name] === '*' || rolePermissions[name][page])
+        // return true
+        return hasRole && rolePermissions[name] && (rolePermissions[name] === '*' || rolePermissions[name][page])
       })
     }
   },
@@ -375,7 +371,8 @@ export const actions = {
       const user = await this.$api.auth.me({ // '/user/me?project_id=' + projectId, {
         headers: {
           'xc-auth': state.token
-        }
+        },
+        query: { project_id: projectId }
       })
       commit('MutProjectRole', user && user.data && user.data.roles)
     } catch (e) {

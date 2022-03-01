@@ -286,7 +286,6 @@
         <notification class="mx-2" />
 
         <language class="ml-3" />
-
         <v-menu
           v-if="isAuthenticated"
           offset-y
@@ -306,54 +305,31 @@
             </v-btn>
           </template>
           <v-list dense class="nc-user-menu">
-            <template v-if="isDocker">
-              <!--              <v-list-item @click="xcMetaTabAdd" v-ge="['Meta add','']">-->
-              <!--                <v-list-item-title>-->
+            <v-list-item v-ge="['Settings','']" dense to="/user/settings">
+              <v-list-item-title>
+                <v-icon small>
+                  mdi-at
+                </v-icon>&nbsp; <span class="font-weight-bold caption">{{ userEmail }}</span>
+              </v-list-item-title>
+            </v-list-item>
 
-              <!--                  <v-icon small>mdi-file-table-box-multiple-outline</v-icon>&nbsp; Export/Import Metadata-->
-              <!--                </v-list-item-title>-->
-              <!--              </v-list-item>-->
-              <!--              <v-list-item @click="showChangeEnv = true" v-ge="['Change env','']">-->
-              <!--                <v-list-item-title>-->
+            <v-divider />
 
-              <!--                  <v-icon small>mdi-test-tube</v-icon>&nbsp; Change Environment-->
-              <!--                </v-list-item-title>-->
-              <!--              </v-list-item>-->
-              <!--              <v-list-item @click="terminalTabAdd()" v-ge="[isDocker ? 'Docker Console' : 'API Generator','']">
-                              <v-list-item-title>
+            <v-list-item
+              v-if="isDashboard"
+              v-clipboard="$store.state.users.token"
+              dense
+              @click.stop="$toast.success('Auth token copied to clipboard').goAway(3000)"
+            >
+              <v-list-item-title>
+                <v-icon key="terminal-dash" small>
+                  mdi-content-copy
+                </v-icon>&nbsp;
+                <span class="font-weight-regular caption">Copy auth token</span>
+              </v-list-item-title>
+            </v-list-item>
 
-                                <v-icon small key="terminal-dash">
-                                  mdi-console
-                                </v-icon>&nbsp;
-                                {{ isDocker ? 'Docker Console' : 'API Generator' }}
-
-                              </v-list-item-title>
-                            </v-list-item>-->
-              <v-list-item v-ge="['Settings','']" dense to="/user/settings">
-                <v-list-item-title>
-                  <v-icon small>
-                    mdi-at
-                  </v-icon>&nbsp; <span class="font-weight-bold caption">{{ userEmail }}</span>
-                </v-list-item-title>
-              </v-list-item>
-
-              <v-divider />
-
-              <v-list-item
-                v-if="isDashboard"
-                v-clipboard="$store.state.users.token"
-                dense
-                @click.stop="$toast.success('Auth token copied to clipboard').goAway(3000)"
-              >
-                <v-list-item-title>
-                  <v-icon key="terminal-dash" small>
-                    mdi-content-copy
-                  </v-icon>&nbsp;
-                  <span class="font-weight-regular caption">Copy auth token</span>
-                </v-list-item-title>
-              </v-list-item>
-
-              <!--
+            <!--
                             <v-list-item dense @click.stop="projectInfoTabAdd">
                               <v-list-item-title>
 
@@ -364,47 +340,46 @@
 
                               </v-list-item-title>
                             </v-list-item>-->
-              <v-list-item
-                v-if="swaggerOrGraphiqlUrl"
-                dense
-                @click.stop="openUrl(`${$axios.defaults.baseURL}${swaggerOrGraphiqlUrl}`)"
-              >
-                <v-list-item-title>
-                  <v-icon key="terminal-dash" small>
-                    {{ isGql ? 'mdi-graphql' : 'mdi-code-json' }}
-                  </v-icon>&nbsp;
-                  <span class="font-weight-regular caption">
-                    {{ isGql ? 'GraphQL APIs' : 'Swagger APIs Doc' }}</span>
-                </v-list-item-title>
-              </v-list-item>
-              <v-divider />
-              <v-list-item v-if="isDashboard" v-ge="['Sign Out','']" dense @click="copyProjectInfo">
-                <v-list-item-title>
-                  <v-icon small>
-                    mdi-information-outline
-                  </v-icon>&nbsp; <span class="font-weight-regular caption">Copy Project info</span>
-                </v-list-item-title>
-              </v-list-item>
+            <v-list-item
+              v-if="swaggerOrGraphiqlUrl"
+              dense
+              @click.stop="openUrl(`${$axios.defaults.baseURL}${swaggerOrGraphiqlUrl}`)"
+            >
+              <v-list-item-title>
+                <v-icon key="terminal-dash" small>
+                  {{ isGql ? 'mdi-graphql' : 'mdi-code-json' }}
+                </v-icon>&nbsp;
+                <span class="font-weight-regular caption">
+                  {{ isGql ? 'GraphQL APIs' : 'Swagger APIs Doc' }}</span>
+              </v-list-item-title>
+            </v-list-item>
+            <v-divider />
+            <v-list-item v-if="isDashboard" v-ge="['Sign Out','']" dense @click="copyProjectInfo">
+              <v-list-item-title>
+                <v-icon small>
+                  mdi-information-outline
+                </v-icon>&nbsp; <span class="font-weight-regular caption">Copy Project info</span>
+              </v-list-item-title>
+            </v-list-item>
 
-              <v-list-item v-if="isDashboard" dense @click.stop="settingsTabAdd">
-                <v-list-item-title>
-                  <v-icon key="terminal-dash" small>
-                    mdi-palette
-                  </v-icon>&nbsp;
-                  <span class="font-weight-regular caption">Themes</span>
-                </v-list-item-title>
-              </v-list-item>
+            <v-list-item v-if="isDashboard" dense @click.stop="settingsTabAdd">
+              <v-list-item-title>
+                <v-icon key="terminal-dash" small>
+                  mdi-palette
+                </v-icon>&nbsp;
+                <span class="font-weight-regular caption">Themes</span>
+              </v-list-item-title>
+            </v-list-item>
 
-              <v-divider v-if="isDashboard" />
+            <v-divider v-if="isDashboard" />
 
-              <v-list-item v-ge="['Sign Out','']" dense @click="MtdSignOut">
-                <v-list-item-title>
-                  <v-icon small>
-                    mdi-logout
-                  </v-icon>&nbsp; <span class="font-weight-regular caption">Sign Out</span>
-                </v-list-item-title>
-              </v-list-item>
-            </template>
+            <v-list-item v-ge="['Sign Out','']" dense @click="MtdSignOut">
+              <v-list-item-title>
+                <v-icon small>
+                  mdi-logout
+                </v-icon>&nbsp; <span class="font-weight-regular caption">Sign Out</span>
+              </v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-menu>
         <v-menu v-else offset-y open-on-hover>

@@ -2,6 +2,7 @@ import Base, { BaseBody } from '../noco-models/Base';
 import Noco from '../noco/Noco';
 import { ProjectType } from 'nc-common';
 import { MetaTable } from '../utils/globals';
+import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
 
 export default class Project implements ProjectType {
   public id: string;
@@ -15,6 +16,11 @@ export default class Project implements ProjectType {
   public order: number;
   public is_meta = false;
   public bases?: Base[];
+
+  // shared base props
+  uuid?: string;
+  password?: string;
+  roles?: string;
 
   constructor(project: Partial<Project>) {
     Object.assign(this, project);
@@ -115,12 +121,50 @@ export default class Project implements ProjectType {
     );
   }
 
+  // @ts-ignore
+  static async update(
+    projectId: string,
+    project: Partial<Project>
+  ): Promise<any> {
+    return await Noco.ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.PROJECT,
+      extractDefinedProps(project, [
+        'title',
+        'prefix',
+        'status',
+        'description',
+        'meta',
+        'color',
+        'deleted',
+        'order',
+        'bases',
+        'uuid',
+        'password',
+        'roles'
+      ]),
+      projectId
+    );
+  }
+
   static async delete(projectId, ncMeta = Noco.ncMeta): Promise<any> {
     const bases = await Base.list({ projectId });
     for (const base of bases) {
       await base.delete(ncMeta);
     }
     return await ncMeta.metaDelete(null, null, MetaTable.PROJECT, projectId);
+  }
+
+  static async getByUuid(uuid) {
+    const projectData = await Noco.ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.PROJECT,
+      { uuid }
+    );
+    if (projectData) return new Project(projectData);
+    return null;
   }
 }
 

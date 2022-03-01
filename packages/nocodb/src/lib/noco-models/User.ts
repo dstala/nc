@@ -15,7 +15,7 @@ export default class User implements UserType {
   username?: string;
   refresh_token?: string;
   invite_token?: string;
-  invite_token_expires?: string;
+  invite_token_expires?: number | Date;
   reset_password_expires?: number | Date;
   reset_password_token?: string;
   email_verification_token?: string;
@@ -72,5 +72,18 @@ export default class User implements UserType {
 
   static async isFirst(ncMeta = Noco.ncMeta) {
     return !(await ncMeta.metaGet2(null, null, MetaTable.USERS, {}));
+  }
+
+  static async count(ncMeta = Noco.ncMeta) {
+    return (
+      await ncMeta
+        .knex(MetaTable.USERS)
+        .count('id', { as: 'count' })
+        .first()
+    )?.count;
+  }
+
+  static async get(userId, ncMeta = Noco.ncMeta) {
+    return await ncMeta.metaGet2(null, null, MetaTable.USERS, userId);
   }
 }

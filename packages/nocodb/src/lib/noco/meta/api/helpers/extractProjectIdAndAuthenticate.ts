@@ -14,6 +14,8 @@ export default async (req, res, next) => {
   // extract project id based on request path params
   if (params.projectId) {
     req.ncProjectId = params.projectId;
+  } else if (req.query.project_id) {
+    req.ncProjectId = req.query.project_id;
   } else if (params.tableId || req.query.fk_model_id) {
     const model = await Model.getByIdOrName({
       id: params.tableId || req.query.fk_model_id

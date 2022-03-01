@@ -8,3 +8,7 @@ export default function getTableNameAlias(tableName: string, prefix): string {
 
   return inflection.camelize(tn);
 }
+
+export function getColumnNameAlias(columnName: string): string {
+  return inflection.camelize(columnName);
+}

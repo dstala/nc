@@ -525,6 +525,11 @@ export interface ProjectListParamsType {
   sort?: string;
 }
 
+export interface SharedBaseCreatePayloadType {
+  roles?: string;
+  password?: string;
+}
+
 export interface UploadPayloadType {
   files?: any;
   json?: string;
@@ -967,11 +972,11 @@ export class Api<
         format: 'json',
         ...params,
       }),
-  };
-  projects = {
+
     /**
      * No description
      *
+     * @tags auth
      * @name ProjectUserAdd
      * @request POST:/projects/{projectId}/users
      * @response `200` `any` OK
@@ -993,17 +998,19 @@ export class Api<
     /**
      * No description
      *
+     * @tags auth
      * @name ProjectUserUpdate
-     * @request PUT:/projects/{projectId}/users - copy
+     * @request PUT:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
      */
     projectUserUpdate: (
       projectId: string,
+      userId: string,
       data: ProjectUserUpdatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/users - copy`,
+        path: `/projects/${projectId}/users/${userId}`,
         method: 'PUT',
         body: data,
         type: ContentType.Json,
@@ -1014,43 +1021,20 @@ export class Api<
     /**
      * No description
      *
+     * @tags auth
      * @name ProjectUserRemove
-     * @request DELETE:/projects/{projectId}/users - copy
+     * @request DELETE:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
      */
-    projectUserRemove: (projectId: string, params: RequestParams = {}) =>
+    projectUserRemove: (
+      projectId: string,
+      userId: string,
+      params: RequestParams = {}
+    ) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/users - copy`,
+        path: `/projects/${projectId}/users/${userId}`,
         method: 'DELETE',
         format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ProjectUpdate
-     * @request PUT:/projects/{projectId}
-     * @response `200` `void` OK
-     */
-    projectUpdate: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}`,
-        method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ProjectReorder
-     * @request POST:/projects/{projectId}/reorder
-     * @response `200` `void` OK
-     */
-    projectReorder: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/reorder`,
-        method: 'POST',
         ...params,
       }),
   };
@@ -1123,6 +1107,60 @@ export class Api<
       this.request<void, any>({
         path: `/projects/${projectId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * @description Read project details
+     *
+     * @tags Meta
+     * @name SharedBaseGet
+     * @request GET:/projects/{projectId}/sharedBase
+     * @response `200` `{ uuid?: string, url?: string }` OK
+     * @response `0` `any`
+     */
+    sharedBaseGet: (projectId: string, params: RequestParams = {}) =>
+      this.request<{ uuid?: string; url?: string }, any>({
+        path: `/projects/${projectId}/sharedBase`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name SharedBaseDisable
+     * @request DELETE:/projects/{projectId}/sharedBase
+     * @response `200` `void` OK
+     */
+    sharedBaseDisable: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/sharedBase`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name SharedBaseCreate
+     * @request POST:/projects/{projectId}/sharedBase
+     * @response `200` `{ url?: string, uuid?: string }` OK
+     */
+    sharedBaseCreate: (
+      projectId: string,
+      data: SharedBaseCreatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<{ url?: string; uuid?: string }, any>({
+        path: `/projects/${projectId}/sharedBase`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
 
@@ -2505,6 +2543,143 @@ export class Api<
         ...params,
       }),
   };
+  projects = {
+    /**
+     * No description
+     *
+     * @name ProjectUpdate
+     * @request PUT:/projects/{projectId}
+     * @response `200` `void` OK
+     */
+    projectUpdate: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}`,
+        method: 'PUT',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name ProjectReorder
+     * @request POST:/projects/{projectId}/reorder
+     * @response `200` `void` OK
+     */
+    projectReorder: (projectId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/reorder`,
+        method: 'POST',
+        ...params,
+      }),
+  };
+  public = {
+    /**
+     * @description Read project details
+     *
+     * @tags public
+     * @name SharedBaseGet
+     * @request GET:/public/sharedBase/{sharedBaseUuid}
+     * @response `200` `{ project_id?: string }` OK
+     * @response `0` `any`
+     */
+    sharedBaseGet: (sharedBaseUuid: string, params: RequestParams = {}) =>
+      this.request<{ project_id?: string }, any>({
+        path: `/public/sharedBase/${sharedBaseUuid}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
+     * @name DataList
+     * @request POST:public/data/{uuid}/list
+     * @response `200` `any` OK
+     */
+    dataList: (
+      { uuid, ...query }: DataListParamsType,
+      data: DataListPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `public/data/${uuid}/list`,
+        method: 'POST',
+        query: query,
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
+     * @name DataCreate
+     * @request POST:public/data/{uuid}/create
+     * @response `200` `any` OK
+     */
+    dataCreate: (
+      uuid: string,
+      data: DataCreatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `public/data/${uuid}/create`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
+     * @name DataRelationList
+     * @request POST:public/data/{uuid}/relationTable/{relationColumnId}
+     * @response `200` `any` OK
+     */
+    dataRelationList: (
+      { uuid, relationColumnId, ...query }: DataRelationListParamsType,
+      data: DataRelationListPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `public/data/${uuid}/relationTable/${relationColumnId}`,
+        method: 'POST',
+        query: query,
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags
+     * @name SharedViewMetaGet
+     * @request POST:public/meta/{uuid}
+     * @response `200` `object` OK
+     */
+    sharedViewMetaGet: (
+      uuid: string,
+      data: SharedViewMetaGetPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<object, any>({
+        path: `public/meta/${uuid}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+  };
   tables = {
     /**
      * No description
@@ -2715,97 +2890,6 @@ export class Api<
       this.request<any, any>({
         path: `/data/${tableId}/${rowId}/mm/${colId}`,
         method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-  };
-  public = {
-    /**
-     * No description
-     *
-     * @tags Public
-     * @name DataList
-     * @request POST:public/data/{uuid}/list
-     * @response `200` `any` OK
-     */
-    dataList: (
-      { uuid, ...query }: DataListParamsType,
-      data: DataListPayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `public/data/${uuid}/list`,
-        method: 'POST',
-        query: query,
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Public
-     * @name DataCreate
-     * @request POST:public/data/{uuid}/create
-     * @response `200` `any` OK
-     */
-    dataCreate: (
-      uuid: string,
-      data: DataCreatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `public/data/${uuid}/create`,
-        method: 'POST',
-        body: data,
-        type: ContentType.FormData,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Public
-     * @name DataRelationList
-     * @request POST:public/data/{uuid}/relationTable/{relationColumnId}
-     * @response `200` `any` OK
-     */
-    dataRelationList: (
-      { uuid, relationColumnId, ...query }: DataRelationListParamsType,
-      data: DataRelationListPayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `public/data/${uuid}/relationTable/${relationColumnId}`,
-        method: 'POST',
-        query: query,
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags
-     * @name SharedViewMetaGet
-     * @request POST:public/meta/{uuid}
-     * @response `200` `object` OK
-     */
-    sharedViewMetaGet: (
-      uuid: string,
-      data: SharedViewMetaGetPayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<object, any>({
-        path: `public/meta/${uuid}`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
         format: 'json',
         ...params,
       }),
