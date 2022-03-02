@@ -26,6 +26,13 @@ export async function projectGet(
   console.log(req.query.page);
   const project = await Project.getWithInfo(req.params.projectId);
 
+  // delete datasource connection details
+  project.bases?.forEach(b => {
+    ['host', 'port', 'username', 'password', 'url', 'params', 'ssl'].forEach(
+      k => delete b[k]
+    );
+  });
+
   res.json(project);
 }
 export async function projectList(

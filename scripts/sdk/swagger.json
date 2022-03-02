@@ -294,16 +294,6 @@
                 }
               }
             }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {}
-                }
-              }
-            }
           }
         },
         "description": "",
@@ -404,6 +394,71 @@
         },
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/projects/{projectId}/{baseId}/modelVisibility": {
+      "get": {
+        "summary": "Password Refresh",
+        "operationId": "project-model-visibility-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "tags": [
+          "meta"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "baseId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "project-model-visibility-set",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "tags": [
+          "meta"
         ]
       }
     },
@@ -524,15 +579,6 @@
                 }
               }
             }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Project"
-                }
-              }
-            }
           }
         }
       },
@@ -602,13 +648,6 @@
                     }
                   }
                 }
-              }
-            }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           }
@@ -700,13 +739,6 @@
                     }
                   }
                 }
-              }
-            }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           }
@@ -5856,6 +5888,30 @@
             "type": "string"
           },
           "price": {
+            "type": "string"
+          }
+        }
+      },
+      "ModelRoleVisibility": {
+        "title": "ModelRoleVisibility",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "base_id": {
+            "type": "string"
+          },
+          "fk_model_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "disabled": {
             "type": "string"
           }
         }

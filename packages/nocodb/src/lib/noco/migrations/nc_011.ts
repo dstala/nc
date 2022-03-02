@@ -797,6 +797,25 @@ const up = async knex => {
     table.timestamps();
   });
 
+  await knex.schema.createTable(MetaTable.MODEL_ROLE_VISIBILITY, table => {
+    table
+      .string('id', 20)
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
+    table.string('fk_model_id', 20);
+    table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
+
+    table.string('role', 45);
+    table.boolean('disabled').defaultTo(true);
+    table.timestamps();
+  });
+
   // await knex('nc_plugins').insert([
   //   googleAuth,
   //   ses,

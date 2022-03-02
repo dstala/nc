@@ -490,6 +490,15 @@ export interface PluginType {
   price?: string;
 }
 
+export interface ModelRoleVisibilityType {
+  id?: string;
+  project_id?: string;
+  base_id?: string;
+  fk_model_id?: string;
+  role?: string;
+  disabled?: string;
+}
+
 export interface SigninPayloadType {
   email: string;
   password: string;
@@ -518,6 +527,8 @@ export interface TokenVerifyPayloadType {
 export type ProjectUserAddPayloadType = any;
 
 export type ProjectUserUpdatePayloadType = any;
+
+export type ProjectModelVisibilitySetPayloadType = any;
 
 export interface ProjectListParamsType {
   page?: number;
@@ -960,12 +971,11 @@ export class Api<
      * @summary Password Refresh
      * @request GET:/projects/{projectId}/users
      * @response `200` `{ users?: { list: (UserType)[], pageInfo: PaginatedType } }` OK
-     * @response `0` `(any)[]`
      */
     projectUserList: (projectId: string, params: RequestParams = {}) =>
       this.request<
         { users?: { list: UserType[]; pageInfo: PaginatedType } },
-        any[]
+        any
       >({
         path: `/projects/${projectId}/users`,
         method: 'GET',
@@ -1040,6 +1050,50 @@ export class Api<
   };
   meta = {
     /**
+     * No description
+     *
+     * @tags meta
+     * @name ProjectModelVisibilityList
+     * @summary Password Refresh
+     * @request GET:/projects/{projectId}/{baseId}/modelVisibility
+     * @response `200` `(any)[]` OK
+     */
+    projectModelVisibilityList: (
+      projectId: string,
+      baseId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any[], any>({
+        path: `/projects/${projectId}/${baseId}/modelVisibility`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name ProjectModelVisibilitySet
+     * @request POST:/projects/{projectId}/{baseId}/modelVisibility
+     * @response `200` `any` OK
+     */
+    projectModelVisibilitySet: (
+      projectId: string,
+      baseId: string,
+      data: ProjectModelVisibilitySetPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/${baseId}/modelVisibility`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
      * @description Read project details
      *
      * @tags Meta
@@ -1085,10 +1139,9 @@ export class Api<
      * @name ProjectRead
      * @request GET:/projects/{projectId}
      * @response `200` `object` OK
-     * @response `0` `ProjectType`
      */
     projectRead: (projectId: string, params: RequestParams = {}) =>
-      this.request<object, ProjectType>({
+      this.request<object, any>({
         path: `/projects/${projectId}`,
         method: 'GET',
         format: 'json',
@@ -1117,7 +1170,6 @@ export class Api<
      * @name SharedBaseGet
      * @request GET:/projects/{projectId}/sharedBase
      * @response `200` `{ uuid?: string, url?: string }` OK
-     * @response `0` `any`
      */
     sharedBaseGet: (projectId: string, params: RequestParams = {}) =>
       this.request<{ uuid?: string; url?: string }, any>({
@@ -2580,7 +2632,6 @@ export class Api<
      * @name SharedBaseGet
      * @request GET:/public/sharedBase/{sharedBaseUuid}
      * @response `200` `{ project_id?: string }` OK
-     * @response `0` `any`
      */
     sharedBaseGet: (sharedBaseUuid: string, params: RequestParams = {}) =>
       this.request<{ project_id?: string }, any>({

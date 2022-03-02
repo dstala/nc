@@ -9,7 +9,7 @@
             dense
             hide-details
             class="my-2 mx-auto search-field"
-            :placeholder="`Search '${db.connection.database}' models`"
+            :placeholder="`Search '${db.database}' models`"
             style="max-width:300px"
             outlined
           >
@@ -74,18 +74,23 @@
                   <td>
                     <v-tooltip bottom>
                       <template #activator="{on}">
-                        <span class="caption ml-2" v-on="on">{{ table.type === 'table' ? table._tn:table.type === 'view' ? table._tn : table.ptn.charAt(0).toUpperCase()+table.ptn.slice(1) }}</span>
+                        <span
+                          class="caption ml-2"
+                          v-on="on"
+                        >{{ table.type === 'table' ? table._tn : table.type === 'view' ? table._tn : table._tn }}</span>
                       </template>
                       <span class="caption">{{ table.tn }}</span>
                     </v-tooltip>
                   </td>
                   <td>
-                    <v-icon small :color="viewIcons[table.type === 'vtable' ? table.show_as : table.type].color" v-on="on">
-                      {{ viewIcons[table.type === 'vtable' ? table.show_as : table.type].icon }}
-                    </v-icon>
+                    <!--
+                                     todo:enable
+                                     <v-icon small :color="viewIcons[(table.type === 'vtable' ? table.show_as : table.type) || 'table'].color" v-on="on">
+                    {{ viewIcons[(table.type === 'vtable' ? table.show_as : table.type) || 'table'].icon }}
+                  </v-icon>-->
                     <span v-if="table.ptn" class="caption">{{ table._tn }}</span>
                     <span v-else class="caption">{{ 'Default' }}</span>
-                    <!--                    {{ table.show_as || table.type }}-->
+                  <!--                    {{ table.show_as || table.type }}-->
                   </td>
                   <td v-for="role in roles" :key="`${table.tn}-${role}`">
                     <v-tooltip bottom>
@@ -143,21 +148,25 @@ export default {
   },
   methods: {
     async loadTableList() {
-      this.tables = (await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        dbAlias: this.db.meta.dbAlias,
-        env: this.$store.getters['project/GtrEnv']
-      }, 'xcVisibilityMetaGet', {
-        type: 'all'
-      }]))
+      this.tables = (await this.$api.meta.projectModelVisibilityList(this.db.project_id, this.db.id)).data
+      // this.tables = (await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   dbAlias: this.db.meta.dbAlias,
+      //   env: this.$store.getters['project/GtrEnv']
+      // }, 'xcVisibilityMetaGet', {
+      //   type: 'all'
+      // }]))
     },
     async save() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          dbAlias: this.db.meta.dbAlias,
-          env: this.$store.getters['project/GtrEnv']
-        }, 'xcVisibilityMetaSetAll', {
-          disableList: this.tables.filter(t => t.edited)
-        }])
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   dbAlias: this.db.meta.dbAlias,
+        //   env: this.$store.getters['project/GtrEnv']
+        // }, 'xcVisibilityMetaSetAll', {
+        //   disableList: this.tables.filter(t => t.edited)
+        // }])
+
+        await this.$api.meta.projectModelVisibilitySet(this.db.project_id, this.db.id, this.tables.filter(t => t.edited))
+
         this.$toast.success('Updated UI ACL for tables successfully').goAway(3000)
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)

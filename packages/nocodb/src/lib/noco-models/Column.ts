@@ -472,7 +472,7 @@ export default class Column implements ColumnType {
       case UITypes.Lookup:
         // LookupColumn.insert()
 
-        await ncMeta.metaDelete(null, null, MetaTable.COL_LOOKUP, {
+        await ncMeta.metaInsert2(null, null, MetaTable.COL_LOOKUP, {
           fk_column_id: colId
         });
         break;

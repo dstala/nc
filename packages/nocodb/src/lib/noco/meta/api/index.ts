@@ -25,6 +25,7 @@ import utilApis from './utilApis';
 import projectUserApis from './projectUserApis';
 import sharedBaseApis from './sharedBaseApis';
 import { initStrategies } from './userApi/initStrategies';
+import modelVisibilityApis from './modelVisibilityApis';
 
 export default function(router: Router) {
   initStrategies(router);
@@ -54,5 +55,6 @@ export default function(router: Router) {
   router.use(pluginApis);
   router.use(projectUserApis);
   router.use(sharedBaseApis);
+  router.use(modelVisibilityApis);
   userApis(router);
 }

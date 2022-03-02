@@ -15,6 +15,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { xcVisibilityMetaGet } from './modelVisibilityApis';
 
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
@@ -27,18 +28,27 @@ export async function tableList(
   req: Request<any, any, any, TableListParamsType>,
   res: Response<TableListType>
 ) {
-  const tables = await Model.list({
-    project_id: req.params.projectId,
-    base_id: null
+  const tablesList = await xcVisibilityMetaGet(
+    req.params.projectId,
+    req.params.baseId
+  );
+
+  const filteredTableList = tablesList.filter((table: any) => {
+    return Object.keys((req as any).session?.passport?.user?.roles).some(
+      role =>
+        (req as any)?.session?.passport?.user?.roles[role] &&
+        !table.disabled[role]
+    );
   });
+
+  //   await Model.list({
+  //   project_id: req.params.projectId,
+  //   base_id: null
+  // });
 
   res // todo: pagination
     .json({
-      tables: new PagedResponseImpl(tables, {
-        totalRows: tables.length,
-        pageSize: 20,
-        page: 1
-      })
+      tables: new PagedResponseImpl(filteredTableList as Model[])
     });
 }
 
