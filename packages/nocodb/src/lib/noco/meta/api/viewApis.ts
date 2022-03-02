@@ -11,6 +11,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import View from '../../../noco-models/View';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { xcVisibilityMetaGet } from './modelVisibilityApis';
 
 // @ts-ignore
 export async function viewGet(req: Request, res: Response<Table>) {}
@@ -20,10 +21,30 @@ export async function viewList(
   req: Request<any, any, any>,
   res: Response<ViewList>
 ) {
+  const model = await Model.get(req.params.tableId);
+
+  const viewList = await xcVisibilityMetaGet(
+    // req.params.projectId,
+    // req.params.baseId,
+    null,
+    null,
+    [model]
+  );
+
+  //await View.list(req.params.tableId)
+  const filteredViewList = viewList.filter((table: any) => {
+    return Object.keys((req as any).session?.passport?.user?.roles).some(
+      role =>
+        (req as any)?.session?.passport?.user?.roles[role] &&
+        !table.disabled[role]
+    );
+  });
+
   res.json({
-    views: new PagedResponseImpl(await View.list(req.params.tableId))
+    views: new PagedResponseImpl(filteredViewList)
   } as any);
 }
+
 // @ts-ignore
 export async function shareView(
   req: Request<any, any, any>,
@@ -52,9 +73,11 @@ async function shareViewPasswordUpdate(req: Request<any, any>, res) {
 async function shareViewDelete(req: Request<any, any>, res) {
   res.json(await View.sharedViewDelete(req.params.viewId));
 }
+
 async function showAllColumns(req: Request<any, any>, res) {
   res.json(await View.showAllColumns(req.params.viewId));
 }
+
 async function hideAllColumns(req: Request<any, any>, res) {
   res.json(await View.hideAllColumns(req.params.viewId));
 }

@@ -77,9 +77,9 @@
                         <span
                           class="caption ml-2"
                           v-on="on"
-                        >{{ table.type === 'table' ? table._tn : table.type === 'view' ? table._tn : table._tn }}</span>
+                        >{{ table.ptype === 'table' ? table._ptn : table.ptype === 'view' ? table._ptn : table._ptn }}</span>
                       </template>
-                      <span class="caption">{{ table.tn }}</span>
+                      <span class="caption">{{ table.ptn || table._ptn }}</span>
                     </v-tooltip>
                   </td>
                   <td>

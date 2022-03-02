@@ -495,6 +495,7 @@ export interface ModelRoleVisibilityType {
   project_id?: string;
   base_id?: string;
   fk_model_id?: string;
+  fk_view_id?: string;
   role?: string;
   disabled?: string;
 }

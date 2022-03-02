@@ -5908,6 +5908,9 @@
           "fk_model_id": {
             "type": "string"
           },
+          "fk_view_id": {
+            "type": "string"
+          },
           "role": {
             "type": "string"
           },

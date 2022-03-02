@@ -7,7 +7,8 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
   id?: string;
   project_id?: string;
   base_id?: string;
-  fk_model_id?: string;
+  // fk_model_id?: string;
+  fk_view_id?: string;
   role?: string;
   disabled?: string;
 
@@ -24,13 +25,19 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     return datas?.map(baseData => new ModelRoleVisibility(baseData));
   }
 
-  static async get(args: { role: string; fk_model_id: any }) {
+  static async get(args: { role: string; fk_view_id: any }) {
     const data = await Noco.ncMeta.metaGet2(
       null,
       null,
       MetaTable.MODEL_ROLE_VISIBILITY,
+      // args.fk_model_id
+      //   ? {
+      //       fk_model_id: args.fk_model_id,
+      //       role: args.role
+      //     }
+      //   :
       {
-        fk_model_id: args.fk_model_id,
+        fk_view_id: args.fk_view_id,
         role: args.role
       }
     );
@@ -65,7 +72,8 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     const insertObj = {
       role: body.role,
       disabled: body.disabled,
-      fk_model_id: body.fk_model_id,
+      // fk_model_id: body.fk_model_id,
+      fk_view_id: body.fk_view_id,
       project_id: body.project_id,
       base_id: body.base_id
     };

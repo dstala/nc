@@ -16,24 +16,24 @@ import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import { xcVisibilityMetaGet } from './modelVisibilityApis';
+import View from '../../../noco-models/View';
 
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
-  res.json(table);
-}
 
-export async function tableList(
-  req: Request<any, any, any, TableListParamsType>,
-  res: Response<TableListType>
-) {
-  const tablesList = await xcVisibilityMetaGet(
-    req.params.projectId,
-    req.params.baseId
+  // todo: optimise
+  const viewList = <View[]>await xcVisibilityMetaGet(
+    // req.params.projectId,
+    // req.params.baseId,
+    null,
+    null,
+    [table]
   );
 
-  const filteredTableList = tablesList.filter((table: any) => {
+  //await View.list(req.params.tableId)
+  table.views = viewList.filter((table: any) => {
     return Object.keys((req as any).session?.passport?.user?.roles).some(
       role =>
         (req as any)?.session?.passport?.user?.roles[role] &&
@@ -41,14 +41,34 @@ export async function tableList(
     );
   });
 
-  //   await Model.list({
-  //   project_id: req.params.projectId,
-  //   base_id: null
+  res.json(table);
+}
+
+export async function tableList(
+  req: Request<any, any, any, TableListParamsType>,
+  res: Response<TableListType>
+) {
+  // const tablesList = await xcVisibilityMetaGet(
+  //   req.params.projectId,
+  //   req.params.baseId
+  // );
+  //
+  // const filteredTableList = tablesList.filter((table: any) => {
+  //   return Object.keys((req as any).session?.passport?.user?.roles).some(
+  //     role =>
+  //       (req as any)?.session?.passport?.user?.roles[role] &&
+  //       !table.disabled[role]
+  //   );
   // });
+
+  const tableList = await Model.list({
+    project_id: req.params.projectId,
+    base_id: null
+  });
 
   res // todo: pagination
     .json({
-      tables: new PagedResponseImpl(filteredTableList as Model[])
+      tables: new PagedResponseImpl(tableList as Model[])
     });
 }
 

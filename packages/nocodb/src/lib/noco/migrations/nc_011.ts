@@ -808,8 +808,11 @@ const up = async knex => {
     table.string('project_id', 128);
     // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
-    table.string('fk_model_id', 20);
-    table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
+    // table.string('fk_model_id', 20);
+    // table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
+
+    table.string('fk_view_id', 20);
+    table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
 
     table.string('role', 45);
     table.boolean('disabled').defaultTo(true);
@@ -826,6 +829,7 @@ const up = async knex => {
 };
 
 const down = async knex => {
+  // todo: update order based on relation and add missing drop statements
   // TODO : delete relations
   await knex.schema.dropTable(MetaTable.PROJECT);
   await knex.schema.dropTable(MetaTable.BASES);
