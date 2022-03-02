@@ -96,10 +96,10 @@ async function projectCreate(
         {
           type: db?.client,
           database: db?.connection.database,
-          host: db?.connection.host,
-          port: db?.connection.port,
-          username: db?.connection.user,
-          password: db?.connection.password,
+          // host: db?.connection.host,
+          // port: db?.connection.port,
+          // username: db?.connection.user,
+          // password: db?.connection.password,
           is_meta: true
         }
       ];

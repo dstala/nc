@@ -87,6 +87,7 @@ export function initStrategies(router): void {
                   user.roles = projectUser?.roles || 'user';
                   user.roles =
                     user.roles === 'owner' ? 'owner,creator' : user.roles;
+                  // + (user.roles ? `,${user.roles}` : '');
 
                   // todo : redis-set
                   XcCache.set(key, user);
