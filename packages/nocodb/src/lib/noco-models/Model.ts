@@ -200,7 +200,7 @@ export default class Model implements TableType {
   }
 
   public static async clear({ id }: { id: string }): Promise<void> {
-    await NocoCache.delAll(`${CacheScope.MODEL}:*:${id}`);
+    await NocoCache.delAll(CacheScope.MODEL, `*${id}*`);
     await Column.clearList({ fk_model_id: id });
   }
 
@@ -383,7 +383,7 @@ export default class Model implements TableType {
           fk_column_id: col.id
         });
         await NocoCache.deepDel(
-          CacheScope.MODEL,
+          cacheScopeName,
           `${cacheScopeName}:${col.id}`,
           CacheDelDirection.CHILD_TO_PARENT
         );

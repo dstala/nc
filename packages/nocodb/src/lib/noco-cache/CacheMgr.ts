@@ -4,7 +4,7 @@ export default abstract class CacheMgr {
   public abstract clear(): Promise<any>;
   public abstract del(key: string): Promise<any>;
   public abstract getAll(pattern: string): Promise<any[]>;
-  public abstract delAll(pattern: string): Promise<any[]>;
+  public abstract delAll(scope: string, pattern: string): Promise<any[]>;
   public abstract getOne(pattern: string): Promise<any>;
   public abstract getList(scope: string, list: string[]): Promise<any[]>;
   public abstract setList(

@@ -74,8 +74,8 @@ export default class NocoCache {
     return this.client.del(key);
   }
 
-  public static async delAll(pattern: string): Promise<any[]> {
-    return this.client.delAll(pattern);
+  public static async delAll(scope: string, pattern: string): Promise<any[]> {
+    return this.client.delAll(scope, pattern);
   }
 
   public static async clear(): Promise<boolean> {
