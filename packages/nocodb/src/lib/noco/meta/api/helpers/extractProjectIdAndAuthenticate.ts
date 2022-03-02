@@ -9,111 +9,116 @@ import FormViewColumn from '../../../../noco-models/FormViewColumn';
 import GalleryViewColumn from '../../../../noco-models/GalleryViewColumn';
 
 export default async (req, res, next) => {
-  const { params } = req;
+  try {
+    const { params } = req;
 
-  // extract project id based on request path params
-  if (params.projectId) {
-    req.ncProjectId = params.projectId;
-  } else if (req.query.project_id) {
-    req.ncProjectId = req.query.project_id;
-  } else if (params.tableId || req.query.fk_model_id) {
-    const model = await Model.getByIdOrName({
-      id: params.tableId || req.query.fk_model_id
-    });
-    req.ncProjectId = model?.project_id;
-  } else if (params.viewId) {
-    const view =
-      (await View.get(params.viewId)) || (await Model.get(params.viewId));
-    req.ncProjectId = view?.project_id;
-  } else if (
-    params.formViewId ||
-    params.gridViewId ||
-    params.kanbanViewId ||
-    params.galleryViewId
-  ) {
-    const view = await View.get(
+    // extract project id based on request path params
+    if (params.projectId) {
+      req.ncProjectId = params.projectId;
+    } else if (req.query.project_id) {
+      req.ncProjectId = req.query.project_id;
+    } else if (params.tableId || req.query.fk_model_id) {
+      const model = await Model.getByIdOrName({
+        id: params.tableId || req.query.fk_model_id
+      });
+      req.ncProjectId = model?.project_id;
+    } else if (params.viewId) {
+      const view =
+        (await View.get(params.viewId)) || (await Model.get(params.viewId));
+      req.ncProjectId = view?.project_id;
+    } else if (
       params.formViewId ||
-        params.gridViewId ||
-        params.kanbanViewId ||
-        params.galleryViewId
-    );
-    req.ncProjectId = view?.project_id;
-  } else if (params.publicDataUuid) {
-    const view = await View.getByUUID(req.params.publicDataUuid);
-    req.ncProjectId = view?.project_id;
-  } else if (params.hookId) {
-    const hook = await Hook.get(params.hookId);
-    req.ncProjectId = hook?.project_id;
-  } else if (params.gridViewColumnId) {
-    const gridViewColumn = await GridViewColumn.get(params.gridViewColumnId);
-    req.ncProjectId = gridViewColumn?.project_id;
-  } else if (params.formViewColumnId) {
-    const formViewColumn = await FormViewColumn.get(params.formViewColumnId);
-    req.ncProjectId = formViewColumn?.project_id;
-  } else if (params.galleryViewColumnId) {
-    const galleryViewColumn = await GalleryViewColumn.get(
-      params.galleryViewColumnId
-    );
-    req.ncProjectId = galleryViewColumn?.project_id;
-  }
+      params.gridViewId ||
+      params.kanbanViewId ||
+      params.galleryViewId
+    ) {
+      const view = await View.get(
+        params.formViewId ||
+          params.gridViewId ||
+          params.kanbanViewId ||
+          params.galleryViewId
+      );
+      req.ncProjectId = view?.project_id;
+    } else if (params.publicDataUuid) {
+      const view = await View.getByUUID(req.params.publicDataUuid);
+      req.ncProjectId = view?.project_id;
+    } else if (params.hookId) {
+      const hook = await Hook.get(params.hookId);
+      req.ncProjectId = hook?.project_id;
+    } else if (params.gridViewColumnId) {
+      const gridViewColumn = await GridViewColumn.get(params.gridViewColumnId);
+      req.ncProjectId = gridViewColumn?.project_id;
+    } else if (params.formViewColumnId) {
+      const formViewColumn = await FormViewColumn.get(params.formViewColumnId);
+      req.ncProjectId = formViewColumn?.project_id;
+    } else if (params.galleryViewColumnId) {
+      const galleryViewColumn = await GalleryViewColumn.get(
+        params.galleryViewColumnId
+      );
+      req.ncProjectId = galleryViewColumn?.project_id;
+    }
 
-  const user = await new Promise((resolve, _reject) => {
-    passport.authenticate('jwt', { session: false }, (_err, user, _info) => {
-      if (user && !req.headers['xc-shared-base-id']) {
-        if (
-          req.path.indexOf('/user/me') === -1 &&
-          req.header('xc-preview') &&
-          /(?:^|,)(?:owner|creator)(?:$|,)/.test(user.roles)
-        ) {
-          return resolve({
-            ...user,
-            isAuthorized: true,
-            roles: req.header('xc-preview')
-          });
+    const user = await new Promise((resolve, _reject) => {
+      passport.authenticate('jwt', { session: false }, (_err, user, _info) => {
+        if (user && !req.headers['xc-shared-base-id']) {
+          if (
+            req.path.indexOf('/user/me') === -1 &&
+            req.header('xc-preview') &&
+            /(?:^|,)(?:owner|creator)(?:$|,)/.test(user.roles)
+          ) {
+            return resolve({
+              ...user,
+              isAuthorized: true,
+              roles: req.header('xc-preview')
+            });
+          }
+
+          return resolve({ ...user, isAuthorized: true });
         }
 
-        return resolve({ ...user, isAuthorized: true });
-      }
-
-      if (req.headers['xc-token']) {
-        passport.authenticate(
-          'authtoken',
-          {
-            session: false,
-            optional: false
-          },
-          (_err, user, _info) => {
+        if (req.headers['xc-token']) {
+          passport.authenticate(
+            'authtoken',
+            {
+              session: false,
+              optional: false
+            },
+            (_err, user, _info) => {
+              // if (_err) return reject(_err);
+              if (user) {
+                return resolve({
+                  ...user,
+                  isAuthorized: true,
+                  roles: user.roles === 'owner' ? 'owner,creator' : user.roles
+                });
+              } else {
+                resolve({ roles: 'guest' });
+              }
+            }
+          )(req, res, next);
+        } else if (req.headers['xc-shared-base-id']) {
+          passport.authenticate('baseView', {}, (_err, user, _info) => {
             // if (_err) return reject(_err);
             if (user) {
               return resolve({
                 ...user,
                 isAuthorized: true,
-                roles: user.roles === 'owner' ? 'owner,creator' : user.roles
+                isPublicBase: true
               });
             } else {
               resolve({ roles: 'guest' });
             }
-          }
-        )(req, res, next);
-      } else if (req.headers['xc-shared-base-id']) {
-        passport.authenticate('baseView', {}, (_err, user, _info) => {
-          // if (_err) return reject(_err);
-          if (user) {
-            return resolve({
-              ...user,
-              isAuthorized: true,
-              isPublicBase: true
-            });
-          } else {
-            resolve({ roles: 'guest' });
-          }
-        })(req, res, next);
-      } else {
-        resolve({ roles: 'guest' });
-      }
-    })(req, res, next);
-  });
+          })(req, res, next);
+        } else {
+          resolve({ roles: 'guest' });
+        }
+      })(req, res, next);
+    });
 
-  await promisify((req as any).login.bind(req))(user);
-  next();
+    await promisify((req as any).login.bind(req))(user);
+    next();
+  } catch (e) {
+    console.log(e);
+    next(new Error('Internal error'));
+  }
 };

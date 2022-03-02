@@ -418,6 +418,12 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
   }
 }
 
+export async function columnSetAsPrimary(req: Request, res: Response) {
+  res.json(
+    await Model.updatePrimaryColumn(req.params.tableId, req.params.columnId)
+  );
+}
+
 export async function columnUpdate(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
@@ -706,7 +712,11 @@ const deleteHmOrBtRelation = async ({
 };
 
 const router = Router({ mergeParams: true });
-router.post('/', ncMetaAclMw(columnAdd));
-router.put('/:columnId', ncMetaAclMw(columnUpdate));
-router.delete('/:columnId', ncMetaAclMw(columnDelete));
+router.post('/tables/:tableId/columns/', ncMetaAclMw(columnAdd));
+router.put('/tables/:tableId/columns/:columnId', ncMetaAclMw(columnUpdate));
+router.delete('/tables/:tableId/columns/:columnId', ncMetaAclMw(columnDelete));
+router.post(
+  '/tables/:tableId/columns/:columnId/primary',
+  ncMetaAclMw(columnSetAsPrimary)
+);
 export default router;

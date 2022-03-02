@@ -1465,6 +1465,25 @@ export class Api<
     /**
      * No description
      *
+     * @tags meta
+     * @name TablePrimaryColumnSet
+     * @request POST:/tables/{tableId}/columns/{columnId}/primary
+     * @response `200` `void` OK
+     */
+    tablePrimaryColumnSet: (
+      tableId: string,
+      columnId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/columns/${columnId}/primary`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Meta
      * @name ViewUpdate
      * @request PUT:/views/{viewId}

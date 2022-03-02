@@ -420,4 +420,41 @@ export default class Model implements TableType {
       tableId
     );
   }
+
+  static async updatePrimaryColumn(
+    tableId: string,
+    columnId: string,
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo : redis del - table get
+    const model = await this.getWithInfo({ id: tableId });
+
+    const currentPvCol = model.primaryValue;
+    const newPvCol = model.columns.find(c => c.id === columnId);
+
+    if (!newPvCol) NcError.badRequest('Column not found');
+
+    if (currentPvCol)
+      await ncMeta.metaUpdate(
+        null,
+        null,
+        MetaTable.COLUMNS,
+        {
+          pv: false
+        },
+        currentPvCol.id
+      );
+
+    await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.COLUMNS,
+      {
+        pv: true
+      },
+      newPvCol.id
+    );
+
+    return true;
+  }
 }

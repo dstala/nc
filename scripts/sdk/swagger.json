@@ -1242,6 +1242,38 @@
         ]
       }
     },
+    "/tables/{tableId}/columns/{columnId}/primary": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "columnId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "table-primary-column-set",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      }
+    },
     "/views/{viewId}": {
       "parameters": [
         {
