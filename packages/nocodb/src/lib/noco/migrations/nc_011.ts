@@ -43,6 +43,8 @@ const up = async knex => {
     table.text('url');
     table.text('params');
 
+    table.boolean('is_meta');
+
     table.string('type');
 
     // todo: type

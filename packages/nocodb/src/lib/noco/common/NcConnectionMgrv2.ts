@@ -7,6 +7,7 @@ import { SqlClientFactory } from 'nc-help';
 // import NcMetaIO from '../meta/NcMetaIO';
 import { defaultConnectionConfig } from '../../utils/NcConfigFactory';
 import Base from '../../noco-models/Base';
+import Noco from '../Noco';
 
 export default class NcConnectionMgrv2 {
   private static connectionRefs: {
@@ -35,6 +36,8 @@ export default class NcConnectionMgrv2 {
   }
 
   public static get(base: Base): XKnex {
+    if (base.is_meta) return Noco.ncMeta.knex;
+
     if (this.connectionRefs?.[base.project_id]?.[base.id]) {
       return this.connectionRefs?.[base.project_id]?.[base.id];
     }

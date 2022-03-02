@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import Project from '../../../noco-models/Project';
-import { ModelTypes, ProjectListParamsType, ProjectListType } from 'nc-common';
+import {
+  ModelTypes,
+  ProjectCreatePayloadType,
+  ProjectListParamsType,
+  ProjectListType
+} from 'nc-common';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 // import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import syncMigration from './helpers/syncMigration';
@@ -16,6 +21,10 @@ import UITypes from '../../../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import ProjectUser from '../../../noco-models/ProjectUser';
+import { customAlphabet } from 'nanoid';
+import Noco from '../../Noco';
+
+const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
 
 // // Project CRUD
 
@@ -35,6 +44,7 @@ export async function projectGet(
 
   res.json(project);
 }
+
 export async function projectList(
   req: Request<any, any, any, ProjectListParamsType>,
   res: Response<ProjectListType>,
@@ -70,12 +80,36 @@ export async function projectDelete(
 //
 //
 
-async function projectCreate(req, res, next) {
-  console.log(req.body);
+async function projectCreate(
+  req: Request<any, any, ProjectCreatePayloadType>,
+  res,
+  next
+) {
   try {
-    const project = await Project.createProject(req.body);
+    const projectBody = req.body;
+    if (!projectBody.external) {
+      const ranId = nanoid();
+      projectBody.prefix = `nc_${ranId}__`;
+      projectBody.is_meta = true;
+      const db = Noco.getConfig().meta?.db;
+      projectBody.bases = [
+        {
+          type: db?.client,
+          database: db?.connection.database,
+          host: db?.connection.host,
+          port: db?.connection.port,
+          username: db?.connection.user,
+          password: db?.connection.password,
+          is_meta: true
+        }
+      ];
+    } else {
+      projectBody.is_meta = false;
+    }
+
+    const project = await Project.createProject(projectBody);
     await ProjectUser.insert({
-      fk_user_id: req.user.id,
+      fk_user_id: (req as any).user.id,
       project_id: project.id,
       roles: 'creator'
     });

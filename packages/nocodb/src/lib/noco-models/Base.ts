@@ -2,9 +2,10 @@ import Noco from '../noco/Noco';
 import Project from './Project';
 import { MetaTable } from '../utils/globals';
 import Model from './Model';
+import { BaseType } from 'nc-common';
 
 // todo: hide credentials
-export default class Base {
+export default class Base implements BaseType {
   public alias?: string;
   public host?: string;
   public port?: number;
@@ -14,6 +15,7 @@ export default class Base {
   public url?: string;
   public params?: string;
   public type?: string;
+  public is_meta?: boolean;
 
   public project_id: string;
   public id: string;
@@ -22,7 +24,7 @@ export default class Base {
     Object.assign(this, base);
   }
 
-  public static async createBase(base: BaseBody & { projectId: string }) {
+  public static async createBase(base: BaseType & { projectId: string }) {
     await Noco.ncMeta.metaInsert2(base.projectId, null, MetaTable.BASES, {
       alias: base.alias,
       host: base.host,
@@ -32,7 +34,8 @@ export default class Base {
       database: base.database,
       url: base.url,
       params: base.params,
-      type: base.type
+      type: base.type,
+      is_meta: base.is_meta
     });
   }
 
@@ -84,17 +87,4 @@ export default class Base {
     }
     return await ncMeta.metaDelete(null, null, MetaTable.BASES, this.id);
   }
-}
-
-export interface BaseBody {
-  alias: string;
-  host?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  database?: string;
-  url?: string;
-  params?: string;
-  token?: string;
-  type?: string;
 }

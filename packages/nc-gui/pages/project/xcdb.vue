@@ -142,10 +142,14 @@ export default {
       if (this.$refs.form.validate()) {
         this.loading = true
         try {
-          const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'projectCreateByWebWithXCDB', {
-            title: this.name,
-            projectType: this.projectType
-          }])
+          // const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'projectCreateByWebWithXCDB', {
+          //   title: this.name,
+          //   projectType: this.projectType
+          // }])
+
+          const result = (await this.$api.meta.projectCreate({
+            title: this.name
+          })).data
 
           await this.$store.dispatch('project/ActLoadProjectInfo')
 

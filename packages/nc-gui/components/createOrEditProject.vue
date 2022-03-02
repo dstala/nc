@@ -1,3 +1,4 @@
+
 <template>
   <v-container fluid>
     <v-col
@@ -1679,7 +1680,8 @@ export default {
           port: con.connection.port,
           username: con.connection.user,
           password: con.connection.password
-        }]
+        }],
+        external: true
       })).data
 
       clearInterval(interv)
