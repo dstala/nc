@@ -162,13 +162,11 @@ export default class Model implements TableType {
           }
         }
       );
-      if (modelList.length) {
-        await NocoCache.setList(
-          CacheScope.MODEL,
-          [project_id, base_id],
-          modelList
-        );
-      }
+      await NocoCache.setList(
+        CacheScope.MODEL,
+        [project_id, base_id],
+        modelList
+      );
     }
     return modelList.map(m => new Model(m));
   }
@@ -191,12 +189,11 @@ export default class Model implements TableType {
         MetaTable.MODELS
       );
 
-      modelList.length &&
-        (await NocoCache.setList(
-          CacheScope.MODEL,
-          [project_id, db_alias],
-          modelList
-        ));
+      await NocoCache.setList(
+        CacheScope.MODEL,
+        [project_id, db_alias],
+        modelList
+      );
     }
 
     return modelList.map(m => new Model(m));

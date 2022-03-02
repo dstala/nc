@@ -195,12 +195,7 @@ export default class Filter {
           }
         }
       );
-      childFilters.length &&
-        (await NocoCache.setList(
-          CacheScope.FILTER_EXP,
-          [this.id],
-          childFilters
-        ));
+      await NocoCache.setList(CacheScope.FILTER_EXP, [this.id], childFilters);
     }
     return childFilters && childFilters.map(f => new Filter(f));
   }
@@ -235,9 +230,7 @@ export default class Filter {
         condition: { fk_view_id: viewId }
       });
 
-      if (filters.length) {
-        await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filters);
-      }
+      await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filters);
     }
 
     const result: FilterType = {

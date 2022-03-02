@@ -76,9 +76,7 @@ export default class Sort {
       sortList = await ncMeta.metaList2(null, null, MetaTable.SORT, {
         condition: { fk_view_id: viewId }
       });
-      if (sortList.length) {
-        await NocoCache.setList(CacheScope.SORT, [viewId], sortList);
-      }
+      await NocoCache.setList(CacheScope.SORT, [viewId], sortList);
     }
     return sortList.map(s => new Sort(s));
   }
@@ -123,9 +121,7 @@ export default class Sort {
       ));
     if (!sortData) {
       sortData = await ncMeta.metaGet2(null, null, MetaTable.SORT, id);
-      if (sortData) {
-        await NocoCache.set(`${CacheScope.SORT}:${id}`, sortData);
-      }
+      await NocoCache.set(`${CacheScope.SORT}:${id}`, sortData);
     }
     return sortData && new Sort(sortData);
   }

@@ -44,15 +44,22 @@ export default class RedisCacheMgr extends CacheMgr {
 
   // @ts-ignore
   async set(key: string, value: any): Promise<any> {
-    console.log(`RedisCacheMgr::set: setting key ${key} with value ${value}`);
-    if (typeof value === 'object') {
-      if (Array.isArray(value) && value.length) {
-        await this.client.del(key);
-        return this.client.sadd(key, value);
+    if (typeof value !== 'undefined' && value) {
+      console.log(`RedisCacheMgr::set: setting key ${key} with value ${value}`);
+      if (typeof value === 'object') {
+        if (Array.isArray(value) && value.length) {
+          await this.client.del(key);
+          return this.client.sadd(key, value);
+        }
+        return this.client.set(key, JSON.stringify(value));
       }
-      return this.client.set(key, JSON.stringify(value));
+      return this.client.set(key, value);
+    } else {
+      console.log(
+        `RedisCacheMgr::set: value is empty for ${key}. Skipping ...`
+      );
+      return Promise.resolve(true);
     }
-    return this.client.set(key, value);
   }
 
   // @ts-ignore
@@ -90,6 +97,10 @@ export default class RedisCacheMgr extends CacheMgr {
     subListKeys: string[],
     list: any[]
   ): Promise<boolean> {
+    if (!list.length) {
+      console.log('RedisCacheMgr::setList: List is empty. Skipping ...');
+      return Promise.resolve(true);
+    }
     // remove null from arrays
     subListKeys = subListKeys.filter(k => k);
     // construct key for List
