@@ -284,11 +284,13 @@ export const actions = {
     try {
       // console.log(err);
 
-      await this.$axios.post('/auth/signout', null, {
-        headers: {
-          'xc-auth': state.token
-        }
-      })
+      // todo: sdk
+
+      // await this.$axios.post('/auth/signout', null, {
+      //   headers: {
+      //     'xc-auth': state.token
+      //   }
+      // })
       commit('MutSetUser', null)
       commit('MutSetToken', null)
       commit('MutMasterKey', null)
