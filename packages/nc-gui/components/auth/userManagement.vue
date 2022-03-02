@@ -161,7 +161,7 @@
                             tooltip="Add user to project"
                             color="primary"
                             small
-                            @click="inviteUser(item.email)"
+                            @click="inviteUser(item)"
                           >
                             mdi-plus
                           </x-icon>
@@ -715,17 +715,18 @@ export default {
       }
       this.userEditDialog = true
     },
-    async inviteUser(email) {
+    async inviteUser(item) {
       try {
-        await this.$axios.post('/admin', {
-          email,
-          project_id: this.$route.params.project_id,
-          projectName: this.$store.getters['project/GtrProjectName']
-        }, {
-          headers: {
-            'xc-auth': this.$store.state.users.token
-          }
-        })
+        // await this.$axios.post('/admin', {
+        //   email,
+        //   project_id: this.$route.params.project_id,
+        //   projectName: this.$store.getters['project/GtrProjectName']
+        // }, {
+        //   headers: {
+        //     'xc-auth': this.$store.state.users.token
+        //   }
+        // })
+        await this.$api.auth.projectUserAdd(this.$route.params.project_id, item)
         this.$toast.success('Successfully added user to project').goAway(3000)
         await this.loadUsers()
       } catch (e) {
