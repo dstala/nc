@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import NcColumn from '../../types/NcColumn';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class FormulaColumn {
   formula: string;
@@ -10,6 +11,7 @@ export default class FormulaColumn {
     Object.assign(this, data);
   }
 
+  // TODO: cache
   public static async insert(model: NcColumn | any) {
     await Noco.ncMeta.metaInsert2(
       model.project_id,
@@ -23,12 +25,21 @@ export default class FormulaColumn {
   }
 
   public static async read(columnId: string) {
-    const column = await Noco.ncMeta.metaGet2(
-      null, //,
-      null, //model.db_alias,
-      MetaTable.COL_FORMULA,
-      { fk_column_id: columnId }
-    );
+    let column =
+      columnId &&
+      (await NocoCache.get(
+        `${CacheScope.COL_FORMULA}:${columnId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!column) {
+      column = await Noco.ncMeta.metaGet2(
+        null, //,
+        null, //model.db_alias,
+        MetaTable.COL_FORMULA,
+        { fk_column_id: columnId }
+      );
+      await NocoCache.set(`${CacheScope.COL_FORMULA}:${columnId}`, column);
+    }
 
     return column ? new FormulaColumn(column) : null;
   }
