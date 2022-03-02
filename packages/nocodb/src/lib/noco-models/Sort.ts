@@ -1,7 +1,13 @@
 import Noco from '../../lib/noco/Noco';
 import Model from './Model';
 import Column from './Column';
-import { MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class Sort {
   id: string;
@@ -17,6 +23,11 @@ export default class Sort {
   }
 
   public static async deleteAll(viewId: string, ncMeta = Noco.ncMeta) {
+    await NocoCache.deepDel(
+      CacheScope.SORT,
+      `${CacheScope.SORT}:${viewId}`,
+      CacheDelDirection.PARENT_TO_CHILD
+    );
     await ncMeta.metaDelete(null, null, MetaTable.SORT, {
       fk_view_id: viewId
     });
@@ -43,6 +54,8 @@ export default class Sort {
       insertObj
     );
 
+    await NocoCache.set(`${CacheScope.SORT}:${id}`, insertObj);
+
     return this.get(id, ncMeta);
   }
 
@@ -58,13 +71,28 @@ export default class Sort {
     ncMeta = Noco.ncMeta
   ): Promise<Sort[]> {
     if (!viewId) return null;
-    const sortList = await ncMeta.metaList2(null, null, MetaTable.SORT, {
-      condition: { fk_view_id: viewId }
-    });
+    let sortList = await NocoCache.getList(CacheScope.SORT, [viewId]);
+    if (!sortList.length) {
+      sortList = await ncMeta.metaList2(null, null, MetaTable.SORT, {
+        condition: { fk_view_id: viewId }
+      });
+      if (sortList.length) {
+        await NocoCache.setList(CacheScope.SORT, [viewId], sortList);
+      }
+    }
     return sortList.map(s => new Sort(s));
   }
 
   public static async update(sortId, body, ncMeta = Noco.ncMeta) {
+    // get existing cache
+    const key = `${CacheScope.SORT}:${sortId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update fk_column_id & direction
+    o.fk_column_id = body.fk_column_id;
+    o.direction = body.direction;
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
     await ncMeta.metaUpdate(
       null,
       null,
@@ -78,12 +106,28 @@ export default class Sort {
   }
 
   public static async delete(sortId: string, ncMeta = Noco.ncMeta) {
+    await NocoCache.deepDel(
+      CacheScope.SORT,
+      `${CacheScope.SORT}:${sortId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     await ncMeta.metaDelete(null, null, MetaTable.SORT, sortId);
   }
 
   public static async get(id: any, ncMeta = Noco.ncMeta) {
-    const sortData = await ncMeta.metaGet2(null, null, MetaTable.SORT, id);
-    return new Sort(sortData);
+    let sortData =
+      id &&
+      (await NocoCache.get(
+        `${CacheScope.SORT}:${id}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!sortData) {
+      sortData = await ncMeta.metaGet2(null, null, MetaTable.SORT, id);
+      if (sortData) {
+        await NocoCache.set(`${CacheScope.SORT}:${id}`, sortData);
+      }
+    }
+    return sortData && new Sort(sortData);
   }
 
   public async getModel(ncMeta = Noco.ncMeta): Promise<Model> {
