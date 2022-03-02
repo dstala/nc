@@ -10,12 +10,12 @@ export default class SingleSelectColumn {
     Object.assign(this, data);
   }
 
+  // TODO: Cache
   public static async insert(model: NcColumn | any) {
     await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_SELECT_OPTIONS, {
       tn: model.tn,
       _tn: model._tn
     });
-    // TODO: Cache
   }
 
   public static async read(columnId: string) {

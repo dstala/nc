@@ -10,6 +10,7 @@ export default class MultiSelectColumn {
     Object.assign(this, data);
   }
 
+  // TODO: Cache
   public static async insert(model: NcColumn | any) {
     await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_SELECT_OPTIONS, {
       tn: model.tn,
