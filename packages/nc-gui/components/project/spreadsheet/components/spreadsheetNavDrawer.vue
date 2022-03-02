@@ -104,6 +104,7 @@
                       </x-icon>
                       <!-- Delete view" -->
                       <x-icon
+                        v-if="!view.is_default"
                         :tooltip="$t('nav_drawer.virtual_views.action.delete')"
                         small
                         color="error"
