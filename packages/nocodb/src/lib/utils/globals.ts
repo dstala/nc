@@ -65,3 +65,8 @@ export enum CacheScope {
   PLUGIN = 'plugin',
   PROJECT_USER = 'projectUser'
 }
+export enum CacheGetType {
+  TYPE_ARRAY = 'TYPE_ARRAY',
+  TYPE_OBJECT = 'TYPE_OBJECT',
+  TYPE_STRING = 'TYPE_STRING'
+}

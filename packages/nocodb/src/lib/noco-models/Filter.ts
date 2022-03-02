@@ -2,7 +2,7 @@ import Noco from '../../lib/noco/Noco';
 import Model from './Model';
 import Column from './Column';
 import UITypes from '../sqlUi/UITypes';
-import { CacheScope, MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import View from './View';
 import { FilterType } from 'nc-common';
 import NocoCache from '../noco-cache/NocoCache';
@@ -78,7 +78,7 @@ export default class Filter {
       );
     }
     const key = `${CacheScope.FILTER_EXP}:${id}`;
-    let value = await NocoCache.get(key, 2);
+    let value = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (!value) {
       /* get from db */
       value = await Noco.ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, id);
@@ -287,7 +287,11 @@ export default class Filter {
 
   private static async get(id: string, ncMeta = Noco.ncMeta) {
     let filterObj =
-      id && (await NocoCache.get(`${CacheScope.FILTER_EXP}:${id}`, 2));
+      id &&
+      (await NocoCache.get(
+        `${CacheScope.FILTER_EXP}:${id}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!filterObj) {
       filterObj = await ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
         id

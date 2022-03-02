@@ -1,5 +1,5 @@
 export default abstract class CacheMgr {
-  public abstract get(key: string, type: number): Promise<any>;
+  public abstract get(key: string, type: string): Promise<any>;
   public abstract set(key: string, value: any, ttl?: any): Promise<any>;
   public abstract clear(): Promise<any>;
   public abstract del(key: string): Promise<any>;

@@ -1,6 +1,6 @@
 import CacheMgr from './CacheMgr';
-// @ts-ignore
 import Redis from 'ioredis';
+import { CacheGetType } from '../utils/globals';
 
 export default class RedisCacheMgr extends CacheMgr {
   client: any;
@@ -21,11 +21,11 @@ export default class RedisCacheMgr extends CacheMgr {
   }
 
   // @ts-ignore
-  async get(key: string, type: number, config?: any): Promise<any> {
+  async get(key: string, type: string, config?: any): Promise<any> {
     console.log(`RedisCacheMgr::get: getting key ${key} with type ${type}`);
-    if (type === 1) {
+    if (type === CacheGetType.TYPE_ARRAY) {
       return this.client.smembers(key);
-    } else if (type == 2) {
+    } else if (type === CacheGetType.TYPE_OBJECT) {
       const res = await this.client.get(key);
       try {
         const o = JSON.parse(res);
@@ -36,7 +36,10 @@ export default class RedisCacheMgr extends CacheMgr {
         return Promise.resolve(res);
       }
       return Promise.resolve(res);
+    } else if (type === CacheGetType.TYPE_STRING) {
+      return await this.client.get(key);
     }
+    throw Error(`Invalid CacheGetType: ${type}`);
   }
 
   // @ts-ignore
@@ -75,9 +78,11 @@ export default class RedisCacheMgr extends CacheMgr {
     // e.g. key = <scope>:<project_id_1>:<base_id_1>:list
     const key = `${scope}:${subKeys.join(':')}:list`;
     // e.g. arr = ["<scope>:<model_id_1>", "<scope>:<model_id_2>"]
-    const arr = (await this.get(key, 1)) || [];
+    const arr = (await this.get(key, CacheGetType.TYPE_ARRAY)) || [];
     console.log(`RedisCacheMgr::getList: getting list with key ${key}`);
-    return Promise.all(arr.map(async k => await this.get(k, 2)));
+    return Promise.all(
+      arr.map(async k => await this.get(k, CacheGetType.TYPE_OBJECT))
+    );
   }
 
   async setList(
@@ -91,7 +96,8 @@ export default class RedisCacheMgr extends CacheMgr {
     // e.g. <scope>:<project_id_1>:<base_id_1>:list
     const listKey = `${scope}:${subListKeys.join(':')}:list`;
     // fetch existing list
-    const listOfGetKeys = (await this.get(listKey, 1)) || [];
+    const listOfGetKeys =
+      (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
     for (const o of list) {
       // construct key for Get
       // e.g. <scope>:<model_id_1>
@@ -111,7 +117,7 @@ export default class RedisCacheMgr extends CacheMgr {
     const scopeList = await this.client.keys(`${scope}:*:list`);
     for (const listKey of scopeList) {
       // get target list
-      let list = (await this.get(listKey, 1)) || [];
+      let list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
       if (!list.length) {
         continue;
       }
@@ -133,7 +139,7 @@ export default class RedisCacheMgr extends CacheMgr {
 
   async appendToList(listKey: string, key: string): Promise<boolean> {
     console.log(`RedisCacheMgr::appendToList: append key ${key} to ${listKey}`);
-    const list = (await this.get(listKey, 1)) || [];
+    const list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
     list.push(key);
     return this.set(listKey, list);
   }

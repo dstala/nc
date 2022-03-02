@@ -14,7 +14,7 @@ import {
   ViewTypes
 } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
-import { CacheScope, MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import View from './View';
 import { NcError } from '../noco/meta/api/helpers/catchError';
 
@@ -203,7 +203,12 @@ export default class Model implements TableType {
   }
 
   public static async get(id: string, ncMeta = Noco.ncMeta): Promise<Model> {
-    let modelData = id && (await NocoCache.get(`${CacheScope.MODEL}:${id}`, 2));
+    let modelData =
+      id &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${id}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!modelData) {
       modelData = await ncMeta.metaGet2(null, null, MetaTable.MODELS, id);
       await NocoCache.set(`${CacheScope.MODEL}:${modelData.id}`, modelData);
@@ -221,7 +226,12 @@ export default class Model implements TableType {
     ncMeta = Noco.ncMeta
   ): Promise<Model> {
     const k = 'id' in args ? args?.id : args;
-    let modelData = k && (await NocoCache.get(`${CacheScope.MODEL}:${k}`, 2));
+    let modelData =
+      k &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${k}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!modelData) {
       modelData = await ncMeta.metaGet2(null, null, MetaTable.MODELS, k);
       await NocoCache.set(`${CacheScope.MODEL}:${modelData.id}`, modelData);
@@ -257,7 +267,12 @@ export default class Model implements TableType {
     tn?: string;
     id?: string;
   }): Promise<Model> {
-    let modelData = id && (await NocoCache.get(`${CacheScope.MODEL}:${id}`, 2));
+    let modelData =
+      id &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${id}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!modelData) {
       modelData = await Noco.ncMeta.metaGet2(
         null,
@@ -400,7 +415,7 @@ export default class Model implements TableType {
     if (!_tn) NcError.badRequest("Missing '_tn' property in body");
     // get existing cache
     const key = `${CacheScope.MODEL}:${tableId}`;
-    const o = await NocoCache.get(key, 2);
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     // update alias
     o._tn = _tn;
     // set cache
