@@ -403,4 +403,21 @@ export default class Model implements TableType {
       return o;
     }, {});
   }
+
+  static async updateOrder(
+    tableId: string,
+    order: number,
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo : redis del - table list
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.MODELS,
+      {
+        order
+      },
+      tableId
+    );
+  }
 }

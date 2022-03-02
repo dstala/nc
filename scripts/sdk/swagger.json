@@ -1086,7 +1086,24 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ]
       }
     },
     "/tables/{tableId}/columns": {
@@ -1223,27 +1240,6 @@
         "tags": [
           "Meta"
         ]
-      }
-    },
-    "/tables/{tableId}/columns/reorder": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "tableId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "",
-        "operationId": "column-reorder",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
       }
     },
     "/views/{viewId}": {
@@ -1816,65 +1812,6 @@
         "tags": [
           "Meta"
         ]
-      }
-    },
-    "/views/{viewsId}/filters/{filterId}/reorder": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "filterId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "viewsId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "",
-        "operationId": "filter-reorder",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "description": ""
-      }
-    },
-    "/views/{viewId}/sorts/{sortId}/reorder": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "sortId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "viewId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "",
-        "operationId": "sort-reorder",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
       }
     },
     "/tables/{tableId}/webhooks/{webhookId}": {

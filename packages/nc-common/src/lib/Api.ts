@@ -559,6 +559,10 @@ export interface TableUpdatePayloadType {
   _tn?: string;
 }
 
+export interface TableReorderPayloadType {
+  order?: string;
+}
+
 export interface ViewUpdatePayloadType {
   order?: string;
   title?: string;
@@ -1331,6 +1335,27 @@ export class Api<
       this.request<void, any>({
         path: `/tables/${tableId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name TableReorder
+     * @request POST:/tables/{tableId}/reorder
+     * @response `200` `void` OK
+     */
+    tableReorder: (
+      tableId: string,
+      data: TableReorderPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/reorder`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -2736,34 +2761,6 @@ export class Api<
     /**
      * No description
      *
-     * @name TableReorder
-     * @request POST:/tables/{tableId}/reorder
-     * @response `200` `void` OK
-     */
-    tableReorder: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ColumnReorder
-     * @request POST:/tables/{tableId}/columns/reorder
-     * @response `200` `void` OK
-     */
-    columnReorder: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/columns/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
      * @name WebhookReorder
      * @request POST:/tables/{tableId}/webhooks/{webhookId}/reorder
      * @response `200` `void` OK
@@ -2775,39 +2772,6 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/tables/${tableId}/webhooks/${webhookId}/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-  };
-  views = {
-    /**
-     * No description
-     *
-     * @name FilterReorder
-     * @request POST:/views/{viewsId}/filters/{filterId}/reorder
-     * @response `200` `void` OK
-     */
-    filterReorder: (
-      filterId: string,
-      viewsId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewsId}/filters/${filterId}/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name SortReorder
-     * @request POST:/views/{viewId}/sorts/{sortId}/reorder
-     * @response `200` `void` OK
-     */
-    sortReorder: (sortId: string, viewId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts/${sortId}/reorder`,
         method: 'POST',
         ...params,
       }),

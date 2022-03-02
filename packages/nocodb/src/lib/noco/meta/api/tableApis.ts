@@ -44,6 +44,10 @@ export async function tableGet(req: Request, res: Response<TableType>) {
   res.json(table);
 }
 
+export async function tableReorder(req: Request, res: Response) {
+  res.json(Model.updateOrder(req.params.tableId, req.body.order));
+}
+
 export async function tableList(
   req: Request<any, any, any, TableListParamsType>,
   res: Response<TableListType>
@@ -162,4 +166,5 @@ router.post('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableCreate));
 router.get('/tables/:tableId', ncMetaAclMw(tableGet));
 router.put('/tables/:tableId', ncMetaAclMw(tableUpdate));
 router.delete('/tables/:tableId', ncMetaAclMw(tableDelete));
+router.post('/tables/:tableId/reorder', ncMetaAclMw(tableReorder));
 export default router;
