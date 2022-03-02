@@ -14,7 +14,12 @@ import {
   ViewTypes
 } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
-import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import View from './View';
 import { NcError } from '../noco/meta/api/helpers/catchError';
 
@@ -157,13 +162,13 @@ export default class Model implements TableType {
           }
         }
       );
-
-      modelList.length &&
-        (await NocoCache.setList(
+      if (modelList.length) {
+        await NocoCache.setList(
           CacheScope.MODEL,
           [project_id, base_id],
           modelList
-        ));
+        );
+      }
     }
     return modelList.map(m => new Model(m));
   }
@@ -382,21 +387,27 @@ export default class Model implements TableType {
         });
         await NocoCache.deepDel(
           CacheScope.MODEL,
-          `${cacheScopeName}:${col.id}`
+          `${cacheScopeName}:${col.id}`,
+          CacheDelDirection.CHILD_TO_PARENT
         );
       }
     }
 
+    await NocoCache.deepDel(
+      CacheScope.COLUMN,
+      `${CacheScope.COLUMN}:${this.id}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, {
       fk_model_id: this.id
     });
-    await NocoCache.deepDel(
-      CacheScope.COLUMN,
-      `${CacheScope.COLUMN}:${this.id}`
-    );
 
+    await NocoCache.deepDel(
+      CacheScope.MODEL,
+      `${CacheScope.MODEL}:${this.id}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     await ncMeta.metaDelete(null, null, MetaTable.MODELS, this.id);
-    await NocoCache.deepDel(CacheScope.MODEL, `${CacheScope.MODEL}:${this.id}`);
 
     return true;
   }
@@ -420,6 +431,7 @@ export default class Model implements TableType {
     o._tn = _tn;
     // set cache
     await NocoCache.set(key, o);
+    // set meta
     return await ncMeta.metaUpdate(
       null,
       null,

@@ -70,3 +70,8 @@ export enum CacheGetType {
   TYPE_OBJECT = 'TYPE_OBJECT',
   TYPE_STRING = 'TYPE_STRING'
 }
+
+export enum CacheDelDirection {
+  PARENT_TO_CHILD = 'PARENT_TO_CHILD',
+  CHILD_TO_PARENT = 'CHILD_TO_PARENT',
+}

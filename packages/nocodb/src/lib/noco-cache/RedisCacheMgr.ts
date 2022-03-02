@@ -1,6 +1,6 @@
 import CacheMgr from './CacheMgr';
 import Redis from 'ioredis';
-import { CacheGetType } from '../utils/globals';
+import { CacheDelDirection, CacheGetType } from '../utils/globals';
 
 export default class RedisCacheMgr extends CacheMgr {
   client: any;
@@ -113,28 +113,46 @@ export default class RedisCacheMgr extends CacheMgr {
     return this.set(listKey, listOfGetKeys);
   }
 
-  async deepDel(scope: string, key: string): Promise<boolean> {
-    const scopeList = await this.client.keys(`${scope}:*:list`);
-    for (const listKey of scopeList) {
-      // get target list
-      let list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
-      if (!list.length) {
-        continue;
+  async deepDel(
+    scope: string,
+    key: string,
+    direction: string
+  ): Promise<boolean> {
+    console.log(`RedisCacheMgr::deepDel: choose direction ${direction}`);
+    if (direction === CacheDelDirection.CHILD_TO_PARENT) {
+      // given a child key, delete all keys in corresponding parent lists
+      const scopeList = await this.client.keys(`${scope}:*:list`);
+      for (const listKey of scopeList) {
+        // get target list
+        let list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
+        if (!list.length) {
+          continue;
+        }
+        // remove target Key
+        list = list.filter(k => k !== key);
+        if (list.length) {
+          // set target list
+          console.log(`RedisCacheMgr::deepDel: set key ${listKey}`);
+          await this.set(listKey, list);
+        } else {
+          // delete list
+          console.log(`RedisCacheMgr::deepDel: remove listKey ${listKey}`);
+          await this.del(listKey);
+        }
       }
-      // remove target Key
-      list = list.filter(k => k !== key);
-      if (list.length) {
-        // set target list
-        console.log(`RedisCacheMgr::deepDel: set key ${listKey}`);
-        await this.set(listKey, list);
-      } else {
-        // delete list
-        console.log(`RedisCacheMgr::deepDel: remove listKey ${listKey}`);
-        await this.del(listKey);
-      }
+      console.log(`RedisCacheMgr::deepDel: remove key ${key}`);
+      return await this.del(key);
+    } else if (direction === CacheDelDirection.PARENT_TO_CHILD) {
+      // given a list key, delete all the children
+      const listOfChildren = await this.get(key, CacheGetType.TYPE_ARRAY);
+      // delete each child key
+      await Promise.all(listOfChildren.map(async k => await this.del(k)));
+      // delete list key
+      return await this.del(key);
+    } else {
+      throw Error(`Invalid deepDel direction found : ${direction}`);
+      return Promise.resolve(false);
     }
-    console.log(`RedisCacheMgr::deepDel: remove key ${key}`);
-    return await this.del(key);
   }
 
   async appendToList(listKey: string, key: string): Promise<boolean> {

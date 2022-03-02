@@ -97,8 +97,12 @@ export default class NocoCache {
     return this.client.setList(scope, subListKeys, list);
   }
 
-  public static async deepDel(scope: string, key: string): Promise<boolean> {
-    return this.client.deepDel(scope, key);
+  public static async deepDel(
+    scope: string,
+    key: string,
+    direction: string
+  ): Promise<boolean> {
+    return this.client.deepDel(scope, key, direction);
   }
 
   public static async appendToList(

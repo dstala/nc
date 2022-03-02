@@ -2,7 +2,12 @@ import Noco from '../../lib/noco/Noco';
 import Model from './Model';
 import Column from './Column';
 import UITypes from '../sqlUi/UITypes';
-import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import View from './View';
 import { FilterType } from 'nc-common';
 import NocoCache from '../noco-cache/NocoCache';
@@ -141,7 +146,8 @@ export default class Filter {
       await Noco.ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
       await NocoCache.deepDel(
         CacheScope.FILTER_EXP,
-        `${CacheScope.FILTER_EXP}:${filter.id}`
+        `${CacheScope.FILTER_EXP}:${filter.id}`,
+        CacheDelDirection.CHILD_TO_PARENT
       );
     };
     await deleteRecursively(filter);

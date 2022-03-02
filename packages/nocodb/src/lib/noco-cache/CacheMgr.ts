@@ -12,6 +12,6 @@ export default abstract class CacheMgr {
     subListKeys: string[],
     list: any[]
   ): Promise<boolean>;
-  public abstract deepDel(scope: string, key: string): Promise<boolean>;
+  public abstract deepDel(scope: string, key: string, direction: string): Promise<boolean>;
   public abstract appendToList(scope: string, key: string): Promise<boolean>;
 }
