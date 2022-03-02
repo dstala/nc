@@ -10,10 +10,6 @@ export default class RedisCacheMgr extends CacheMgr {
     this.client = new Redis(config);
   }
 
-  async clear(): Promise<any> {
-    return Promise.resolve(undefined);
-  }
-
   // @ts-ignore
   async del(key: string): Promise<any> {
     console.log(`RedisCacheMgr::del: deleting key ${key}`);
@@ -65,11 +61,6 @@ export default class RedisCacheMgr extends CacheMgr {
   // @ts-ignore
   async getAll(pattern: string): Promise<any> {
     return this.client.hgetall(pattern);
-  }
-
-  // @ts-ignore
-  getOne(pattern: string): Promise<any> {
-    return Promise.resolve(undefined);
   }
 
   // @ts-ignore
