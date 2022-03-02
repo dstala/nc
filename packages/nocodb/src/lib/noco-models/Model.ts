@@ -4,8 +4,6 @@ import NcModel from '../../types/NcModel';
 import NocoCache from '../noco-cache/NocoCache';
 import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
-import Filter from './Filter';
-import Sort from './Sort';
 import {
   isVirtualCol,
   ModelTypes,
@@ -321,8 +319,9 @@ export default class Model implements TableType {
     //  columns - done
     //  table - done
 
-    await Sort.deleteAll(this.id, ncMeta);
-    await Filter.deleteAll(this.id, ncMeta);
+    for (const view of await this.getViews(true)) {
+      await view.delete();
+    }
 
     for (const col of await this.getColumns(false, ncMeta)) {
       let colOptionTableName = null;

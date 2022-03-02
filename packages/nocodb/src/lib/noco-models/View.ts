@@ -11,7 +11,6 @@ import Filter from './Filter';
 import { ViewType, ViewTypes } from 'nc-common';
 import GalleryViewColumn from './GalleryViewColumn';
 import FormViewColumn from './FormViewColumn';
-import { NcError } from '../noco/meta/api/helpers/catchError';
 import UITypes from '../sqlUi/UITypes';
 import Column from './Column';
 
@@ -514,10 +513,6 @@ export default class View implements ViewType {
   // @ts-ignore
   static async delete(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
-
-    if (view.is_default)
-      NcError.badRequest('Deleting default view is not allowed');
-
     await Sort.deleteAll(viewId);
     await Filter.deleteAll(viewId);
     const table = this.extractViewTableName(view);
@@ -593,5 +588,9 @@ export default class View implements ViewType {
         fk_view_id: viewId
       }
     );
+  }
+
+  async delete() {
+    await View.delete(this.id);
   }
 }
