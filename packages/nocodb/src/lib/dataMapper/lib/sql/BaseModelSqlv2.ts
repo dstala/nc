@@ -1263,7 +1263,10 @@ class BaseModelSqlv2 {
         );
       }
       response = Array.isArray(response) ? response[0] : response;
-      if (response) rowId = response[this.model.primaryKey.cn];
+      if (response)
+        rowId =
+          response[this.model.primaryKey._cn] ||
+          response[this.model.primaryKey.cn];
       await Promise.all(postInsertOps.map(f => f()));
 
       if (!trx) {

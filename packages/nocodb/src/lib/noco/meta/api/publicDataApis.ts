@@ -10,7 +10,6 @@ import multer from 'multer';
 import { ErrorMessages, UITypes, ViewTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function dataList(req: Request, res: Response, next) {
   try {
@@ -145,7 +144,11 @@ async function dataInsert(
       return o;
     }, {}) as any);
 
-  const insertObject = Object.entries(req.body).reduce((obj, [key, val]) => {
+  let body = req.body?.data;
+
+  if (typeof body === 'string') body = JSON.parse(body);
+
+  const insertObject = Object.entries(body).reduce((obj, [key, val]) => {
     if (key in fields) {
       obj[key] = val;
     }
@@ -268,8 +271,8 @@ async function relDataList(req, res, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.post('/list', ncMetaAclMw(dataList));
-router.post('/relationTable/:tableId', ncMetaAclMw(relDataList));
+router.post('/list', catchError(dataList));
+router.post('/relationTable/:tableId', catchError(relDataList));
 router.post(
   '/create',
   multer({
