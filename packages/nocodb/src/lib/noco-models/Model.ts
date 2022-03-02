@@ -195,6 +195,7 @@ export default class Model implements TableType {
     const modelData = await ncMeta.metaGet2(null, null, MetaTable.MODELS, id);
     return modelData && new Model(modelData);
   }
+
   public static async getByIdOrName(
     args:
       | {
@@ -381,5 +382,25 @@ export default class Model implements TableType {
       },
       tableId
     );
+  }
+
+  return;
+
+  async getAliasColMapping() {
+    return (await this.getColumns()).reduce((o, c) => {
+      if (c.cn) {
+        o[c._cn] = c.cn;
+      }
+      return o;
+    }, {});
+  }
+
+  async getColAliasMapping() {
+    return (await this.getColumns()).reduce((o, c) => {
+      if (c.cn) {
+        o[c.cn] = c._cn;
+      }
+      return o;
+    }, {});
   }
 }

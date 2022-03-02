@@ -98,7 +98,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.tn);
     await this.selectObject({ qb });
-    qb.xwhere(where);
+    qb.xwhere(where, await this.model.getAliasColMapping());
 
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
@@ -406,7 +406,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.tn);
 
-    qb.xwhere(where);
+    qb.xwhere(where, await this.model.getAliasColMapping());
 
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
