@@ -23,12 +23,25 @@ export default class Sort {
   }
 
   public static async insert(sortObj: Partial<Sort>, ncMeta = Noco.ncMeta) {
+    // todo: implement a generic function
+    const order =
+      (+(
+        await ncMeta
+          .knex(MetaTable.SORT)
+          .max('order', { as: 'order' })
+          .where({
+            fk_view_id: sortObj.fk_view_id
+          })
+          .first()
+      )?.order || 0) + 1;
+
     const insertObj = {
       fk_view_id: sortObj.fk_view_id,
       fk_column_id: sortObj.fk_column_id,
       direction: sortObj.direction,
       project_id: sortObj.project_id,
-      base_id: sortObj.base_id
+      base_id: sortObj.base_id,
+      order
     };
     if (!(sortObj.project_id && sortObj.base_id)) {
       const model = await Column.get({ colId: sortObj.fk_column_id });
@@ -59,7 +72,10 @@ export default class Sort {
   ): Promise<Sort[]> {
     if (!viewId) return null;
     const sortList = await ncMeta.metaList2(null, null, MetaTable.SORT, {
-      condition: { fk_view_id: viewId }
+      condition: { fk_view_id: viewId },
+      orderBy: {
+        order: 'asc'
+      }
     });
     return sortList.map(s => new Sort(s));
   }
