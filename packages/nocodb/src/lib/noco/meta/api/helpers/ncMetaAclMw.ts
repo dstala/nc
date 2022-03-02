@@ -5,6 +5,23 @@ import extractProjectIdAndAuthenticate from './extractProjectIdAndAuthenticate';
 export default function(handlerFn, permissionName = handlerFn.name) {
   return [
     extractProjectIdAndAuthenticate,
+    catchError((req, _res, next) => {
+      const roles = req?.session?.passport?.user?.roles;
+      if (
+        !(
+          roles?.creator ||
+          roles?.owner ||
+          roles?.editor ||
+          roles?.viewer ||
+          roles?.commenter ||
+          roles?.user ||
+          roles?.user_new
+        )
+      ) {
+        NcError.unauthorized('Unauthorized access');
+      }
+      next();
+    }),
     // @ts-ignore
     catchError(
       async (
@@ -51,25 +68,6 @@ export default function(handlerFn, permissionName = handlerFn.name) {
         next();
       }
     ),
-    catchError((req, _res, next) => {
-      const roles = req?.session?.passport?.user?.roles;
-      if (
-        !(
-          roles?.creator ||
-          roles?.owner ||
-          roles?.editor ||
-          roles?.viewer ||
-          roles?.commenter ||
-          roles?.user ||
-          roles?.user_new
-        )
-      ) {
-        NcError.unauthorized(
-          'Unauthorized access : xc-auth does not have admin permission'
-        );
-      }
-      next();
-    }),
     catchError(handlerFn)
   ];
 }
