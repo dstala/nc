@@ -98,7 +98,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.tn);
     await this.selectObject({ qb });
-    qb.xwhere(where);
+    qb.xwhere(where, await this.model.getAliasColMapping());
 
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
@@ -406,7 +406,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.tn);
 
-    qb.xwhere(where);
+    qb.xwhere(where, await this.model.getAliasColMapping());
 
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
@@ -1263,7 +1263,10 @@ class BaseModelSqlv2 {
         );
       }
       response = Array.isArray(response) ? response[0] : response;
-      if (response) rowId = response[this.model.primaryKey.cn];
+      if (response)
+        rowId =
+          response[this.model.primaryKey._cn] ||
+          response[this.model.primaryKey.cn];
       await Promise.all(postInsertOps.map(f => f()));
 
       if (!trx) {

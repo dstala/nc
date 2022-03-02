@@ -217,6 +217,7 @@ export default class Model implements TableType {
     }
     return modelData && new Model(modelData);
   }
+
   public static async getByIdOrName(
     args:
       | {
@@ -435,6 +436,43 @@ export default class Model implements TableType {
       MetaTable.MODELS,
       {
         _tn
+      },
+      tableId
+    );
+  }
+
+  return;
+
+  async getAliasColMapping() {
+    return (await this.getColumns()).reduce((o, c) => {
+      if (c.cn) {
+        o[c._cn] = c.cn;
+      }
+      return o;
+    }, {});
+  }
+
+  async getColAliasMapping() {
+    return (await this.getColumns()).reduce((o, c) => {
+      if (c.cn) {
+        o[c.cn] = c._cn;
+      }
+      return o;
+    }, {});
+  }
+
+  static async updateOrder(
+    tableId: string,
+    order: number,
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo : redis del - table list
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.MODELS,
+      {
+        order
       },
       tableId
     );

@@ -515,7 +515,8 @@ export default class View implements ViewType {
   static async delete(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
 
-    if (view.is_default) NcError.badRequest("Default view can't be deleted");
+    if (view.is_default)
+      NcError.badRequest('Deleting default view is not allowed');
 
     await Sort.deleteAll(viewId);
     await Filter.deleteAll(viewId);

@@ -292,7 +292,7 @@
     >
       <div class="flex-grow-1 h-100" style="overflow-y: auto">
         <div
-          v-if="selectedView"
+          v-if="selectedViewId && selectedView"
           ref="table"
           :style="{height:isForm ? '100%' : 'calc(100% - 36px)'}"
           style="overflow: auto;width:100%"
@@ -1080,11 +1080,11 @@ export default {
               position: 'bottom-center'
             }).goAway(3000) */
           } catch (e) {
-            if (e.response && e.response.data && e.response.data.msg) {
-              this.$toast.error(e.response.data.msg).goAway(3000)
-            } else {
-              this.$toast.error(`Failed to save row : ${e.message}`).goAway(3000)
-            }
+            // if (e.response && e.response.data && e.response.data.msg) {
+            this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
+            // } else {
+            //   this.$toast.error(`Failed to save row : ${e.message}`).goAway(3000)
+            // }
           }
 
           this.$set(this.data[row], 'saving', false)
@@ -1151,11 +1151,11 @@ export default {
             position: 'bottom-center'
           }).goAway(3000) */
         } catch (e) {
-          if (e.response && e.response.data && e.response.data.msg) {
-            this.$toast.error(e.response.data.msg).goAway(3000)
-          } else {
-            this.$toast.error(`Failed to update row : ${e.message}`).goAway(3000)
-          }
+          // if (e.response && e.response.data && e.response.data.msg) {
+          this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
+          // } else {
+          //   this.$toast.error(`Failed to update row : ${e.message}`).goAway(3000)
+          // }
         }
 
         this.$set(this.data[row], 'saving', false)

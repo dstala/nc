@@ -13,16 +13,16 @@
         </div>
       </v-tab-item>
 
-      <template v-for="(db,i) in dbAliasList">
-        <v-tab :key="db.meta.dbAlias + i" :href="'#' + db.meta.dbAlias" class="text-capitalize caption nc-meta-mgmt-metadata-tab">
-          <!--          {{ db.connection.database | extractDbName }} {{ db.meta.dbAlias }} -->
+      <template v-for="(db,i) in bases">
+        <v-tab :key="db.id + i" :href="'#' + db.id" class="text-capitalize caption nc-meta-mgmt-metadata-tab">
+          <!--          {{ db.connection.database | extractDbName }} {{ db.id }} -->
           Metadata
         </v-tab>
-        <v-tab-item :key="db.meta.dbAlias + 't' + i" :value=" db.meta.dbAlias">
+        <v-tab-item :key="db.id + 't' + i" :value=" db.id">
           <disable-or-enable-tables
             :nodes="nodes"
             :db="db"
-            :db-alias="db.meta.dbAlias"
+            :db-id="db.id"
           />
           <!--          <v-tabs color="x-active" height="28">
             <v-tab class="text-capitalize caption">
@@ -32,7 +32,7 @@
               <disable-or-enable-tables
                 :nodes="nodes"
                 :db="db"
-                :db-alias="db.meta.dbAlias"
+                :db-alias="db.id"
               />
             </v-tab-item>
             &lt;!&ndash; enable extra &ndash;&gt;
@@ -43,34 +43,34 @@
               <disable-or-enable-views
                 :nodes="nodes"
                 :db="db"
-                :db-alias="db.meta.dbAlias"
+                :db-alias="db.id"
               />
             </v-tab-item>
             &lt;!&ndash; <v-tab class="text-capitalize caption">Functions</v-tab>
              <v-tab-item>
                <disable-or-enable-functions :nodes="nodes" :db="db"
-                                            :db-alias="db.meta.dbAlias"></disable-or-enable-functions>
+                                            :db-alias="db.id"></disable-or-enable-functions>
              </v-tab-item>
              <v-tab class="text-capitalize caption">Procedures</v-tab>
              <v-tab-item>
                <disable-or-enable-procedures :nodes="nodes" :db="db"
-                                             :db-alias="db.meta.dbAlias"></disable-or-enable-procedures>
+                                             :db-alias="db.id"></disable-or-enable-procedures>
              </v-tab-item>&ndash;&gt;
 
             <v-tab class="text-capitalize caption">
               Relations
             </v-tab>
             <v-tab-item>
-              <disable-or-enable-relations :nodes="nodes" :db-alias="db.meta.dbAlias" />
+              <disable-or-enable-relations :nodes="nodes" :db-alias="db.id" />
             </v-tab-item>
           </v-tabs>-->
         </v-tab-item>
         <template v-if="uiacl">
-          <v-tab :key="db.meta.dbAlias + 'acl'" :href="'#' + db.meta.dbAlias + 'acl'" class="text-capitalize caption nc-ui-acl-tab">
+          <v-tab :key="db.id + 'acl'" :href="'#' + db.id + 'acl'" class="text-capitalize caption nc-ui-acl-tab">
             <!--          {{ db.connection.database | extractDbName }}-->
             UI Access Control
           </v-tab>
-          <v-tab-item :key="db.meta.dbAlias + 'aclt'" :value=" db.meta.dbAlias + 'acl'">
+          <v-tab-item :key="db.id + 'aclt'" :value=" db.id + 'acl'">
             <v-tabs color="x-active" height="28">
               <v-tab class="text-capitalize caption">
                 Tables
@@ -79,25 +79,25 @@
                 <toggle-table-ui-acl
                   :nodes="nodes"
                   :db="db"
-                  :db-alias="db.meta.dbAlias"
+                  :db-alias="db.id"
                 />
               </v-tab-item>
             <!-- enable extra -->
             <!--  <v-tab class="text-capitalize caption">Views</v-tab>
               <v-tab-item>
                 <toggle-view-ui-acl :nodes="nodes" :db="db"
-                                    :db-alias="db.meta.dbAlias"></toggle-view-ui-acl>
+                                    :db-alias="db.id"></toggle-view-ui-acl>
               </v-tab-item>
               <v-tab class="text-capitalize caption">Functions</v-tab>
               <v-tab-item>
                 <toggle-function-ui-acl :nodes="nodes" :db="db"
-                                        :db-alias="db.meta.dbAlias"></toggle-function-ui-acl>
+                                        :db-alias="db.id"></toggle-function-ui-acl>
               </v-tab-item>
 
               <v-tab class="text-capitalize caption">Procedures</v-tab>
               <v-tab-item>
                 <toggle-procedure-ui-acl :nodes="nodes" :db="db"
-                                         :db-alias="db.meta.dbAlias"></toggle-procedure-ui-acl>
+                                         :db-alias="db.id"></toggle-procedure-ui-acl>
 
               </v-tab-item>-->
             <!--            <v-tab class="text-capitalize caption">
@@ -107,7 +107,7 @@
               <toggle-relations-ui-acl
                 :nodes="nodes"
                 :db="db"
-                :db-alias="db.meta.dbAlias"
+                :db-alias="db.id"
               />
             </v-tab-item>-->
             </v-tabs>
@@ -152,6 +152,9 @@ export default {
   },
   methods: {},
   computed: {
+    bases() {
+      return this.$store.state.project.project && this.$store.state.project.project.bases
+    },
     dbsTab: {
       set(tab) {
         if (!tab) {

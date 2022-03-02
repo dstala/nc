@@ -490,6 +490,16 @@ export interface PluginType {
   price?: string;
 }
 
+export interface ModelRoleVisibilityType {
+  id?: string;
+  project_id?: string;
+  base_id?: string;
+  fk_model_id?: string;
+  fk_view_id?: string;
+  role?: string;
+  disabled?: string;
+}
+
 export interface SigninPayloadType {
   email: string;
   password: string;
@@ -519,6 +529,8 @@ export type ProjectUserAddPayloadType = any;
 
 export type ProjectUserUpdatePayloadType = any;
 
+export type ProjectModelVisibilitySetPayloadType = any;
+
 export interface ProjectListParamsType {
   page?: number;
   pageSize?: number;
@@ -545,6 +557,10 @@ export interface TableListParamsType {
 
 export interface TableUpdatePayloadType {
   _tn?: string;
+}
+
+export interface TableReorderPayloadType {
+  order?: string;
 }
 
 export interface ViewUpdatePayloadType {
@@ -960,12 +976,11 @@ export class Api<
      * @summary Password Refresh
      * @request GET:/projects/{projectId}/users
      * @response `200` `{ users?: { list: (UserType)[], pageInfo: PaginatedType } }` OK
-     * @response `0` `(any)[]`
      */
     projectUserList: (projectId: string, params: RequestParams = {}) =>
       this.request<
         { users?: { list: UserType[]; pageInfo: PaginatedType } },
-        any[]
+        any
       >({
         path: `/projects/${projectId}/users`,
         method: 'GET',
@@ -1040,6 +1055,50 @@ export class Api<
   };
   meta = {
     /**
+     * No description
+     *
+     * @tags meta
+     * @name ProjectModelVisibilityList
+     * @summary Password Refresh
+     * @request GET:/projects/{projectId}/{baseId}/modelVisibility
+     * @response `200` `(any)[]` OK
+     */
+    projectModelVisibilityList: (
+      projectId: string,
+      baseId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any[], any>({
+        path: `/projects/${projectId}/${baseId}/modelVisibility`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name ProjectModelVisibilitySet
+     * @request POST:/projects/{projectId}/{baseId}/modelVisibility
+     * @response `200` `any` OK
+     */
+    projectModelVisibilitySet: (
+      projectId: string,
+      baseId: string,
+      data: ProjectModelVisibilitySetPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/${baseId}/modelVisibility`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
      * @description Read project details
      *
      * @tags Meta
@@ -1085,10 +1144,9 @@ export class Api<
      * @name ProjectRead
      * @request GET:/projects/{projectId}
      * @response `200` `object` OK
-     * @response `0` `ProjectType`
      */
     projectRead: (projectId: string, params: RequestParams = {}) =>
-      this.request<object, ProjectType>({
+      this.request<object, any>({
         path: `/projects/${projectId}`,
         method: 'GET',
         format: 'json',
@@ -1117,7 +1175,6 @@ export class Api<
      * @name SharedBaseGet
      * @request GET:/projects/{projectId}/sharedBase
      * @response `200` `{ uuid?: string, url?: string }` OK
-     * @response `0` `any`
      */
     sharedBaseGet: (projectId: string, params: RequestParams = {}) =>
       this.request<{ uuid?: string; url?: string }, any>({
@@ -1278,6 +1335,27 @@ export class Api<
       this.request<void, any>({
         path: `/tables/${tableId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name TableReorder
+     * @request POST:/tables/{tableId}/reorder
+     * @response `200` `void` OK
+     */
+    tableReorder: (
+      tableId: string,
+      data: TableReorderPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/reorder`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -2580,7 +2658,6 @@ export class Api<
      * @name SharedBaseGet
      * @request GET:/public/sharedBase/{sharedBaseUuid}
      * @response `200` `{ project_id?: string }` OK
-     * @response `0` `any`
      */
     sharedBaseGet: (sharedBaseUuid: string, params: RequestParams = {}) =>
       this.request<{ project_id?: string }, any>({
@@ -2684,34 +2761,6 @@ export class Api<
     /**
      * No description
      *
-     * @name TableReorder
-     * @request POST:/tables/{tableId}/reorder
-     * @response `200` `void` OK
-     */
-    tableReorder: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ColumnReorder
-     * @request POST:/tables/{tableId}/columns/reorder
-     * @response `200` `void` OK
-     */
-    columnReorder: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/columns/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
      * @name WebhookReorder
      * @request POST:/tables/{tableId}/webhooks/{webhookId}/reorder
      * @response `200` `void` OK
@@ -2723,39 +2772,6 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/tables/${tableId}/webhooks/${webhookId}/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-  };
-  views = {
-    /**
-     * No description
-     *
-     * @name FilterReorder
-     * @request POST:/views/{viewsId}/filters/{filterId}/reorder
-     * @response `200` `void` OK
-     */
-    filterReorder: (
-      filterId: string,
-      viewsId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewsId}/filters/${filterId}/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name SortReorder
-     * @request POST:/views/{viewId}/sorts/{sortId}/reorder
-     * @response `200` `void` OK
-     */
-    sortReorder: (sortId: string, viewId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts/${sortId}/reorder`,
         method: 'POST',
         ...params,
       }),

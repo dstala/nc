@@ -104,6 +104,7 @@
                       </x-icon>
                       <!-- Delete view" -->
                       <x-icon
+                        v-if="!view.is_default"
                         :tooltip="$t('nav_drawer.virtual_views.action.delete')"
                         small
                         color="error"
@@ -763,7 +764,7 @@ export default {
         // ])
         this.$toast.success('Successfully updated').goAway(3000)
       } catch (e) {
-        this.$toast.error(e.message).goAway(3000)
+        this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
       }
     },
     async loadViews() {
@@ -842,7 +843,7 @@ export default {
         })
         this.$toast.success('View renamed successfully').goAway(3000)
       } catch (e) {
-        this.$toast.error(e.message).goAway(3000)
+        this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
       }
     },
     showRenameTextBox(view, i) {
@@ -866,7 +867,7 @@ export default {
         this.$toast.success('View deleted successfully').goAway(3000)
         await this.loadViews()
       } catch (e) {
-        this.$toast.error(e.message).goAway(3000)
+        this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
       }
     },
     async genShareLink() {

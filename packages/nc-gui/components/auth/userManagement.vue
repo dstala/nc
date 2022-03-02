@@ -663,7 +663,7 @@ export default {
     },
     async loadRoles() {
       try {
-        this.roles = ['creator', 'editor', 'commenter']
+        this.roles = ['creator', 'editor', 'commenter', 'viewer']
 
         // todo:
         //   (await this.$axios.get('/admin/roles', {

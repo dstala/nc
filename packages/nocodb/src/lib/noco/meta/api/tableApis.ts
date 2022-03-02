@@ -15,30 +15,64 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { xcVisibilityMetaGet } from './modelVisibilityApis';
+import View from '../../../noco-models/View';
 
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
   });
+
+  // todo: optimise
+  const viewList = <View[]>await xcVisibilityMetaGet(
+    // req.params.projectId,
+    // req.params.baseId,
+    null,
+    null,
+    [table]
+  );
+
+  //await View.list(req.params.tableId)
+  table.views = viewList.filter((table: any) => {
+    return Object.keys((req as any).session?.passport?.user?.roles).some(
+      role =>
+        (req as any)?.session?.passport?.user?.roles[role] &&
+        !table.disabled[role]
+    );
+  });
+
   res.json(table);
+}
+
+export async function tableReorder(req: Request, res: Response) {
+  res.json(Model.updateOrder(req.params.tableId, req.body.order));
 }
 
 export async function tableList(
   req: Request<any, any, any, TableListParamsType>,
   res: Response<TableListType>
 ) {
-  const tables = await Model.list({
+  // const tablesList = await xcVisibilityMetaGet(
+  //   req.params.projectId,
+  //   req.params.baseId
+  // );
+  //
+  // const filteredTableList = tablesList.filter((table: any) => {
+  //   return Object.keys((req as any).session?.passport?.user?.roles).some(
+  //     role =>
+  //       (req as any)?.session?.passport?.user?.roles[role] &&
+  //       !table.disabled[role]
+  //   );
+  // });
+
+  const tableList = await Model.list({
     project_id: req.params.projectId,
     base_id: null
   });
 
   res // todo: pagination
     .json({
-      tables: new PagedResponseImpl(tables, {
-        totalRows: tables.length,
-        pageSize: 20,
-        page: 1
-      })
+      tables: new PagedResponseImpl(tableList as Model[])
     });
 }
 
@@ -132,4 +166,5 @@ router.post('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableCreate));
 router.get('/tables/:tableId', ncMetaAclMw(tableGet));
 router.put('/tables/:tableId', ncMetaAclMw(tableUpdate));
 router.delete('/tables/:tableId', ncMetaAclMw(tableDelete));
+router.post('/tables/:tableId/reorder', ncMetaAclMw(tableReorder));
 export default router;
