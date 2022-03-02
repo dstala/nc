@@ -335,7 +335,7 @@ export default class Column implements ColumnType {
     ncMeta = Noco.ncMeta
   ): Promise<Column[]> {
     let columnsList = await NocoCache.getList(CacheScope.COLUMN, [fk_model_id]);
-    if (!columnsList?.length) {
+    if (!columnsList.length) {
       columnsList = await ncMeta.metaList2(null, null, MetaTable.COLUMNS, {
         condition: {
           fk_model_id
