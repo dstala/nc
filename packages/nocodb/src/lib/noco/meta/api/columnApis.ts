@@ -368,7 +368,7 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
 
       case UITypes.Formula:
         colBody.formula = await substituteColumnNameWithIdInFormula(
-          colBody.formula,
+          colBody.formula_raw || colBody.formula,
           table.columns
         );
         await Column.insert({
@@ -442,9 +442,21 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
     ].includes(column.uidt)
   ) {
     if (column.uidt === colBody.uidt) {
-      await Column.updateAlias(req.params.columnId, {
-        _cn: colBody._cn
-      });
+      if (column.uidt === UITypes.Formula) {
+        colBody.formula = await substituteColumnNameWithIdInFormula(
+          colBody.formula_raw || colBody.formula,
+          table.columns
+        );
+        await Column.update(column.id, {
+          // _cn: colBody._cn,
+          ...column,
+          ...colBody
+        });
+      } else if (colBody._cn !== column._cn) {
+        await Column.updateAlias(req.params.columnId, {
+          _cn: colBody._cn
+        });
+      }
     } else {
       NcError.notImplemented(
         `Updating ${colBody.uidt} => ${colBody.uidt} is not implemented`

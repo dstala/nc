@@ -3,6 +3,7 @@ import { MetaTable } from '../utils/globals';
 
 export default class FormulaColumn {
   formula: string;
+  formula_raw: string;
   fk_column_id: string;
 
   constructor(data: Partial<FormulaColumn>) {
@@ -15,6 +16,7 @@ export default class FormulaColumn {
   ) {
     const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
       fk_column_id: data.fk_column_id,
+      formula_raw: data.formula_raw,
       formula: data.formula
     });
     return new FormulaColumn(row);

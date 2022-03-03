@@ -90,8 +90,15 @@ export default {
           text: fn,
           type: 'function'
         })),
-        ...this.meta.columns.map(c => ({ text: c._cn, type: 'column', c })),
-        ...this.availableBinOps.map(op => ({ text: op, type: 'op' }))
+        ...this.meta.columns.map(c => ({
+          text: c._cn,
+          type: 'column',
+          c
+        })),
+        ...this.availableBinOps.map(op => ({
+          text: op,
+          type: 'op'
+        }))
       ]
     },
     acTree() {
@@ -102,8 +109,21 @@ export default {
       return ref
     }
   },
+  watch: {
+    value(v, o) {
+      if (v !== o) {
+        this.formula = this.formula || {}
+        this.formula.value = v || ''
+      }
+    },
+    'formula.value'(v, o) {
+      if (v !== o) {
+        this.$emit('input', v)
+      }
+    }
+  },
   created() {
-    this.formula = this.value ? { ...this.value } : {}
+    this.formula = { value: this.value || '' }
   },
   methods: {
     async save() {
@@ -135,7 +155,7 @@ export default {
         const formulaCol = {
           _cn: this.alias,
           uidt: UITypes.Formula,
-          formula: this.formula.value
+          formula_raw: this.formula.value
         }
 
         const col = await this.$api.meta.columnCreate(this.meta.id, formulaCol)

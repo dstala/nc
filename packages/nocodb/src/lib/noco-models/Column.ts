@@ -178,7 +178,8 @@ export default class Column implements ColumnType {
         await FormulaColumn.insert(
           {
             fk_column_id: colId,
-            formula: column.formula
+            formula: column.formula,
+            formula_raw: column.formula_raw
           },
           ncMeta
         );
@@ -465,37 +466,6 @@ export default class Column implements ColumnType {
   static async update(colId: string, column: any, ncMeta = Noco.ncMeta) {
     const oldCol = await Column.get({ colId }, ncMeta);
 
-    // const row = await ncMeta.metaInsert2(
-    //   null, //column.project_id || column.base_id,
-    //   null, //column.db_alias,
-    //   'nc_columns_v2',
-    //   {
-    //     fk_model_id: column.fk_model_id,
-    //     cn: column.cn,
-    //     _cn: column._cn,
-    //     uidt: column.uidt,
-    //     dt: column.dt,
-    //     np: column.np,
-    //     ns: column.ns,
-    //     clen: column.clen,
-    //     cop: column.cop,
-    //     pk: column.pk,
-    //     rqd: column.rqd,
-    //     un: column.un,
-    //     ct: column.ct,
-    //     ai: column.ai,
-    //     unique: column.unique,
-    //     cdf: column.cdf,
-    //     cc: column.cc,
-    //     csn: column.csn,
-    //     dtx: column.dtx,
-    //     dtxp: column.dtxp,
-    //     dtxs: column.dtxs,
-    //     au: column.au,
-    //     pv: column.pv
-    //   }
-    // );
-    // if (oldCol.uidt !== column.uidt)
     switch (oldCol.uidt) {
       case UITypes.Lookup:
         // LookupColumn.insert()
@@ -527,59 +497,10 @@ export default class Column implements ColumnType {
         });
         break;
     }
-    /*  default:
-        {
-          await ncMeta.metaInsert2(
-            model.project_id,
-            model.db_alias,
-            'nc_col_props_v2',
-            {
-              column_id: model.column_id,
 
-              cn: model.cn,
-              // todo: decide type
-              uidt: model.uidt,
-              dt: model.dt,
-              np: model.np,
-              ns: model.ns,
-              clen: model.clen,
-              cop: model.cop,
-              pk: model.pk,
-              rqd: model.rqd,
-              un: model.un,
-              ct: model.ct,
-              ai: model.ai,
-              unique: model.unique,
-              ctf: model.ctf,
-              cc: model.cc,0
-              csn: model.csn,
-              dtx: model.dtx,
-              dtxp: model.dtxp,
-              dtxs: model.dtxs,
-              au: model.au
-            }
-          );
-          if (
-            model.uidt === UITypes.MultiSelect ||
-            model.uidt === UITypes.SingleSelect
-          ) {
-            for (const option of model.dtxp.split(','))
-              await ncMeta.metaInsert2(
-                model.project_id,
-                model.db_alias,
-                'nc_col_select_options_v2',
-                {
-                  column_id: colId,
-                  name: option
-                }
-              );
-          }
-        }
-        break;*/
-    // }
     await ncMeta.metaUpdate(
-      null, //column.project_id || column.base_id,
-      null, //column.db_alias,
+      null,
+      null,
       MetaTable.COLUMNS,
       {
         cn: column.cn,

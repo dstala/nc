@@ -26,11 +26,10 @@
               outlined
             />
           </v-col>
-
-          <v-col v-if="column.formula" cols="12">
+          <v-col v-if="newColumn && newColumn.uidt === UITypes.Formula" cols="12">
             <formula-options
               ref="formula"
-              :value="column.formula"
+              v-model="newColumn.formula_raw"
               :column="column"
               :new-column="newColumn"
               :nodes="nodes"
@@ -55,6 +54,7 @@
 </template>
 
 <script>
+import { UITypes } from 'nc-common'
 import FormulaOptions from '@/components/project/spreadsheet/components/editColumn/formulaOptions'
 import { validateColumnName } from '~/helpers'
 
@@ -70,17 +70,28 @@ export default {
   },
   data: () => ({
     valid: false,
-    newColumn: {}
+    newColumn: {},
+    UITypes
   }),
   watch: {
     column(c) {
-      this.newColumn = { ...c }
+      const { colOptions, ...rest } = c
+      this.newColumn = rest
+
+      if (rest.uidt === UITypes.Formula) {
+        this.newColumn.formula_raw = colOptions.formula_raw
+      }
     }
   },
   async created() {
   },
   mounted() {
-    this.newColumn = { ...this.column }
+    const { colOptions, ...rest } = this.column
+    this.newColumn = rest
+
+    if (rest.uidt === UITypes.Formula) {
+      this.newColumn.formula_raw = colOptions.formula_raw
+    }
   },
   methods: {
     close() {
