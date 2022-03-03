@@ -26,6 +26,7 @@ import projectUserApis from './projectUserApis';
 import sharedBaseApis from './sharedBaseApis';
 import { initStrategies } from './userApi/initStrategies';
 import modelVisibilityApis from './modelVisibilityApis';
+import publicDataExportApis from './publicDataExportApis';
 
 export default function(router: Router) {
   initStrategies(router);
@@ -41,6 +42,7 @@ export default function(router: Router) {
   router.use('/tables/:tableId/grids', gridViewApis);
   router.use('/formColumns', formViewColumnApis);
   router.use('/public/data/:publicDataUuid', publicDataApis);
+  router.use('/public/data/:publicDataUuid', publicDataExportApis);
   router.use('/public/meta/:publicDataUuid', publicMetaApis);
 
   router.use(gridViewColumnApis);

@@ -837,12 +837,15 @@ export class Api<
      * @summary Signup
      * @request POST:/auth/user/signup
      * @response `200` `{ token?: string }` OK
+     * @response `400` `void` Bad Request
+     * @response `401` `void` Unauthorized
+     * @response `403` `void` Forbidden
      */
     signup: (
       data: { email?: boolean; password?: string },
       params: RequestParams = {}
     ) =>
-      this.request<{ token?: string }, any>({
+      this.request<{ token?: string }, void>({
         path: `/auth/user/signup`,
         method: 'POST',
         body: data,
@@ -2779,6 +2782,25 @@ export class Api<
         body: data,
         type: ContentType.FormData,
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags public
+     * @name CsvExport
+     * @request GET:/public/data/{uuid}/export/{type}
+     * @response `200` `any` OK
+     */
+    csvExport: (
+      uuid: string,
+      type: 'csv' | 'excel',
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/public/data/${uuid}/export/${type}`,
+        method: 'GET',
         ...params,
       }),
 

@@ -254,11 +254,16 @@ export default {
           //   null,
           //   true
           // ])
-
-          const res = await this.$api.data.csvExport(this.selectedView.id, ExportTypes.CSV, {
-            responseType: 'blob'
-          })
-
+          let res
+          if (this.publicViewId) {
+            res = await this.$api.public.csvExport(this.publicViewId, ExportTypes.CSV, {
+              responseType: 'blob'
+            })
+          } else {
+            res = await this.$api.data.csvExport(this.selectedView.id, ExportTypes.CSV, {
+              responseType: 'blob'
+            })
+          }
           const { data } = res
 
           offset = +res.headers['nc-export-offset']
