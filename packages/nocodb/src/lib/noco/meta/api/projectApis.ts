@@ -23,6 +23,8 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 import ProjectUser from '../../../noco-models/ProjectUser';
 import { customAlphabet } from 'nanoid';
 import Noco from '../../Noco';
+import isDocker from 'is-docker';
+import { packageVersion } from 'nc-help';
 
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
 
@@ -501,8 +503,22 @@ async function getManyToManyRelations(
     ];
   }
 }
+export async function projectInfoGet(req, res) {
+  const project = await Project.getWithInfo(req.params.projectId);
+  res.json({
+    Node: process.version,
+    Arch: process.arch,
+    Platform: process.platform,
+    Docker: isDocker(),
+    Database: project.bases?.[0]?.type,
+    ProjectOnRootDB: !!project?.is_meta,
+    RootDB: Noco.getConfig()?.meta?.db?.client,
+    PackageVersion: packageVersion
+  });
+}
 
 export default router => {
+  router.get('/projects/:projectId/info', ncMetaAclMw(projectInfoGet));
   router.get('/projects/:projectId', ncMetaAclMw(projectGet));
   router.delete('/projects/:projectId', ncMetaAclMw(projectDelete));
   router.post('/projects', ncMetaAclMw(projectCreate));
