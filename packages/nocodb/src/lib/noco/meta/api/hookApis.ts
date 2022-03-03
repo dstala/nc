@@ -15,7 +15,7 @@ export async function hookList(
   // todo: pagination
   res.json({
     hooks: new PagedResponseImpl(
-      await Hook.list({ fk_model_id: req.params.modelId })
+      await Hook.list({ fk_model_id: req.params.tableId })
     )
   });
 }
@@ -26,7 +26,7 @@ export async function hookCreate(
 ) {
   const hook = await Hook.insert({
     ...req.body,
-    fk_model_id: req.params.modelId
+    fk_model_id: req.params.tableId
   });
   res.json(hook);
 }
@@ -49,7 +49,7 @@ export async function hookTest(
   req: Request<any, any, HookTestPayloadType>,
   res: Response
 ) {
-  const model = await Model.getByIdOrName({ id: req.params.modelId });
+  const model = await Model.getByIdOrName({ id: req.params.tableId });
 
   const {
     hook,
@@ -67,9 +67,9 @@ export async function tableSampleData(req: Request, res: Response) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/tables/:modelId/hooks', ncMetaAclMw(hookList));
-router.post('/tables/:modelId/hooks/test', ncMetaAclMw(hookTest));
-router.post('/tables/:modelId/hooks', ncMetaAclMw(hookCreate));
+router.get('/tables/:tableId/hooks', ncMetaAclMw(hookList));
+router.post('/tables/:tableId/hooks/test', ncMetaAclMw(hookTest));
+router.post('/tables/:tableId/hooks', ncMetaAclMw(hookCreate));
 router.delete('/hooks/:hookId', ncMetaAclMw(hookDelete));
 router.put('/hooks/:hookId', ncMetaAclMw(hookUpdate));
 router.get(
