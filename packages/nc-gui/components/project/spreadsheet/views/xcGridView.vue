@@ -97,6 +97,7 @@
                 <span v-on="on" />
               </template>
               <edit-column
+                v-if="addNewColMenu"
                 :meta="meta"
                 :nodes="nodes"
                 :sql-ui="sqlUi"
