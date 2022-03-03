@@ -84,7 +84,12 @@ async function showAllColumns(req: Request<any, any>, res) {
 }
 
 async function hideAllColumns(req: Request<any, any>, res) {
-  res.json(await View.hideAllColumns(req.params.viewId));
+  res.json(
+    await View.hideAllColumns(
+      req.params.viewId,
+      <string[]>(req.query?.ignoreIds || [])
+    )
+  );
 }
 
 const router = Router({ mergeParams: true });

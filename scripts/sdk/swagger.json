@@ -1553,7 +1553,8 @@
             "in": "query",
             "name": "ignoreIds"
           }
-        ]
+        ],
+        "description": ""
       }
     },
     "/views/{viewId}/columns/{columnId}": {

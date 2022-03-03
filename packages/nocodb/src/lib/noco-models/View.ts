@@ -651,7 +651,7 @@ export default class View implements ViewType {
       ignoreColdIds?.length
         ? {
             _not: {
-              fk_view_id: {
+              fk_column_id: {
                 in: ignoreColdIds
               }
             }
@@ -660,17 +660,23 @@ export default class View implements ViewType {
     );
   }
 
-  static async hideAllColumns(viewId, ncMeta = Noco.ncMeta) {
+  static async hideAllColumns(
+    viewId,
+    ignoreColdIds = [],
+    ncMeta = Noco.ncMeta
+  ) {
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);
     const scope = this.extractViewColumnsTableNameScope(view);
     // get existing cache
     const key = `${scope}:${viewId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    // update alias
-    o.show = false;
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      // update alias
+      o.show = false;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     return await ncMeta.metaUpdate(
       null,
@@ -679,7 +685,16 @@ export default class View implements ViewType {
       { show: false },
       {
         fk_view_id: viewId
-      }
+      },
+      ignoreColdIds?.length
+        ? {
+            _not: {
+              fk_column_id: {
+                in: ignoreColdIds
+              }
+            }
+          }
+        : null
     );
   }
 

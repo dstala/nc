@@ -499,8 +499,8 @@ export default {
     return obj
   },
   computed: {
-    ignoredColumnIds() {
-      return ((this.meta && this.meta.columns.filter(col => col.uidt === UITypes.ForeignKey ||
+    systemFieldsIds() {
+      return ((this.fields && this.fields.filter(col => col.uidt === UITypes.ForeignKey ||
         col.cn === 'created_at' ||
         col.cn === 'updated_at' ||
         (col.pk && (col.ai || col.cdf)))) || []).map(c => c.id)
@@ -541,7 +541,7 @@ export default {
     },
     hiddenColumns: {
       get() {
-        return this.fields.filter(f => !f.show && f.uidt !== UITypes.ForeignKey)
+        return this.fields.filter(f => !f.show && !this.systemFieldsIds.includes(f.id))
         // return this.allColumns.filter(c => !this.showFields[c.alias] && !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && !(this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn))
       }
     },
@@ -661,8 +661,7 @@ export default {
         [f.fk_column_id]: f
       }), {})
       this.fields = this.meta.columns.map(c => ({
-        _cn: c._cn,
-        uidt: c.uidt,
+        ...c,
         alias: c._cn,
         fk_column_id: c.id,
         ...(fieldById[c.id] ? fieldById[c.id] : {}),
@@ -701,9 +700,9 @@ export default {
     },
     async addAllColumns() {
       for (const col of this.fields) {
-        if (!this.ignoredColumnIds.includes(col.id)) { this.$set(col, 'show', true) }
+        if (!this.systemFieldsIds.includes(col.id)) { this.$set(col, 'show', true) }
       }
-      await this.$api.meta.viewShowAllColumn({ viewId: this.viewId, ignoreIds: this.ignoredColumnIds })
+      await this.$api.meta.viewShowAllColumn({ viewId: this.viewId, ignoreIds: this.systemFieldsIds })
       // this.columns = [...this.allColumnsLoc]
     },
     async removeAllColumns() {
