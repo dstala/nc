@@ -17,9 +17,13 @@ export default async (req, res, next) => {
       req.ncProjectId = params.projectId;
     } else if (req.query.project_id) {
       req.ncProjectId = req.query.project_id;
-    } else if (params.tableId || req.query.fk_model_id) {
+    } else if (
+      params.tableId ||
+      req.query.fk_model_id ||
+      req.body?.fk_model_id
+    ) {
       const model = await Model.getByIdOrName({
-        id: params.tableId || req.query.fk_model_id
+        id: params.tableId || req.query?.fk_model_id || req.body?.fk_model_id
       });
       req.ncProjectId = model?.project_id;
     } else if (params.viewId) {
