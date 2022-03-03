@@ -443,7 +443,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   ) {
     if (column.uidt === colBody.uidt) {
       await Column.updateAlias(req.params.columnId, {
-        _cn: column._cn
+        _cn: colBody._cn
       });
     } else {
       NcError.notImplemented(

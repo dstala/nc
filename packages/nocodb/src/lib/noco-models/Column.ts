@@ -615,6 +615,7 @@ export default class Column implements ColumnType {
     { _cn }: { _cn: string },
     ncMeta = Noco.ncMeta
   ) {
+    // todo: redis del - col list
     await ncMeta.metaUpdate(
       null, //column.project_id || column.base_id,
       null, //column.db_alias,

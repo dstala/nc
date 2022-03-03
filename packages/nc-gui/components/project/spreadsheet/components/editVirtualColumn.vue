@@ -19,7 +19,7 @@
               label="Column name"
               :rules="[
                 v => !!v || 'Required',
-                v => !meta || !meta.columns || !column ||meta.columns.every(c => v !== c.cn ) && meta.v.every(c => column && c._cn === column._cn || v !== c._cn ) || 'Duplicate column name',
+                v => !meta || !meta.columns || !column ||meta.columns.every(c => column === c || (v !== c.cn && v !== c._cn )) || 'Duplicate column name',
                 validateColumnName
               ]"
               dense
@@ -90,22 +90,23 @@ export default {
     async save() {
       // todo: rollup update
       try {
-        if (this.column.formula) {
-          await this.$refs.formula.update()
-        } else {
-          await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-            env: this.nodes.env,
-            dbAlias: this.nodes.dbAlias
-          }, 'xcUpdateVirtualKeyAlias', {
-            tn: this.nodes.tn,
-            oldAlias: this.column._cn,
-            newAlias: this.newColumn._cn
-          }])
-
-          this.$toast.success('Successfully updated alias').goAway(3000)
-        }
+        // if (this.column.formula) {
+        //   await this.$refs.formula.update()
+        // } else {
+        //   await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //     env: this.nodes.env,
+        //     dbAlias: this.nodes.dbAlias
+        //   }, 'xcUpdateVirtualKeyAlias', {
+        //     tn: this.nodes.tn,
+        //     oldAlias: this.column._cn,
+        //     newAlias: this.newColumn._cn
+        //   }])
+        //
+        //   this.$toast.success('Successfully updated alias').goAway(3000)
+        // }
+        await this.$api.meta.columnUpdate(this.meta.id, this.column.id, this.newColumn)
       } catch (e) {
-        console.log(e)
+        console.log(this._extractSdkResponseErrorMsg(e))
         this.$toast.error('Failed to update column alias').goAway(3000)
       }
       this.$emit('saved', this.newColumn._cn, this.column._cn)
