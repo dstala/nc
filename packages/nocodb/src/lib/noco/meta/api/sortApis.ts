@@ -22,54 +22,33 @@ export async function sortGet(req: Request, res: Response<TableType>) {}
 // @ts-ignore
 export async function sortList(
   req: Request<any, any, any, TableListParamsType>,
-  res: Response<SortListType>,
-  next
+  res: Response<SortListType>
 ) {
-  try {
-    const sortList = await Sort.list({ viewId: req.params.viewId });
-    res.json({
-      sorts: new PagedResponseImpl(sortList)
-    });
-  } catch (e) {
-    next(e);
-  }
+  const sortList = await Sort.list({ viewId: req.params.viewId });
+  res.json({
+    sorts: new PagedResponseImpl(sortList)
+  });
 }
 
 // @ts-ignore
-export async function sortCreate(
-  req: Request<any, any, TableReqType>,
-  res,
-  next
-) {
-  try {
-    const sort = await Sort.insert({
-      ...req.body,
-      fk_view_id: req.params.viewId
-    });
-    res.json(sort);
-  } catch (e) {
-    next(e);
-  }
+export async function sortCreate(req: Request<any, any, TableReqType>, res) {
+  const sort = await Sort.insert({
+    ...req.body,
+    fk_view_id: req.params.viewId
+  });
+  res.json(sort);
 }
 
 // @ts-ignore
 export async function sortUpdate(req, res, next) {
-  try {
-    const sort = await Sort.update(req.params.sortId, req.body);
-    res.json(sort);
-  } catch (e) {
-    next(e);
-  }
+  const sort = await Sort.update(req.params.sortId, req.body);
+  res.json(sort);
 }
 
 // @ts-ignore
 export async function sortDelete(req: Request, res: Response, next) {
-  try {
-    const sort = await Sort.delete(req.params.sortId);
-    res.json(sort);
-  } catch (e) {
-    next(e);
-  }
+  const sort = await Sort.delete(req.params.sortId);
+  res.json(sort);
 }
 
 const router = Router({ mergeParams: true });
