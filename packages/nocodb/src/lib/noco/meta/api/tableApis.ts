@@ -153,7 +153,7 @@ export async function tableDelete(req: Request, res: Response, next) {
       ip: (req as any).clientIp
     }).then(() => {});
 
-    res.json(table.delete());
+    res.json(await table.delete());
   } catch (e) {
     console.log(e);
     next(e);

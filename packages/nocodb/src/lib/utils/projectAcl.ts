@@ -164,6 +164,10 @@ export default {
     projectList: true
   },
   user: {
+    pluginList: true,
+    pluginRead: true,
+    pluginTest: true,
+    pluginUpdate: true,
     projectCreate: true,
     projectList: true,
     handleAxiosCall: true,

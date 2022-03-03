@@ -176,23 +176,25 @@ export default {
     async setAsPrimaryValue() {
       // todo: pass only updated fields
       try {
-        const meta = JSON.parse(JSON.stringify(this.meta))
-        for (const col of meta.columns) {
-          if (col.pv) {
-            delete col.pv
-          }
-          if (col.cn === this.column.cn) {
-            col.pv = true
-          }
-        }
+        // const meta = JSON.parse(JSON.stringify(this.meta))
+        // for (const col of meta.columns) {
+        //   if (col.pv) {
+        //     delete col.pv
+        //   }
+        //   if (col.cn === this.column.cn) {
+        //     col.pv = true
+        //   }
+        // }
 
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcModelSet', {
-          tn: this.nodes.tn,
-          meta
-        }])
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   env: this.nodes.env,
+        //   dbAlias: this.nodes.dbAlias
+        // }, 'xcModelSet', {
+        //   tn: this.nodes.tn,
+        //   meta
+        // }])
+
+        await this.$api.meta.tablePrimaryColumnSet(this.meta.id, this.column.id)
         this.$toast.success('Successfully updated as primary column').goAway(3000)
       } catch (e) {
         console.log(e)

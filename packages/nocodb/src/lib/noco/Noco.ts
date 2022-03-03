@@ -74,6 +74,7 @@ export default class Noco {
     return Noco._this.init(args);
   }
 
+  private static config: NcConfig;
   public readonly router: express.Router;
   public readonly projectRouter: express.Router;
   public static _ncMeta: NcMetaIO;
@@ -100,7 +101,7 @@ export default class Noco {
     this.projectRouter = express.Router();
 
     /* prepare config */
-    this.config = NcConfigFactory.make();
+    Noco.config = this.config = NcConfigFactory.make();
 
     /******************* setup : start *******************/
     this.env = '_noco'; //process.env['NODE_ENV'] || this.config.workingEnv || 'dev';
@@ -566,6 +567,9 @@ export default class Noco {
   }
   public get ncMeta(): NcMetaIO {
     return Noco._ncMeta;
+  }
+  public static getConfig(): NcConfig {
+    return Noco.config;
   }
 }
 

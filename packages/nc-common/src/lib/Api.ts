@@ -55,6 +55,8 @@ export interface ProjectType {
   deleted?: string | boolean;
   order?: number;
   bases?: BaseType[];
+  is_meta?: boolean;
+  prefix?: string;
 }
 
 export interface ProjectListType {
@@ -74,6 +76,7 @@ export interface BaseType {
   params?: string;
   type?: string;
   ssl?: string;
+  is_meta?: boolean;
 }
 
 export interface BaseReqType {
@@ -536,6 +539,8 @@ export interface ProjectListParamsType {
   pageSize?: number;
   sort?: string;
 }
+
+export type ProjectCreatePayloadType = ProjectType & { external?: boolean };
 
 export interface SharedBaseCreatePayloadType {
   roles?: string;
@@ -1106,16 +1111,11 @@ export class Api<
      * @request GET:/projects/
      * @response `201` `ProjectListType`
      */
-    projectList: (
-      query: ProjectListParamsType,
-      data: ProjectReqType,
-      params: RequestParams = {}
-    ) =>
+    projectList: (query: ProjectListParamsType, params: RequestParams = {}) =>
       this.request<ProjectListType, any>({
         path: `/projects/`,
         method: 'GET',
         query: query,
-        body: data,
         ...params,
       }),
 
@@ -1127,7 +1127,10 @@ export class Api<
      * @request POST:/projects/
      * @response `200` `ProjectType` OK
      */
-    projectCreate: (data: ProjectType, params: RequestParams = {}) =>
+    projectCreate: (
+      data: ProjectCreatePayloadType,
+      params: RequestParams = {}
+    ) =>
       this.request<ProjectType, any>({
         path: `/projects/`,
         method: 'POST',
@@ -1459,6 +1462,25 @@ export class Api<
       this.request<void, any>({
         path: `/tables/${tableId}/columns/${columnId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name TablePrimaryColumnSet
+     * @request POST:/tables/{tableId}/columns/{columnId}/primary
+     * @response `200` `void` OK
+     */
+    tablePrimaryColumnSet: (
+      tableId: string,
+      columnId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/columns/${columnId}/primary`,
+        method: 'POST',
         ...params,
       }),
 

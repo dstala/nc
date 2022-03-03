@@ -64,6 +64,10 @@ export default abstract class NcMetaIO {
     this.config = config;
   }
 
+  public getConfig() {
+    return this.config;
+  }
+
   public abstract metaInit(): Promise<boolean>;
 
   public abstract metaInsert(

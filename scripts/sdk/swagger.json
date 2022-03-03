@@ -473,9 +473,6 @@
           }
         },
         "description": "Read project details",
-        "requestBody": {
-          "$ref": "#/components/requestBodies/ProjectCreate"
-        },
         "parameters": [
           {
             "schema": {
@@ -530,7 +527,20 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Project"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Project"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "external": {
+                        "type": "boolean",
+                        "default": false
+                      }
+                    }
+                  }
+                ]
               }
             }
           }
@@ -1239,6 +1249,38 @@
         },
         "tags": [
           "Meta"
+        ]
+      }
+    },
+    "/tables/{tableId}/columns/{columnId}/primary": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "columnId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "table-primary-column-set",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
         ]
       }
     },
@@ -3889,6 +3931,12 @@
             "items": {
               "$ref": "#/components/schemas/Base"
             }
+          },
+          "is_meta": {
+            "type": "boolean"
+          },
+          "prefix": {
+            "type": "string"
           }
         }
       },
@@ -3989,6 +4037,10 @@
           },
           "ssl": {
             "type": "string"
+          },
+          "is_meta": {
+            "type": "boolean",
+            "readOnly": true
           }
         }
       },
@@ -5894,6 +5946,15 @@
               "anyOf": [
                 {
                   "$ref": "#/components/schemas/ProjectReq"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "external": {
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
                 }
               ]
             },

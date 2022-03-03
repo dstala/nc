@@ -4,8 +4,6 @@ import NcModel from '../../types/NcModel';
 import NocoCache from '../noco-cache/NocoCache';
 import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
-import Filter from './Filter';
-import Sort from './Sort';
 import {
   isVirtualCol,
   ModelTypes,
@@ -349,8 +347,9 @@ export default class Model implements TableType {
     //  columns - done
     //  table - done
 
-    await Sort.deleteAll(this.id, ncMeta);
-    await Filter.deleteAll(this.id, ncMeta);
+    for (const view of await this.getViews(true)) {
+      await view.delete();
+    }
 
     for (const col of await this.getColumns(false, ncMeta)) {
       let colOptionTableName = null;
@@ -476,5 +475,42 @@ export default class Model implements TableType {
       },
       tableId
     );
+  }
+
+  static async updatePrimaryColumn(
+    tableId: string,
+    columnId: string,
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo : redis del - table get
+    const model = await this.getWithInfo({ id: tableId });
+
+    const currentPvCol = model.primaryValue;
+    const newPvCol = model.columns.find(c => c.id === columnId);
+
+    if (!newPvCol) NcError.badRequest('Column not found');
+
+    if (currentPvCol)
+      await ncMeta.metaUpdate(
+        null,
+        null,
+        MetaTable.COLUMNS,
+        {
+          pv: false
+        },
+        currentPvCol.id
+      );
+
+    await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.COLUMNS,
+      {
+        pv: true
+      },
+      newPvCol.id
+    );
+
+    return true;
   }
 }

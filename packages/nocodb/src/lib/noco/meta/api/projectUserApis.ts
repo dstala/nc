@@ -58,7 +58,8 @@ async function userInvite(req, res, next): Promise<any> {
           roles: 'editor'
         });
       }
-      this.xcMeta.audit(req.params.projectId, null, 'nc_audit', {
+      Audit.insert({
+        project_id: req.params.projectId,
         op_type: 'AUTHENTICATION',
         op_sub_type: 'INVITE',
         user: req.user.email,
@@ -107,6 +108,7 @@ async function userInvite(req, res, next): Promise<any> {
           // sendInviteEmail(email, invite_token, req);
         }
       } catch (e) {
+        console.log(e);
         if (emails.length === 1) {
           return next(e);
         } else {
@@ -190,7 +192,9 @@ async function projectUserDelete(req, res): Promise<any> {
     //   .andWhere('roles', 'like', '%super%')
     //   .first();
     // if (deleteUser) {
-    NcError.forbidden('Insufficient privilege to delete a super admin user.');
+    const user = await User.get(req.params.userId);
+    if (user.roles?.split(',').includes('super'))
+      NcError.forbidden('Insufficient privilege to delete a super admin user.');
     // }
   }
 

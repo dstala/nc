@@ -33,7 +33,7 @@ export default function(router: Router) {
   projectApis(router);
   utilApis(router);
 
-  router.use('/tables/:tableId/columns', columnApis);
+  router.use(columnApis);
   router.use('/data/:viewId', dataApis);
   router.use(sortApis);
   router.use(filterApis);
