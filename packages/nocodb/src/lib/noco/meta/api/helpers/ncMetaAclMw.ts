@@ -61,7 +61,11 @@ export default function(handlerFn, permissionName = handlerFn.name) {
             );
           });
         if (!isAllowed) {
-          NcError.forbidden(`'${permissionName}' - Not allowed`);
+          NcError.forbidden(
+            `${permissionName} - ${Object.keys(roles).filter(
+              k => roles[k]
+            )} : Not allowed`
+          );
         }
         //   }
         // }

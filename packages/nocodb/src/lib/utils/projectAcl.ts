@@ -18,10 +18,23 @@ export default {
     dataDelete: true,
     dataInsert: true,
     commentsCount: true,
+    exportCsv: true,
 
     viewList: true,
     columnList: true,
+    viewColumnUpdate: true,
+
     sortList: true,
+    sortCreate: true,
+    sortUpdate: true,
+    sortDelete: true,
+
+    filterList: true,
+    filterCreate: true,
+    filterUpdate: true,
+    filterDelete: true,
+    filterGet: true,
+    filterChildrenRead: true,
 
     // old
     xcTableAndViewList: true,
@@ -94,6 +107,7 @@ export default {
   commenter: {
     // project
     projectGet: true,
+    exportCsv: true,
 
     //table
     tableGet: true,
@@ -136,6 +150,7 @@ export default {
     // data
     dataList: true,
     commentsCount: true,
+    exportCsv: true,
 
     // sort & filter
     sortList: true,

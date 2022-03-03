@@ -64,44 +64,45 @@
         relationPrimaryValue
       }}) -> {{ relationType === 'hm' ? ' Has Many ' : ' Belongs To ' }} -> {{ table }}</span>
       <div class="d-inline-flex">
-        <fields
-          v-if="!isForm"
-          ref="fields"
-          v-model="showFields"
-          :field-list="fieldList"
-          :meta="meta"
-          :is-locked="isLocked"
-          :fields-order.sync="fieldsOrder"
-          :sql-ui="sqlUi"
-          :show-system-fields.sync="showSystemFields"
-          :cover-image-field.sync="coverImageField"
-          :grouping-field.sync="groupingField"
-          :is-gallery="isGallery"
-          :is-kanban="isKanban"
-          :view-id="selectedViewId"
-          @updated="loadTableData"
-        />
+        <template v-if="_isUIAllowed('gridViewOptions')">
+          <fields
+            v-if="!isForm"
+            ref="fields"
+            v-model="showFields"
+            :field-list="fieldList"
+            :meta="meta"
+            :is-locked="isLocked"
+            :fields-order.sync="fieldsOrder"
+            :sql-ui="sqlUi"
+            :show-system-fields.sync="showSystemFields"
+            :cover-image-field.sync="coverImageField"
+            :grouping-field.sync="groupingField"
+            :is-gallery="isGallery"
+            :is-kanban="isKanban"
+            :view-id="selectedViewId"
+            @updated="loadTableData"
+          />
 
-        <sort-list
-          v-if="!isForm"
-          :is-locked="isLocked"
-          :meta="meta"
-          :view-id="selectedViewId"
-          @updated="loadTableData"
-        />
-        <!--        v-model="sortList"-->
-        <!--        :field-list="[...realFieldList, ...formulaFieldList]"-->
-        <column-filter
-          v-if="!isForm"
-          v-model="filters"
-          :meta="meta"
-          :is-locked="isLocked"
-          :field-list="[...realFieldList, ...formulaFieldList]"
-          dense
-          :view-id="selectedViewId"
-          @updated="loadTableData"
-        />
-
+          <sort-list
+            v-if="!isForm"
+            :is-locked="isLocked"
+            :meta="meta"
+            :view-id="selectedViewId"
+            @updated="loadTableData"
+          />
+          <!--        v-model="sortList"-->
+          <!--        :field-list="[...realFieldList, ...formulaFieldList]"-->
+          <column-filter
+            v-if="!isForm"
+            v-model="filters"
+            :meta="meta"
+            :is-locked="isLocked"
+            :field-list="[...realFieldList, ...formulaFieldList]"
+            dense
+            :view-id="selectedViewId"
+            @updated="loadTableData"
+          />
+        </template>
         <share-view-menu @share="$refs.drawer && $refs.drawer.genShareLink()" />
 
         <MoreActions

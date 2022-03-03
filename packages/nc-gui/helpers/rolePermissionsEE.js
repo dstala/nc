@@ -8,7 +8,8 @@ export default {
     column: true,
     tableAttachment: true,
     tableRowUpdate: true,
-    rowComments: true
+    rowComments: true,
+    gridViewOptions: true
   },
   commenter: {
     airTable: true,

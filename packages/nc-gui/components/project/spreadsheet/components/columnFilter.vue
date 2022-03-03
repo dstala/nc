@@ -38,6 +38,7 @@
             v-if="filter.id || shared"
             v-model="filter.children"
             :parent-id="filter.id"
+            :view-id="viewId"
             nested
             :meta="meta"
             :shared="shared"

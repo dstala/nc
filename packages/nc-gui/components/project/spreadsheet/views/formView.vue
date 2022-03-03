@@ -694,7 +694,7 @@ export default {
           .columns[i],
         show: false
       }, i)
-      this.columns[i].show = false
+      this.$set(this.columns[i], 'show', false)
 
       // this.columns = this.columns.filter((_, j) => i !== j)
     },
