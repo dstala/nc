@@ -224,26 +224,26 @@
                         />
                       </v-list-item-title>
                     </v-list-item>-->
-                    <v-divider />
-                    <v-list-item
-                      title
-                      class="pt-2 nc-create-project-from-excel"
-                      @click="onCreateProjectFromExcel()"
-                    >
-                      <v-list-item-icon class="mr-2">
-                        <v-icon small class="">
-                          mdi-file-excel-outline
-                        </v-icon>
-                      </v-list-item-icon>
-                      <v-list-item-title>
-                        <span
-                          class="caption font-weight-regular"
-                          v-html="
-                            $t('projects.create_new_project_button.from_excel')
-                          "
-                        />
-                      </v-list-item-title>
-                    </v-list-item>
+<!--                    <v-divider />-->
+<!--                    <v-list-item-->
+<!--                      title-->
+<!--                      class="pt-2 nc-create-project-from-excel"-->
+<!--                      @click="onCreateProjectFromExcel()"-->
+<!--                    >-->
+<!--                      <v-list-item-icon class="mr-2">-->
+<!--                        <v-icon small class="">-->
+<!--                          mdi-file-excel-outline-->
+<!--                        </v-icon>-->
+<!--                      </v-list-item-icon>-->
+<!--                      <v-list-item-title>-->
+<!--                        <span-->
+<!--                          class="caption font-weight-regular"-->
+<!--                          v-html="-->
+<!--                            $t('projects.create_new_project_button.from_excel')-->
+<!--                          "-->
+<!--                        />-->
+<!--                      </v-list-item-title>-->
+<!--                    </v-list-item>-->
                   </v-list>
                 </v-menu>
               </template>
