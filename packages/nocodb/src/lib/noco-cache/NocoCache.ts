@@ -66,9 +66,10 @@ export default class NocoCache {
   }
 
   public static async appendToList(
-    listKey: string,
+    scope: string,
+    subListKeys: string[],
     key: string
   ): Promise<boolean> {
-    return this.client.appendToList(listKey, key);
+    return this.client.appendToList(scope, subListKeys, key);
   }
 }

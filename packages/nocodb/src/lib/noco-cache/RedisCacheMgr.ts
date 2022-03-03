@@ -165,7 +165,15 @@ export default class RedisCacheMgr extends CacheMgr {
     }
   }
 
-  async appendToList(listKey: string, key: string): Promise<boolean> {
+  async appendToList(
+    scope: string,
+    subListKeys: string[],
+    key: string
+  ): Promise<boolean> {
+    // remove null from arrays
+    subListKeys = subListKeys.filter(k => k);
+    // e.g. key = <scope>:<project_id_1>:<base_id_1>:list
+    const listKey = `${scope}:${subListKeys.join(':')}:list`;
     console.log(`RedisCacheMgr::appendToList: append key ${key} to ${listKey}`);
     const list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
     list.push(key);

@@ -15,5 +15,9 @@ export default abstract class CacheMgr {
     key: string,
     direction: string
   ): Promise<boolean>;
-  public abstract appendToList(scope: string, key: string): Promise<boolean>;
+  public abstract appendToList(
+    scope: string,
+    subListKeys: string[],
+    key: string
+  ): Promise<boolean>;
 }

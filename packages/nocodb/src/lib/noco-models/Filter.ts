@@ -93,21 +93,20 @@ export default class Filter {
       p.push(NocoCache.set(key, value));
       /* append key to relevant lists */
       p.push(
-        NocoCache.appendToList(
-          `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:list`,
-          key
-        )
+        NocoCache.appendToList(CacheScope.FILTER_EXP, [filter.fk_view_id], key)
       );
       if (filter.fk_parent_id) {
         p.push(
           NocoCache.appendToList(
-            `${CacheScope.FILTER_EXP}:${filter.fk_view_id}:${filter.fk_parent_id}:list`,
+            CacheScope.FILTER_EXP,
+            [filter.fk_view_id, filter.fk_parent_id],
             key
           )
         );
         p.push(
           NocoCache.appendToList(
-            `${CacheScope.FILTER_EXP}:${filter.fk_parent_id}:list`,
+            CacheScope.FILTER_EXP,
+            [filter.fk_parent_id],
             key
           )
         );
