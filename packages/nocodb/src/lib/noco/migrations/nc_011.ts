@@ -289,6 +289,7 @@ const up = async knex => {
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
 
     table.text('formula').notNullable();
+    table.text('formula_raw');
 
     table.boolean('deleted');
     table.float('order');

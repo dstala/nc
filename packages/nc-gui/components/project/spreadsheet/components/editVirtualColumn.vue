@@ -19,18 +19,17 @@
               label="Column name"
               :rules="[
                 v => !!v || 'Required',
-                v => !meta || !meta.columns || !column ||meta.columns.every(c => v !== c.cn ) && meta.v.every(c => column && c._cn === column._cn || v !== c._cn ) || 'Duplicate column name',
+                v => !meta || !meta.columns || !column ||meta.columns.every(c => column === c || (v !== c.cn && v !== c._cn )) || 'Duplicate column name',
                 validateColumnName
               ]"
               dense
               outlined
             />
           </v-col>
-
-          <v-col v-if="column.formula" cols="12">
+          <v-col v-if="newColumn && newColumn.uidt === UITypes.Formula" cols="12">
             <formula-options
               ref="formula"
-              :value="column.formula"
+              v-model="newColumn.formula_raw"
               :column="column"
               :new-column="newColumn"
               :nodes="nodes"
@@ -55,6 +54,7 @@
 </template>
 
 <script>
+import { UITypes } from 'nc-common'
 import FormulaOptions from '@/components/project/spreadsheet/components/editColumn/formulaOptions'
 import { validateColumnName } from '~/helpers'
 
@@ -70,17 +70,28 @@ export default {
   },
   data: () => ({
     valid: false,
-    newColumn: {}
+    newColumn: {},
+    UITypes
   }),
   watch: {
     column(c) {
-      this.newColumn = { ...c }
+      const { colOptions, ...rest } = c
+      this.newColumn = rest
+
+      if (rest.uidt === UITypes.Formula) {
+        this.newColumn.formula_raw = colOptions.formula_raw
+      }
     }
   },
   async created() {
   },
   mounted() {
-    this.newColumn = { ...this.column }
+    const { colOptions, ...rest } = this.column
+    this.newColumn = rest
+
+    if (rest.uidt === UITypes.Formula) {
+      this.newColumn.formula_raw = colOptions.formula_raw
+    }
   },
   methods: {
     close() {
@@ -90,22 +101,23 @@ export default {
     async save() {
       // todo: rollup update
       try {
-        if (this.column.formula) {
-          await this.$refs.formula.update()
-        } else {
-          await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-            env: this.nodes.env,
-            dbAlias: this.nodes.dbAlias
-          }, 'xcUpdateVirtualKeyAlias', {
-            tn: this.nodes.tn,
-            oldAlias: this.column._cn,
-            newAlias: this.newColumn._cn
-          }])
-
-          this.$toast.success('Successfully updated alias').goAway(3000)
-        }
+        // if (this.column.formula) {
+        //   await this.$refs.formula.update()
+        // } else {
+        //   await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //     env: this.nodes.env,
+        //     dbAlias: this.nodes.dbAlias
+        //   }, 'xcUpdateVirtualKeyAlias', {
+        //     tn: this.nodes.tn,
+        //     oldAlias: this.column._cn,
+        //     newAlias: this.newColumn._cn
+        //   }])
+        //
+        //   this.$toast.success('Successfully updated alias').goAway(3000)
+        // }
+        await this.$api.meta.columnUpdate(this.meta.id, this.column.id, this.newColumn)
       } catch (e) {
-        console.log(e)
+        console.log(this._extractSdkResponseErrorMsg(e))
         this.$toast.error('Failed to update column alias').goAway(3000)
       }
       this.$emit('saved', this.newColumn._cn, this.column._cn)
