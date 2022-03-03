@@ -66,6 +66,7 @@
       <div class="d-inline-flex">
         <fields
           v-if="!isForm"
+          ref="fields"
           v-model="showFields"
           :field-list="fieldList"
           :meta="meta"
@@ -324,6 +325,7 @@
               :view-id="selectedViewId"
               @drop="onFileDrop"
               @onNewColCreation="onNewColCreation"
+              @colDelete="onColDelete"
               @onCellValueChange="onCellValueChange"
               @insertNewRow="insertNewRow"
               @showRowContextMenu="showRowContextMenu"
@@ -1388,6 +1390,10 @@ export default {
       this.$nextTick(async() => {
         await this.loadTableData()
       })
+      this.$refs.fields && this.$refs.fields.loadFields()
+    },
+    onColDelete() {
+      this.$refs.fields && this.$refs.fields.loadFields()
     },
     onFileDrop(ev) {
       let file
