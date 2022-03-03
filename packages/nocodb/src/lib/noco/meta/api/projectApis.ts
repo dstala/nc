@@ -303,8 +303,13 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
 
   /* handle xc_tables update in parallel */
   await NcHelp.executeOperations(tableMetasInsert, base.type);
-  await getManyToManyRelations(metasArr);
+  const { assocMetas } = await getManyToManyRelations(metasArr);
   await NcHelp.executeOperations(virtualColumnsInsert, base.type);
+
+  // set flag to m2m tables
+  for (const m2mMeta of assocMetas || []) {
+    await Model.setAsMm(models2[m2mMeta.tn]?.id);
+  }
 
   // views
 
@@ -502,6 +507,7 @@ async function getManyToManyRelations(
         })
     ];
   }
+  return { assocMetas };
 }
 export async function projectInfoGet(req, res) {
   const project = await Project.getWithInfo(req.params.projectId);

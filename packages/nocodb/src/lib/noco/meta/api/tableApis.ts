@@ -72,7 +72,7 @@ export async function tableList(
 
   res // todo: pagination
     .json({
-      tables: new PagedResponseImpl(tableList as Model[])
+      tables: new PagedResponseImpl(tableList.filter(t => !t.mm) as Model[])
     });
 }
 

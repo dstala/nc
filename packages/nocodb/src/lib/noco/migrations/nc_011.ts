@@ -72,6 +72,7 @@ const up = async knex => {
     table.text('meta', 'mediumtext');
     table.text('schema', 'text');
     table.boolean('enabled').defaultTo(true);
+    table.boolean('mm').defaultTo(false);
 
     table.string('tags');
     table.boolean('pinned');

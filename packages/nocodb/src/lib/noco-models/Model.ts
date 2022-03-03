@@ -43,6 +43,8 @@ export default class Model implements TableType {
   tn: string;
   _tn: string;
 
+  mm: boolean;
+
   uuid: string;
 
   columns?: Column[];
@@ -98,7 +100,7 @@ export default class Model implements TableType {
   public static async insert(
     projectId,
     baseId,
-    model: TableReqType,
+    model: TableReqType & { mm?: boolean },
     ncMeta = Noco.ncMeta
   ) {
     const { id } = await ncMeta.metaInsert2(
@@ -108,6 +110,7 @@ export default class Model implements TableType {
       {
         tn: model.tn,
         _tn: model._tn,
+        mm: !!model.mm,
         order:
           model.order ||
           (await ncMeta.metaGetNextOrder(MetaTable.FORM_VIEW_COLUMNS, {
@@ -519,5 +522,18 @@ export default class Model implements TableType {
     );
 
     return true;
+  }
+
+  static async setAsMm(id: any, ncMeta = Noco.ncMeta) {
+    // todo: redis del
+    await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.MODELS,
+      {
+        mm: true
+      },
+      id
+    );
   }
 }
