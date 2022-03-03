@@ -190,7 +190,7 @@ async function dataInsert(req: Request, res: Response, next) {
     });
 
     console.timeEnd('BaseModel.get');
-    res.json(await baseModel.insert(req.body));
+    res.json(await baseModel.insert(req.body, null, req));
   } catch (e) {
     console.log(e);
     res.status(500).json({ msg: e.message });
@@ -213,7 +213,7 @@ async function dataUpdate(req: Request, res: Response, next) {
     });
 
     console.timeEnd('BaseModel.get');
-    res.json(await baseModel.updateByPk(req.params.rowId, req.body));
+    res.json(await baseModel.updateByPk(req.params.rowId, req.body, null, req));
   } catch (e) {
     console.log(e);
     res.status(500).json({ msg: e.message });
@@ -236,7 +236,7 @@ async function dataDelete(req: Request, res: Response, next) {
     });
 
     console.timeEnd('BaseModel.get');
-    res.json(await baseModel.delByPk(req.params.rowId));
+    res.json(await baseModel.delByPk(req.params.rowId, null, req));
   } catch (e) {
     console.log(e);
     res.status(500).json({ msg: e.message });
