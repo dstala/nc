@@ -6,16 +6,15 @@ export default class NocoCache {
   private static client: CacheMgr;
   private static cacheDisabled: boolean;
 
-  public static init(config: { driver: 'redis' | 'redisMock' }) {
+  public static init() {
     this.cacheDisabled = !!process.env.NC_DISABLE_CACHE || false;
-
-    switch (config.driver) {
-      case 'redis':
-        this.client = new RedisCacheMgr({});
-        break;
-      case 'redisMock':
-        this.client = new RedisMockCacheMgr({});
-        break;
+    if (this.cacheDisabled) {
+      return;
+    }
+    if (process.env.NC_REDIS_URL) {
+      this.client = new RedisCacheMgr(process.env.NC_REDIS_URL);
+    } else {
+      this.client = new RedisMockCacheMgr({});
     }
   }
 
