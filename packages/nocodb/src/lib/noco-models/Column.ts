@@ -109,8 +109,6 @@ export default class Column implements ColumnType {
       insertObj
     );
 
-    await NocoCache.set(`${CacheScope.COLUMN}:${row.id}`, row);
-
     await this.insertColOption(column, row.id, ncMeta);
 
     await View.insertColumnToAllViews(
