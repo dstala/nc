@@ -418,7 +418,7 @@ export default {
         }, {})
 
         if (this.isNew) {
-          const data = await this.$api.data.create(this.viewId || this.meta.id, updatedObj)
+          const data = (await this.$api.data.create(this.viewId || this.meta.id, updatedObj))?.data
           this.localState = { ...this.localState, ...data }
 
           // save hasmany and manytomany relations from local state

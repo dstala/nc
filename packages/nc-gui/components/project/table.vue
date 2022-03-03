@@ -595,6 +595,7 @@ export default {
               ...this.nodes
             }
           })
+
         } catch (e) {
           const msg = await this._extractSdkResponseErrorMsg(e)
           this.$toast.error(msg).goAway(3000)

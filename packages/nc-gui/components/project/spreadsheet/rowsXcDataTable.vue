@@ -1086,7 +1086,9 @@ export default {
             // if (e.response && e.response.data && e.response.data.msg) {
             this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
             // } else {
-            //   this.$toast.error(`Failed to save row : ${e.message}`).goAway(3000)
+            //   this.$toast.error(`Failed to
+            //
+            //   row : ${e.message}`).goAway(3000)
             // }
           }
 
