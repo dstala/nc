@@ -544,6 +544,7 @@ export default class View implements ViewType {
     }
     return table;
   }
+
   private static extractViewTableName(view: View) {
     let table;
     switch (view.type) {
@@ -563,7 +564,11 @@ export default class View implements ViewType {
     return table;
   }
 
-  static async showAllColumns(viewId, ncMeta = Noco.ncMeta) {
+  static async showAllColumns(
+    viewId,
+    ignoreColdIds = [],
+    ncMeta = Noco.ncMeta
+  ) {
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);
     return await ncMeta.metaUpdate(
@@ -573,9 +578,19 @@ export default class View implements ViewType {
       { show: true },
       {
         fk_view_id: viewId
-      }
+      },
+      ignoreColdIds?.length
+        ? {
+            _not: {
+              fk_view_id: {
+                in: ignoreColdIds
+              }
+            }
+          }
+        : null
     );
   }
+
   static async hideAllColumns(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);

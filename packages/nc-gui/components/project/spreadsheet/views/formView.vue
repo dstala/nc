@@ -34,7 +34,7 @@
                 v-if="columns.length"
                 class="pointer caption"
                 style="border-bottom: 2px solid rgb(218,218,218)"
-                @click="columns=[]"
+                @click="removeAllColumns()"
               >remove all</span>
             </div>
             <draggable
@@ -499,6 +499,12 @@ export default {
     return obj
   },
   computed: {
+    ignoredColumnIds() {
+      return ((this.meta && this.meta.columns.filter(col => col.uidt === UITypes.ForeignKey ||
+        col.cn === 'created_at' ||
+        col.cn === 'updated_at' ||
+        (col.pk && (col.ai || col.cdf)))) || []).map(c => c.id)
+    },
     emailMe: {
       get() {
         try {
@@ -600,7 +606,8 @@ export default {
     onMove(event) {
       const {
         newIndex,
-        element, oldIndex
+        element,
+        oldIndex
       } = (event.added || event.moved || event.removed)
       if (event.added) {
         element.show = true
@@ -692,8 +699,18 @@ export default {
 
       // this.columns = this.columns.filter((_, j) => i !== j)
     },
-    addAllColumns() {
-      this.columns = [...this.allColumnsLoc]
+    async addAllColumns() {
+      for (const col of this.fields) {
+        if (!this.ignoredColumnIds.includes(col.id)) { this.$set(col, 'show', true) }
+      }
+      await this.$api.meta.viewShowAllColumn({ viewId: this.viewId, ignoreIds: this.ignoredColumnIds })
+      // this.columns = [...this.allColumnsLoc]
+    },
+    async removeAllColumns() {
+      for (const col of this.fields) {
+        this.$set(col, 'show', false)
+      }
+      await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
     },
     isDbRequired(column) {
       if (hiddenCols.includes(column.cn)) {

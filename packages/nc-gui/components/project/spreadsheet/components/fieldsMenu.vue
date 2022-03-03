@@ -313,7 +313,7 @@ export default {
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     async showAll() {
-      await this.$api.meta.viewHideAllColumn(this.viewId)
+      await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
       for (const f of this.fields) {
         f.show = true
       }
@@ -323,7 +323,7 @@ export default {
       this.$emit('updated')
     },
     async hideAll() {
-      await this.$api.meta.viewShowAllColumn(this.viewId)
+      await this.$api.meta.viewShowAllColumn({ viewId: this.viewId })
       for (const f of this.fields) {
         f.show = false
       }

@@ -575,6 +575,16 @@ export interface ViewUpdatePayloadType {
 
 export type ViewColumnCreatePayloadType = any;
 
+export interface ViewShowAllColumnParamsType {
+  ignoreIds?: any[];
+  viewId: string;
+}
+
+export interface ViewHideAllColumnParamsType {
+  ignoreIds?: any[];
+  viewId: string;
+}
+
 export type ViewColumnUpdatePayloadType = any;
 
 export interface SetSharedViewPasswordPayloadType {
@@ -1630,10 +1640,14 @@ export class Api<
      * @request POST:/views/{viewId}/showAll
      * @response `200` `void` OK
      */
-    viewShowAllColumn: (viewId: string, params: RequestParams = {}) =>
+    viewShowAllColumn: (
+      { viewId, ...query }: ViewShowAllColumnParamsType,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/views/${viewId}/showAll`,
         method: 'POST',
+        query: query,
         ...params,
       }),
 
@@ -1645,10 +1659,14 @@ export class Api<
      * @request POST:/views/{viewId}/hideAll
      * @response `200` `void` OK
      */
-    viewHideAllColumn: (viewId: string, params: RequestParams = {}) =>
+    viewHideAllColumn: (
+      { viewId, ...query }: ViewHideAllColumnParamsType,
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/views/${viewId}/hideAll`,
         method: 'POST',
+        query: query,
         ...params,
       }),
 
