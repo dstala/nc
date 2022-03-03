@@ -210,14 +210,14 @@ const parseConditionV2 = async (
             qb = qb.where(
               field,
               qb?.client?.config?.client === 'pg' ? 'ilike' : 'like',
-              val
+              `%${val}%`
             );
             break;
           case 'nlike':
             qb = qb.whereNot(
               field,
               qb?.client?.config?.client === 'pg' ? 'ilike' : 'like',
-              val
+              `%${val}%`
             );
             break;
           case 'gt':
