@@ -264,7 +264,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
     if (base_id !== null) insertObj.base_id = base_id;
     if (project_id !== null) insertObj.project_id = project_id;
     await this.knexConnection(target).insert(insertObj);
-    return { ...data, id };
+    return insertObj;
   }
 
   public async metaList(

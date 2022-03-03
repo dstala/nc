@@ -128,58 +128,80 @@ export default class Column implements ColumnType {
       case UITypes.Lookup:
         // LookupColumn.insert()
 
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_LOOKUP, {
-          fk_column_id: colId,
-
-          fk_relation_column_id: column.fk_relation_column_id,
-
-          fk_lookup_column_id: column.fk_lookup_column_id
-        });
+        await LookupColumn.insert(
+          {
+            fk_column_id: colId,
+            fk_relation_column_id: column.fk_relation_column_id,
+            fk_lookup_column_id: column.fk_lookup_column_id
+          },
+          ncMeta
+        );
         break;
       case UITypes.Rollup:
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_ROLLUP, {
-          fk_column_id: colId,
-          fk_relation_column_id: column.fk_relation_column_id,
+        await RollupColumn.insert(
+          {
+            fk_column_id: colId,
+            fk_relation_column_id: column.fk_relation_column_id,
 
-          fk_rollup_column_id: column.fk_rollup_column_id,
-          rollup_function: column.rollup_function
-        });
+            fk_rollup_column_id: column.fk_rollup_column_id,
+            rollup_function: column.rollup_function
+          },
+          ncMeta
+        );
         break;
       case UITypes.LinkToAnotherRecord:
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_RELATIONS, {
-          fk_column_id: colId,
+        await LinkToAnotherRecordColumn.insert(
+          {
+            fk_column_id: colId,
 
-          // ref_db_alias
-          type: column.type,
-          // db_type:
+            // ref_db_alias
+            type: column.type,
+            // db_type:
 
-          fk_child_column_id: column.fk_child_column_id,
-          fk_parent_column_id: column.fk_parent_column_id,
+            fk_child_column_id: column.fk_child_column_id,
+            fk_parent_column_id: column.fk_parent_column_id,
 
-          fk_mm_model_id: column.fk_mm_model_id,
-          fk_mm_child_column_id: column.fk_mm_child_column_id,
-          fk_mm_parent_column_id: column.fk_mm_parent_column_id,
+            fk_mm_model_id: column.fk_mm_model_id,
+            fk_mm_child_column_id: column.fk_mm_child_column_id,
+            fk_mm_parent_column_id: column.fk_mm_parent_column_id,
 
-          ur: column.ur,
-          dr: column.dr,
+            ur: column.ur,
+            dr: column.dr,
 
-          fk_index_name: column.fk_index_name,
-          fk_related_model_id: column.fk_related_model_id
-        });
+            fk_index_name: column.fk_index_name,
+            fk_related_model_id: column.fk_related_model_id
+          },
+          ncMeta
+        );
         break;
       case UITypes.Formula:
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
-          fk_column_id: colId,
-          formula: column.formula
-        });
+        await FormulaColumn.insert(
+          {
+            fk_column_id: colId,
+            formula: column.formula
+          },
+          ncMeta
+        );
         break;
       case UITypes.MultiSelect:
+        for (const option of column.dtxp?.split(',') || [])
+          await MultiSelectColumn.insert(
+            {
+              fk_column_id: colId,
+              title: option
+            },
+            ncMeta
+          );
+        break;
       case UITypes.SingleSelect:
         for (const option of column.dtxp?.split(',') || [])
-          await ncMeta.metaInsert2(null, null, MetaTable.COL_SELECT_OPTIONS, {
-            fk_column_id: colId,
-            title: option
-          });
+          await SingleSelectColumn.insert(
+            {
+              fk_column_id: colId,
+              title: option
+            },
+            ncMeta
+          );
         break;
 
       /*  default:
@@ -393,6 +415,7 @@ export default class Column implements ColumnType {
   id: string;
 
   static async delete(id, ncMeta = Noco.ncMeta) {
+    // todo: delete sort & filters
     const col = await this.get({ colId: id }, ncMeta);
     let colOptionTableName = null;
     switch (col.uidt) {
@@ -472,29 +495,29 @@ export default class Column implements ColumnType {
       case UITypes.Lookup:
         // LookupColumn.insert()
 
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_LOOKUP, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_LOOKUP, {
           fk_column_id: colId
         });
         break;
       case UITypes.Rollup:
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_ROLLUP, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_ROLLUP, {
           fk_column_id: colId
         });
         break;
       case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord:
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_RELATIONS, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_RELATIONS, {
           fk_column_id: colId
         });
         break;
       case UITypes.Formula:
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_FORMULA, {
           fk_column_id: colId
         });
         break;
       case UITypes.MultiSelect:
       case UITypes.SingleSelect:
-        await ncMeta.metaInsert2(null, null, MetaTable.COL_SELECT_OPTIONS, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_SELECT_OPTIONS, {
           fk_column_id: colId
         });
         break;

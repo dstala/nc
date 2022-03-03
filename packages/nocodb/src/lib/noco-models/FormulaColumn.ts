@@ -1,27 +1,24 @@
 import Noco from '../../lib/noco/Noco';
-import NcColumn from '../../types/NcColumn';
 import { MetaTable } from '../utils/globals';
 
 export default class FormulaColumn {
   formula: string;
   fk_column_id: string;
 
-  constructor(data: NcColumn) {
+  constructor(data: Partial<FormulaColumn>) {
     Object.assign(this, data);
   }
 
-  public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(
-      model.project_id,
-      model.base_id,
-      MetaTable.COL_FORMULA,
-      {
-        tn: model.tn,
-        _tn: model._tn
-      }
-    );
+  public static async insert(
+    data: Partial<FormulaColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
+      fk_column_id: data.fk_column_id,
+      formula: data.formula
+    });
+    return new FormulaColumn(row);
   }
-
   public static async read(columnId: string) {
     const column = await Noco.ncMeta.metaGet2(
       null, //,

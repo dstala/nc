@@ -1,20 +1,29 @@
 import Noco from '../../lib/noco/Noco';
-import NcColumn from '../../types/NcColumn';
 import NocoCache from '../noco-cache/NocoCache';
 import { MetaTable } from '../utils/globals';
 
 export default class MultiSelectColumn {
   title: string;
+  fk_column_id: string;
 
-  constructor(data: NcColumn) {
+  constructor(data: Partial<MultiSelectColumn>) {
     Object.assign(this, data);
   }
 
-  public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_SELECT_OPTIONS, {
-      tn: model.tn,
-      _tn: model._tn
-    });
+  public static async insert(
+    data: Partial<MultiSelectColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const row = await ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.COL_SELECT_OPTIONS,
+      {
+        fk_column_id: data.fk_column_id,
+        title: data.title
+      }
+    );
+    return new MultiSelectColumn(row);
   }
 
   public static async read(columnId: string) {

@@ -1,23 +1,31 @@
 import Noco from '../../lib/noco/Noco';
-import NcColumn from '../../types/NcColumn';
 import Column from './Column';
 import { MetaTable } from '../utils/globals';
 
 export default class RollupColumn {
-  constructor(data: NcColumn) {
+  fk_column_id;
+  fk_relation_column_id;
+  fk_rollup_column_id;
+
+  rollup_function: string;
+
+  id: string;
+
+  constructor(data: Partial<RollupColumn>) {
     Object.assign(this, data);
   }
 
-  public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(
-      model.project_id,
-      model.base_id,
-      MetaTable.COL_ROLLUP,
-      {
-        tn: model.tn,
-        _tn: model._tn
-      }
-    );
+  public static async insert(
+    data: Partial<RollupColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_ROLLUP, {
+      fk_column_id: data.fk_column_id,
+      fk_relation_column_id: data.fk_relation_column_id,
+      fk_rollup_column_id: data.fk_rollup_column_id,
+      rollup_function: data.rollup_function
+    });
+    return new RollupColumn(row);
   }
 
   public static async read(columnId: string) {
@@ -38,12 +46,4 @@ export default class RollupColumn {
   public async getRelationColumn(): Promise<Column> {
     return Column.get({ colId: this.fk_relation_column_id });
   }
-
-  fk_column_id;
-  fk_relation_column_id;
-  fk_rollup_column_id;
-
-  rollup_function: string;
-
-  id: string;
 }

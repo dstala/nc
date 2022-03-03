@@ -1,5 +1,4 @@
 import Noco from '../../lib/noco/Noco';
-import NcColumn from '../../types/NcColumn';
 import NocoCache from '../noco-cache/NocoCache';
 import Column from './Column';
 import { MetaTable } from '../utils/globals';
@@ -7,8 +6,9 @@ import { MetaTable } from '../utils/globals';
 export default class LookupColumn {
   fk_relation_column_id: string;
   fk_lookup_column_id: string;
+  fk_column_id: string;
 
-  constructor(data: NcColumn) {
+  constructor(data: Partial<LookupColumn>) {
     Object.assign(this, data);
   }
 
@@ -24,16 +24,16 @@ export default class LookupColumn {
     });
   }
 
-  public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(
-      model.project_id,
-      model.base_id,
-      MetaTable.COL_LOOKUP,
-      {
-        tn: model.tn,
-        _tn: model._tn
-      }
-    );
+  public static async insert(
+    data: Partial<LookupColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_LOOKUP, {
+      fk_column_id: data.fk_column_id,
+      fk_relation_column_id: data.fk_relation_column_id,
+      fk_lookup_column_id: data.fk_lookup_column_id
+    });
+    return new LookupColumn(row);
   }
 
   public static async read(columnId: string) {

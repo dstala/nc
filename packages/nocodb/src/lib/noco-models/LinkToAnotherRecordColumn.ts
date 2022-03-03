@@ -1,5 +1,4 @@
 import Noco from '../../lib/noco/Noco';
-import NcColumn from '../../types/NcColumn';
 import Column from './Column';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
@@ -14,6 +13,10 @@ export default class LinkToAnotherRecordColumn {
   fk_mm_parent_column_id?: string;
   fk_related_model_id?: string;
 
+  dr?: string;
+  ur?: string;
+  fk_index_name?: string;
+
   type: 'hm' | 'bt' | 'mm';
   virtual = false;
 
@@ -26,7 +29,7 @@ export default class LinkToAnotherRecordColumn {
   childColumn?: Column;
   parentColumn?: Column;
 
-  constructor(data: NcColumn) {
+  constructor(data: Partial<LinkToAnotherRecordColumn>) {
     Object.assign(this, data);
   }
 
@@ -63,16 +66,31 @@ export default class LinkToAnotherRecordColumn {
     }));
   }
 
-  public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(
-      model.project_id,
-      model.base_id,
-      MetaTable.COL_RELATIONS,
-      {
-        tn: model.tn,
-        _tn: model._tn
-      }
-    );
+  public static async insert(
+    data: Partial<LinkToAnotherRecordColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_RELATIONS, {
+      fk_column_id: data.fk_column_id,
+
+      // ref_db_alias
+      type: data.type,
+      // db_type:
+
+      fk_child_column_id: data.fk_child_column_id,
+      fk_parent_column_id: data.fk_parent_column_id,
+
+      fk_mm_model_id: data.fk_mm_model_id,
+      fk_mm_child_column_id: data.fk_mm_child_column_id,
+      fk_mm_parent_column_id: data.fk_mm_parent_column_id,
+
+      ur: data.ur,
+      dr: data.dr,
+
+      fk_index_name: data.fk_index_name,
+      fk_related_model_id: data.fk_related_model_id
+    });
+    return new LinkToAnotherRecordColumn(row);
   }
 
   public static async read(columnId: string) {
