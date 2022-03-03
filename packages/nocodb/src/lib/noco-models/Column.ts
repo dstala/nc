@@ -109,6 +109,12 @@ export default class Column implements ColumnType {
       insertObj
     );
 
+    await NocoCache.appendToList(
+      CacheScope.COLUMN,
+      [column.fk_model_id],
+      `${CacheScope.COLUMN}:${row.id}`
+    );
+
     await this.insertColOption(column, row.id, ncMeta);
 
     await View.insertColumnToAllViews(
@@ -482,7 +488,6 @@ export default class Column implements ColumnType {
     await ncMeta.metaDelete(null, null, MetaTable.GRID_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    // TODO: Cache - add fields when implementation is done
     await NocoCache.deepDel(
       CacheScope.GRID_VIEW_COLUMN,
       `${CacheScope.GRID_VIEW_COLUMN}:${col.id}`,
@@ -491,7 +496,6 @@ export default class Column implements ColumnType {
     await ncMeta.metaDelete(null, null, MetaTable.FORM_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    // TODO: Cache - add fields when implementation is done
     await NocoCache.deepDel(
       CacheScope.FORM_VIEW_COLUMN,
       `${CacheScope.FORM_VIEW_COLUMN}:${col.id}`,
@@ -500,7 +504,6 @@ export default class Column implements ColumnType {
     await ncMeta.metaDelete(null, null, MetaTable.KANBAN_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    // TODO: Cache - add fields when implementation is done
     await NocoCache.deepDel(
       CacheScope.KANBAN_VIEW_COLUMN,
       `${CacheScope.KANBAN_VIEW_COLUMN}:${col.id}`,
@@ -509,14 +512,12 @@ export default class Column implements ColumnType {
     await ncMeta.metaDelete(null, null, MetaTable.GALLERY_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    // TODO: Cache - add fields when implementation is done
     await NocoCache.deepDel(
       CacheScope.GALLERY_VIEW_COLUMN,
       `${CacheScope.GALLERY_VIEW_COLUMN}:${col.id}`,
       CacheDelDirection.CHILD_TO_PARENT
     );
     await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, col.id);
-    // TODO: Cache - add fields when implementation is done
     await NocoCache.deepDel(
       CacheScope.COLUMN,
       `${CacheScope.COLUMN}:${col.id}`,
@@ -534,7 +535,6 @@ export default class Column implements ColumnType {
         const row = await ncMeta.metaDelete(null, null, MetaTable.COL_LOOKUP, {
           fk_column_id: colId
         });
-        // TODO: Cache - add fields when implementation is done
         await NocoCache.set(`${CacheScope.COL_LOOKUP}:${colId}`, row);
         break;
       }
@@ -542,7 +542,6 @@ export default class Column implements ColumnType {
         const row = await ncMeta.metaDelete(null, null, MetaTable.COL_ROLLUP, {
           fk_column_id: colId
         });
-        // TODO: Cache - add fields when implementation is done
         await NocoCache.set(`${CacheScope.COL_ROLLUP}:${colId}`, row);
         break;
       }

@@ -62,7 +62,6 @@ export default class GridViewColumn implements GridColumnType {
     return view && new GridViewColumn(view);
   }
 
-  // TODO: Cache
   static async insert(column: Partial<GridViewColumn>, ncMeta = Noco.ncMeta) {
     const insertObj = {
       fk_view_id: column.fk_view_id,
@@ -87,6 +86,13 @@ export default class GridViewColumn implements GridColumnType {
       MetaTable.GRID_VIEW_COLUMNS,
       insertObj
     );
+
+    await NocoCache.appendToList(
+      CacheScope.GRID_VIEW_COLUMN,
+      [column.fk_view_id],
+      `${CacheScope.GRID_VIEW_COLUMN}:${id}`
+    );
+
     return new GridViewColumn({
       id,
       fk_view_id: column.fk_view_id,

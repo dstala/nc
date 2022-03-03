@@ -60,6 +60,13 @@ export default class GalleryViewColumn {
       MetaTable.GALLERY_VIEW_COLUMNS,
       insertObj
     );
+
+    await NocoCache.appendToList(
+      CacheScope.GALLERY_VIEW_COLUMN,
+      [column.fk_view_id],
+      `${CacheScope.GALLERY_VIEW_COLUMN}:${id}`
+    );
+
     return new GalleryViewColumn({
       id,
       fk_view_id: column.fk_view_id,

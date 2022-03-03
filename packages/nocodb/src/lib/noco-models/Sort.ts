@@ -62,6 +62,12 @@ export default class Sort {
 
     const row = await ncMeta.metaInsert2(null, null, MetaTable.SORT, insertObj);
 
+    await NocoCache.appendToList(
+      CacheScope.SORT,
+      [sortObj.fk_view_id],
+      `${CacheScope.SORT}:${row.id}`
+    );
+
     await NocoCache.set(`${CacheScope.SORT}:${row.id}`, row);
 
     return this.get(row.id, ncMeta);

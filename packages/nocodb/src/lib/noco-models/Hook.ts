@@ -129,6 +129,12 @@ export default class Hook implements HookType {
       insertObj
     );
 
+    await NocoCache.appendToList(
+      CacheScope.HOOK,
+      [hook.fk_model_id],
+      `${CacheScope.HOOK}:${id}`
+    );
+
     return this.get(id);
   }
 
