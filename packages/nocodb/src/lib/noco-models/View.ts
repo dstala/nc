@@ -1,5 +1,10 @@
 import Noco from '../noco/Noco';
-import { MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import Model from './Model';
 import FormView from './FormView';
 import GridView from './GridView';
@@ -13,6 +18,7 @@ import GalleryViewColumn from './GalleryViewColumn';
 import FormViewColumn from './FormViewColumn';
 import UITypes from '../sqlUi/UITypes';
 import Column from './Column';
+import NocoCache from '../noco-cache/NocoCache';
 
 const { v4: uuidv4 } = require('uuid');
 export default class View implements ViewType {
@@ -86,25 +92,33 @@ export default class View implements ViewType {
   }
 
   public static async get(viewId: string) {
-    const view = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.VIEWS,
-      viewId
-    );
+    let view =
+      viewId &&
+      (await NocoCache.get(
+        `${CacheScope.VIEW}:${viewId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!view) {
+      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.VIEWS, viewId);
+      await NocoCache.set(`${CacheScope.VIEW}:${viewId}`, view);
+    }
 
     return view && new View(view);
   }
 
   public static async list(modelId: string) {
-    const viewsList = await Noco.ncMeta.metaList2(null, null, MetaTable.VIEWS, {
-      condition: {
-        fk_model_id: modelId
-      },
-      orderBy: {
-        order: 'asc'
-      }
-    });
+    let viewsList = await NocoCache.getList(CacheScope.VIEW, [modelId]);
+    if (!viewsList.length) {
+      viewsList = await Noco.ncMeta.metaList2(null, null, MetaTable.VIEWS, {
+        condition: {
+          fk_model_id: modelId
+        },
+        orderBy: {
+          order: 'asc'
+        }
+      });
+      await NocoCache.setList(CacheScope.VIEW, [modelId], viewsList);
+    }
 
     return viewsList?.map(v => new View(v));
   }
@@ -516,14 +530,31 @@ export default class View implements ViewType {
     await Sort.deleteAll(viewId);
     await Filter.deleteAll(viewId);
     const table = this.extractViewTableName(view);
+    const tableScope = this.extractViewTableNameScope(view);
     const columnTable = this.extractViewColumnsTableName(view);
+    const columnTableScope = this.extractViewColumnsTableNameScope(view);
     await ncMeta.metaDelete(null, null, columnTable, {
       fk_view_id: viewId
     });
+    await NocoCache.deepDel(
+      tableScope,
+      `${tableScope}:${viewId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     await ncMeta.metaDelete(null, null, table, {
       fk_view_id: viewId
     });
+    await NocoCache.deepDel(
+      columnTableScope,
+      `${columnTableScope}:${viewId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     await ncMeta.metaDelete(null, null, MetaTable.VIEWS, viewId);
+    await NocoCache.deepDel(
+      CacheScope.VIEW,
+      `${CacheScope.VIEW}:${viewId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
   }
 
   private static extractViewColumnsTableName(view: View) {
@@ -563,6 +594,44 @@ export default class View implements ViewType {
     return table;
   }
 
+  private static extractViewColumnsTableNameScope(view: View) {
+    let scope;
+    switch (view.type) {
+      case ViewTypes.GRID:
+        scope = CacheScope.GRID_VIEW_COLUMN;
+        break;
+      case ViewTypes.GALLERY:
+        scope = CacheScope.GALLERY_VIEW_COLUMN;
+        break;
+      case ViewTypes.KANBAN:
+        scope = CacheScope.KANBAN_VIEW_COLUMN;
+        break;
+      case ViewTypes.FORM:
+        scope = CacheScope.FORM_VIEW_COLUMN;
+        break;
+    }
+    return scope;
+  }
+
+  private static extractViewTableNameScope(view: View) {
+    let scope;
+    switch (view.type) {
+      case ViewTypes.GRID:
+        scope = CacheScope.GRID_VIEW;
+        break;
+      case ViewTypes.GALLERY:
+        scope = CacheScope.GALLERY_VIEW;
+        break;
+      case ViewTypes.KANBAN:
+        scope = CacheScope.KANBAN_VIEW;
+        break;
+      case ViewTypes.FORM:
+        scope = CacheScope.FORM_VIEW;
+        break;
+    }
+    return scope;
+  }
+
   static async showAllColumns(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);
@@ -579,6 +648,15 @@ export default class View implements ViewType {
   static async hideAllColumns(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);
+    const scope = this.extractViewColumnsTableNameScope(view);
+    // get existing cache
+    const key = `${scope}:${viewId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    o.show = false;
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
     return await ncMeta.metaUpdate(
       null,
       null,
