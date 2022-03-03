@@ -179,12 +179,12 @@
       </v-icon>
       Add Filter
     </v-btn>
-    <v-btn small class="elevation-0 grey--text my-3" @click.stop="addFilterGroup">
-      <v-icon small color="grey">
-        mdi-plus
-      </v-icon>
-      Add Filter Group
-    </v-btn>
+    <!--    <v-btn small class="elevation-0 grey&#45;&#45;text my-3" @click.stop="addFilterGroup">-->
+    <!--      <v-icon small color="grey">-->
+    <!--        mdi-plus-->
+    <!--      </v-icon>-->
+    <!--      Add Filter Group-->
+    <!--    </v-btn>-->
     <slot />
   </div>
 </template>
