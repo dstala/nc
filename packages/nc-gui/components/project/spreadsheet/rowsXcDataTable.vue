@@ -103,7 +103,7 @@
             @updated="loadTableData"
           />
         </template>
-        <share-view-menu @share="$refs.drawer && $refs.drawer.genShareLink()" />
+        <share-view-menu v-if="!isGallery" @share="$refs.drawer && $refs.drawer.genShareLink()" />
 
         <MoreActions
           v-if="!isForm"
