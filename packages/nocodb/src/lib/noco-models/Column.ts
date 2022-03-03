@@ -623,11 +623,14 @@ export default class Column implements ColumnType {
   ) {
     // get existing cache
     const key = `${CacheScope.COLUMN}:${colId}`;
+    // todo: redis - verify data is empty or valid
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    // update alias
-    o._cn = _cn;
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      // update alias
+      o._cn = _cn;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     await ncMeta.metaUpdate(
       null, //column.project_id || column.base_id,
