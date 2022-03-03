@@ -1,7 +1,8 @@
 import Noco from '../noco/Noco';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import GridViewColumn from './GridViewColumn';
 import View from './View';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class GridView {
   title: string;
@@ -25,9 +26,18 @@ export default class GridView {
   }
 
   public static async get(viewId: string) {
-    const view = await Noco.ncMeta.metaGet2(null, null, MetaTable.GRID_VIEW, {
-      fk_view_id: viewId
-    });
+    let view =
+      viewId &&
+      (await NocoCache.get(
+        `${CacheScope.GRID_VIEW}:${viewId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!view) {
+      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.GRID_VIEW, {
+        fk_view_id: viewId
+      });
+      await NocoCache.set(`${CacheScope.GRID_VIEW}:${viewId}`, view);
+    }
 
     return view && new GridView(view);
   }
