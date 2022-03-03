@@ -391,7 +391,7 @@
                       dense
                       validate-on-blur
                       outlined
-                      :rules="validate && emailRules"
+                      :rules="emailRules"
                       class="caption"
                       hint="You can add multiple comma(,) separated emails"
                       label="Email"

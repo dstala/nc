@@ -71,6 +71,7 @@
               :is-virtual="isVirtual"
               :is-locked="isLocked"
               @onRelationDelete="$emit('onRelationDelete')"
+              @colDelete="$emit('colDelete')"
               @saved="onNewColCreation"
             />
           </th>

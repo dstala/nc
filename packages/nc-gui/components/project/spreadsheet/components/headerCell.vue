@@ -167,6 +167,7 @@ export default {
 
         await this.$api.meta.columnDelete(this.meta.id, column.id)
 
+        this.$emit('colDelete')
         this.$emit('saved')
         this.columnDeleteDialog = false
       } catch (e) {

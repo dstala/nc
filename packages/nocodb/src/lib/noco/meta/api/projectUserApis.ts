@@ -55,7 +55,7 @@ async function userInvite(req, res, next): Promise<any> {
         await ProjectUser.insert({
           project_id: req.params.projectId,
           fk_user_id: user.id,
-          roles: 'editor'
+          roles: req.body.roles || 'editor'
         });
       }
       Audit.insert({
@@ -80,7 +80,7 @@ async function userInvite(req, res, next): Promise<any> {
         await ProjectUser.insert({
           project_id: req.params.projectId,
           fk_user_id: id,
-          roles: 'editor'
+          roles: req.body.roles
         });
 
         const count = await User.count();
