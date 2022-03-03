@@ -1,3 +1,5 @@
+import { isVirtualCol } from 'nc-common'
+
 export default {
   data: () => ({
     viewStatus: {},
@@ -81,7 +83,7 @@ export default {
       }, [])
     },
     availableRealColumns() {
-      return this.availableColumns && this.availableColumns.filter(c => !c.virtual)
+      return this.availableColumns && this.availableColumns.filter(c => !isVirtualCol(c))
     },
 
     allColumns() {
