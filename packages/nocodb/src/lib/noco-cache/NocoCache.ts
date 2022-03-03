@@ -1,15 +1,13 @@
 import CacheMgr from './CacheMgr';
 import RedisCacheMgr from './RedisCacheMgr';
-// import MemCacheMgr from './MemCacheMgr';
-// import DummyCacheMgr from './DummyCacheMgr';
+import RedisMockCacheMgr from './RedisMockCacheMgr';
 
 export default class NocoCache {
   private static client: CacheMgr;
   private static cacheDisabled: boolean;
 
-  public static init(config: { driver: 'redis' | 'memory' }) {
+  public static init(config: { driver: 'redis' | 'redisMock' }) {
     if (process.env.NC_DISABLE_CACHE) {
-      // this.client = new DummyCacheMgr();
       this.cacheDisabled = !!process.env.NC_DISABLE_CACHE || false;
       // return;
     }
@@ -18,9 +16,9 @@ export default class NocoCache {
       case 'redis':
         this.client = new RedisCacheMgr({});
         break;
-      // case 'memory':
-      //   this.client = new MemCacheMgr({});
-      //   break;
+      case 'redisMock':
+        this.client = new RedisMockCacheMgr({});
+        break;
     }
   }
 
