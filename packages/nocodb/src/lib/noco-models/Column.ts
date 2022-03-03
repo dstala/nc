@@ -147,21 +147,20 @@ export default class Column implements ColumnType {
         break;
       }
       case UITypes.Rollup: {
+        const row = await RollupColumn.insert(
+          {
+            fk_column_id: colId,
+            fk_relation_column_id: column.fk_relation_column_id,
 
-       const row = await RollupColumn.insert(
-        {
-          fk_column_id: colId,
-          fk_relation_column_id: column.fk_relation_column_id,
-
-          fk_rollup_column_id: column.fk_rollup_column_id,
-          rollup_function: column.rollup_function
-        },
-        ncMeta
-      );
-      await NocoCache.set(`${CacheScope.COL_ROLLUP}:${row.id}`, row);
-      break;
+            fk_rollup_column_id: column.fk_rollup_column_id,
+            rollup_function: column.rollup_function
+          },
+          ncMeta
+        );
+        await NocoCache.set(`${CacheScope.COL_ROLLUP}:${row.id}`, row);
+        break;
       }
-      case UITypes.LinkToAnotherRecord:{
+      case UITypes.LinkToAnotherRecord: {
         const row = await LinkToAnotherRecordColumn.insert(
           {
             fk_column_id: colId,
@@ -189,7 +188,6 @@ export default class Column implements ColumnType {
         break;
       }
       case UITypes.Formula: {
-
         const row = await FormulaColumn.insert(
           {
             fk_column_id: colId,
@@ -199,11 +197,9 @@ export default class Column implements ColumnType {
         );
         await NocoCache.set(`${CacheScope.COL_FORMULA}:${row.id}`, row);
         break;
-      
       }
-      case UITypes.MultiSelect:{
+      case UITypes.MultiSelect: {
         for (const option of column.dtxp?.split(',') || []) {
-
           const row = await MultiSelectColumn.insert(
             {
               fk_column_id: colId,
@@ -215,8 +211,7 @@ export default class Column implements ColumnType {
         }
         break;
       }
-      case UITypes.SingleSelect:{
-
+      case UITypes.SingleSelect: {
         for (const option of column.dtxp?.split(',') || []) {
           const row = await SingleSelectColumn.insert(
             {
@@ -228,7 +223,6 @@ export default class Column implements ColumnType {
           await NocoCache.set(`${CacheScope.COL_SELECT_OPTION}:${row.id}`, row);
         }
         break;
-      }
       }
 
       /*  default:
@@ -576,35 +570,48 @@ export default class Column implements ColumnType {
         await NocoCache.set(`${CacheScope.COL_LOOKUP}:${colId}`, row);
         break;
       }
-      case UITypes.Rollup:{
+      case UITypes.Rollup: {
         const row = await ncMeta.metaDelete(null, null, MetaTable.COL_ROLLUP, {
           fk_column_id: colId
         });
         // TODO: Cache - add fields when implementation is done
         await NocoCache.set(`${CacheScope.COL_ROLLUP}:${colId}`, row);
-        break;}
-      
+        break;
+      }
+
       case UITypes.ForeignKey:
-      case UITypes.LinkToAnotherRecord:{
-        const row = await ncMeta.metaDelete(null, null, MetaTable.COL_RELATIONS, {
-          fk_column_id: colId
-        });
+      case UITypes.LinkToAnotherRecord: {
+        const row = await ncMeta.metaDelete(
+          null,
+          null,
+          MetaTable.COL_RELATIONS,
+          {
+            fk_column_id: colId
+          }
+        );
         await NocoCache.set(`${CacheScope.COL_RELATION}:${colId}`, row);
-        break;}
-      case UITypes.Formula:{
+        break;
+      }
+      case UITypes.Formula: {
         const row = await ncMeta.metaDelete(null, null, MetaTable.COL_FORMULA, {
           fk_column_id: colId
         });
         await NocoCache.set(`${CacheScope.COL_FORMULA}:${colId}`, row);
-        break;}
-      
+        break;
+      }
+
       case UITypes.MultiSelect:
-      case UITypes.SingleSelect:{
-        const row = await ncMeta.metaDelete(null, null, MetaTable.COL_SELECT_OPTIONS, {
-          fk_column_id: colId
-        });
-        await NocoCache.set(`${CacheScope.COL_SELECT_OPTIONS}:${colId}`, row);
-        break;}
+      case UITypes.SingleSelect: {
+        const row = await ncMeta.metaDelete(
+          null,
+          null,
+          MetaTable.COL_SELECT_OPTIONS,
+          {
+            fk_column_id: colId
+          }
+        );
+        await NocoCache.set(`${CacheScope.COL_SELECT_OPTION}:${colId}`, row);
+        break;
       }
     }
     /*  default:
