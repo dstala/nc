@@ -1,6 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import Column from './Column';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class RollupColumn {
   fk_column_id;
@@ -15,6 +16,7 @@ export default class RollupColumn {
     Object.assign(this, data);
   }
 
+  // TODO: Cache
   public static async insert(
     data: Partial<RollupColumn>,
     ncMeta = Noco.ncMeta
@@ -29,12 +31,21 @@ export default class RollupColumn {
   }
 
   public static async read(columnId: string) {
-    const column = await Noco.ncMeta.metaGet2(
-      null, //,
-      null, //model.db_alias,
-      MetaTable.COL_ROLLUP,
-      { fk_column_id: columnId }
-    );
+    let column =
+      columnId &&
+      (await NocoCache.get(
+        `${CacheScope.COL_ROLLUP}:${columnId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!column) {
+      column = await Noco.ncMeta.metaGet2(
+        null, //,
+        null, //model.db_alias,
+        MetaTable.COL_ROLLUP,
+        { fk_column_id: columnId }
+      );
+      await NocoCache.set(`${CacheScope.COL_ROLLUP}:${columnId}`, column);
+    }
 
     return column ? new RollupColumn(column) : null;
   }

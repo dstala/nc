@@ -1,6 +1,7 @@
 import Noco from '../noco/Noco';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import View from './View';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class GalleryViewColumn {
   id: string;
@@ -18,15 +19,18 @@ export default class GalleryViewColumn {
   }
 
   public static async get(viewId: string) {
-    const view = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.GALLERY_VIEW,
-      {
+    let view =
+      viewId &&
+      (await NocoCache.get(
+        `${CacheScope.GALLERY_VIEW_COLUMN}:${viewId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!view) {
+      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.GALLERY_VIEW, {
         fk_view_id: viewId
-      }
-    );
-
+      });
+      await NocoCache.set(`${CacheScope.GALLERY_VIEW_COLUMN}:${viewId}`, view);
+    }
     return view && new GalleryViewColumn(view);
   }
   static async insert(
@@ -66,19 +70,25 @@ export default class GalleryViewColumn {
   }
 
   public static async list(viewId: string): Promise<GalleryViewColumn[]> {
-    const views = await Noco.ncMeta.metaList2(
-      null,
-      null,
-      MetaTable.GALLERY_VIEW_COLUMNS,
-      {
-        condition: {
-          fk_view_id: viewId
-        },
-        orderBy: {
-          order: 'asc'
+    let views = await NocoCache.getList(CacheScope.GALLERY_VIEW_COLUMN, [
+      viewId
+    ]);
+    if (!views.length) {
+      views = await Noco.ncMeta.metaList2(
+        null,
+        null,
+        MetaTable.GALLERY_VIEW_COLUMNS,
+        {
+          condition: {
+            fk_view_id: viewId
+          },
+          orderBy: {
+            order: 'asc'
+          }
         }
-      }
-    );
+      );
+      await NocoCache.setList(CacheScope.GALLERY_VIEW_COLUMN, [viewId], views);
+    }
 
     return views?.map(v => new GalleryViewColumn(v));
   }

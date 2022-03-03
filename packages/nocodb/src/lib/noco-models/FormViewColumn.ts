@@ -1,7 +1,8 @@
 import Noco from '../noco/Noco';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import { FormColumnType } from 'nc-common';
 import View from './View';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class FormViewColumn implements FormColumnType {
   id?: string;
@@ -24,9 +25,18 @@ export default class FormViewColumn implements FormColumnType {
   uuid?: any;
 
   public static async get(viewId: string) {
-    const view = await Noco.ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
-      fk_view_id: viewId
-    });
+    let view =
+      viewId &&
+      (await NocoCache.get(
+        `${CacheScope.FORM_VIEW_COLUMN}:${viewId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!view) {
+      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
+        fk_view_id: viewId
+      });
+    }
+    await NocoCache.set(`${CacheScope.FORM_VIEW_COLUMN}:${viewId}`, view);
 
     return view && new FormViewColumn(view);
   }
@@ -62,24 +72,40 @@ export default class FormViewColumn implements FormColumnType {
   }
 
   public static async list(viewId: string): Promise<FormViewColumn[]> {
-    const views = await Noco.ncMeta.metaList2(
-      null,
-      null,
-      MetaTable.FORM_VIEW_COLUMNS,
-      {
-        condition: {
-          fk_view_id: viewId
-        },
-        orderBy: {
-          order: 'asc'
+    const views = await NocoCache.getList(CacheScope.FORM_VIEW_COLUMN, [
+      viewId
+    ]);
+    if (!views.length) {
+      const views = await Noco.ncMeta.metaList2(
+        null,
+        null,
+        MetaTable.FORM_VIEW_COLUMNS,
+        {
+          condition: {
+            fk_view_id: viewId
+          },
+          orderBy: {
+            order: 'asc'
+          }
         }
-      }
-    );
+      );
+      await NocoCache.setList(CacheScope.FORM_VIEW_COLUMN, [viewId], views);
+    }
 
     return views?.map(v => new FormViewColumn(v));
   }
 
   static async update(columnId: string, body: Partial<FormViewColumn>) {
+    // get existing cache
+    const key = `${CacheScope.FORM_VIEW_COLUMN}:${columnId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    o.label = body.label;
+    o.help = body.help;
+    o.description = body.description;
+    o.required = body.required;
+    // set cache
+    await NocoCache.set(key, o);
+    // update meta
     await Noco.ncMeta.metaUpdate(
       null,
       null,

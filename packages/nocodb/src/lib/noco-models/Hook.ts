@@ -1,7 +1,13 @@
 import { HookType } from 'nc-common';
-import { MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import Noco from '../noco/Noco';
 import Model from './Model';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class Hook implements HookType {
   id?: string;
@@ -31,12 +37,16 @@ export default class Hook implements HookType {
   }
 
   public static async get(hookId: string) {
-    const hook = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.HOOKS,
-      hookId
-    );
+    let hook =
+      hookId &&
+      (await NocoCache.get(
+        `${CacheScope.HOOK}:${hookId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!hook) {
+      hook = await Noco.ncMeta.metaGet2(null, null, MetaTable.HOOKS, hookId);
+      await NocoCache.set(`${CacheScope.HOOK}:${hookId}`, hook);
+    }
     return hook && new Hook(hook);
   }
 
@@ -63,13 +73,17 @@ export default class Hook implements HookType {
     event?: 'After' | 'Before';
     operation?: 'insert' | 'delete' | 'update';
   }) {
-    const hooks = await Noco.ncMeta.metaList(null, null, MetaTable.HOOKS, {
-      condition: {
-        fk_model_id: param.fk_model_id,
-        ...(param.event ? { event: param.event } : {}),
-        ...(param.operation ? { operation: param.operation } : {})
-      }
-    });
+    let hooks = await NocoCache.getList(CacheScope.HOOK, [param.fk_model_id]);
+    if (!hooks.length) {
+      hooks = await Noco.ncMeta.metaList(null, null, MetaTable.HOOKS, {
+        condition: {
+          fk_model_id: param.fk_model_id,
+          ...(param.event ? { event: param.event } : {}),
+          ...(param.operation ? { operation: param.operation } : {})
+        }
+      });
+      await NocoCache.setList(CacheScope.HOOK, [param.fk_model_id], hooks);
+    }
     return hooks?.map(h => new Hook(h));
   }
 
@@ -119,34 +133,44 @@ export default class Hook implements HookType {
   }
 
   public static async update(hookId: string, hook: Partial<Hook>) {
+    const updateObj = {
+      title: hook.title,
+      description: hook.description,
+      env: hook.env,
+      type: hook.type,
+      event: hook.event,
+      operation: hook.operation,
+      async: hook.async,
+      payload: !!hook.payload,
+      url: hook.url,
+      headers: hook.headers,
+      condition:
+        hook.condition && typeof hook.condition === 'object'
+          ? JSON.stringify(hook.condition)
+          : hook.condition,
+      notification:
+        hook.notification && typeof hook.notification === 'object'
+          ? JSON.stringify(hook.notification)
+          : hook.notification,
+      retries: hook.retries,
+      retry_interval: hook.retry_interval,
+      timeout: hook.timeout,
+      active: hook.active
+    };
+
+    // get existing cache
+    const key = `${CacheScope.HOOK}:${hookId}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    o = { ...updateObj, ...o };
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
     await Noco.ncMeta.metaUpdate(
       null,
       null,
       MetaTable.HOOKS,
-      {
-        title: hook.title,
-        description: hook.description,
-        env: hook.env,
-        type: hook.type,
-        event: hook.event,
-        operation: hook.operation,
-        async: hook.async,
-        payload: !!hook.payload,
-        url: hook.url,
-        headers: hook.headers,
-        condition:
-          hook.condition && typeof hook.condition === 'object'
-            ? JSON.stringify(hook.condition)
-            : hook.condition,
-        notification:
-          hook.notification && typeof hook.notification === 'object'
-            ? JSON.stringify(hook.notification)
-            : hook.notification,
-        retries: hook.retries,
-        retry_interval: hook.retry_interval,
-        timeout: hook.timeout,
-        active: hook.active
-      },
+      updateObj,
       hookId
     );
 
@@ -155,5 +179,10 @@ export default class Hook implements HookType {
 
   static async delete(hookId: any) {
     return await Noco.ncMeta.metaDelete(null, null, MetaTable.HOOKS, hookId);
+    await NocoCache.deepDel(
+      CacheScope.HOOK,
+      `${CacheScope.HOOK}:${hookId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
   }
 }

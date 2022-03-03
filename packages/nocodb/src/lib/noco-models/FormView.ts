@@ -1,8 +1,9 @@
 import Noco from '../noco/Noco';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import { FormType } from 'nc-common';
 import FormViewColumn from './FormViewColumn';
 import View from './View';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class FormView implements FormType {
   show: boolean;
@@ -31,10 +32,18 @@ export default class FormView implements FormType {
   }
 
   public static async get(viewId: string) {
-    const view = await Noco.ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
-      fk_view_id: viewId
-    });
-
+    let view =
+      viewId &&
+      (await NocoCache.get(
+        `${CacheScope.FORM_VIEW}:${viewId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!view) {
+      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
+        fk_view_id: viewId
+      });
+      await NocoCache.set(`${CacheScope.FORM_VIEW}:${viewId}`, view);
+    }
     return view && new FormView(view);
   }
 
@@ -61,6 +70,23 @@ export default class FormView implements FormType {
   }
 
   static async update(formId: string, body: Partial<FormView>) {
+    // get existing cache
+    const key = `${CacheScope.FORM_VIEW}:${formId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    o.title = body.title;
+    o.heading = body.heading;
+    o.subheading = body.subheading;
+    o.success_msg = body.success_msg;
+    o.redirect_url = body.redirect_url;
+    o.redirect_after_secs = body.redirect_after_secs;
+    o.email = body.email;
+    o.banner_image_url = body.banner_image_url;
+    o.logo_url = body.logo_url;
+    o.submit_another_form = body.submit_another_form;
+    o.show_blank_form = body.show_blank_form;
+    // set cache
+    await NocoCache.set(key, o);
+    // update meta
     return await Noco.ncMeta.metaUpdate(
       null,
       null,

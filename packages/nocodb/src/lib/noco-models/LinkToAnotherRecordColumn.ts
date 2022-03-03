@@ -1,8 +1,9 @@
 import Noco from '../../lib/noco/Noco';
 import Column from './Column';
 import Model from './Model';
+// import NocoCache from '../noco-cache/NocoCache';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import NocoCache from '../noco-cache/NocoCache';
-import { MetaTable } from '../utils/globals';
 
 export default class LinkToAnotherRecordColumn {
   fk_column_id?: string;
@@ -65,7 +66,8 @@ export default class LinkToAnotherRecordColumn {
       id: this.fk_related_model_id
     }));
   }
-
+  
+ // TODO: Cache
   public static async insert(
     data: Partial<LinkToAnotherRecordColumn>,
     ncMeta = Noco.ncMeta
@@ -94,15 +96,20 @@ export default class LinkToAnotherRecordColumn {
   }
 
   public static async read(columnId: string) {
-    let colData = (await NocoCache.getv2(columnId))?.[0];
+    let colData =
+      columnId &&
+      (await NocoCache.get(
+        `${CacheScope.COL_RELATION}:${columnId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!colData) {
       colData = await Noco.ncMeta.metaGet2(
         null, //,
-        null, //model.db_alias,
+        null, //model.db_alias
         MetaTable.COL_RELATIONS,
         { fk_column_id: columnId }
       );
-      await NocoCache.setv2(colData?.id, columnId, colData);
+      await NocoCache.set(`${CacheScope.COL_RELATION}:${columnId}`, colData);
     }
     return colData ? new LinkToAnotherRecordColumn(colData) : null;
   }

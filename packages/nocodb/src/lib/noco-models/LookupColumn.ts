@@ -1,7 +1,8 @@
 import Noco from '../../lib/noco/Noco';
-import NocoCache from '../noco-cache/NocoCache';
+// import NocoCache from '../noco-cache/NocoCache';
 import Column from './Column';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class LookupColumn {
   fk_relation_column_id: string;
@@ -24,6 +25,7 @@ export default class LookupColumn {
     });
   }
 
+  // TODO: Cache
   public static async insert(
     data: Partial<LookupColumn>,
     ncMeta = Noco.ncMeta
@@ -37,7 +39,12 @@ export default class LookupColumn {
   }
 
   public static async read(columnId: string) {
-    let colData = (await NocoCache.getv2(columnId))?.[0];
+    let colData =
+      columnId &&
+      (await NocoCache.get(
+        `${CacheScope.COL_LOOKUP}:${columnId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!colData) {
       colData = await Noco.ncMeta.metaGet2(
         null, //,
@@ -45,7 +52,7 @@ export default class LookupColumn {
         MetaTable.COL_LOOKUP,
         { fk_column_id: columnId }
       );
-      await NocoCache.setv2(colData.id, columnId, colData);
+      await NocoCache.set(`${CacheScope.COL_LOOKUP}:${columnId}`, colData);
     }
     return colData ? new LookupColumn(colData) : null;
   }

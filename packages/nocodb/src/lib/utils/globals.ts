@@ -32,3 +32,47 @@ export enum MetaTable {
   PROJECT_USERS = 'nc_project_users_v2',
   MODEL_ROLE_VISIBILITY = 'nc_disabled_models_for_role_v2'
 }
+
+export enum CacheScope {
+  PROJECT = 'project',
+  BASE = 'base',
+  MODEL = 'model',
+  COLUMN = 'column',
+  COL_PROP = 'colProp',
+  COL_RELATION = 'colRelation',
+  COL_SELECT_OPTION = 'colSelectOption',
+  COL_LOOKUP = 'colLookup',
+  COL_ROLLUP = 'colRollup',
+  COL_FORMULA = 'colFormula',
+  FILTER_EXP = 'filterExp',
+  SORT = 'sort',
+  SHARED_VIEW = 'sharedView',
+  ACL = 'acl',
+  FORM_VIEW = 'formView',
+  FORM_VIEW_COLUMN = 'formViewColumn',
+  GALLERY_VIEW = 'galleryView',
+  GALLERY_VIEW_COLUMN = 'galleryViewColumn',
+  GRID_VIEW = 'gridView',
+  GRID_VIEW_COLUMN = 'gridViewColumn',
+  KANBAN_VIEW = 'kanbanView',
+  KANBAN_VIEW_COLUMN = 'kanbanViewColumn',
+  USER = 'user',
+  ORGS = 'orgs',
+  TEAM = 'team',
+  TEAM_USER = 'teamUser',
+  VIEW = 'view',
+  AUDIT = 'audit',
+  HOOK = 'hook',
+  PLUGIN = 'plugin',
+  PROJECT_USER = 'projectUser'
+}
+export enum CacheGetType {
+  TYPE_ARRAY = 'TYPE_ARRAY',
+  TYPE_OBJECT = 'TYPE_OBJECT',
+  TYPE_STRING = 'TYPE_STRING'
+}
+
+export enum CacheDelDirection {
+  PARENT_TO_CHILD = 'PARENT_TO_CHILD',
+  CHILD_TO_PARENT = 'CHILD_TO_PARENT',
+}

@@ -12,7 +12,12 @@ import {
   ViewTypes
 } from 'nc-common';
 import UITypes from '../sqlUi/UITypes';
-import { MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import View from './View';
 import { NcError } from '../noco/meta/api/helpers/catchError';
 
@@ -113,6 +118,12 @@ export default class Model implements TableType {
       }
     );
 
+    await NocoCache.appendToList(
+      CacheScope.MODEL,
+      [projectId, baseId],
+      `${CacheScope.MODEL}:${id}`
+    );
+
     const view = await View.insert(
       {
         fk_model_id: id,
@@ -140,7 +151,10 @@ export default class Model implements TableType {
     },
     ncMeta = Noco.ncMeta
   ): Promise<Model[]> {
-    let modelList = []; //await NocoCache.getv2(project_id);
+    let modelList = await NocoCache.getList(CacheScope.MODEL, [
+      project_id,
+      base_id
+    ]);
     if (!modelList.length) {
       modelList = await ncMeta.metaList2(
         project_id,
@@ -153,11 +167,12 @@ export default class Model implements TableType {
         }
       );
 
-      for (const model of modelList) {
-        await NocoCache.setv2(model.id, project_id, model);
-      }
+      await NocoCache.setList(
+        CacheScope.MODEL,
+        [project_id, base_id],
+        modelList
+      );
     }
-
     return modelList.map(m => new Model(m));
   }
 
@@ -168,7 +183,10 @@ export default class Model implements TableType {
     project_id: string;
     db_alias: string;
   }): Promise<Model[]> {
-    let modelList = await NocoCache.getv2(project_id);
+    let modelList = await NocoCache.getList(CacheScope.MODEL, [
+      project_id,
+      db_alias
+    ]);
     if (!modelList.length) {
       modelList = await Noco.ncMeta.metaList2(
         project_id,
@@ -176,21 +194,32 @@ export default class Model implements TableType {
         MetaTable.MODELS
       );
 
-      // for (const model of modelList) {
-      //   await NocoCache.setv2(model.id, project_id, model);
-      // }
+      await NocoCache.setList(
+        CacheScope.MODEL,
+        [project_id, db_alias],
+        modelList
+      );
     }
 
     return modelList.map(m => new Model(m));
   }
 
   public static async clear({ id }: { id: string }): Promise<void> {
-    await NocoCache.delAll(`*_${id}`);
+    await NocoCache.delAll(CacheScope.MODEL, `*${id}*`);
     await Column.clearList({ fk_model_id: id });
   }
 
   public static async get(id: string, ncMeta = Noco.ncMeta): Promise<Model> {
-    const modelData = await ncMeta.metaGet2(null, null, MetaTable.MODELS, id);
+    let modelData =
+      id &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${id}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!modelData) {
+      modelData = await ncMeta.metaGet2(null, null, MetaTable.MODELS, id);
+      await NocoCache.set(`${CacheScope.MODEL}:${modelData.id}`, modelData);
+    }
     return modelData && new Model(modelData);
   }
 
@@ -204,15 +233,16 @@ export default class Model implements TableType {
         },
     ncMeta = Noco.ncMeta
   ): Promise<Model> {
-    let modelData = null; //id && (await NocoCache.get(id));
+    const k = 'id' in args ? args?.id : args;
+    let modelData =
+      k &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${k}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!modelData) {
-      modelData = await ncMeta.metaGet2(
-        null,
-        null,
-        MetaTable.MODELS,
-        'id' in args ? args?.id : args
-      );
-      await NocoCache.setv2(modelData.id, modelData?.base_id, modelData);
+      modelData = await ncMeta.metaGet2(null, null, MetaTable.MODELS, k);
+      await NocoCache.set(`${CacheScope.MODEL}:${modelData.id}`, modelData);
       // if (
       //   this.baseModels?.[modelData.base_id]?.[modelData.db_alias]?.[
       //     modelData.title
@@ -245,7 +275,12 @@ export default class Model implements TableType {
     tn?: string;
     id?: string;
   }): Promise<Model> {
-    let modelData = null; //id && (await NocoCache.get(id));
+    let modelData =
+      id &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${id}`,
+        CacheGetType.TYPE_OBJECT
+      ));
     if (!modelData) {
       modelData = await Noco.ncMeta.metaGet2(
         null,
@@ -255,7 +290,7 @@ export default class Model implements TableType {
           tn
         }
       );
-      await NocoCache.setv2(id, modelData?.base_id, modelData);
+      await NocoCache.set(`${CacheScope.MODEL}:${modelData.id}`, modelData);
       // modelData.filters = await Filter.getFilterObject({
       //   viewId: modelData.id
       // });
@@ -325,36 +360,57 @@ export default class Model implements TableType {
 
     for (const col of await this.getColumns(false, ncMeta)) {
       let colOptionTableName = null;
+      let cacheScopeName = null;
       switch (col.uidt) {
         case UITypes.Rollup:
           colOptionTableName = MetaTable.COL_ROLLUP;
+          cacheScopeName = CacheScope.COL_ROLLUP;
           break;
         case UITypes.Lookup:
           colOptionTableName = MetaTable.COL_LOOKUP;
+          cacheScopeName = CacheScope.COL_LOOKUP;
           break;
         case UITypes.ForeignKey:
         case UITypes.LinkToAnotherRecord:
           colOptionTableName = MetaTable.COL_RELATIONS;
+          cacheScopeName = CacheScope.COL_RELATION;
           break;
         case UITypes.MultiSelect:
         case UITypes.SingleSelect:
           colOptionTableName = MetaTable.COL_SELECT_OPTIONS;
+          cacheScopeName = CacheScope.COL_SELECT_OPTION;
           break;
         case UITypes.Formula:
           colOptionTableName = MetaTable.COL_FORMULA;
+          cacheScopeName = CacheScope.COL_FORMULA;
           break;
       }
-      if (colOptionTableName) {
+      if (colOptionTableName && cacheScopeName) {
         await ncMeta.metaDelete(null, null, colOptionTableName, {
           fk_column_id: col.id
         });
+        await NocoCache.deepDel(
+          cacheScopeName,
+          `${cacheScopeName}:${col.id}`,
+          CacheDelDirection.CHILD_TO_PARENT
+        );
       }
     }
 
+    await NocoCache.deepDel(
+      CacheScope.COLUMN,
+      `${CacheScope.COLUMN}:${this.id}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, {
       fk_model_id: this.id
     });
 
+    await NocoCache.deepDel(
+      CacheScope.MODEL,
+      `${CacheScope.MODEL}:${this.id}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     await ncMeta.metaDelete(null, null, MetaTable.MODELS, this.id);
 
     return true;
@@ -372,6 +428,14 @@ export default class Model implements TableType {
 
   static async updateAlias(tableId, _tn: string, ncMeta = Noco.ncMeta) {
     if (!_tn) NcError.badRequest("Missing '_tn' property in body");
+    // get existing cache
+    const key = `${CacheScope.MODEL}:${tableId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    o._tn = _tn;
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
     return await ncMeta.metaUpdate(
       null,
       null,

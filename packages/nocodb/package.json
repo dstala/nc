@@ -127,6 +127,7 @@
     "handlebars": "^4.7.6",
     "import-fresh": "^3.2.1",
     "inflection": "^1.12.0",
+    "ioredis": "^4.28.5",
     "ioredis-mock": "^5.8.1",
     "is-docker": "^2.2.1",
     "js-beautify": "^1.11.0",

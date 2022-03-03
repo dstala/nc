@@ -1,6 +1,6 @@
 import Noco from '../../lib/noco/Noco';
 import NocoCache from '../noco-cache/NocoCache';
-import { MetaTable } from '../utils/globals';
+import { CacheScope, MetaTable } from '../utils/globals';
 
 export default class MultiSelectColumn {
   title: string;
@@ -9,7 +9,7 @@ export default class MultiSelectColumn {
   constructor(data: Partial<MultiSelectColumn>) {
     Object.assign(this, data);
   }
-
+// TODO: Cache
   public static async insert(
     data: Partial<MultiSelectColumn>,
     ncMeta = Noco.ncMeta
@@ -27,8 +27,9 @@ export default class MultiSelectColumn {
   }
 
   public static async read(columnId: string) {
-    let options = await NocoCache.getv2(columnId);
-
+    let options = await NocoCache.getList(CacheScope.COL_SELECT_OPTION, [
+      columnId
+    ]);
     if (!options.length) {
       options = await Noco.ncMeta.metaList2(
         null, //,
@@ -36,8 +37,11 @@ export default class MultiSelectColumn {
         MetaTable.COL_SELECT_OPTIONS,
         { condition: { fk_column_id: columnId } }
       );
-      for (const option of options)
-        await NocoCache.set(option.id, columnId, option);
+      await NocoCache.setList(
+        CacheScope.COL_SELECT_OPTION,
+        [columnId],
+        options
+      );
     }
 
     return options?.length

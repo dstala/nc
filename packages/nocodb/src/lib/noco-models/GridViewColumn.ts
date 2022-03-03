@@ -1,8 +1,9 @@
 import Noco from '../noco/Noco';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import { GridColumnType } from 'nc-common';
 import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
 import View from './View';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class GridViewColumn implements GridColumnType {
   id: string;
@@ -20,36 +21,48 @@ export default class GridViewColumn implements GridColumnType {
   }
 
   public static async list(viewId: string): Promise<GridViewColumn[]> {
-    const views = await Noco.ncMeta.metaList2(
-      null,
-      null,
-      MetaTable.GRID_VIEW_COLUMNS,
-      {
-        condition: {
-          fk_view_id: viewId
-        },
-        orderBy: {
-          order: 'asc'
+    let views = await NocoCache.getList(CacheScope.GRID_VIEW_COLUMN, [viewId]);
+    if (!views.length) {
+      views = await Noco.ncMeta.metaList2(
+        null,
+        null,
+        MetaTable.GRID_VIEW_COLUMNS,
+        {
+          condition: {
+            fk_view_id: viewId
+          },
+          orderBy: {
+            order: 'asc'
+          }
         }
-      }
-    );
-
+      );
+      await NocoCache.setList(CacheScope.GRID_VIEW_COLUMN, [viewId], views);
+    }
     return views?.map(v => new GridViewColumn(v));
   }
 
   public static async get(viewId: string) {
-    const view = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.GRID_VIEW_COLUMNS,
-      {
-        fk_view_id: viewId
-      }
-    );
-
+    let view =
+      viewId &&
+      (await NocoCache.get(
+        `${CacheScope.GRID_VIEW_COLUMN}:${viewId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!view) {
+      view = await Noco.ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.GRID_VIEW_COLUMNS,
+        {
+          fk_view_id: viewId
+        }
+      );
+      await NocoCache.set(`${CacheScope.GRID_VIEW_COLUMN}:${viewId}`, view);
+    }
     return view && new GridViewColumn(view);
   }
 
+  // TODO: Cache
   static async insert(column: Partial<GridViewColumn>, ncMeta = Noco.ncMeta) {
     const insertObj = {
       fk_view_id: column.fk_view_id,
@@ -88,8 +101,8 @@ export default class GridViewColumn implements GridColumnType {
     body: Partial<GridViewColumn>,
     ncMeta = Noco.ncMeta
   ) {
+    // TODO: Cache
     const updateBody = extractDefinedProps(body, ['order', 'show', 'width']);
-
     await ncMeta.metaUpdate(
       null,
       null,
