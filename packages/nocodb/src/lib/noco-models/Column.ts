@@ -415,8 +415,13 @@ export default class Column implements ColumnType {
   id: string;
 
   static async delete(id, ncMeta = Noco.ncMeta) {
-    // todo: delete sort & filters
     const col = await this.get({ colId: id }, ncMeta);
+
+    // todo: redis del - sort, filter, grid column, columns
+    // todo: delete from view column list
+    // todo: delete from sort list
+    // todo: delete from filter list
+
     let colOptionTableName = null;
     switch (col.uidt) {
       case UITypes.Rollup:
@@ -425,7 +430,6 @@ export default class Column implements ColumnType {
       case UITypes.Lookup:
         colOptionTableName = MetaTable.COL_LOOKUP;
         break;
-      case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord:
         colOptionTableName = MetaTable.COL_RELATIONS;
         break;
@@ -437,6 +441,7 @@ export default class Column implements ColumnType {
         colOptionTableName = MetaTable.COL_FORMULA;
         break;
     }
+
     if (colOptionTableName) {
       await ncMeta.metaDelete(null, null, colOptionTableName, {
         fk_column_id: col.id

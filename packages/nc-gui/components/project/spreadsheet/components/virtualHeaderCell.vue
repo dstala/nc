@@ -225,115 +225,123 @@ export default {
     }
   },
   methods: {
-    async deleteRelation() {
-      try {
-        await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcRelationColumnDelete', {
-          type: this.type,
-          childColumn: this.childColumn,
-          childTable: this.childTable,
-          parentTable: this.parentTable,
-          parentColumn: this.parentColumn,
-          assocTable: this.column.mm && this.column.mm.vtn
-        }])
-        this.$emit('saved')
-        this.columnDeleteDialog = false
-      } catch (e) {
-        console.log(e)
-      }
-    },
-    async deleteLookupColumn() {
-      try {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          dbAlias: this.nodes.dbAlias,
-          env: this.nodes.env,
-          tn: this.meta.tn,
-          force: true
-        })
-        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
-
-        // remove lookup from virtual columns
-        meta.v = meta.v.filter(cl => cl.cn !== this.column.cn ||
-          cl.type !== this.column.type ||
-          cl._cn !== this.column._cn ||
-          cl.tn !== this.column.tn)
-
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcModelSet', {
-          tn: this.nodes.tn,
-          meta
-        }])
-        this.$emit('saved')
-        this.columnDeleteDialog = false
-      } catch (e) {
-        console.log(e)
-      }
-    },
-    async deleteFormulaColumn() {
-      try {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          dbAlias: this.nodes.dbAlias,
-          env: this.nodes.env,
-          tn: this.meta.tn,
-          force: true
-        })
-        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
-        // remove formula from virtual columns
-        meta.v = meta.v.filter(cl => !cl.formula || cl._cn !== this.column._cn)
-
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcModelSet', {
-          tn: this.nodes.tn,
-          meta
-        }])
-        this.$emit('saved')
-        this.columnDeleteDialog = false
-      } catch (e) {
-        console.log(e)
-      }
-    },
-    async deleteRollupColumn() {
-      try {
-        await this.$store.dispatch('meta/ActLoadMeta', {
-          dbAlias: this.nodes.dbAlias,
-          env: this.nodes.env,
-          tn: this.meta.tn,
-          force: true
-        })
-        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
-
-        // remove rollup from virtual columns
-        meta.v = meta.v.filter(cl => !cl.rl || cl._cn !== this.column._cn)
-
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        }, 'xcModelSet', {
-          tn: this.nodes.tn,
-          meta
-        }])
-        this.$emit('saved')
-        this.columnDeleteDialog = false
-      } catch (e) {
-        console.log(e)
-      }
-    },
+    // async deleteRelation() {
+    //   try {
+    //     await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
+    //       env: this.nodes.env,
+    //       dbAlias: this.nodes.dbAlias
+    //     }, 'xcRelationColumnDelete', {
+    //       type: this.type,
+    //       childColumn: this.childColumn,
+    //       childTable: this.childTable,
+    //       parentTable: this.parentTable,
+    //       parentColumn: this.parentColumn,
+    //       assocTable: this.column.mm && this.column.mm.vtn
+    //     }])
+    //     this.$emit('saved')
+    //     this.columnDeleteDialog = false
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // },
+    // async deleteLookupColumn() {
+    //   try {
+    //     await this.$store.dispatch('meta/ActLoadMeta', {
+    //       dbAlias: this.nodes.dbAlias,
+    //       env: this.nodes.env,
+    //       tn: this.meta.tn,
+    //       force: true
+    //     })
+    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+    //
+    //     // remove lookup from virtual columns
+    //     meta.v = meta.v.filter(cl => cl.cn !== this.column.cn ||
+    //       cl.type !== this.column.type ||
+    //       cl._cn !== this.column._cn ||
+    //       cl.tn !== this.column.tn)
+    //
+    //     await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+    //       env: this.nodes.env,
+    //       dbAlias: this.nodes.dbAlias
+    //     }, 'xcModelSet', {
+    //       tn: this.nodes.tn,
+    //       meta
+    //     }])
+    //     this.$emit('saved')
+    //     this.columnDeleteDialog = false
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // },
+    // async deleteFormulaColumn() {
+    //   try {
+    //     await this.$store.dispatch('meta/ActLoadMeta', {
+    //       dbAlias: this.nodes.dbAlias,
+    //       env: this.nodes.env,
+    //       tn: this.meta.tn,
+    //       force: true
+    //     })
+    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+    //     // remove formula from virtual columns
+    //     meta.v = meta.v.filter(cl => !cl.formula || cl._cn !== this.column._cn)
+    //
+    //     await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+    //       env: this.nodes.env,
+    //       dbAlias: this.nodes.dbAlias
+    //     }, 'xcModelSet', {
+    //       tn: this.nodes.tn,
+    //       meta
+    //     }])
+    //     this.$emit('saved')
+    //     this.columnDeleteDialog = false
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // },
+    // async deleteRollupColumn() {
+    //   try {
+    //     await this.$store.dispatch('meta/ActLoadMeta', {
+    //       dbAlias: this.nodes.dbAlias,
+    //       env: this.nodes.env,
+    //       tn: this.meta.tn,
+    //       force: true
+    //     })
+    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+    //
+    //     // remove rollup from virtual columns
+    //     meta.v = meta.v.filter(cl => !cl.rl || cl._cn !== this.column._cn)
+    //
+    //     await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+    //       env: this.nodes.env,
+    //       dbAlias: this.nodes.dbAlias
+    //     }, 'xcModelSet', {
+    //       tn: this.nodes.tn,
+    //       meta
+    //     }])
+    //     this.$emit('saved')
+    //     this.columnDeleteDialog = false
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // },
     async deleteColumn() {
-      if (this.column.lk) {
-        await this.deleteLookupColumn()
-      } else if (this.column.formula) {
-        await this.deleteFormulaColumn()
-      } else if (this.column.rl) {
-        await this.deleteRollupColumn()
-      } else {
-        await this.deleteRelation()
+      try {
+        await this.$api.meta.columnDelete(this.meta.id, this.column.id)
+        this.$emit('saved')
+        this.columnDeleteDialog = false
+      } catch (e) {
+        this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
       }
+
+      // if (this.column.lk) {
+      //   await this.deleteLookupColumn()
+      // } else if (this.column.formula) {
+      //   await this.deleteFormulaColumn()
+      // } else if (this.column.rl) {
+      //   await this.deleteRollupColumn()
+      // } else {
+      //   await this.deleteRelation()
+      // }
     }
   }
 }
