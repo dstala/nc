@@ -41,22 +41,27 @@ export const actions = {
     if (!force && state.metas[id]) {
       return state.metas[id]
     }
-    commit('MutLoading', {
-      key: tn || id,
-      value: true
-    })
 
-    const model = await this.$api.meta.tableRead(
-      id ||
-      rootState
+    const modelId = id ||
+      (rootState
         .project
         .unserializedList[0]
         .projectJson
         .envs
         ._noco
         .db[0]
-        .tables.find(t => t._tn === tn || t.tn === tn).id
-    )
+        .tables.find(t => t._tn === tn || t.tn === tn) || {}).id
+    if (!modelId) {
+      console.warn(`Table '${tn}' is not found in the table list`)
+      return
+    }
+
+    commit('MutLoading', {
+      key: tn || id,
+      value: true
+    })
+
+    const model = await this.$api.meta.tableRead(modelId)
     // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tn }], { root: true })
     // const meta = JSON.parse(model.meta)
     commit('MutMeta', {

@@ -336,6 +336,72 @@
         ]
       }
     },
+    "/projects/{projectId}/info": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "User Info",
+        "operationId": "project-meta-get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Node": {
+                      "type": "string"
+                    },
+                    "Arch": {
+                      "type": "string"
+                    },
+                    "Platform": {
+                      "type": "string"
+                    },
+                    "Docker": {
+                      "type": "boolean"
+                    },
+                    "Database": {
+                      "type": "string"
+                    },
+                    "ProjectOnRootDB": {
+                      "type": "string"
+                    },
+                    "RootDB": {
+                      "type": "string"
+                    },
+                    "PackageVersion": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      }
+    },
     "/projects/{projectId}/users/{userId}": {
       "parameters": [
         {

@@ -518,8 +518,7 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
   // try {
   const column: Column = table.columns.find(c => c.id === req.params.columnId);
 
-  const colBody = req.body;
-  switch (colBody.uidt) {
+  switch (column.uidt) {
     case UITypes.Lookup:
     case UITypes.Rollup:
     case UITypes.Formula:
@@ -678,15 +677,18 @@ const deleteHmOrBtRelation = async ({
   sqlMgr: SqlMgrv2;
   ncMeta?: NcMetaIO;
 }) => {
-  await sqlMgr.sqlOpPlus(base, 'relationDelete', {
-    childColumn: childColumn.cn,
-    childTable: childTable.tn,
-    parentTable: parentTable.tn,
-    parentColumn: parentColumn.cn
-    // foreignKeyName: relation.fkn
-  });
-
-  await Column.delete(childColumn.id, ncMeta);
+  // todo: handle relation delete exception
+  try {
+    await sqlMgr.sqlOpPlus(base, 'relationDelete', {
+      childColumn: childColumn.cn,
+      childTable: childTable.tn,
+      parentTable: parentTable.tn,
+      parentColumn: parentColumn.cn
+      // foreignKeyName: relation.fkn
+    });
+  } catch (e) {
+    console.log(e);
+  }
 
   if (!relationColOpt) return;
   const columnsInRelatedTable: Column[] = await relationColOpt
@@ -707,8 +709,12 @@ const deleteHmOrBtRelation = async ({
     }
   }
 
+  // delete virtual columns
   await Column.delete(relationColOpt.fk_column_id, ncMeta);
   await Column.delete(columnInRelatedTable.id, ncMeta);
+
+  // delete foreign key column
+  await Column.delete(childColumn.id, ncMeta);
 };
 
 const router = Router({ mergeParams: true });

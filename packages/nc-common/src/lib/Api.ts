@@ -1063,6 +1063,36 @@ export class Api<
      * No description
      *
      * @tags meta
+     * @name ProjectMetaGet
+     * @summary User Info
+     * @request GET:/projects/{projectId}/info
+     * @response `200` `UserType` OK
+     * @response `0` `{ Node?: string, Arch?: string, Platform?: string, Docker?: boolean, Database?: string, ProjectOnRootDB?: string, RootDB?: string, PackageVersion?: string }`
+     */
+    projectMetaGet: (projectId: string, params: RequestParams = {}) =>
+      this.request<
+        UserType,
+        {
+          Node?: string;
+          Arch?: string;
+          Platform?: string;
+          Docker?: boolean;
+          Database?: string;
+          ProjectOnRootDB?: string;
+          RootDB?: string;
+          PackageVersion?: string;
+        }
+      >({
+        path: `/projects/${projectId}/info`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
      * @name ProjectModelVisibilityList
      * @summary Password Refresh
      * @request GET:/projects/{projectId}/{baseId}/modelVisibility

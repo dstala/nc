@@ -1,21 +1,30 @@
 import Noco from '../../lib/noco/Noco';
-import NcColumn from '../../types/NcColumn';
 import NocoCache from '../noco-cache/NocoCache';
 import { CacheScope, MetaTable } from '../utils/globals';
 
 export default class SingleSelectColumn {
   title: string;
+  fk_column_id: string;
 
-  constructor(data: NcColumn) {
+  constructor(data: Partial<SingleSelectColumn>) {
     Object.assign(this, data);
   }
 
   // TODO: Cache
-  public static async insert(model: NcColumn | any) {
-    await Noco.ncMeta.metaInsert2(null, null, MetaTable.COL_SELECT_OPTIONS, {
-      tn: model.tn,
-      _tn: model._tn
-    });
+  public static async insert(
+    data: Partial<SingleSelectColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
+    const row = await ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.COL_SELECT_OPTIONS,
+      {
+        fk_column_id: data.fk_column_id,
+        title: data.title
+      }
+    );
+    return new SingleSelectColumn(row);
   }
 
   public static async read(columnId: string) {

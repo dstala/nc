@@ -354,7 +354,6 @@ export const actions = {
       //   "xcTableAndViewList", {includeM2M: rootState.windows.includeM2M}
       // ], {root: true});
 
-
       const tables = (await this.$api.meta.tableList({
         projectId: state.projectId,
         baseId: state.project.bases[0].id

@@ -67,7 +67,7 @@ export async function tableList(
 
   const tableList = await Model.list({
     project_id: req.params.projectId,
-    base_id: null
+    base_id: req.params.baseId
   });
 
   res // todo: pagination

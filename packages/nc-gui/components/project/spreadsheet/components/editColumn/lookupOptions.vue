@@ -19,7 +19,7 @@
           >
             <template #item="{item}">
               <span class="caption"><span class="font-weight-bold"> {{
-                item.tn
+                item._tn || item.tn
               }}</span> <small>({{ relationNames[item.col.type] }})
               </small></span>
             </template>
