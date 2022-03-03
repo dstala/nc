@@ -67,6 +67,8 @@ export async function xcVisibilityMetaGet(
         ptn: model.tn,
         _ptn: model._tn,
         ptype: model.type,
+        tn: view.title,
+        _tn: view.title,
         ...view,
         disabled: { ...defaultDisabled }
       };
