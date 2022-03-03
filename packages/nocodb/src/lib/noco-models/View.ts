@@ -177,6 +177,12 @@ export default class View implements ViewType {
       insertObj
     );
 
+    await NocoCache.appendToList(
+      CacheScope.VIEW,
+      [view.fk_model_id],
+      `${CacheScope.VIEW}:${view_id}`
+    );
+
     switch (view.type) {
       case ViewTypes.GRID:
         await GridView.insert({

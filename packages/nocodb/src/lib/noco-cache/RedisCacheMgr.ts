@@ -82,7 +82,10 @@ export default class RedisCacheMgr extends CacheMgr {
     // remove null from arrays
     subKeys = subKeys.filter(k => k);
     // e.g. key = <scope>:<project_id_1>:<base_id_1>:list
-    const key = `${scope}:${subKeys.join(':')}:list`;
+    const key =
+      subKeys.length === 0
+        ? `${scope}:list`
+        : `${scope}:${subKeys.join(':')}:list`;
     // e.g. arr = ["<scope>:<model_id_1>", "<scope>:<model_id_2>"]
     const arr = (await this.get(key, CacheGetType.TYPE_ARRAY)) || [];
     console.log(`RedisCacheMgr::getList: getting list with key ${key}`);
@@ -104,7 +107,10 @@ export default class RedisCacheMgr extends CacheMgr {
     subListKeys = subListKeys.filter(k => k);
     // construct key for List
     // e.g. <scope>:<project_id_1>:<base_id_1>:list
-    const listKey = `${scope}:${subListKeys.join(':')}:list`;
+    const listKey =
+      subListKeys.length === 0
+        ? `${scope}:list`
+        : `${scope}:${subListKeys.join(':')}:list`;
     // fetch existing list
     const listOfGetKeys =
       (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];

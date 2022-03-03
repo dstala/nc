@@ -25,7 +25,6 @@ export default class LookupColumn {
     });
   }
 
-  // TODO: Cache
   public static async insert(
     data: Partial<LookupColumn>,
     ncMeta = Noco.ncMeta
@@ -35,6 +34,8 @@ export default class LookupColumn {
       fk_relation_column_id: data.fk_relation_column_id,
       fk_lookup_column_id: data.fk_lookup_column_id
     });
+
+    await NocoCache.set(`${CacheScope.COL_LOOKUP}:${data.fk_column_id}`, row);
     return new LookupColumn(row);
   }
 

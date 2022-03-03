@@ -11,7 +11,6 @@ export default class FormulaColumn {
     Object.assign(this, data);
   }
 
-  // TODO: cache
   public static async insert(
     data: Partial<FormulaColumn>,
     ncMeta = Noco.ncMeta
@@ -21,6 +20,8 @@ export default class FormulaColumn {
       formula_raw: data.formula_raw,
       formula: data.formula
     });
+
+    await NocoCache.set(`${CacheScope.COL_FORMULA}:${data.fk_column_id}`, row);
     return new FormulaColumn(row);
   }
   public static async read(columnId: string) {

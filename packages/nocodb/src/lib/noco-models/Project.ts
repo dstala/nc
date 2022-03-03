@@ -1,8 +1,14 @@
 import Base from '../noco-models/Base';
 import Noco from '../noco/Noco';
 import { ProjectType } from 'nc-common';
-import { MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class Project implements ProjectType {
   public id: string;
@@ -41,6 +47,12 @@ export default class Project implements ProjectType {
       }
     );
 
+    await NocoCache.appendToList(
+      CacheScope.PROJECT,
+      [],
+      `${CacheScope.PROJECT}:${projectId}`
+    );
+
     for (const base of projectBody.bases) {
       await Base.createBase({
         ...base,
@@ -52,11 +64,9 @@ export default class Project implements ProjectType {
 
   // @ts-ignore
   static async list(param): Promise<Project[]> {
-    const projectList = await Noco.ncMeta.metaList2(
-      null,
-      null,
-      MetaTable.PROJECT,
-      {
+    let projectList = await NocoCache.getList(CacheScope.PROJECT, []);
+    if (!projectList.length) {
+      projectList = await Noco.ncMeta.metaList2(null, null, MetaTable.PROJECT, {
         xcCondition: {
           _or: [
             {
@@ -71,22 +81,30 @@ export default class Project implements ProjectType {
             }
           ]
         }
-      }
-    );
-
+      });
+      await NocoCache.setList(CacheScope.PROJECT, [], projectList);
+    }
     return projectList.map(m => new Project(m));
   }
 
   // @ts-ignore
   static async get(projectId: string): Promise<Project> {
-    const projectData = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.PROJECT,
-      projectId
-    );
-    if (projectData) return new Project(projectData);
-    return null;
+    let projectData =
+      projectId &&
+      (await NocoCache.get(
+        `${CacheScope.PROJECT}:${projectId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!projectData) {
+      projectData = await Noco.ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.PROJECT,
+        projectId
+      );
+      await NocoCache.set(`${CacheScope.PROJECT}:${projectId}`, projectData);
+    }
+    return projectData && new Project(projectData);
   }
 
   async getBases(): Promise<Base[]> {
@@ -96,12 +114,21 @@ export default class Project implements ProjectType {
   // todo: hide credentials
   // @ts-ignore
   static async getWithInfo(projectId: string): Promise<Project> {
-    const projectData = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.PROJECT,
-      projectId
-    );
+    let projectData =
+      projectId &&
+      (await NocoCache.get(
+        `${CacheScope.PROJECT}:${projectId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!projectData) {
+      projectData = await Noco.ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.PROJECT,
+        projectId
+      );
+      await NocoCache.set(`${CacheScope.PROJECT}:${projectId}`, projectData);
+    }
     if (projectData) {
       const project = new Project(projectData);
       await project.getBases();
@@ -112,6 +139,14 @@ export default class Project implements ProjectType {
 
   // @ts-ignore
   static async softDelete(projectId: string): Promise<any> {
+    // get existing cache
+    const key = `${CacheScope.PROJECT}:${projectId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    o.deleted = true;
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
     return await Noco.ncMeta.metaUpdate(
       null,
       null,
@@ -126,24 +161,33 @@ export default class Project implements ProjectType {
     projectId: string,
     project: Partial<Project>
   ): Promise<any> {
+    const updateObj = extractDefinedProps(project, [
+      'title',
+      'prefix',
+      'status',
+      'description',
+      'meta',
+      'color',
+      'deleted',
+      'order',
+      'bases',
+      'uuid',
+      'password',
+      'roles'
+    ]);
+    // get existing cache
+    const key = `${CacheScope.PROJECT}:${projectId}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    o = { ...o, ...updateObj };
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
     return await Noco.ncMeta.metaUpdate(
       null,
       null,
       MetaTable.PROJECT,
-      extractDefinedProps(project, [
-        'title',
-        'prefix',
-        'status',
-        'description',
-        'meta',
-        'color',
-        'deleted',
-        'order',
-        'bases',
-        'uuid',
-        'password',
-        'roles'
-      ]),
+      updateObj,
       projectId
     );
   }
@@ -153,17 +197,27 @@ export default class Project implements ProjectType {
     for (const base of bases) {
       await base.delete(ncMeta);
     }
+    await NocoCache.deepDel(
+      CacheScope.PROJECT,
+      `${CacheScope.PROJECT}:${projectId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     return await ncMeta.metaDelete(null, null, MetaTable.PROJECT, projectId);
   }
 
   static async getByUuid(uuid) {
-    const projectData = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.PROJECT,
-      { uuid }
-    );
-    if (projectData) return new Project(projectData);
-    return null;
+    let projectData =
+      uuid &&
+      (await NocoCache.get(
+        `${CacheScope.PROJECT}:${uuid}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!projectData) {
+      projectData = await Noco.ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
+        uuid
+      });
+      await NocoCache.set(`${CacheScope.PROJECT}:${uuid}`, projectData);
+    }
+    return projectData && new Project(projectData);
   }
 }

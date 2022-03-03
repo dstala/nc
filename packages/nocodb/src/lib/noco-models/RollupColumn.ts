@@ -16,7 +16,6 @@ export default class RollupColumn {
     Object.assign(this, data);
   }
 
-  // TODO: Cache
   public static async insert(
     data: Partial<RollupColumn>,
     ncMeta = Noco.ncMeta
@@ -27,6 +26,7 @@ export default class RollupColumn {
       fk_rollup_column_id: data.fk_rollup_column_id,
       rollup_function: data.rollup_function
     });
+    await NocoCache.set(`${CacheScope.COL_ROLLUP}:${data.fk_column_id}`, row);
     return new RollupColumn(row);
   }
 
@@ -46,7 +46,6 @@ export default class RollupColumn {
       );
       await NocoCache.set(`${CacheScope.COL_ROLLUP}:${columnId}`, column);
     }
-
     return column ? new RollupColumn(column) : null;
   }
 
