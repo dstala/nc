@@ -1511,7 +1511,16 @@
         "tags": [
           "Meta"
         ],
-        "description": ""
+        "description": "",
+        "parameters": [
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "ignoreIds"
+          }
+        ]
       }
     },
     "/views/{viewId}/hideAll": {
@@ -1535,6 +1544,15 @@
         },
         "tags": [
           "Meta"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "ignoreIds"
+          }
         ]
       }
     },

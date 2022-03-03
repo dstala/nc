@@ -386,7 +386,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
       query.condition(xcCondition);
     }
 
-    // console.log(query.toQuery())
+    console.log(query.toQuery());
 
     return query;
   }

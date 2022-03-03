@@ -75,7 +75,12 @@ async function shareViewDelete(req: Request<any, any>, res) {
 }
 
 async function showAllColumns(req: Request<any, any>, res) {
-  res.json(await View.showAllColumns(req.params.viewId));
+  res.json(
+    await View.showAllColumns(
+      req.params.viewId,
+      <string[]>(req.query?.ignoreIds || [])
+    )
+  );
 }
 
 async function hideAllColumns(req: Request<any, any>, res) {
@@ -89,6 +94,6 @@ router.put('/views/:viewId/share', ncMetaAclMw(shareViewPasswordUpdate));
 router.delete('/views/:viewId/share', ncMetaAclMw(shareViewDelete));
 router.put('/views/:viewId', ncMetaAclMw(viewUpdate));
 router.delete('/views/:viewId', ncMetaAclMw(viewDelete));
-router.post('/views/:viewId/showAll', ncMetaAclMw(hideAllColumns));
-router.post('/views/:viewId/hideAll', ncMetaAclMw(showAllColumns));
+router.post('/views/:viewId/showAll', ncMetaAclMw(showAllColumns));
+router.post('/views/:viewId/hideAll', ncMetaAclMw(hideAllColumns));
 export default router;
