@@ -60,16 +60,11 @@ export default class Sort {
       insertObj.base_id = model.base_id;
     }
 
-    const { id } = await ncMeta.metaInsert2(
-      null,
-      null,
-      MetaTable.SORT,
-      insertObj
-    );
+    const row = await ncMeta.metaInsert2(null, null, MetaTable.SORT, insertObj);
 
-    await NocoCache.set(`${CacheScope.SORT}:${id}`, insertObj);
+    await NocoCache.set(`${CacheScope.SORT}:${row.id}`, row);
 
-    return this.get(id, ncMeta);
+    return this.get(row.id, ncMeta);
   }
 
   public getColumn(): Promise<Column> {
