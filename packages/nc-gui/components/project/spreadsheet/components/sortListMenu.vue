@@ -150,7 +150,7 @@ export default {
       this.$emit('updated')
     },
     async deleteSort(sort, i) {
-      if (sort.id) {
+      if (!this.shared && sort.id) {
         await this.$api.meta.sortDelete(this.viewId, sort.id)
         await this.loadSortList()
       } else {

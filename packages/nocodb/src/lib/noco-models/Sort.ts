@@ -101,12 +101,15 @@ export default class Sort {
   public static async update(sortId, body, ncMeta = Noco.ncMeta) {
     // get existing cache
     const key = `${CacheScope.SORT}:${sortId}`;
+    // todo: redis - verify data is empty or valid
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    // update fk_column_id & direction
-    o.fk_column_id = body.fk_column_id;
-    o.direction = body.direction;
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      // update fk_column_id & direction
+      o.fk_column_id = body.fk_column_id;
+      o.direction = body.direction;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     await ncMeta.metaUpdate(
       null,
