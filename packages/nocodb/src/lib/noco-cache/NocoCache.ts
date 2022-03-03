@@ -7,10 +7,7 @@ export default class NocoCache {
   private static cacheDisabled: boolean;
 
   public static init(config: { driver: 'redis' | 'redisMock' }) {
-    if (process.env.NC_DISABLE_CACHE) {
-      this.cacheDisabled = !!process.env.NC_DISABLE_CACHE || false;
-      // return;
-    }
+    this.cacheDisabled = !!process.env.NC_DISABLE_CACHE || false;
 
     switch (config.driver) {
       case 'redis':
