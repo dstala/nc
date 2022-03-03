@@ -5,11 +5,13 @@ import RedisCacheMgr from './RedisCacheMgr';
 
 export default class NocoCache {
   private static client: CacheMgr;
+  private static cacheDisabled: boolean;
 
   public static init(config: { driver: 'redis' | 'memory' }) {
     if (process.env.NC_DISABLE_CACHE) {
       // this.client = new DummyCacheMgr();
-      return;
+      this.cacheDisabled = !!process.env.NC_DISABLE_CACHE || false;
+      // return;
     }
 
     switch (config.driver) {
@@ -23,22 +25,27 @@ export default class NocoCache {
   }
 
   public static async set(key, value, ttl?): Promise<boolean> {
+    if (this.cacheDisabled) return Promise.resolve(true);
     return this.client.set(key, value, ttl);
   }
 
   public static async get(key, type): Promise<any> {
+    if (this.cacheDisabled) return Promise.resolve(true);
     return this.client.get(key, type);
   }
 
   public static async getAll(pattern: string): Promise<any[]> {
+    if (this.cacheDisabled) return Promise.resolve([]);
     return this.client.getAll(pattern);
   }
 
   public static async del(key): Promise<boolean> {
+    if (this.cacheDisabled) return Promise.resolve(true);
     return this.client.del(key);
   }
 
   public static async delAll(scope: string, pattern: string): Promise<any[]> {
+    if (this.cacheDisabled) return Promise.resolve([]);
     return this.client.delAll(scope, pattern);
   }
 
@@ -46,6 +53,7 @@ export default class NocoCache {
     scope: string,
     subKeys: string[]
   ): Promise<any[]> {
+    if (this.cacheDisabled) return Promise.resolve([]);
     return this.client.getList(scope, subKeys);
   }
 
@@ -54,6 +62,7 @@ export default class NocoCache {
     subListKeys: string[],
     list: any[]
   ): Promise<boolean> {
+    if (this.cacheDisabled) return Promise.resolve(true);
     return this.client.setList(scope, subListKeys, list);
   }
 
@@ -62,6 +71,7 @@ export default class NocoCache {
     key: string,
     direction: string
   ): Promise<boolean> {
+    if (this.cacheDisabled) return Promise.resolve(true);
     return this.client.deepDel(scope, key, direction);
   }
 
@@ -70,6 +80,7 @@ export default class NocoCache {
     subListKeys: string[],
     key: string
   ): Promise<boolean> {
+    if (this.cacheDisabled) return Promise.resolve(true);
     return this.client.appendToList(scope, subListKeys, key);
   }
 }
