@@ -167,7 +167,7 @@ export default class Hook implements HookType {
     // get existing cache
     const key = `${CacheScope.HOOK}:${hookId}`;
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    // update alias
+    // update data
     o = { ...updateObj, ...o };
     // set cache
     await NocoCache.set(key, o);

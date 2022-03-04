@@ -651,7 +651,7 @@ export default class View implements ViewType {
     const key = `${scope}:${viewId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
-      // update alias
+      // update data
       o.show = true;
       // set cache
       await NocoCache.set(key, o);
@@ -689,7 +689,7 @@ export default class View implements ViewType {
     const key = `${scope}:${viewId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
-      // update alias
+      // update data
       o.show = false;
       // set cache
       await NocoCache.set(key, o);

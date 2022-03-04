@@ -627,10 +627,9 @@ export default class Column implements ColumnType {
   ) {
     // get existing cache
     const key = `${CacheScope.COLUMN}:${colId}`;
-    // todo: redis - verify data is empty or valid
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
-      // update alias
+      // update data
       o._cn = _cn;
       // set cache
       await NocoCache.set(key, o);

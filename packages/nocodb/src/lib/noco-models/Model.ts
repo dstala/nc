@@ -435,10 +435,12 @@ export default class Model implements TableType {
     // get existing cache
     const key = `${CacheScope.MODEL}:${tableId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    // update alias
-    o._tn = _tn;
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      // update data
+      o._tn = _tn;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     return await ncMeta.metaUpdate(
       null,
@@ -476,7 +478,15 @@ export default class Model implements TableType {
     order: number,
     ncMeta = Noco.ncMeta
   ) {
-    // todo : redis del - table list
+    // get existing cache
+    const key = `${CacheScope.MODEL}:${tableId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      o.order = order;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     return await ncMeta.metaUpdate(
       null,
       null,
@@ -493,15 +503,22 @@ export default class Model implements TableType {
     columnId: string,
     ncMeta = Noco.ncMeta
   ) {
-    // todo : redis del - table get
     const model = await this.getWithInfo({ id: tableId });
-
     const currentPvCol = model.primaryValue;
     const newPvCol = model.columns.find(c => c.id === columnId);
 
     if (!newPvCol) NcError.badRequest('Column not found');
 
-    if (currentPvCol)
+    if (currentPvCol) {
+      // get existing cache
+      const key = `${CacheScope.MODEL}:${currentPvCol.id}`;
+      const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+      if (o) {
+        o.pv = false;
+        // set cache
+        await NocoCache.set(key, o);
+      }
+      // set meta
       await ncMeta.metaUpdate(
         null,
         null,
@@ -511,7 +528,17 @@ export default class Model implements TableType {
         },
         currentPvCol.id
       );
+    }
 
+    // get existing cache
+    const key = `${CacheScope.MODEL}:${newPvCol.id}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      o.pv = true;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     await ncMeta.metaUpdate(
       null,
       null,
@@ -526,7 +553,15 @@ export default class Model implements TableType {
   }
 
   static async setAsMm(id: any, ncMeta = Noco.ncMeta) {
-    // todo: redis del
+    // get existing cache
+    const key = `${CacheScope.MODEL}:${id}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      o.mm = true;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     await ncMeta.metaUpdate(
       null,
       null,
