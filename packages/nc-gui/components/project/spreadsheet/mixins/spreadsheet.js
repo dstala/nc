@@ -236,9 +236,9 @@ export default {
         limit: this.size,
         offset: this.size * (this.page - 1),
         // condition: this.condition,
-        where: this.concatenatedXWhere,
-        sort: this.sort,
-        ...this.nestedAndRollupColumnParams
+        where: this.concatenatedXWhere
+        // sort: this.sort,
+        // ...this.nestedAndRollupColumnParams
         // ...Object.entries(nestedFields).reduce((ro, [k, a]) => ({ ...ro, [k]: a.join(',') })),
         // ...fieldsObj
       }
