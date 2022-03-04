@@ -16,7 +16,7 @@ export async function viewMetaGet(req: Request, res: Response, next) {
   if (!view) return next(new Error('Not found'));
 
   if (view.password && view.password !== req.body?.password) {
-    return res.status(401).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+    return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
   await view.getFilters();
