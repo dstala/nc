@@ -20,6 +20,7 @@ export async function commentRow(
   res.json(
     await Audit.insert({
       ...req.body,
+      user: (req as any).user?.email,
       op_type: AuditOperationTypes.COMMENT
     })
   );
