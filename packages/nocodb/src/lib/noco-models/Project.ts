@@ -180,10 +180,12 @@ export default class Project implements ProjectType {
     // get existing cache
     const key = `${CacheScope.PROJECT}:${projectId}`;
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    // update alias
-    o = { ...o, ...updateObj };
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      // update data
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     return await Noco.ncMeta.metaUpdate(
       null,

@@ -1,6 +1,7 @@
 import CacheMgr from './CacheMgr';
 import RedisCacheMgr from './RedisCacheMgr';
 import RedisMockCacheMgr from './RedisMockCacheMgr';
+import { CacheGetType } from '../utils/globals';
 
 export default class NocoCache {
   private static client: CacheMgr;
@@ -14,17 +15,21 @@ export default class NocoCache {
     if (process.env.NC_REDIS_URL) {
       this.client = new RedisCacheMgr(process.env.NC_REDIS_URL);
     } else {
-      this.client = new RedisMockCacheMgr({});
+      this.client = new RedisMockCacheMgr(process.env.NC_REDIS_MOCK_URL);
     }
   }
 
-  public static async set(key, value, ttl?): Promise<boolean> {
+  public static async set(key, value): Promise<boolean> {
     if (this.cacheDisabled) return Promise.resolve(true);
-    return this.client.set(key, value, ttl);
+    return this.client.set(key, value);
   }
 
   public static async get(key, type): Promise<any> {
-    if (this.cacheDisabled) return Promise.resolve();
+    if (this.cacheDisabled) {
+      if (type === CacheGetType.TYPE_ARRAY) return Promise.resolve([]);
+      else if (type === CacheGetType.TYPE_OBJECT) return Promise.resolve(null);
+      return Promise.resolve(null);
+    }
     return this.client.get(key, type);
   }
 
