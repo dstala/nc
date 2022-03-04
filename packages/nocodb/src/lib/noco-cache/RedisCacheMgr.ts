@@ -137,7 +137,7 @@ export default class RedisCacheMgr extends CacheMgr {
     console.log(`RedisCacheMgr::deepDel: choose direction ${direction}`);
     if (direction === CacheDelDirection.CHILD_TO_PARENT) {
       // given a child key, delete all keys in corresponding parent lists
-      const scopeList = await this.client.keys(`${scope}:*:list`);
+      const scopeList = await this.client.keys(`${scope}*list`);
       for (const listKey of scopeList) {
         // get target list
         let list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];

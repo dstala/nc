@@ -139,13 +139,12 @@ export default class Project implements ProjectType {
 
   // @ts-ignore
   static async softDelete(projectId: string): Promise<any> {
-    // get existing cache
-    const key = `${CacheScope.PROJECT}:${projectId}`;
-    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    // update alias
-    o.deleted = true;
-    // set cache
-    await NocoCache.set(key, o);
+    // remove cache
+    await NocoCache.deepDel(
+      CacheScope.PROJECT,
+      `${CacheScope.PROJECT}:${projectId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     // set meta
     return await Noco.ncMeta.metaUpdate(
       null,

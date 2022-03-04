@@ -138,8 +138,7 @@ export default class Column implements ColumnType {
     switch (column.uidt || column.ui_data_type) {
       case UITypes.Lookup: {
         // LookupColumn.insert()
-
-        const row = await LookupColumn.insert(
+        await LookupColumn.insert(
           {
             fk_column_id: colId,
             fk_relation_column_id: column.fk_relation_column_id,
@@ -147,11 +146,10 @@ export default class Column implements ColumnType {
           },
           ncMeta
         );
-        await NocoCache.set(`${CacheScope.COL_LOOKUP}:${row.id}`, row);
         break;
       }
       case UITypes.Rollup: {
-        const row = await RollupColumn.insert(
+        await RollupColumn.insert(
           {
             fk_column_id: colId,
             fk_relation_column_id: column.fk_relation_column_id,
@@ -161,11 +159,10 @@ export default class Column implements ColumnType {
           },
           ncMeta
         );
-        await NocoCache.set(`${CacheScope.COL_ROLLUP}:${row.id}`, row);
         break;
       }
       case UITypes.LinkToAnotherRecord: {
-        const row = await LinkToAnotherRecordColumn.insert(
+        await LinkToAnotherRecordColumn.insert(
           {
             fk_column_id: colId,
 
@@ -188,11 +185,10 @@ export default class Column implements ColumnType {
           },
           ncMeta
         );
-        await NocoCache.set(`${CacheScope.COL_RELATION}:${row.id}`, row);
         break;
       }
       case UITypes.Formula: {
-        const row = await FormulaColumn.insert(
+        await FormulaColumn.insert(
           {
             fk_column_id: colId,
             formula: column.formula,
@@ -200,32 +196,29 @@ export default class Column implements ColumnType {
           },
           ncMeta
         );
-        await NocoCache.set(`${CacheScope.COL_FORMULA}:${row.id}`, row);
         break;
       }
       case UITypes.MultiSelect: {
         for (const option of column.dtxp?.split(',') || []) {
-          const row = await MultiSelectColumn.insert(
+          await MultiSelectColumn.insert(
             {
               fk_column_id: colId,
               title: option
             },
             ncMeta
           );
-          await NocoCache.set(`${CacheScope.COL_SELECT_OPTION}:${row.id}`, row);
         }
         break;
       }
       case UITypes.SingleSelect: {
         for (const option of column.dtxp?.split(',') || []) {
-          const row = await SingleSelectColumn.insert(
+          await SingleSelectColumn.insert(
             {
               fk_column_id: colId,
               title: option
             },
             ncMeta
           );
-          await NocoCache.set(`${CacheScope.COL_SELECT_OPTION}:${row.id}`, row);
         }
         break;
       }
