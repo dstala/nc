@@ -436,9 +436,11 @@ export default class Model implements TableType {
     const key = `${CacheScope.MODEL}:${tableId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     // update alias
-    o._tn = _tn;
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      o._tn = _tn;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     return await ncMeta.metaUpdate(
       null,
