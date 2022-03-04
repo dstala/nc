@@ -424,7 +424,7 @@
 import draggable from 'vuedraggable'
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
-import { UITypes, isVirtualCol } from 'nc-common'
+import { UITypes, isVirtualCol, RelationTypes } from 'nc-common'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'
@@ -503,7 +503,7 @@ export default {
       return ((this.fields && this.fields.filter(col => col.uidt === UITypes.ForeignKey ||
         col.cn === 'created_at' ||
         col.cn === 'updated_at' ||
-        (col.pk && (col.ai || col.cdf)))) || []).map(c => c.id)
+        (col.pk && (col.ai || col.cdf)))) || []).map(c => c.fk_column_id)
     },
     emailMe: {
       get() {
@@ -539,31 +539,11 @@ export default {
         this.$emit('update:formParams', params)
       }
     },
-    hiddenColumns: {
-      get() {
-        return this.fields.filter(f => !f.show && !this.systemFieldsIds.includes(f.id))
-        // return this.allColumns.filter(c => !this.showFields[c.alias] && !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && !(this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn))
-      }
+    hiddenColumns() {
+      return this.fields.filter(f => !f.show && !this.systemFieldsIds.includes(f.fk_column_id))
     },
-    columns: {
-      get() {
-        return this.fields.filter(f => f.show).sort((a, b) => a.order - b.order)
-        //   .sort((a, b) =>
-        //   ((this.fieldsOrder.indexOf(a.alias) + 1) || Infinity) - ((this.fieldsOrder.indexOf(b.alias) + 1) || Infinity)
-        // )
-      }
-      // set(val) {
-      //   const showFields = val.reduce((o, v) => {
-      //     o[v.alias] = true
-      //     return o
-      //   }, this.allColumnsLoc.reduce((o, v) => {
-      //     o[v.alias] = this.isDbRequired(v)
-      //     return o
-      //   }, {}))
-      //   const fieldsOrder = val.map(v => v.alias)
-      //   this.$emit('update:showFields', showFields)
-      //   this.$emit('update:fieldsOrder', fieldsOrder)
-      // }
+    columns() {
+      return this.fields.filter(f => f.show).sort((a, b) => a.order - b.order)
     }
   },
   watch: {
@@ -617,7 +597,7 @@ export default {
         element.show = false
         this.saveOrUpdateOrderOrVisibility(element, oldIndex)
       } else {
-        if (this.columns.length === 0) {
+        if (!this.columns.length || this.columns.length === 1) {
           this.$set(element, 'order', 1)
         } else if (this.columns.length - 1 === newIndex) {
           this.$set(element, 'order', this.columns[newIndex - 1].order + 1)
@@ -633,10 +613,28 @@ export default {
     },
 
     async saveOrUpdateOrderOrVisibility(field, i) {
-      if (field.id) {
-        await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
+      const {
+        fk_view_id,
+        fk_column_id,
+        order,
+        show,
+        id
+      } = field
+
+      if (id) {
+        await this.$api.meta.viewColumnUpdate(this.viewId, field.id, {
+          fk_view_id,
+          fk_column_id,
+          order,
+          show
+        })
       } else {
-        this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field)).data
+        field.id = (await this.$api.meta.viewColumnCreate(this.viewId, {
+          fk_view_id,
+          fk_column_id,
+          order,
+          show
+        })).data.id
       }
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
@@ -664,8 +662,10 @@ export default {
         ...c,
         alias: c._cn,
         fk_column_id: c.id,
+        fk_view_id: this.viewId,
         ...(fieldById[c.id] ? fieldById[c.id] : {}),
-        order: (fieldById[c.id] && fieldById[c.id].order) || order++
+        order: (fieldById[c.id] && fieldById[c.id].order) || order++,
+        id: (fieldById[c.id] && fieldById[c.id].id)
       })
       ).sort((a, b) => a.order - b.order)
     },
@@ -700,9 +700,14 @@ export default {
     },
     async addAllColumns() {
       for (const col of this.fields) {
-        if (!this.systemFieldsIds.includes(col.id)) { this.$set(col, 'show', true) }
+        if (!this.systemFieldsIds.includes(col.fk_column_id)) {
+          this.$set(col, 'show', true)
+        }
       }
-      await this.$api.meta.viewShowAllColumn({ viewId: this.viewId, ignoreIds: this.systemFieldsIds })
+      await this.$api.meta.viewShowAllColumn({
+        viewId: this.viewId,
+        ignoreIds: this.systemFieldsIds
+      })
       // this.columns = [...this.allColumnsLoc]
     },
     async removeAllColumns() {
@@ -712,19 +717,19 @@ export default {
       await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
     },
     isDbRequired(column) {
-      if (hiddenCols.includes(column.cn)) {
+      if (hiddenCols.includes(column.id)) {
         return true
       }
       let isRequired =
-        (!column.virtual && column.rqd && !column.default && this.meta.columns.every(
+        (!isVirtualCol(column) && column.rqd && !column.cdf && this.meta.columns.every(
           c => c.uidt === UITypes.LinkToAnotherRecord &&
-            c.type === 'bt' &&
-            column.id !== c.fk_child_column_id
+            c.colOptions.type === RelationTypes.BELONGS_TO &&
+            column.id !== c.colOptions.fk_child_column_id
         )) ||
         (column.pk && !(column.ai || column.default))
 
-      if (column.uidt === UITypes.LinkToAnotherRecord && column.type === 'bt') {
-        const col = this.meta.columns.find(c => c.id === column.fk_child_column_id)
+      if (column.uidt === UITypes.LinkToAnotherRecord && column.colOptions.type === RelationTypes.BELONGS_TO) {
+        const col = this.meta.columns.find(c => c.id === column.colOptions.fk_child_column_id)
         if ((col.rqd && !col.default) || this.localParams.fields[column.alias].required) {
           isRequired = true
         }
@@ -753,7 +758,13 @@ export default {
     },
     handleMouseUp(col) {
       if (!this.moved) {
-        this.columns = [...this.columns, col]
+        const index = this.columns.length
+        // this.columns = [...this.columns, col]
+        col.order = (index ? this.columns[index - 1].order : 0) + 1
+        col.show = true
+        this.$nextTick(() => {
+          this.saveOrUpdateOrderOrVisibility(col, index)
+        })
       }
     },
     onNewColCreation(col) {

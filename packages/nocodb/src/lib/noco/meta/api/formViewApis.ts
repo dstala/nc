@@ -14,7 +14,8 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // @ts-ignore
 export async function formViewGet(req: Request, res: Response<FormType>) {
-  res.json(await FormView.getWithInfo(req.params.formViewId));
+  const formViewData = await FormView.getWithInfo(req.params.formViewId);
+  res.json(formViewData);
 }
 
 export async function formViewCreate(req: Request<any, any>, res) {
