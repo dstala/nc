@@ -135,7 +135,7 @@ async function projectUserUpdate(req, res, next): Promise<any> {
 
   if (
     req.session?.passport?.user?.roles?.owner &&
-    req.session?.passport?.user?.id === +req.params.id &&
+    req.session?.passport?.user?.id === req.params.userId &&
     req.body.roles.indexOf('owner') === -1
   ) {
     NcError.badRequest("Super admin can't remove Super role themselves");
@@ -144,7 +144,7 @@ async function projectUserUpdate(req, res, next): Promise<any> {
     const user = await User.get(req.params.userId);
 
     if (!user) {
-      NcError.badRequest(`User with id '${req.params.id}' doesn't exist`);
+      NcError.badRequest(`User with id '${req.params.userId}' doesn't exist`);
     }
 
     // todo: handle roles which contains super
