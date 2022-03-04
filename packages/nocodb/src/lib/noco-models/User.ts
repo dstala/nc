@@ -1,7 +1,8 @@
 import { UserType } from 'nc-common';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
 import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
+import NocoCache from '../noco-cache/NocoCache';
 export default class User implements UserType {
   id: number;
 
@@ -46,7 +47,7 @@ export default class User implements UserType {
     return await ncMeta.metaInsert2(null, null, MetaTable.USERS, insertObj);
   }
   public static async update(id, user: Partial<User>, ncMeta = Noco.ncMeta) {
-    const insertObj = extractDefinedProps(user, [
+    const updateObj = extractDefinedProps(user, [
       'email',
       'password',
       'salt',
@@ -62,12 +63,29 @@ export default class User implements UserType {
       'email_verified',
       'roles'
     ]);
-    return await ncMeta.metaUpdate(null, null, MetaTable.USERS, insertObj, id);
+    // get existing cache
+    const key = `${CacheScope.USER}:${id}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    o = { ...o, ...updateObj };
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
+    return await ncMeta.metaUpdate(null, null, MetaTable.USERS, updateObj, id);
   }
   public static async getByEmail(email, ncMeta = Noco.ncMeta) {
-    return await ncMeta.metaGet2(null, null, MetaTable.USERS, {
-      email
-    });
+    let user =
+      email &&
+      (await NocoCache.get(
+        `${CacheScope.USER}:${email}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!user) {
+      user = await ncMeta.metaGet2(null, null, MetaTable.USERS, {
+        email
+      });
+      await NocoCache.set(`${CacheScope.USER}:${email}`, user);
+    }
+    return user;
   }
 
   static async isFirst(ncMeta = Noco.ncMeta) {
@@ -84,6 +102,16 @@ export default class User implements UserType {
   }
 
   static async get(userId, ncMeta = Noco.ncMeta) {
-    return await ncMeta.metaGet2(null, null, MetaTable.USERS, userId);
+    let user =
+      userId &&
+      (await NocoCache.get(
+        `${CacheScope.USER}:${userId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!user) {
+      user = await ncMeta.metaGet2(null, null, MetaTable.USERS, userId);
+      await NocoCache.set(`${CacheScope.USER}:${userId}`, user);
+    }
+    return user;
   }
 }
