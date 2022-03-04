@@ -36,6 +36,10 @@ export default {
     filterGet: true,
     filterChildrenRead: true,
 
+    mmList: true,
+    commentList: true,
+    commentRow: true,
+
     // old
     xcTableAndViewList: true,
     xcAuditCreate: true,
@@ -116,6 +120,10 @@ export default {
     viewList: true,
     columnList: true,
 
+    mmList: true,
+    commentList: true,
+    commentRow: true,
+
     // data
     dataList: true,
     commentsCount: true,
@@ -154,6 +162,10 @@ export default {
 
     // sort & filter
     sortList: true,
+
+    mmList: true,
+    commentList: true,
+    commentRow: false,
 
     xcTableAndViewList: true,
     xcVirtualTableList: true,
