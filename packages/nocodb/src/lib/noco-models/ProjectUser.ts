@@ -1,5 +1,11 @@
-import { MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import Noco from '../noco/Noco';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class ProjectUser {
   project_id: string;
@@ -10,6 +16,7 @@ export default class ProjectUser {
     Object.assign(this, data);
   }
 
+  // TODO: cache
   public static async insert(
     projectUser: Partial<ProjectUser>,
     ncMeta = Noco.ncMeta
@@ -31,10 +38,24 @@ export default class ProjectUser {
   //   // return await ncMeta.metaUpdate(null, null, MetaTable.USERS, id, insertObj);
   // }
   static async get(projectId: string, userId: string, ncMeta = Noco.ncMeta) {
-    return await ncMeta.metaGet2(null, null, MetaTable.PROJECT_USERS, {
-      fk_user_id: userId,
-      project_id: projectId
-    });
+    let projectUser =
+      projectId &&
+      userId &&
+      (await NocoCache.get(
+        `${CacheScope.PROJECT_USER}:${projectId}:${userId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!projectUser) {
+      projectUser = await ncMeta.metaGet2(null, null, MetaTable.PROJECT_USERS, {
+        fk_user_id: userId,
+        project_id: projectId
+      });
+      await NocoCache.set(
+        `${CacheScope.PROJECT_USER}:${projectId}:${userId}`,
+        projectUser
+      );
+    }
+    return projectUser;
   }
 
   public static async getUsersList(
@@ -103,6 +124,13 @@ export default class ProjectUser {
   }
 
   static async update(projectId, userId, roles: string, ncMeta = Noco.ncMeta) {
+    // get existing cache
+    const key = `${CacheScope.PROJECT_USER}:${projectId}:${userId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    o.roles = roles;
+    // set cache
+    await NocoCache.set(key, o);
+    // set meta
     return await ncMeta.metaUpdate(
       null,
       null,
@@ -118,6 +146,11 @@ export default class ProjectUser {
   }
 
   static async delete(projectId: string, userId, ncMeta = Noco.ncMeta) {
+    await NocoCache.deepDel(
+      CacheScope.PROJECT_USER,
+      `${CacheScope.PROJECT_USER}:${projectId}:${userId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     return await ncMeta.metaDelete(null, null, MetaTable.PROJECT_USERS, {
       fk_user_id: userId,
       project_id: projectId
