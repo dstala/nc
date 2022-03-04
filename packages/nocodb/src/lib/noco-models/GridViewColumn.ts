@@ -41,11 +41,11 @@ export default class GridViewColumn implements GridColumnType {
     return views?.map(v => new GridViewColumn(v));
   }
 
-  public static async get(viewId: string) {
+  public static async get(gridViewColumnId: string) {
     let view =
-      viewId &&
+      gridViewColumnId &&
       (await NocoCache.get(
-        `${CacheScope.GRID_VIEW_COLUMN}:${viewId}`,
+        `${CacheScope.GRID_VIEW_COLUMN}:${gridViewColumnId}`,
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
@@ -53,11 +53,12 @@ export default class GridViewColumn implements GridColumnType {
         null,
         null,
         MetaTable.GRID_VIEW_COLUMNS,
-        {
-          fk_view_id: viewId
-        }
+        gridViewColumnId
       );
-      await NocoCache.set(`${CacheScope.GRID_VIEW_COLUMN}:${viewId}`, view);
+      await NocoCache.set(
+        `${CacheScope.GRID_VIEW_COLUMN}:${gridViewColumnId}`,
+        view
+      );
     }
     return view && new GridViewColumn(view);
   }

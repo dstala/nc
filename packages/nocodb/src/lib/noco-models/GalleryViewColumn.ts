@@ -18,18 +18,24 @@ export default class GalleryViewColumn {
     Object.assign(this, data);
   }
 
-  public static async get(viewId: string) {
+  public static async get(galleryViewColumnId: string) {
     let view =
-      viewId &&
+      galleryViewColumnId &&
       (await NocoCache.get(
-        `${CacheScope.GALLERY_VIEW_COLUMN}:${viewId}`,
+        `${CacheScope.GALLERY_VIEW_COLUMN}:${galleryViewColumnId}`,
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.GALLERY_VIEW, {
-        fk_view_id: viewId
-      });
-      await NocoCache.set(`${CacheScope.GALLERY_VIEW_COLUMN}:${viewId}`, view);
+      view = await Noco.ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.GALLERY_VIEW_COLUMNS,
+        galleryViewColumnId
+      );
+      await NocoCache.set(
+        `${CacheScope.GALLERY_VIEW_COLUMN}:${galleryViewColumnId}`,
+        view
+      );
     }
     return view && new GalleryViewColumn(view);
   }
