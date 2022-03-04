@@ -14,14 +14,16 @@ export default class NocoCache {
     }
     if (process.env.NC_REDIS_URL) {
       this.client = new RedisCacheMgr(process.env.NC_REDIS_URL);
+    } else if (process.env.NC_REDIS_MOCK_URL) {
+      this.client = new RedisMockCacheMgr(process.env.NC_REDIS_MOCK_URL);
     } else {
-      this.client = new RedisMockCacheMgr({});
+      this.cacheDisabled = true;
     }
   }
 
-  public static async set(key, value, ttl?): Promise<boolean> {
+  public static async set(key, value): Promise<boolean> {
     if (this.cacheDisabled) return Promise.resolve(true);
-    return this.client.set(key, value, ttl);
+    return this.client.set(key, value);
   }
 
   public static async get(key, type): Promise<any> {
