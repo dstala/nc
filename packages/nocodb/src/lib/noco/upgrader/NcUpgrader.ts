@@ -19,7 +19,7 @@ export default class NcUpgrader {
     this.log(`upgrade :`);
 
     try {
-      await ctx.ncMeta.startTransaction();
+      ctx.ncMeta = await ctx.ncMeta.startTransaction();
 
       const NC_VERSIONS: any[] = [
         { name: '0009000', handler: null },

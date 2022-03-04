@@ -113,7 +113,7 @@ async function projectCreate(
     await ProjectUser.insert({
       fk_user_id: (req as any).user.id,
       project_id: project.id,
-      roles: 'creator'
+      roles: 'owner'
     });
 
     // await ProjectMgrv2.getSqlMgr(project).projectOpenByWeb();

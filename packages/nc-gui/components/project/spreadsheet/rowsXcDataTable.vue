@@ -653,6 +653,7 @@
       :nodes="nodes"
       :type="featureType"
       :table="table"
+      :meta="meta"
     />
   </v-container>
 </template>
@@ -1337,6 +1338,7 @@ export default {
       this.loadTableDataDeb(this)
     },
     async loadTableDataFn() {
+      if (this.isForm) { return }
       this.loadingData = true
       try {
         // if (this.api) {

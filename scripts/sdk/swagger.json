@@ -1697,7 +1697,7 @@
       ],
       "post": {
         "summary": "",
-        "operationId": "share-view",
+        "operationId": "share-view-create",
         "responses": {
           "200": {
             "description": "OK",
@@ -1721,7 +1721,7 @@
       },
       "put": {
         "summary": "",
-        "operationId": "set-shared-view-password",
+        "operationId": "shared-view-update",
         "responses": {
           "200": {
             "description": "OK",
@@ -1755,10 +1755,43 @@
       },
       "delete": {
         "summary": "",
-        "operationId": "delete-shared-view",
+        "operationId": "shared-view-delete",
         "responses": {
           "200": {
             "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/tables/{viewId}/share": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "shared-view-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
           }
         },
         "description": "",

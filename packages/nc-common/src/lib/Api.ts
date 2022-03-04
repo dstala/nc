@@ -587,7 +587,7 @@ export interface ViewHideAllColumnParamsType {
 
 export type ViewColumnUpdatePayloadType = any;
 
-export interface SetSharedViewPasswordPayloadType {
+export interface SharedViewUpdatePayloadType {
   password?: string;
 }
 
@@ -1752,11 +1752,11 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name ShareView
+     * @name ShareViewCreate
      * @request POST:/views/{viewId}/share
      * @response `200` `{ uuid?: string }` OK
      */
-    shareView: (viewId: string, params: RequestParams = {}) =>
+    shareViewCreate: (viewId: string, params: RequestParams = {}) =>
       this.request<{ uuid?: string }, any>({
         path: `/views/${viewId}/share`,
         method: 'POST',
@@ -1768,13 +1768,13 @@ export class Api<
      * No description
      *
      * @tags meta
-     * @name SetSharedViewPassword
+     * @name SharedViewUpdate
      * @request PUT:/views/{viewId}/share
      * @response `200` `SharedViewType` OK
      */
-    setSharedViewPassword: (
+    sharedViewUpdate: (
       viewId: string,
-      data: SetSharedViewPasswordPayloadType,
+      data: SharedViewUpdatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<SharedViewType, any>({
@@ -1790,14 +1790,30 @@ export class Api<
      * No description
      *
      * @tags meta
-     * @name DeleteSharedView
+     * @name SharedViewDelete
      * @request DELETE:/views/{viewId}/share
      * @response `200` `void` OK
      */
-    deleteSharedView: (viewId: string, params: RequestParams = {}) =>
+    sharedViewDelete: (viewId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/share`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name SharedViewList
+     * @request GET:/tables/{viewId}/share
+     * @response `200` `(any)[]` OK
+     */
+    sharedViewList: (viewId: string, params: RequestParams = {}) =>
+      this.request<any[], any>({
+        path: `/tables/${viewId}/share`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 

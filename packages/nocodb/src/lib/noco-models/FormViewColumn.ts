@@ -104,12 +104,14 @@ export default class FormViewColumn implements FormColumnType {
     // get existing cache
     const key = `${CacheScope.FORM_VIEW_COLUMN}:${columnId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    o.label = body.label;
-    o.help = body.help;
-    o.description = body.description;
-    o.required = body.required;
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      o.label = body.label;
+      o.help = body.help;
+      o.description = body.description;
+      o.required = body.required;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // update meta
     await Noco.ncMeta.metaUpdate(
       null,

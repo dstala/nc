@@ -52,13 +52,17 @@
         v-else-if="type === 'view-columns'"
         :nodes="nodes"
       />
-
-      <shared-views-list
+      <template
         v-else-if="type === 'shared-views'"
-        :selected-view="selectedView"
-        :model-name="table"
-        :nodes="nodes"
-      />
+      >
+        <shared-views-list
+          v-if="show"
+          :selected-view="selectedView"
+          :model-name="table"
+          :nodes="nodes"
+          :meta="meta"
+        />
+      </template>
 
       <!--      </v-card-text>-->
       <!--    </v-card>-->
@@ -79,7 +83,7 @@ import SharedViewsList from '@/components/project/spreadsheet/components/sharedV
 export default {
   name: 'AdditionalFeatures',
   components: { SharedViewsList, ViewColumns, Validation, Webhooks, Triggers, Indexes, Columns, TableAcl },
-  props: ['value', 'nodes', 'type', 'deleteTable', 'table', 'selectedView'],
+  props: ['value', 'nodes', 'type', 'deleteTable', 'table', 'selectedView', 'meta'],
   computed: {
     show: {
       set(v) {

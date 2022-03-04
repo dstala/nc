@@ -255,7 +255,8 @@ type XcConditionStr = {
     | string
     | number
     | boolean
-    | Date;
+    | Date
+    | null;
 };
 
 interface XcCondition {
