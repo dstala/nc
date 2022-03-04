@@ -525,52 +525,63 @@ export default class Column implements ColumnType {
       case UITypes.Lookup: {
         // LookupColumn.insert()
 
-        const row = await ncMeta.metaDelete(null, null, MetaTable.COL_LOOKUP, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_LOOKUP, {
           fk_column_id: colId
         });
-        await NocoCache.set(`${CacheScope.COL_LOOKUP}:${colId}`, row);
+        await NocoCache.deepDel(
+          CacheScope.COL_LOOKUP,
+          `${CacheScope.COL_LOOKUP}:${colId}`,
+          CacheDelDirection.CHILD_TO_PARENT
+        );
         break;
       }
       case UITypes.Rollup: {
-        const row = await ncMeta.metaDelete(null, null, MetaTable.COL_ROLLUP, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_ROLLUP, {
           fk_column_id: colId
         });
-        await NocoCache.set(`${CacheScope.COL_ROLLUP}:${colId}`, row);
+        await NocoCache.deepDel(
+          CacheScope.COL_ROLLUP,
+          `${CacheScope.COL_ROLLUP}:${colId}`,
+          CacheDelDirection.CHILD_TO_PARENT
+        );
         break;
       }
 
       case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord: {
-        const row = await ncMeta.metaDelete(
-          null,
-          null,
-          MetaTable.COL_RELATIONS,
-          {
-            fk_column_id: colId
-          }
+        await ncMeta.metaDelete(null, null, MetaTable.COL_RELATIONS, {
+          fk_column_id: colId
+        });
+        await NocoCache.deepDel(
+          CacheScope.COL_RELATION,
+          `${CacheScope.COL_RELATION}:${colId}`,
+          CacheDelDirection.CHILD_TO_PARENT
         );
-        await NocoCache.set(`${CacheScope.COL_RELATION}:${colId}`, row);
         break;
       }
       case UITypes.Formula: {
-        const row = await ncMeta.metaDelete(null, null, MetaTable.COL_FORMULA, {
+        await ncMeta.metaDelete(null, null, MetaTable.COL_FORMULA, {
           fk_column_id: colId
         });
-        await NocoCache.set(`${CacheScope.COL_FORMULA}:${colId}`, row);
+
+        await NocoCache.deepDel(
+          CacheScope.COL_FORMULA,
+          `${CacheScope.COL_FORMULA}:${colId}`,
+          CacheDelDirection.CHILD_TO_PARENT
+        );
         break;
       }
 
       case UITypes.MultiSelect:
       case UITypes.SingleSelect: {
-        const row = await ncMeta.metaDelete(
-          null,
-          null,
-          MetaTable.COL_SELECT_OPTIONS,
-          {
-            fk_column_id: colId
-          }
+        await ncMeta.metaDelete(null, null, MetaTable.COL_SELECT_OPTIONS, {
+          fk_column_id: colId
+        });
+        await NocoCache.deepDel(
+          CacheScope.COL_SELECT_OPTION,
+          `${CacheScope.COL_SELECT_OPTION}:${colId}`,
+          CacheDelDirection.CHILD_TO_PARENT
         );
-        await NocoCache.set(`${CacheScope.COL_SELECT_OPTION}:${colId}`, row);
         break;
       }
     }
