@@ -653,6 +653,7 @@
       :nodes="nodes"
       :type="featureType"
       :table="table"
+      :meta="meta"
     />
   </v-container>
 </template>

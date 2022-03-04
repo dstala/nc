@@ -707,4 +707,22 @@ export default class View implements ViewType {
   async delete() {
     await View.delete(this.id);
   }
+
+  static async shareViewList(tableId, ncMeta = Noco.ncMeta) {
+    // todo: redis get
+    const sharedViews = await ncMeta.metaList2(null, null, MetaTable.VIEWS, {
+      xcCondition: {
+        fk_model_id: {
+          eq: tableId
+        },
+        _not: {
+          uuid: {
+            eq: null
+          }
+        }
+      }
+    });
+
+    return sharedViews?.map(v => new View(v));
+  }
 }

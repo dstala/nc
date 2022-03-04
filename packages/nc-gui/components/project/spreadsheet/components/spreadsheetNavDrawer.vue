@@ -895,7 +895,7 @@ export default {
       //     password: this.sharedViewPassword
       //   }
       // ])
-      const shared = (await this.$api.meta.shareView(this.selectedViewId)).data
+      const shared = (await this.$api.meta.shareViewCreate(this.selectedViewId)).data
 
       // todo: url
       this.shareLink = shared
