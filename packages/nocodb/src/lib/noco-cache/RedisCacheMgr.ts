@@ -26,6 +26,13 @@ export default class RedisCacheMgr extends CacheMgr {
       try {
         const o = JSON.parse(res);
         if (typeof o === 'object') {
+          if (
+            o &&
+            Object.keys(o).length === 0 &&
+            Object.getPrototypeOf(o) === Object.prototype
+          ) {
+            console.log(`RedisCacheMgr::get: object is empty!`);
+          }
           return Promise.resolve(o);
         }
       } catch (e) {
@@ -36,6 +43,7 @@ export default class RedisCacheMgr extends CacheMgr {
       return await this.client.get(key);
     }
     throw Error(`Invalid CacheGetType: ${type}`);
+    return Promise.resolve(true);
   }
 
   // @ts-ignore
@@ -99,12 +107,14 @@ export default class RedisCacheMgr extends CacheMgr {
     subListKeys: string[],
     list: any[]
   ): Promise<boolean> {
-    if (!list.length) {
-      console.log('RedisCacheMgr::setList: List is empty. Skipping ...');
-      return Promise.resolve(true);
-    }
     // remove null from arrays
     subListKeys = subListKeys.filter(k => k);
+    if (!list.length) {
+      console.log(
+        `RedisCacheMgr::setList: List is empty for ${subListKeys}. Skipping ...`
+      );
+      return Promise.resolve(true);
+    }
     // construct key for List
     // e.g. <scope>:<project_id_1>:<base_id_1>:list
     const listKey =
