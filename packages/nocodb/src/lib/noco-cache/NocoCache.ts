@@ -27,8 +27,8 @@ export default class NocoCache {
   public static async get(key, type): Promise<any> {
     if (this.cacheDisabled) {
       if (type === CacheGetType.TYPE_ARRAY) return Promise.resolve([]);
-      else if (type === CacheGetType.TYPE_OBJECT) return Promise.resolve({});
-      return Promise.resolve();
+      else if (type === CacheGetType.TYPE_OBJECT) return Promise.resolve(null);
+      return Promise.resolve(null);
     }
     return this.client.get(key, type);
   }
