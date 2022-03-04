@@ -717,16 +717,26 @@ export default {
       await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
     },
     isDbRequired(column) {
-      if (hiddenCols.includes(column.id)) {
+      if (hiddenCols.includes(column.fk_column_id)) {
         return true
       }
+
       let isRequired =
-        (!isVirtualCol(column) && column.rqd && !column.cdf && this.meta.columns.every(
-          c => c.uidt === UITypes.LinkToAnotherRecord &&
-            c.colOptions.type === RelationTypes.BELONGS_TO &&
-            column.id !== c.colOptions.fk_child_column_id
-        )) ||
-        (column.pk && !(column.ai || column.default))
+        (
+          // confirm column is not virtual
+          !isVirtualCol(column) &&
+          // column required / not null
+          column.rqd &&
+          // column default value
+          !column.cdf &&
+          // confirm it's not foreign key
+          !this.meta.columns.some(
+            c => c.uidt === UITypes.LinkToAnotherRecord &&
+              c.colOptions.type === RelationTypes.BELONGS_TO &&
+              column.fk_column_id === c.colOptions.fk_child_column_id
+          )) ||
+        // primary column
+        (column.pk && !(column.ai || column.cdf))
 
       if (column.uidt === UITypes.LinkToAnotherRecord && column.colOptions.type === RelationTypes.BELONGS_TO) {
         const col = this.meta.columns.find(c => c.id === column.colOptions.fk_child_column_id)
