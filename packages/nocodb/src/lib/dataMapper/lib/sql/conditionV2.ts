@@ -192,6 +192,11 @@ const parseConditionV2 = async (
         builder
       );
     } else {
+      if (
+        filter.comparison_op === 'empty' ||
+        filter.comparison_op === 'noempty'
+      )
+        filter.value = '';
       const field = customWhereClause
         ? filter.value
         : alias
@@ -232,12 +237,19 @@ const parseConditionV2 = async (
           case 'le':
             qb = qb.where(field, customWhereClause ? '>=' : '<=', val);
             break;
-          // case 'in':
-          //   qb = qb.whereIn(fieldName, val);
-          //   break;
-          // case 'nin':
-          //   qb = qb.whereNotIn(fieldName, val);
-          //   break;
+
+          case 'empty':
+            qb = qb.where(field, val);
+            break;
+          case 'notempty':
+            qb = qb.whereNot(field, val);
+            break;
+          case 'null':
+            qb = qb.whereNull(customWhereClause || field);
+            break;
+          case 'notnull':
+            qb = qb.whereNotNull(customWhereClause || field);
+            break;
         }
       };
     }

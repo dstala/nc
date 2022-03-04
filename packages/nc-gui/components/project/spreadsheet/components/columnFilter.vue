@@ -140,7 +140,7 @@
               <span class="caption font-weight-regular">{{ item.text }}</span>
             </template>
           </v-select>
-          <span v-if="['is null', 'is not null'].includes(filter.op)" :key="'span' + i" />
+          <span v-if="['null', 'notnull', 'empty', 'notempty'].includes(filter.comparison_op)" :key="'span' + i" />
           <v-checkbox
             v-else-if="types[filter.field] === 'boolean'"
             :key="i + '_7'"
@@ -218,8 +218,10 @@ export default {
       { text: 'is not equal', value: 'neq' },
       { text: 'is like', value: 'like' },
       { text: 'is not like', value: 'nlike' },
-      // 'is empty', 'is not empty',
-      // 'is null', 'is not null',
+      { text: 'is empty', value: 'empty', ignoreVal: true },
+      { text: 'is not empty', value: 'notempty', ignoreVal: true },
+      { text: 'is null', value: 'null', ignoreVal: true },
+      { text: 'is not null', value: 'notnull', ignoreVal: true },
       { text: '>', value: 'gt' },
       { text: '<', value: 'lt' },
       { text: '>=', value: 'gte' },

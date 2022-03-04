@@ -303,6 +303,7 @@
           <template v-if=" selectedView.type === viewTypes.GRID">
             <xc-grid-view
               ref="ncgridview"
+              :loading="loadingData"
               :is-view="isView"
               droppable
               :relation-type="relationType"

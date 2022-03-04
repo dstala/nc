@@ -7,6 +7,7 @@ import slash from 'slash';
 import mimetypes, { mimeIcons } from '../../../utils/mimeTypes';
 import Local from '../../plugins/adapters/storage/Local';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import catchError from './helpers/catchError';
 
 // todo:  use plugin manager
 const storageAdapter = new Local();
@@ -79,5 +80,5 @@ router.post(
   }).any(),
   ncMetaAclMw(upload)
 );
-router.get('/download/:projectId/:viewId/:fileName', ncMetaAclMw(fileRead));
+router.get('/download/:projectId/:viewId/:fileName', catchError(fileRead));
 export default router;

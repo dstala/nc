@@ -9,7 +9,7 @@ async function xcVisibilityMetaSetAll(req, res) {
       const dataInDb = await ModelRoleVisibility.get({
         role,
         // fk_model_id: d.fk_model_id,
-        fk_view_id: d.fk_view_id
+        fk_view_id: d.id
       });
       if (dataInDb) {
         if (d.disabled[role]) {
@@ -23,7 +23,7 @@ async function xcVisibilityMetaSetAll(req, res) {
         }
       } else if (d.disabled[role]) {
         await ModelRoleVisibility.insert({
-          fk_view_id: d.fk_view_id,
+          fk_view_id: d.id,
           disabled: d.disabled[role],
           role
         });
