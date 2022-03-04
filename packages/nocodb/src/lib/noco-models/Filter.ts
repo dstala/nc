@@ -132,7 +132,7 @@ export default class Filter {
       },
       id
     );
-    await NocoCache.set(`${CacheScope.FILTER_EXP}:${id}`, filter);
+    // TODO: update cache
   }
 
   static async delete(id: string) {

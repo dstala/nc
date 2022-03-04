@@ -218,13 +218,16 @@ export default {
     },
     async confirmResetPlugin() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginSet', {
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginSet', {
+        //   input: null,
+        //   id: this.resetPluginRef.id,
+        //   title: this.resetPluginRef.title,
+        //   uninstall: true
+        // }])
+        await this.$api.meta.pluginUpdate(this.resetPluginRef.id, {
           input: null,
-          id: this.resetPluginRef.id,
-          title: this.resetPluginRef.title,
-          uninstall: true
-        }])
-
+          active: 0
+        })
         this.$toast.success('Plugin uninstalled successfully').goAway(5000)
         await this.loadPluginList()
       } catch (e) {

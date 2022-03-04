@@ -612,9 +612,11 @@ export default class Column implements ColumnType {
     // get existing cache
     const key = `${CacheScope.COLUMN}:${colId}`;
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    o = { ...o, ...updateObj };
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     await ncMeta.metaUpdate(null, null, MetaTable.COLUMNS, updateObj, colId);
     await this.insertColOption(column, colId, ncMeta);

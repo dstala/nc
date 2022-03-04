@@ -81,19 +81,21 @@ export default class GalleryView implements GalleryType {
     // get existing cache
     const key = `${CacheScope.GALLERY_VIEW}:${galleryId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    o.title = body.title;
-    o.next_enabled = body.next_enabled;
-    o.prev_enabled = body.prev_enabled;
-    o.cover_image_idx = body.cover_image_idx;
-    o.cover_image = body.cover_image;
-    o.restrict_types = body.restrict_types;
-    o.restrict_size = body.restrict_size;
-    o.restrict_number = body.restrict_number;
-    o.columns = body.columns;
-    o.fk_model_id = body.fk_model_id;
-    o.fk_cover_image_col_id = body.fk_cover_image_col_id;
-    // set cache
-    await NocoCache.set(key, o);
+    if(o) {
+      o.title = body.title;
+      o.next_enabled = body.next_enabled;
+      o.prev_enabled = body.prev_enabled;
+      o.cover_image_idx = body.cover_image_idx;
+      o.cover_image = body.cover_image;
+      o.restrict_types = body.restrict_types;
+      o.restrict_size = body.restrict_size;
+      o.restrict_number = body.restrict_number;
+      o.columns = body.columns;
+      o.fk_model_id = body.fk_model_id;
+      o.fk_cover_image_col_id = body.fk_cover_image_col_id;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // update meta
     return await Noco.ncMeta.metaUpdate(
       null,

@@ -424,7 +424,6 @@ export default class View implements ViewType {
     },
     ncMeta = Noco.ncMeta
   ): Promise<Array<GridViewColumn | any>> {
-    const columns: Array<GridViewColumn | any> = [];
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);
 
@@ -444,16 +443,15 @@ export default class View implements ViewType {
         },
         existingCol.id
       );
+      return { ...existingCol, ...colData };
     } else {
-      await ncMeta.metaInsert2(null, null, table, {
+      return await ncMeta.metaInsert2(null, null, table, {
         fk_view_id: viewId,
         fk_column_id: fkColId,
         order: colData.order,
         show: colData.show
       });
     }
-
-    return columns;
   }
 
   static async getByUUID(uuid: string, ncMeta = Noco.ncMeta) {

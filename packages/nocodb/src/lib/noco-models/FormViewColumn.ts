@@ -80,11 +80,11 @@ export default class FormViewColumn implements FormColumnType {
   }
 
   public static async list(viewId: string): Promise<FormViewColumn[]> {
-    const views = await NocoCache.getList(CacheScope.FORM_VIEW_COLUMN, [
+    let viewColumns = await NocoCache.getList(CacheScope.FORM_VIEW_COLUMN, [
       viewId
     ]);
-    if (!views.length) {
-      const views = await Noco.ncMeta.metaList2(
+    if (!viewColumns.length) {
+      viewColumns = await Noco.ncMeta.metaList2(
         null,
         null,
         MetaTable.FORM_VIEW_COLUMNS,
@@ -97,10 +97,14 @@ export default class FormViewColumn implements FormColumnType {
           }
         }
       );
-      await NocoCache.setList(CacheScope.FORM_VIEW_COLUMN, [viewId], views);
+      await NocoCache.setList(
+        CacheScope.FORM_VIEW_COLUMN,
+        [viewId],
+        viewColumns
+      );
     }
 
-    return views?.map(v => new FormViewColumn(v));
+    return viewColumns?.map(v => new FormViewColumn(v));
   }
 
   static async update(columnId: string, body: Partial<FormViewColumn>) {

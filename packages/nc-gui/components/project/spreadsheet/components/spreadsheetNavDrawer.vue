@@ -750,7 +750,7 @@ export default {
     },
     async saveShareLinkPassword() {
       try {
-        await this.$api.meta.setSharedViewPassword(this.shareLink.id, {
+        await this.$api.meta.sharedViewUpdate(this.shareLink.id, {
           password: this.shareLink.password
         })
 

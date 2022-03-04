@@ -123,7 +123,7 @@
                             @updateCol="updateCol"
                           />
                           <div
-                            v-if="$v.virtual && $v.virtual.$dirty && $v.virtual[col.alias] && (!$v.virtual[col.alias].required || !$v.virtual[col.alias].minLength)"
+                            v-if="$v.virtual && $v.virtual.$dirty && $v.virtual[col._cn] && (!$v.virtual[col._cn].required || !$v.virtual[col._cn].minLength)"
                             class="error--text caption"
                           >
                             Field is required.
@@ -229,7 +229,7 @@
 
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
-import { ErrorMessages, isVirtualCol, UITypes } from 'nc-common'
+import { ErrorMessages, isVirtualCol, RelationTypes, UITypes } from 'nc-common'
 import form from '../mixins/form'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
@@ -379,7 +379,7 @@ export default {
     async save() {
       try {
         this.$v.$touch()
-        if (this.$v.localState.$invalid) {
+        if (this.$v.localState.$invalid || this.$v.virtual.$invalid) {
           this.$toast.error('Provide values of all required field').goAway(3000)
           return
         }
@@ -451,27 +451,25 @@ export default {
       virtual: {}
     }
     for (const column of this.columns) {
-      if (!this.localParams || !this.localParams.fields || !this.localParams.fields[column.alias]) {
-        continue
-      }
-      if (!column.virtual && (((column.rqd || column.notnull) && !column.default) || (column.pk && !(column.ai || column.default)) || this.localParams.fields[column.alias].required)) {
+      // debugger
+      // if (!this.localParams || !this.localParams.fields || !this.localParams.fields[column.alias]) {
+      //   continue
+      // }
+      if (!isVirtualCol(column) && (((column.rqd || column.notnull) && !column.cdf) || (column.pk && !(column.ai || column.cdf)) || column.required)) {
         obj.localState[column._cn] = { required }
-      } else if (column.bt) {
-        const col = this.meta.columns.find(c => c.cn === column.bt.cn)
+      } else if (column.uidt === UITypes.LinkToAnotherRecord && column.colOptions && column.colOptions.type === RelationTypes.BELONGS_TO) {
+        const col = this.meta.columns.find(c => c.id === column.colOptions.fk_child_column_id)
 
-        console.log(col, this.meta.columns, column)
-
-        if ((col.rqd && !col.default) || this.localParams.fields[column.alias].required) {
+        if ((col.rqd && !col.cdf) || column.required) {
           obj.localState[col._cn] = { required }
         }
-      } else if (column.virtual && this.localParams.fields[column.alias].required && (column.mm || column.hm)) {
-        obj.virtual[column.alias] = {
+      } else if (isVirtualCol(column) && column.required) {
+        obj.virtual[column._cn] = {
           minLength: minLength(1),
           required
         }
       }
     }
-
     return obj
   }
 }

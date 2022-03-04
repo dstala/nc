@@ -127,9 +127,11 @@ export default class ProjectUser {
     // get existing cache
     const key = `${CacheScope.PROJECT_USER}:${projectId}:${userId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    o.roles = roles;
-    // set cache
-    await NocoCache.set(key, o);
+    if (o) {
+      o.roles = roles;
+      // set cache
+      await NocoCache.set(key, o);
+    }
     // set meta
     return await ncMeta.metaUpdate(
       null,
