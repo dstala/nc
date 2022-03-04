@@ -109,18 +109,18 @@ export default class RedisCacheMgr extends CacheMgr {
   ): Promise<boolean> {
     // remove null from arrays
     subListKeys = subListKeys.filter(k => k);
-    if (!list.length) {
-      console.log(
-        `RedisCacheMgr::setList: List is empty for ${subListKeys}. Skipping ...`
-      );
-      return Promise.resolve(true);
-    }
     // construct key for List
     // e.g. <scope>:<project_id_1>:<base_id_1>:list
     const listKey =
       subListKeys.length === 0
         ? `${scope}:list`
         : `${scope}:${subListKeys.join(':')}:list`;
+    if (!list.length) {
+      console.log(
+        `RedisCacheMgr::setList: List is empty for ${listKey}. Skipping ...`
+      );
+      return Promise.resolve(true);
+    }
     // fetch existing list
     const listOfGetKeys =
       (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
@@ -189,7 +189,10 @@ export default class RedisCacheMgr extends CacheMgr {
     // remove null from arrays
     subListKeys = subListKeys.filter(k => k);
     // e.g. key = <scope>:<project_id_1>:<base_id_1>:list
-    const listKey = `${scope}:${subListKeys.join(':')}:list`;
+    const listKey =
+      subListKeys.length === 0
+        ? `${scope}:list`
+        : `${scope}:${subListKeys.join(':')}:list`;
     console.log(`RedisCacheMgr::appendToList: append key ${key} to ${listKey}`);
     const list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
     list.push(key);
