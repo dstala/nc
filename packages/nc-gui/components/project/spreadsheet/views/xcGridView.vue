@@ -297,6 +297,7 @@ export default {
   },
   mixins: [colors],
   props: {
+    loading: Boolean,
     droppable: Boolean,
     isView: Boolean,
     metas: Object,
@@ -431,7 +432,7 @@ export default {
       this.$emit('drop', event)
     },
     isRequired(_columnObj, rowObj, ignoreCurrentValue = false) {
-      if (this.isPublicView) {
+      if (this.isPublicView || this.loading) {
         return false
       }
 

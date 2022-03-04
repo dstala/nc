@@ -220,7 +220,12 @@ export default {
       }
     },
     columnMeta() {
-      return this.meta && this.meta.columns ? this.meta.columns.reduce((o, c) => ({ ...o, [c._cn]: c }), {}) : {}
+      return this.meta && this.meta.columns
+        ? this.meta.columns.reduce((o, c) => ({
+          ...o,
+          [c._cn]: c
+        }), {})
+        : {}
     },
 
     isAnyFieldHidden() {
@@ -249,7 +254,9 @@ export default {
     },
     showFields: {
       handler(v) {
-        this.$emit('input', v)
+        this.$nextTick(() => {
+          this.$emit('input', v)
+        })
       },
       deep: true
     },
@@ -283,7 +290,10 @@ export default {
       let order = 1
       if (this.viewId) {
         const data = await this.$api.meta.viewColumnList(this.viewId)
-        const fieldById = data.data.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
+        const fieldById = data.data.reduce((o, f) => ({
+          ...o,
+          [f.fk_column_id]: f
+        }), {})
         fields = this.meta.columns.map(c => ({
           _cn: c._cn,
           fk_column_id: c.id,
@@ -297,7 +307,10 @@ export default {
 
       this.fields = fields
 
-      this.$emit('input', this.fields.reduce((o, c) => ({ ...o, [c._cn]: c.show }), {}))
+      this.$emit('input', this.fields.reduce((o, c) => ({
+        ...o,
+        [c._cn]: c.show
+      }), {}))
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     async saveOrUpdate(field, i) {
@@ -309,28 +322,32 @@ export default {
         }
       }
       this.$emit('updated')
-      this.$emit('input', this.fields.reduce((o, c) => ({ ...o, [c._cn]: c.show }), {}))
+      this.$emit('input', this.fields.reduce((o, c) => ({
+        ...o,
+        [c._cn]: c.show
+      }), {}))
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     async showAll() {
-      await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
+      await this.$api.meta.viewShowAllColumn({ viewId: this.viewId })
       for (const f of this.fields) {
         f.show = true
       }
+      this.$emit('updated')
+
       // eslint-disable-next-line no-return-assign,no-sequences
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = true, o), {})
-
-      this.$emit('updated')
     },
     async hideAll() {
-      await this.$api.meta.viewShowAllColumn({ viewId: this.viewId })
+      await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
       for (const f of this.fields) {
         f.show = false
       }
-      // eslint-disable-next-line no-return-assign,no-sequences
-      this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = false, o), {})
-
       this.$emit('updated')
+
+      this.$nextTick(() => {
+        this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = false, o), {})
+      })
     },
     onMove(event) {
       if (this.fields.length - 1 === event.moved.newIndex) {
