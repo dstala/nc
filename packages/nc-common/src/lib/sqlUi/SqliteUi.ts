@@ -1,3 +1,5 @@
+import UITypes from "../UITypes";
+
 const dbTypes = [
   'int',
   'integer',
@@ -88,7 +90,7 @@ export class SqliteUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'CreateTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       },
@@ -110,7 +112,7 @@ export class SqliteUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'LastModifiedTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       }

@@ -1,3 +1,5 @@
+import UITypes from "../UITypes";
+
 const dbTypes = [
   'bigint',
   'binary',
@@ -101,7 +103,7 @@ export class MssqlUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'CreateTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       },
@@ -123,7 +125,7 @@ export class MssqlUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'LastModifiedTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       }
@@ -1038,8 +1040,8 @@ export class MssqlUi {
   static getDataTypeForUiType(
     col
   ): {
-    dt: string;
-    [key: string]: any;
+    readonly dt: string;
+    readonly [key: string]: any;
   } {
     const colProp: any = {};
     switch (col.uidt) {

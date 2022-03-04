@@ -1,3 +1,5 @@
+import UITypes from "../UITypes";
+
 const dbTypes = [
   'int',
   'smallint',
@@ -105,7 +107,7 @@ export class MysqlUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'CreateTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       },
@@ -127,7 +129,7 @@ export class MysqlUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'LastModifiedTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       }

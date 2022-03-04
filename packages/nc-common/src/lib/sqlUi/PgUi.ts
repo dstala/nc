@@ -1,3 +1,5 @@
+import UITypes from "../UITypes";
+
 const dbTypes = [
   'int',
   'integer',
@@ -164,7 +166,7 @@ export class PgUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'CreateTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       },
@@ -187,7 +189,7 @@ export class PgUi {
         dtxp: '',
         dtxs: '',
         altered: 1,
-        uidt: 'LastModifiedTime',
+        uidt: UITypes.DateTime,
         uip: '',
         uicn: ''
       }
