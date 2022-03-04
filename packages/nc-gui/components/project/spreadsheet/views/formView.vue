@@ -56,7 +56,7 @@
                 <div class="d-flex">
                   <label :for="`data-table-form-${col._cn}`" class="body-2 text-capitalize flex-grow-1">
                     <virtual-header-cell
-                      v-if="col.virtual"
+                      v-if="isVirtualCol(col)"
                       class="caption"
                       :column="col"
                       :nodes="nodes"
@@ -251,7 +251,7 @@
 
                       </label>
                       <div
-                        v-if="col.virtual"
+                        v-if="isVirtualCol(col)"
                         @click.stop
                       >
                         <virtual-cell

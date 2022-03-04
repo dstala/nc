@@ -24,19 +24,22 @@ export default class FormViewColumn implements FormColumnType {
 
   uuid?: any;
 
-  public static async get(viewId: string) {
+  public static async get(formViewId: string) {
     let view =
-      viewId &&
+      formViewId &&
       (await NocoCache.get(
-        `${CacheScope.FORM_VIEW_COLUMN}:${viewId}`,
+        `${CacheScope.FORM_VIEW_COLUMN}:${formViewId}`,
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
-        fk_view_id: viewId
-      });
+      view = await Noco.ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.FORM_VIEW_COLUMNS,
+        formViewId
+      );
     }
-    await NocoCache.set(`${CacheScope.FORM_VIEW_COLUMN}:${viewId}`, view);
+    await NocoCache.set(`${CacheScope.FORM_VIEW_COLUMN}:${formViewId}`, view);
 
     return view && new FormViewColumn(view);
   }
