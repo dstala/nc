@@ -170,12 +170,14 @@ export default class View implements ViewType {
     const copyFormView =
       view.copy_from_id && (await View.get(view.copy_from_id));
 
-    const { id: view_id } = await ncMeta.metaInsert2(
+    const row = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.VIEWS,
       insertObj
     );
+    const view_id = row.id;
+    await NocoCache.set(`${CacheScope.VIEW}:${view_id}`, row);
 
     await NocoCache.appendToList(
       CacheScope.VIEW,
