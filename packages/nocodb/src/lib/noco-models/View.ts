@@ -646,6 +646,17 @@ export default class View implements ViewType {
   ) {
     const view = await this.get(viewId);
     const table = this.extractViewColumnsTableName(view);
+    const scope = this.extractViewColumnsTableNameScope(view);
+    // get existing cache
+    const key = `${scope}:${viewId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update alias
+      o.show = true;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     return await ncMeta.metaUpdate(
       null,
       null,
@@ -709,20 +720,22 @@ export default class View implements ViewType {
   }
 
   static async shareViewList(tableId, ncMeta = Noco.ncMeta) {
-    // todo: redis get
-    const sharedViews = await ncMeta.metaList2(null, null, MetaTable.VIEWS, {
-      xcCondition: {
-        fk_model_id: {
-          eq: tableId
-        },
-        _not: {
-          uuid: {
-            eq: null
+    let sharedViews = await NocoCache.getList(CacheScope.VIEW, [tableId]);
+    if (!sharedViews) {
+      sharedViews = await ncMeta.metaList2(null, null, MetaTable.VIEWS, {
+        xcCondition: {
+          fk_model_id: {
+            eq: tableId
+          },
+          _not: {
+            uuid: {
+              eq: null
+            }
           }
         }
-      }
-    });
-
+      });
+      await NocoCache.setList(CacheScope.VIEW, [tableId], sharedViews);
+    }
     return sharedViews?.map(v => new View(v));
   }
 }
