@@ -4734,10 +4734,7 @@
             "type": "number"
           },
           "columns": {
-            "type": [
-              "string",
-              "array"
-            ],
+            "type": "array",
             "items": {
               "$ref": "#/components/schemas/Column"
             }

@@ -223,7 +223,7 @@
         >
           mdi-circle-small
         </v-icon>
-        <x-icon
+        <x-iconq
           v-if="_isUIAllowed('table-delete')"
           icon.class="nc-table-delete-btn mx-1 mr-1"
           :disabled="isLocked"
@@ -233,7 +233,7 @@
           @click="checkAndDeleteTable"
         >
           mdi-delete-outline
-        </x-icon>
+        </x-iconq>
 
         <v-icon small class="ml-n2" color="grey lighten-1">
           mdi-circle-small

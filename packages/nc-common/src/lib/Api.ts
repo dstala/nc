@@ -155,7 +155,7 @@ export interface TableReqType {
   pinned?: boolean;
   deleted?: boolean;
   order?: number;
-  columns?: string | any[];
+  columns?: ColumnType[];
 }
 
 export interface TableListType {

@@ -1,7 +1,9 @@
-import { MysqlUi } from './MysqlUi';
-import { PgUi } from './PgUi';
+import UITypes from "../UITypes";
+
 import { MssqlUi } from './MssqlUi';
+import { MysqlUi } from './MysqlUi';
 import { OracleUi } from './OracleUi';
+import { PgUi } from './PgUi';
 import { SqliteUi } from './SqliteUi';
 
 // import {YugabyteUi} from "./YugabyteUi";
@@ -46,6 +48,28 @@ export class SqlUiFactory {
   }
 }
 
+export type SqlUIColumn = {
+  cn?: string;
+  dt?: string;
+  dtx?: string;
+  ct?: string;
+  nrqd?: boolean;
+  rqd?: boolean;
+  ck?: string;
+  pk?: boolean;
+  un?: boolean;
+  ai?: boolean;
+  cdf?: string | any;
+  clen?: number | any;
+  np?: string;
+  ns?: string;
+  dtxp?: string;
+  dtxs?: string;
+  uidt?: UITypes;
+  uip?: string;
+  uicn?: string;
+  altered?:number;
+};
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd
  *

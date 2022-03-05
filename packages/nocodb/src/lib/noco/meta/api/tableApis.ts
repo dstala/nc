@@ -17,7 +17,7 @@ import Audit from '../../../noco-models/Audit';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import { xcVisibilityMetaGet } from './modelVisibilityApis';
 import View from '../../../noco-models/View';
-
+import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
@@ -114,7 +114,9 @@ export async function tableCreate(
     const project = await Project.getWithInfo(req.params.projectId);
     const base = project.bases.find(b => b.id === req.params.baseId);
     const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
-
+    req.body.columns = req.body.columns?.map(c =>
+      getColumnPropsFromUIDT(c as any, base)
+    );
     await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
 
     const tables = await Model.list({
