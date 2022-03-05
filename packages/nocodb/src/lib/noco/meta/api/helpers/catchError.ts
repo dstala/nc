@@ -6,7 +6,7 @@ export default function(
       return await requestHandler(req, res, next);
     } catch (e) {
       // todo: error log
-      console.log(requestHandler.name, '::', e);
+      console.log(requestHandler.name ? `${requestHandler.name} ::` : '', e);
 
       if (e instanceof BasRequest) {
         return res.status(400).json({ msg: e.message });
