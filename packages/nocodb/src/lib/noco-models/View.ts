@@ -719,7 +719,7 @@ export default class View implements ViewType {
 
   static async shareViewList(tableId, ncMeta = Noco.ncMeta) {
     let sharedViews = await NocoCache.getList(CacheScope.VIEW, [tableId]);
-    if (!sharedViews) {
+    if (!sharedViews.length) {
       sharedViews = await ncMeta.metaList2(null, null, MetaTable.VIEWS, {
         xcCondition: {
           fk_model_id: {
