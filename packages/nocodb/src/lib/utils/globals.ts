@@ -3,6 +3,7 @@ export enum MetaTable {
   BASES = 'nc_bases_v2',
   MODELS = 'nc_models_v2',
   COLUMNS = 'nc_columns_v2',
+  COLUMN_VALIDATIONS = 'nc_columns_validations_v2',
   COL_PROPS = 'nc_col_props_v2',
   COL_RELATIONS = 'nc_col_relations_v2',
   COL_SELECT_OPTIONS = 'nc_col_select_options_v2',
@@ -74,5 +75,5 @@ export enum CacheGetType {
 
 export enum CacheDelDirection {
   PARENT_TO_CHILD = 'PARENT_TO_CHILD',
-  CHILD_TO_PARENT = 'CHILD_TO_PARENT',
+  CHILD_TO_PARENT = 'CHILD_TO_PARENT'
 }

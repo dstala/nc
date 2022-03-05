@@ -36,6 +36,7 @@ import {
   invokeWebhook,
   parseBody
 } from '../../../noco/meta/api/helpers/webhookHelpers';
+import Validator from 'validator';
 
 /**
  * Base class for models
@@ -1026,6 +1027,8 @@ class BaseModelSqlv2 {
     try {
       const insertObj = await this.model.mapAliasToColumn(data);
 
+      await this.validate(insertObj);
+
       if ('beforeInsert' in this) {
         await this.beforeInsert(insertObj, trx, cookie);
       }
@@ -1036,8 +1039,6 @@ class BaseModelSqlv2 {
       await this.model.getColumns();
       let response;
       // const driver = trx ? trx : this.dbDriver;
-
-      // await this.validate(insertObj);
 
       const query = this.dbDriver(this.tnPath).insert(insertObj);
 
@@ -1101,12 +1102,12 @@ class BaseModelSqlv2 {
     try {
       const updateObj = await this.model.mapAliasToColumn(data);
 
-      // await this.validate(data);
+      await this.validate(data);
 
       await this.beforeUpdate(data, trx, cookie);
 
       // const driver = trx ? trx : this.dbDriver;
-
+      //
       // this.validate(data);
       // await this._run(
       await this.dbDriver(this.tnPath)
@@ -1159,7 +1160,7 @@ class BaseModelSqlv2 {
     return this.dbDriver.clientType();
   }
 
-  async nestedInsert(data, trx = null) {
+  async nestedInsert(data, trx = null, cookie?) {
     const driver = trx ? trx : await this.dbDriver.transaction();
     try {
       const insertObj = await this.model.mapAliasToColumn(data);
@@ -1229,6 +1230,10 @@ class BaseModelSqlv2 {
         }
       }
 
+      await this.validate(insertObj);
+
+      await this.beforeInsert(insertObj, driver, cookie);
+
       let response;
       const query = this.dbDriver(this.tnPath).insert(insertObj);
 
@@ -1272,6 +1277,8 @@ class BaseModelSqlv2 {
       if (!trx) {
         await driver.commit();
       }
+
+      await this.afterInsert(response, driver, cookie);
 
       return response;
     } catch (e) {
@@ -1767,6 +1774,35 @@ class BaseModelSqlv2 {
   }
   // @ts-ignore
   protected async errorDelete(e, id, trx, cookie) {}
+
+  async validate(columns) {
+    await this.model.getColumns();
+    // let cols = Object.keys(this.columns);
+    for (let i = 0; i < this.model.columns.length; ++i) {
+      const column = this.model.columns[i];
+      const validate = column.getValidators();
+      const cn = column.cn;
+      if (!validate) continue;
+      const { func, msg } = validate;
+      for (let j = 0; j < func.length; ++j) {
+        const fn = typeof func[j] === 'string' ? Validator[func[j]] : func[j];
+        const arg =
+          typeof func[j] === 'string' ? columns[cn] + '' : columns[cn];
+        if (
+          columns[cn] !== null &&
+          columns[cn] !== undefined &&
+          columns[cn] !== '' &&
+          cn in columns &&
+          !(fn.constructor.name === 'AsyncFunction' ? await fn(arg) : fn(arg))
+        ) {
+          throw new Error(
+            msg[j].replace(/\{VALUE}/g, columns[cn]).replace(/\{cn}/g, cn)
+          );
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export { BaseModelSqlv2 };

@@ -52,6 +52,8 @@ export default class Column implements ColumnType {
 
   public order: number;
 
+  public validate: any;
+
   constructor(data: NcColumn) {
     Object.assign(this, data);
   }
@@ -66,7 +68,7 @@ export default class Column implements ColumnType {
     column: Partial<T> & { base_id?: string; [key: string]: any },
     ncMeta = Noco.ncMeta
   ) {
-    const insertObj = {
+    const insertObj: any = {
       fk_model_id: column.fk_model_id,
       cn: column.cn,
       _cn: column._cn || column.cn,
@@ -94,6 +96,13 @@ export default class Column implements ColumnType {
       project_id: column.project_id,
       base_id: column.base_id
     };
+
+    if (column.validate) {
+      if (typeof column.validate === 'string')
+        insertObj.validate = column.validate;
+      else insertObj.validate = JSON.stringify(column.validate);
+    }
+
     if (!(column.project_id && column.base_id)) {
       const model = await Model.getByIdOrName({ id: column.fk_model_id });
       insertObj.project_id = model.project_id;
@@ -607,8 +616,16 @@ export default class Column implements ColumnType {
       dtxp: column.dtxp,
       dtxs: column.dtxs,
       au: column.au,
-      pv: column.pv
+      pv: column.pv,
+      validate: null
     };
+
+    if (column.validate) {
+      if (typeof column.validate === 'string')
+        updateObj.validate = column.validate;
+      else updateObj.validate = JSON.stringify(column.validate);
+    }
+
     // get existing cache
     const key = `${CacheScope.COLUMN}:${colId}`;
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
@@ -646,5 +663,13 @@ export default class Column implements ColumnType {
       },
       colId
     );
+  }
+
+  public getValidators(): any {
+    if (this.validate && typeof this.validate === 'string')
+      try {
+        return JSON.parse(this.validate);
+      } catch {}
+    return null;
   }
 }
