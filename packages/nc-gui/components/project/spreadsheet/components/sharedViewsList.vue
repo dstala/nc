@@ -64,7 +64,7 @@
                     {{ viewIcons[link.type].icon }}
                   </v-icon>
 
-                  {{ link.view_name }}
+                  {{ link.title }}
                 </td>
                 <td class="caption text-left">
                   <nuxt-link :to="sharedViewUrl(link)">
