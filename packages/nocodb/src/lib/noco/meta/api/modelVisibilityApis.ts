@@ -14,7 +14,7 @@ async function xcVisibilityMetaSetAll(req, res) {
       if (dataInDb) {
         if (d.disabled[role]) {
           if (!dataInDb.disabled) {
-            await ModelRoleVisibility.update(dataInDb.id, {
+            await ModelRoleVisibility.update(d.id, role, {
               disabled: d.disabled[role]
             });
           }

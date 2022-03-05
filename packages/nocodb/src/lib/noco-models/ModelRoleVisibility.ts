@@ -68,7 +68,11 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     return data && new ModelRoleVisibility(data);
   }
 
-  static async update(id: string, body: { disabled: any }) {
+  static async update(
+    fk_view_id: string,
+    role: string,
+    body: { disabled: any }
+  ) {
     // TODO: cache -> use <fk_view_id_1>:<role_1>
     return await Noco.ncMeta.metaUpdate(
       null,
@@ -77,20 +81,26 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
       {
         disabled: body.disabled
       },
-      id
+      {
+        fk_view_id,
+        role
+      }
     );
   }
 
   async delete() {
-    return await ModelRoleVisibility.delete(this.id);
+    return await ModelRoleVisibility.delete(this.fk_view_id, this.role);
   }
-  static async delete(id: string) {
+  static async delete(fk_view_id: string, role: string) {
     // TODO: cache -> use <fk_view_id_1>:<role_1>
     return await Noco.ncMeta.metaDelete(
       null,
       null,
       MetaTable.MODEL_ROLE_VISIBILITY,
-      id
+      {
+        fk_view_id,
+        role
+      }
     );
   }
 
