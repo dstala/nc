@@ -8,7 +8,7 @@ export default class NocoCache {
   private static cacheDisabled: boolean;
 
   public static init() {
-    this.cacheDisabled = !!process.env.NC_DISABLE_CACHE || false;
+    this.cacheDisabled = (process.env.NC_DISABLE_CACHE || false) === 'true';
     if (this.cacheDisabled) {
       return;
     }
