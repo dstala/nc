@@ -68,8 +68,6 @@ export default class Sort {
       `${CacheScope.SORT}:${row.id}`
     );
 
-    await NocoCache.set(`${CacheScope.SORT}:${row.id}`, row);
-
     return this.get(row.id, ncMeta);
   }
 

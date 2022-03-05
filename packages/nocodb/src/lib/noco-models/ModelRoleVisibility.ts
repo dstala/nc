@@ -1,7 +1,8 @@
 import { ModelRoleVisibilityType } from 'nc-common';
 import Noco from '../noco/Noco';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import Model from './Model';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class ModelRoleVisibility implements ModelRoleVisibilityType {
   id?: string;
@@ -17,34 +18,58 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
   }
 
   static async list(projectId): Promise<ModelRoleVisibility[]> {
-    const datas = await Noco.ncMeta.metaList2(
-      projectId,
-      null,
-      MetaTable.MODEL_ROLE_VISIBILITY
-    );
-    return datas?.map(baseData => new ModelRoleVisibility(baseData));
+    let data = await NocoCache.getList(CacheScope.MODEL_ROLE_VISIBILITY, [
+      projectId
+    ]);
+    if (!data.length) {
+      data = await Noco.ncMeta.metaList2(
+        projectId,
+        null,
+        MetaTable.MODEL_ROLE_VISIBILITY
+      );
+      await NocoCache.setList(
+        CacheScope.MODEL_ROLE_VISIBILITY,
+        [projectId],
+        data
+      );
+    }
+    return data?.map(baseData => new ModelRoleVisibility(baseData));
   }
 
   static async get(args: { role: string; fk_view_id: any }) {
-    const data = await Noco.ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.MODEL_ROLE_VISIBILITY,
-      // args.fk_model_id
-      //   ? {
-      //       fk_model_id: args.fk_model_id,
-      //       role: args.role
-      //     }
-      //   :
-      {
-        fk_view_id: args.fk_view_id,
-        role: args.role
-      }
-    );
+    let data =
+      args.fk_view_id &&
+      args.role &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL_ROLE_VISIBILITY}:${args.fk_view_id}:${args.role}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!data) {
+      data = await Noco.ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.MODEL_ROLE_VISIBILITY,
+        // args.fk_model_id
+        //   ? {
+        //       fk_model_id: args.fk_model_id,
+        //       role: args.role
+        //     }
+        //   :
+        {
+          fk_view_id: args.fk_view_id,
+          role: args.role
+        }
+      );
+      await NocoCache.set(
+        `${CacheScope.MODEL_ROLE_VISIBILITY}:${args.fk_view_id}:${args.role}`,
+        data
+      );
+    }
     return data && new ModelRoleVisibility(data);
   }
 
   static async update(id: string, body: { disabled: any }) {
+    // TODO: cache -> use <fk_view_id_1>:<role_1>
     return await Noco.ncMeta.metaUpdate(
       null,
       null,
@@ -60,6 +85,7 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     return await ModelRoleVisibility.delete(this.id);
   }
   static async delete(id: string) {
+    // TODO: cache -> use <fk_view_id_1>:<role_1>
     return await Noco.ncMeta.metaDelete(
       null,
       null,
@@ -83,11 +109,24 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
-    return await Noco.ncMeta.metaInsert2(
+    const row = await Noco.ncMeta.metaInsert2(
       null,
       null,
       MetaTable.MODEL_ROLE_VISIBILITY,
       insertObj
     );
+
+    await NocoCache.appendToList(
+      CacheScope.MODEL_ROLE_VISIBILITY,
+      [body.project_id],
+      `${CacheScope.MODEL_ROLE_VISIBILITY}:${body.fk_view_id}:${body.role}`
+    );
+
+    await NocoCache.set(
+      `${CacheScope.MODEL_ROLE_VISIBILITY}:${body.fk_view_id}:${body.role}`,
+      row
+    );
+
+    return row;
   }
 }

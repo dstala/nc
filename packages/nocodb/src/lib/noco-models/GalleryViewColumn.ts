@@ -73,13 +73,7 @@ export default class GalleryViewColumn {
       `${CacheScope.GALLERY_VIEW_COLUMN}:${id}`
     );
 
-    return new GalleryViewColumn({
-      id,
-      fk_view_id: column.fk_view_id,
-      fk_column_id: column.fk_column_id,
-      order: column.order,
-      show: column.show
-    });
+    return this.get(id);
   }
 
   public static async list(viewId: string): Promise<GalleryViewColumn[]> {

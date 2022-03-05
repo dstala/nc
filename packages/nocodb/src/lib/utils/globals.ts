@@ -65,7 +65,8 @@ export enum CacheScope {
   AUDIT = 'audit',
   HOOK = 'hook',
   PLUGIN = 'plugin',
-  PROJECT_USER = 'projectUser'
+  PROJECT_USER = 'projectUser',
+  MODEL_ROLE_VISIBILITY = 'modelRoleVisibility'
 }
 export enum CacheGetType {
   TYPE_ARRAY = 'TYPE_ARRAY',

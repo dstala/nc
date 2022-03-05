@@ -44,7 +44,14 @@ export default class User implements UserType {
       'email_verified',
       'roles'
     ]);
-    return await ncMeta.metaInsert2(null, null, MetaTable.USERS, insertObj);
+    const row = await ncMeta.metaInsert2(
+      null,
+      null,
+      MetaTable.USERS,
+      insertObj
+    );
+    await NocoCache.set(`${CacheScope.USER}:${row.id}`, row);
+    return row;
   }
   public static async update(id, user: Partial<User>, ncMeta = Noco.ncMeta) {
     const updateObj = extractDefinedProps(user, [

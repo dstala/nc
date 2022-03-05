@@ -142,12 +142,20 @@ export default class Project implements ProjectType {
     // get existing cache
     const key = `${CacheScope.PROJECT}:${projectId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    if(o) {
+    if (o) {
       // update alias
       o.deleted = true;
       // set cache
       await NocoCache.set(key, o);
     }
+
+    // remove item in cache list
+    await NocoCache.deepDel(
+      CacheScope.PROJECT,
+      `${CacheScope.PROJECT}:${projectId}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
+
     // set meta
     return await Noco.ncMeta.metaUpdate(
       null,
@@ -186,6 +194,7 @@ export default class Project implements ProjectType {
       // set cache
       await NocoCache.set(key, o);
     }
+
     // set meta
     return await Noco.ncMeta.metaUpdate(
       null,

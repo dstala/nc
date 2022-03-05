@@ -136,7 +136,9 @@ export default class Column implements ColumnType {
       ncMeta
     );
 
-    return row;
+    return this.get({
+      colId: row.id
+    });
   }
 
   private static async insertColOption<T>(
