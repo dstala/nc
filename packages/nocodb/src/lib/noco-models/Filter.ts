@@ -117,22 +117,32 @@ export default class Filter {
   }
 
   static async update(id, filter: Partial<Filter>) {
+    const updateObj = {
+      fk_column_id: filter.fk_column_id,
+      comparison_op: filter.comparison_op,
+      value: filter.value,
+      fk_parent_id: filter.fk_parent_id,
+
+      is_group: filter.is_group,
+      logical_op: filter.logical_op
+    };
+    // get existing cache
+    const key = `${CacheScope.FILTER_EXP}:${id}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    if (o) {
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     await Noco.ncMeta.metaUpdate(
       null,
       null,
       MetaTable.FILTER_EXP,
-      {
-        fk_column_id: filter.fk_column_id,
-        comparison_op: filter.comparison_op,
-        value: filter.value,
-        fk_parent_id: filter.fk_parent_id,
-
-        is_group: filter.is_group,
-        logical_op: filter.logical_op
-      },
+      updateObj,
       id
     );
-    // TODO: update cache
   }
 
   static async delete(id: string) {
@@ -277,7 +287,11 @@ export default class Filter {
       for (const f of filter?.children || []) await deleteRecursively(f);
       if (filter.id) {
         await ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
-        await NocoCache.del(`${CacheScope.FILTER_EXP}:${filter.id}`);
+        await NocoCache.deepDel(
+          CacheScope.FILTER_EXP,
+          `${CacheScope.FILTER_EXP}:${filter.id}`,
+          CacheDelDirection.CHILD_TO_PARENT
+        );
       }
     };
     await deleteRecursively(filter);
@@ -310,9 +324,7 @@ export default class Filter {
           condition: { fk_view_id: viewId }
         }
       );
-
-      if (filterObjs.length)
-        await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filterObjs);
+      await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filterObjs);
     }
     return filterObjs?.map(f => new Filter(f));
   }
@@ -340,13 +352,11 @@ export default class Filter {
           }
         }
       );
-      if (filterObjs.length) {
-        await NocoCache.setList(
-          CacheScope.FILTER_EXP,
-          [viewId, parentId],
-          filterObjs
-        );
-      }
+      await NocoCache.setList(
+        CacheScope.FILTER_EXP,
+        [viewId, parentId],
+        filterObjs
+      );
     }
     return filterObjs?.map(f => new Filter(f));
   }
