@@ -356,7 +356,8 @@ export const actions = {
 
       const tables = (await this.$api.meta.tableList({
         projectId: state.projectId,
-        baseId: state.project.bases[0].id
+        baseId: state.project.bases[0].id,
+        includeM2M: rootState.windows.includeM2M || ''
       })).data.tables.list
 
 

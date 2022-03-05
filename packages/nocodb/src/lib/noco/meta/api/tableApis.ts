@@ -72,7 +72,11 @@ export async function tableList(
 
   res // todo: pagination
     .json({
-      tables: new PagedResponseImpl(tableList.filter(t => !t.mm) as Model[])
+      tables: new PagedResponseImpl(
+        req.query?.includeM2M
+          ? tableList
+          : (tableList.filter(t => !t.mm) as Model[])
+      )
     });
 }
 

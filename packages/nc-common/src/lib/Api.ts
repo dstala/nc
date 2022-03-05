@@ -556,6 +556,7 @@ export interface TableListParamsType {
   page?: number;
   pageSize?: number;
   sort?: string;
+  includeM2M?: boolean;
   projectId: string;
   baseId: string;
 }
