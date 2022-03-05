@@ -94,13 +94,7 @@ export default class GridViewColumn implements GridColumnType {
       `${CacheScope.GRID_VIEW_COLUMN}:${id}`
     );
 
-    return new GridViewColumn({
-      id,
-      fk_view_id: column.fk_view_id,
-      fk_column_id: column.fk_column_id,
-      order: column.order,
-      show: column.show
-    });
+    return this.get(id);
   }
 
   static async update(
@@ -108,13 +102,22 @@ export default class GridViewColumn implements GridColumnType {
     body: Partial<GridViewColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    // TODO: Cache
-    const updateBody = extractDefinedProps(body, ['order', 'show', 'width']);
+    const updateObj = extractDefinedProps(body, ['order', 'show', 'width']);
+    // get existing cache
+    const key = `${CacheScope.GRID_VIEW_COLUMN}:${columnId}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update data
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     await ncMeta.metaUpdate(
       null,
       null,
       MetaTable.GRID_VIEW_COLUMNS,
-      updateBody,
+      updateObj,
       columnId
     );
   }

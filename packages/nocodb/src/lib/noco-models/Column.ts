@@ -127,7 +127,7 @@ export default class Column implements ColumnType {
       ncMeta
     );
 
-    return await this.get({
+    return this.get({
       colId: row.id
     });
   }

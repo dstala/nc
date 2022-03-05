@@ -73,10 +73,7 @@ export default class FormViewColumn implements FormColumnType {
       [column.fk_view_id],
       `${CacheScope.FORM_VIEW_COLUMN}:${id}`
     );
-    return new FormViewColumn({
-      id,
-      ...insertObj
-    });
+    return this.get(id);
   }
 
   public static async list(viewId: string): Promise<FormViewColumn[]> {
