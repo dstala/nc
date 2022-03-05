@@ -37,6 +37,7 @@ import {
   parseBody
 } from '../../../noco/meta/api/helpers/webhookHelpers';
 import Validator from 'validator';
+import { NcError } from '../../../noco/meta/api/helpers/catchError';
 
 /**
  * Base class for models
@@ -1795,7 +1796,7 @@ class BaseModelSqlv2 {
           cn in columns &&
           !(fn.constructor.name === 'AsyncFunction' ? await fn(arg) : fn(arg))
         ) {
-          throw new Error(
+          NcError.badRequest(
             msg[j].replace(/\{VALUE}/g, columns[cn]).replace(/\{cn}/g, cn)
           );
         }
