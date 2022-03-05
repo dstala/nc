@@ -738,7 +738,7 @@ export default {
     fieldsOrder: [],
     coverImageField: null,
     groupingField: null,
-    showSystemFields: false,
+    // showSystemFields: false,
     showAdvanceOptions: false,
     loadViews: false,
     selectedView: {},
@@ -1549,6 +1549,19 @@ export default {
     }
   },
   computed: {
+    showSystemFields: {
+      get() {
+        return this.selectedView && this.selectedView.hide_system_fields
+      },
+      set(v) {
+        if (this.selectedView) {
+          this.selectedView.hide_system_fields = v
+          this.$api.meta.viewUpdate(this.selectedViewId, {
+            hide_system_fields: this.showSystemFields
+          })
+        }
+      }
+    },
     viewTypes() {
       return ViewTypes
     },

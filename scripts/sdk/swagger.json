@@ -1396,6 +1396,9 @@
                   },
                   "title": {
                     "type": "string"
+                  },
+                  "hide_system_fields": {
+                    "type": "boolean"
                   }
                 }
               }

@@ -572,6 +572,7 @@ export interface TableReorderPayloadType {
 export interface ViewUpdatePayloadType {
   order?: string;
   title?: string;
+  hide_system_fields?: boolean;
 }
 
 export type ViewColumnCreatePayloadType = any;

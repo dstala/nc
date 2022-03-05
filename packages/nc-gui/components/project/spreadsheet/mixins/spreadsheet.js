@@ -124,10 +124,13 @@ export default {
       }
       // todo: generate hideCols based on default values
       const hideCols = ['created_at', 'updated_at']
-
       if (this.showSystemFields) {
         columns = this.meta.columns || []
       } else {
+        // columns = filterOutSystemColumns(this.meta.columns.filter(c => !(c.pk && c.ai) &&
+        //   !((this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn)) &&
+        //   !hideCols.includes(c.cn))) || []
+
         columns = (this.meta.columns.filter(c => !(c.pk && c.ai) &&
           !((this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn)) &&
           !hideCols.includes(c.cn))) || []
