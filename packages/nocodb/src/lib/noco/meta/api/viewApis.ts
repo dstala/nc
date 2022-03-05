@@ -32,11 +32,11 @@ export async function viewList(
   );
 
   //await View.list(req.params.tableId)
-  const filteredViewList = viewList.filter((table: any) => {
+  const filteredViewList = viewList.filter((view: any) => {
     return Object.keys((req as any).session?.passport?.user?.roles).some(
       role =>
         (req as any)?.session?.passport?.user?.roles[role] &&
-        !table.disabled[role]
+        !view.disabled[role]
     );
   });
 

@@ -73,6 +73,7 @@ export default class Hook implements HookType {
     event?: 'After' | 'Before';
     operation?: 'insert' | 'delete' | 'update';
   }) {
+    // todo: redis - here things could go wrong, populate cache key based on args(include env & operation)
     let hooks = await NocoCache.getList(CacheScope.HOOK, [param.fk_model_id]);
     if (!hooks.length) {
       hooks = await Noco.ncMeta.metaList(null, null, MetaTable.HOOKS, {
