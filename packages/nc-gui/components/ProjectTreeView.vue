@@ -823,7 +823,7 @@ export default {
       cookie: null,
       defaultValue: null,
     },
-    rolesList: null,
+    rolesList: [{title:'editor'}, {title:'viewer'},{title: 'commenter'}],
     selectedNodeForDelete: {
       dialog: false,
       item: null,
@@ -929,22 +929,22 @@ export default {
       }
     },
     async loadRoles() {
-      if (this.$store.getters['users/GtrIsAdmin']) {
-        const roles = (
-          await this.$axios.get('/admin/roles', {
-            headers: {
-              'xc-auth': this.$store.state.users.token,
-            },
-            params: {
-              project_id: this.$route.params.project_id,
-            },
-          })
-        ).data
-        this.rolesList = roles.filter(role => !['owner', 'creator', 'guest'].includes(role.title))
-      } else {
-        this.rolesList = null
-        this.previewAs = null
-      }
+      // if (this.$store.getters['users/GtrIsAdmin']) {
+      //   const roles = (
+      //     await this.$axios.get('/admin/roles', {
+      //       headers: {
+      //         'xc-auth': this.$store.state.users.token,
+      //       },
+      //       params: {
+      //         project_id: this.$route.params.project_id,
+      //       },
+      //     })
+      //   ).data
+      //   this.rolesList = roles.filter(role => !['owner', 'creator', 'guest'].includes(role.title))
+      // } else {
+      //   this.rolesList = null
+      //   this.previewAs = null
+      // }
     },
     appsTabAdd() {
       const tabIndex = this.tabs.findIndex(el => el.key === `appStore`)
