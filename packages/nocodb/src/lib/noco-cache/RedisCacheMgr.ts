@@ -155,14 +155,14 @@ export default class RedisCacheMgr extends CacheMgr {
         }
         // remove target Key
         list = list.filter(k => k !== key);
+        // delete list
+        console.log(`RedisCacheMgr::deepDel: remove listKey ${listKey}`);
+        await this.del(listKey);
         if (list.length) {
           // set target list
           console.log(`RedisCacheMgr::deepDel: set key ${listKey}`);
-          await this.set(listKey, list);
-        } else {
-          // delete list
-          console.log(`RedisCacheMgr::deepDel: remove listKey ${listKey}`);
           await this.del(listKey);
+          await this.set(listKey, list);
         }
       }
       console.log(`RedisCacheMgr::deepDel: remove key ${key}`);
