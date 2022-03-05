@@ -107,7 +107,9 @@
           v-for="(field,i) in fields"
         >
           <v-list-item
-            v-show="!fieldFilter || (field._cn||'').toLowerCase().includes(fieldFilter.toLowerCase())"
+            v-show="(!fieldFilter || (field._cn||'').toLowerCase().includes(fieldFilter.toLowerCase()))
+              && !(!showSystemFieldsLoc && systemColumnsIds.includes(field.fk_column_id))
+            "
             :key="field.id"
             dense
           >
@@ -161,6 +163,7 @@
 
 <script>
 import draggable from 'vuedraggable'
+import { getSystemColumnsIds } from 'nc-common'
 
 export default {
   name: 'FieldsMenu',
@@ -192,6 +195,9 @@ export default {
     fieldsOrderLoc: []
   }),
   computed: {
+    systemColumnsIds() {
+      return getSystemColumnsIds(this.meta && this.meta.columns)
+    },
     attachmentFields() {
       return [...(this.meta && this.meta.columns ? this.meta.columns.filter(f => f.uidt === 'Attachment') : []), {
         alias: 'None',

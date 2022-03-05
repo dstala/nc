@@ -1,9 +1,9 @@
-import { isVirtualCol } from 'nc-common'
+import { isVirtualCol, filterOutSystemColumns } from 'nc-common'
 
 export default {
   data: () => ({
+    showSystemFieldsLoc: false,
     viewStatus: {},
-    showSystemFields: false,
     fieldFilter: '',
     filtersKey: 0,
     filters: [],
@@ -61,6 +61,14 @@ export default {
     }
   },
   computed: {
+    showSystemFields: {
+      get() {
+        return this.showSystemFieldsLoc
+      },
+      set(v) {
+        this.showSystemFieldsLoc = v
+      }
+    },
     isLocked() {
       return this.viewStatus && this.viewStatus.type === 'locked'
     },
@@ -93,7 +101,10 @@ export default {
 
       let columns = this.meta.columns
       if (this.meta && this.meta.v) {
-        columns = [...columns, ...this.meta.v.map(v => ({ ...v, virtual: 1 }))]
+        columns = [...columns, ...this.meta.v.map(v => ({
+          ...v,
+          virtual: 1
+        }))]
       }
 
       {
@@ -123,21 +134,17 @@ export default {
         return []
       }
       // todo: generate hideCols based on default values
-      const hideCols = ['created_at', 'updated_at']
       if (this.showSystemFields) {
         columns = this.meta.columns || []
       } else {
-        // columns = filterOutSystemColumns(this.meta.columns.filter(c => !(c.pk && c.ai) &&
-        //   !((this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn)) &&
-        //   !hideCols.includes(c.cn))) || []
-
-        columns = (this.meta.columns.filter(c => !(c.pk && c.ai) &&
-          !((this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn)) &&
-          !hideCols.includes(c.cn))) || []
+        columns = filterOutSystemColumns(this.meta.columns)
       }
 
       if (this.meta && this.meta.v) {
-        columns = [...columns, ...this.meta.v.map(v => ({ ...v, virtual: 1 }))]
+        columns = [...columns, ...this.meta.v.map(v => ({
+          ...v,
+          virtual: 1
+        }))]
       }
 
       {
@@ -192,7 +199,11 @@ export default {
           obj.mm.push(vc.mm.rtn)
         }
         return obj
-      }, { hm: [], bt: [], mm: [] })
+      }, {
+        hm: [],
+        bt: [],
+        mm: []
+      })
 
       // todo: handle if virtual column missing
       // construct fields args based on lookup columns
@@ -230,7 +241,10 @@ export default {
         return obj
       }, {})
       return {
-        ...Object.entries(nestedFields).reduce((ro, [k, a]) => ({ ...ro, [k]: a.join(',') }), {}),
+        ...Object.entries(nestedFields).reduce((ro, [k, a]) => ({
+          ...ro,
+          [k]: a.join(',')
+        }), {}),
         ...fieldsObj
       }
     },

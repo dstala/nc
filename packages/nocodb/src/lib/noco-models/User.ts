@@ -1,7 +1,7 @@
 import { UserType } from 'nc-common';
 import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
-import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
+import extractProps from '../noco/meta/api/helpers/extractProps';
 import NocoCache from '../noco-cache/NocoCache';
 export default class User implements UserType {
   id: number;
@@ -28,7 +28,7 @@ export default class User implements UserType {
   }
 
   public static async insert(user: Partial<User>, ncMeta = Noco.ncMeta) {
-    const insertObj = extractDefinedProps(user, [
+    const insertObj = extractProps(user, [
       'email',
       'password',
       'salt',
@@ -54,7 +54,7 @@ export default class User implements UserType {
     return row;
   }
   public static async update(id, user: Partial<User>, ncMeta = Noco.ncMeta) {
-    const updateObj = extractDefinedProps(user, [
+    const updateObj = extractProps(user, [
       'email',
       'password',
       'salt',

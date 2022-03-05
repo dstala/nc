@@ -7,7 +7,7 @@ import {
   CacheScope,
   MetaTable
 } from '../utils/globals';
-import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
+import extractProps from '../noco/meta/api/helpers/extractProps';
 import NocoCache from '../noco-cache/NocoCache';
 
 export default class Project implements ProjectType {
@@ -171,7 +171,7 @@ export default class Project implements ProjectType {
     projectId: string,
     project: Partial<Project>
   ): Promise<any> {
-    const updateObj = extractDefinedProps(project, [
+    const updateObj = extractProps(project, [
       'title',
       'prefix',
       'status',

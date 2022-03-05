@@ -1,7 +1,7 @@
 import Noco from '../noco/Noco';
 import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import { GridColumnType } from 'nc-common';
-import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
+import extractProps from '../noco/meta/api/helpers/extractProps';
 import View from './View';
 import NocoCache from '../noco-cache/NocoCache';
 
@@ -102,8 +102,7 @@ export default class GridViewColumn implements GridColumnType {
     body: Partial<GridViewColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const updateObj = extractDefinedProps(body, ['order', 'show', 'width']);
-    // get existing cache
+    const updateObj = extractProps(body, ['order', 'show', 'width']);    // get existing cache
     const key = `${CacheScope.GRID_VIEW_COLUMN}:${columnId}`;
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {

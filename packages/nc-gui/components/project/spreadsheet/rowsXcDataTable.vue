@@ -1557,7 +1557,7 @@ export default {
         if (this.selectedView) {
           this.selectedView.hide_system_fields = v
           this.$api.meta.viewUpdate(this.selectedViewId, {
-            hide_system_fields: this.showSystemFields
+            hide_system_fields: v
           })
         }
       }

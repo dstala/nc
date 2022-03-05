@@ -19,7 +19,7 @@ import FormViewColumn from './FormViewColumn';
 import UITypes from '../sqlUi/UITypes';
 import Column from './Column';
 import NocoCache from '../noco-cache/NocoCache';
-import extractDefinedProps from '../noco/meta/api/helpers/extractDefinedProps';
+import extractProps from '../noco/meta/api/helpers/extractProps';
 
 const { v4: uuidv4 } = require('uuid');
 export default class View implements ViewType {
@@ -521,7 +521,7 @@ export default class View implements ViewType {
       null,
       null,
       MetaTable.VIEWS,
-      extractDefinedProps(['title', 'order', 'hide_system_fields'], body),
+      extractProps(body, ['title', 'order', 'hide_system_fields']),
       viewId
     );
   }

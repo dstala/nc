@@ -1,4 +1,4 @@
-export default function extractDefinedProps(body: any, props) {
+export default function extractProps(body: any, props: string[]) {
   return props.reduce((o, key) => {
     if (key in body) o[key] = body[key];
     return body;
