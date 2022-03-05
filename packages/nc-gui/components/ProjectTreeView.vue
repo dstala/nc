@@ -304,7 +304,7 @@
                                       <span classs="caption">Rename</span>
                                     </v-list-item-title>
                                   </v-list-item>
-                                  <v-list-item v-if="_isUIAllowed('ui-acl')" dense @click="openUIACL">
+                                  <v-list-item v-if="_isUIAllowed('ui-acl')" dense @click="openUIACL(child)">
                                     <v-list-item-icon>
                                       <v-icon x-small>
                                         mdi-shield-outline
@@ -907,13 +907,15 @@ export default {
       })
 
     },
-    openUIACL() {
+    openUIACL(child) {
+      console.log(child)
+      debugger
       this.disableOrEnableModelTabAdd()
       setTimeout(() => {
         this.$router.push({
           query: {
             ...this.$route.query,
-            nested_1: 'dbacl',
+            nested_1: (child && child._nodes && child._nodes.dbConnection&& child._nodes.dbConnection.id) + 'acl'
           },
         })
       }, 100)
