@@ -107,6 +107,7 @@
           v-for="(field,i) in fields"
         >
           <v-list-item
+            v-show="!fieldFilter || (field._cn||'').toLowerCase().includes(fieldFilter.toLowerCase())"
             :key="field.id"
             dense
           >
