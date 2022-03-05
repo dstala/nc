@@ -299,10 +299,10 @@ export default {
   },
   methods: {
     async loadXcDiff() {
-      this.diff = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        dbAlias: this.db.meta.dbAlias,
-        env: this.$store.getters['project/GtrEnv']
-      }, 'xcMetaDiff'])
+      // this.diff = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+      //   dbAlias: this.db.meta.dbAlias,
+      //   env: this.$store.getters['project/GtrEnv']
+      // }, 'xcMetaDiff'])
     },
     /* async addTableMeta(tables) {
       try {

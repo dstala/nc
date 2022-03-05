@@ -87,7 +87,6 @@ const up = async knex => {
       .string('id', 20)
       .primary()
       .notNullable();
-
     table.string('base_id', 20);
     // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
     table.string('project_id', 128);
@@ -121,6 +120,9 @@ const up = async knex => {
     table.string('dtxs');
     table.boolean('au');
 
+    // todo: normalise
+    table.text('validate');
+
     //todo: virtual, real, etc
     table.boolean('virtual');
 
@@ -131,6 +133,12 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
+  // await knex.schema.createTable(MetaTable.COLUMN_VALIDATIONS, table => {
+  //   table
+  //     .string('id', 20)
+  //     .primary()
+  //     .notNullable();
+  // })
   /*
   await knex.schema.createTable('nc_col_props_v2', table => {
     table
