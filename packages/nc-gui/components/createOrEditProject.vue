@@ -524,7 +524,8 @@
                                             :label="$t('projects.ext_db.credentials.db_create_if_not_exists')"
                                           />
                                         </v-col>
-                                        <v-col v-if="db.client !== 'sqlite3'" class="">
+                                        <!--  todo : ssl & inflection -->
+                                        <v-col v-if="false && db.client !== 'sqlite3'" class="">
                                           <v-expansion-panels>
                                             <v-expansion-panel style="border: 1px solid wheat">
                                               <v-expansion-panel-header>
