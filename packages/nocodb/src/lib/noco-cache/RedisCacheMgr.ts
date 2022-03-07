@@ -58,8 +58,8 @@ export default class RedisCacheMgr extends CacheMgr {
     } else if (type === CacheGetType.TYPE_STRING) {
       return await this.client.get(key);
     }
-    throw Error(`Invalid CacheGetType: ${type}`);
-    return Promise.resolve(true);
+    console.log(`Invalid CacheGetType: ${type}`);
+    return Promise.resolve(false);
   }
 
   // @ts-ignore
@@ -198,7 +198,7 @@ export default class RedisCacheMgr extends CacheMgr {
       // delete list key
       return await this.del(key);
     } else {
-      throw Error(`Invalid deepDel direction found : ${direction}`);
+      console.log(`Invalid deepDel direction found : ${direction}`);
       return Promise.resolve(false);
     }
   }
