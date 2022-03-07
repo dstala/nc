@@ -38,7 +38,8 @@ async function xcVisibilityMetaSetAll(req, res) {
 export async function xcVisibilityMetaGet(
   projectId,
   baseId,
-  _models: Model[] = null
+  _models: Model[] = null,
+  includeM2M = true
   // type: 'table' | 'tableAndViews' | 'views' = 'table'
 ) {
   // todo: move to
@@ -46,8 +47,10 @@ export async function xcVisibilityMetaGet(
 
   const defaultDisabled = roles.reduce((o, r) => ({ ...o, [r]: false }), {});
 
-  const models =
+  let models =
     _models || (await Model.list({ project_id: projectId, base_id: baseId }));
+
+  models = includeM2M ? models : (models.filter(t => !t.mm) as Model[]);
 
   const result = await models.reduce(async (_obj, model) => {
     const obj = await _obj;
@@ -100,7 +103,12 @@ router.get(
   '/projects/:projectId/:baseId/modelVisibility',
   ncMetaAclMw(async (req, res) => {
     res.json(
-      await xcVisibilityMetaGet(req.params.projectId, req.params.baseId)
+      await xcVisibilityMetaGet(
+        req.params.projectId,
+        req.params.baseId,
+        null,
+        req.query.includeM2M
+      )
     );
   }, 'modelVisibilityList')
 );
