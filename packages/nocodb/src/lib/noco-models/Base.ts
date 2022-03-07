@@ -131,4 +131,8 @@ export default class Base implements BaseType {
     );
     return await ncMeta.metaDelete(null, null, MetaTable.BASES, this.id);
   }
+
+  async getModels() {
+    return await Model.list({ project_id: this.project_id, base_id: this.id });
+  }
 }

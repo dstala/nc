@@ -712,9 +712,10 @@ export default {
     },
     async removeAllColumns() {
       for (const col of this.fields) {
+        if (this.isDbRequired(col)) { continue }
         this.$set(col, 'show', false)
       }
-      await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
+      await this.$api.meta.viewHideAllColumn({ viewId: this.viewId, ignoreIds: this.fields.filter(this.isDbRequired).map(f => f.fk_column_id) })
     },
     isDbRequired(column) {
       if (hiddenCols.includes(column.fk_column_id)) {
