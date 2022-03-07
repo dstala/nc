@@ -158,6 +158,7 @@ export async function tableDelete(req: Request, res: Response, next) {
   try {
     console.log(req.params);
     const table = await Model.getByIdOrName({ id: req.params.tableId });
+    await table.getColumns();
 
     const project = await Project.getWithInfo(table.project_id);
     const base = project.bases.find(b => b.id === table.base_id);
