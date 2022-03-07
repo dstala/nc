@@ -9,7 +9,7 @@ export default class MultiSelectColumn {
   constructor(data: Partial<MultiSelectColumn>) {
     Object.assign(this, data);
   }
-// TODO: Cache
+
   public static async insert(
     data: Partial<MultiSelectColumn>,
     ncMeta = Noco.ncMeta
@@ -23,6 +23,15 @@ export default class MultiSelectColumn {
         title: data.title
       }
     );
+
+    await NocoCache.set(`${CacheScope.COL_SELECT_OPTION}:${row.id}`, row);
+
+    await NocoCache.appendToList(
+      CacheScope.COL_SELECT_OPTION,
+      [data.fk_column_id],
+      `${CacheScope.COL_SELECT_OPTION}:${row.id}`
+    );
+
     return new MultiSelectColumn(row);
   }
 
