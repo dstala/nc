@@ -10,6 +10,20 @@ export default class RedisCacheMgr extends CacheMgr {
     this.client = new Redis(config);
   }
 
+  // avoid circular structure to JSON
+  getCircularReplacer = () => {
+    const seen = new WeakSet();
+    return (_, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return;
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+  };
+
   // @ts-ignore
   async del(key: string): Promise<any> {
     console.log(`RedisCacheMgr::del: deleting key ${key}`);
@@ -54,7 +68,10 @@ export default class RedisCacheMgr extends CacheMgr {
         if (Array.isArray(value) && value.length) {
           return this.client.sadd(key, value);
         }
-        return this.client.set(key, JSON.stringify(value));
+        return this.client.set(
+          key,
+          JSON.stringify(value, this.getCircularReplacer())
+        );
       }
       return this.client.set(key, value);
     } else {
@@ -129,7 +146,7 @@ export default class RedisCacheMgr extends CacheMgr {
       const getKey = `${scope}:${o.id}`;
       // set Get Key
       console.log(`RedisCacheMgr::setList: setting key ${getKey}`);
-      await this.set(getKey, JSON.stringify(o));
+      await this.set(getKey, JSON.stringify(o, this.getCircularReplacer()));
       // push Get Key to List
       listOfGetKeys.push(getKey);
     }
