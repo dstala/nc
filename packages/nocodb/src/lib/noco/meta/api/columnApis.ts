@@ -25,6 +25,7 @@ import Noco from '../../Noco';
 import NcMetaIO from '../NcMetaIO';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import { NcError } from './helpers/catchError';
+import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
@@ -42,7 +43,7 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
     const base = await Base.get(table.base_id);
     const project = await base.getProject();
 
-    const colBody = req.body;
+    let colBody = req.body;
     switch (colBody.uidt) {
       case UITypes.Rollup:
         {
@@ -380,6 +381,7 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
         break;
       default:
         {
+          colBody = getColumnPropsFromUIDT(colBody, base);
           const tableUpdateBody = {
             ...table,
             originalColumns: table.columns,
@@ -432,7 +434,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   const base = await Base.get(table.base_id);
 
   const column = table.columns.find(c => c.id === req.params.columnId);
-  const colBody = req.body;
+  let colBody = req.body;
   if (
     [
       UITypes.Lookup,
@@ -476,6 +478,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
       `Updating ${colBody.uidt} => ${colBody.uidt} is not implemented`
     );
   } else {
+    colBody = getColumnPropsFromUIDT(colBody, base);
     const tableUpdateBody = {
       ...table,
       originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),

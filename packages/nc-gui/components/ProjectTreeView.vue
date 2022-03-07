@@ -823,7 +823,7 @@ export default {
       cookie: null,
       defaultValue: null,
     },
-    rolesList: [{title:'editor'}, {title:'viewer'},{title: 'commenter'}],
+    rolesList: [{title:'editor'}, {title:'commenter'},{title: 'viewer'}],
     selectedNodeForDelete: {
       dialog: false,
       item: null,

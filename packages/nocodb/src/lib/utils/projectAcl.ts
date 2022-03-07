@@ -17,6 +17,7 @@ export default {
     dataUpdate: true,
     dataDelete: true,
     dataInsert: true,
+    dataRead: true,
     commentsCount: true,
     exportCsv: true,
 
@@ -126,6 +127,7 @@ export default {
 
     // data
     dataList: true,
+    dataRead: true,
     commentsCount: true,
 
     xcTableAndViewList: true,
@@ -157,6 +159,7 @@ export default {
     tableGet: true,
     // data
     dataList: true,
+    dataRead: true,
     commentsCount: true,
     exportCsv: true,
 

@@ -181,7 +181,7 @@ export default {
       return this.tables && this.tables.length && this.tables.some(t => t.edited)
     },
     roles() {
-      return this.tables && this.tables.length ? Object.keys(this.tables[0].disabled) : []
+      return ['editor', 'commenter', 'viewer']// this.tables && this.tables.length ? Object.keys(this.tables[0].disabled) : []
     }
   }
 }

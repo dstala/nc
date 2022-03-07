@@ -22,14 +22,14 @@
           </v-icon>
         </v-btn>
 
-        <x-icon
-          :tooltip="`${showSystemFields ? 'Hide' : 'Show'} system fields`"
-          icon.class="mr-3 mt-n1"
-          small
-          @click="showSystemFields = !showSystemFields"
-        >
-          mdi-table-headers-eye
-        </x-icon>
+<!--        <x-icon-->
+<!--          :tooltip="`${showSystemFields ? 'Hide' : 'Show'} system fields`"-->
+<!--          icon.class="mr-3 mt-n1"-->
+<!--          small-->
+<!--          @click="showSystemFields = !showSystemFields"-->
+<!--        >-->
+<!--          mdi-table-headers-eye-->
+<!--        </x-icon>-->
 
         <x-icon
           v-if="!isNew && _isUIAllowed('rowComments')"

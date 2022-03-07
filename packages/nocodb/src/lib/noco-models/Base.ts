@@ -85,9 +85,19 @@ export default class Base implements BaseType {
   }
 
   public getConnectionConfig(): any {
+    if (this.is_meta) {
+      const metaConfig = Noco.getConfig()?.meta?.db;
+      const config = { ...metaConfig };
+      if (config.client === 'sqlite3') {
+        config.connection = metaConfig;
+      }
+
+      return config;
+    }
+
     // todo: construct with props
     return {
-      client: 'mysql2',
+      client: this.type,
       connection: {
         host: this.host ?? 'localhost',
         port: this.port ?? 3303,

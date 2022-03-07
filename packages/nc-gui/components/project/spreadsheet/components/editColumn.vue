@@ -579,7 +579,6 @@ export default {
         if (this.editColumn) {
           const col = await this.$api.meta.columnUpdate(this.meta.id, this.column.id, this.newColumn)
           console.log(col)
-
           //   tn: this.nodes.tn,
           //   _tn: this.meta._tn,
           //   originalColumns: this.meta.columns,
@@ -589,6 +588,12 @@ export default {
           // columns[this.columnIndex] = this.newColumn
         } else {
           const col = await this.$api.meta.columnCreate(this.meta.id, this.newColumn)
+          // const col = await this.$api.meta.columnCreate(this.meta.id, {
+          //   cn: this
+          //     .newColumn.cn,
+          //   _cn: this.newColumn.cn,
+          //   uidt: this.newColumn.uidt
+          // })
           console.log(col)
         }
 

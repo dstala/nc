@@ -73,13 +73,16 @@ export default class Hook implements HookType {
     event?: 'After' | 'Before';
     operation?: 'insert' | 'delete' | 'update';
   }) {
+    // todo: redis - here things could go wrong, populate cache key based on args(include env & operation)
     let hooks = await NocoCache.getList(CacheScope.HOOK, [param.fk_model_id]);
     if (!hooks.length) {
       hooks = await Noco.ncMeta.metaList(null, null, MetaTable.HOOKS, {
         condition: {
           fk_model_id: param.fk_model_id,
-          ...(param.event ? { event: param.event } : {}),
-          ...(param.operation ? { operation: param.operation } : {})
+          ...(param.event ? { event: param.event?.toLowerCase?.() } : {}),
+          ...(param.operation
+            ? { operation: param.operation?.toLowerCase?.() }
+            : {})
         }
       });
       await NocoCache.setList(CacheScope.HOOK, [param.fk_model_id], hooks);
@@ -94,8 +97,8 @@ export default class Hook implements HookType {
       description: hook.description,
       env: hook.env,
       type: hook.type,
-      event: hook.event,
-      operation: hook.operation,
+      event: hook.event?.toLowerCase?.(),
+      operation: hook.operation?.toLowerCase?.(),
       async: hook.async,
       payload: !!hook.payload,
       url: hook.url,
@@ -144,8 +147,8 @@ export default class Hook implements HookType {
       description: hook.description,
       env: hook.env,
       type: hook.type,
-      event: hook.event,
-      operation: hook.operation,
+      event: hook.event?.toLowerCase?.(),
+      operation: hook.operation?.toLowerCase?.(),
       async: hook.async,
       payload: !!hook.payload,
       url: hook.url,

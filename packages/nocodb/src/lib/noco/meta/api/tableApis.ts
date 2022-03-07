@@ -17,7 +17,7 @@ import Audit from '../../../noco-models/Audit';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import { xcVisibilityMetaGet } from './modelVisibilityApis';
 import View from '../../../noco-models/View';
-
+import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
@@ -64,11 +64,34 @@ export async function tableList(
   //       !table.disabled[role]
   //   );
   // });
+  const viewList = await xcVisibilityMetaGet(
+    // req.params.projectId,
+    // req.params.baseId,
+    null,
+    null
+  );
 
-  const tableList = await Model.list({
-    project_id: req.params.projectId,
-    base_id: req.params.baseId
-  });
+  // todo: optimise
+  const tableViewMapping = viewList.reduce((o, view: any) => {
+    o[view.fk_model_id] = o[view.fk_model_id] || 0;
+    if (
+      Object.keys((req as any).session?.passport?.user?.roles).some(
+        role =>
+          (req as any)?.session?.passport?.user?.roles[role] &&
+          !view.disabled[role]
+      )
+    ) {
+      o[view.fk_model_id]++;
+    }
+    return o;
+  }, {});
+
+  const tableList = (
+    await Model.list({
+      project_id: req.params.projectId,
+      base_id: req.params.baseId
+    })
+  ).filter(t => tableViewMapping[t.id]);
 
   res // todo: pagination
     .json({
@@ -91,7 +114,9 @@ export async function tableCreate(
     const project = await Project.getWithInfo(req.params.projectId);
     const base = project.bases.find(b => b.id === req.params.baseId);
     const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
-
+    req.body.columns = req.body.columns?.map(c =>
+      getColumnPropsFromUIDT(c as any, base)
+    );
     await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
 
     const tables = await Model.list({
