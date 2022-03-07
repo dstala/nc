@@ -30,8 +30,7 @@
                     dense
                     :value="view.id"
                     active-class="x-active--text"
-                    class="body-2  view nc-view-item nc-draggable-child"
-                    :class="`nc-${view.type}-view-item`"
+                    :class="`body-2  view nc-view-item nc-draggable-child nc-${viewTypeAlias[view.type]}-view-item`"
                   >
                     <v-icon
                       v-if="_isUIAllowed('viewlist-drag-n-drop')"
@@ -583,7 +582,8 @@ export default {
     shareLink: {},
     showShareModel: false,
     showCreateView: false,
-    loading: false
+    loading: false,
+    viewTypeAlias: { [ViewTypes.GRID]: 'grid', [ViewTypes.FORM]: 'form', [ViewTypes.GALLERY]: 'gallery' }
   }),
   computed: {
     viewsList: {
