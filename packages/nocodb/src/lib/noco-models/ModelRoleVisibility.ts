@@ -1,6 +1,11 @@
 import { ModelRoleVisibilityType } from 'nc-common';
 import Noco from '../noco/Noco';
-import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
+import {
+  CacheDelDirection,
+  CacheGetType,
+  CacheScope,
+  MetaTable
+} from '../utils/globals';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
 
@@ -73,7 +78,16 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     role: string,
     body: { disabled: any }
   ) {
-    // TODO: cache -> use <fk_view_id_1>:<role_1>
+    // get existing cache
+    const key = `${CacheScope.MODEL_ROLE_VISIBILITY}:${fk_view_id}:${role}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update data
+      o.disabled = body.disabled;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     return await Noco.ncMeta.metaUpdate(
       null,
       null,
@@ -92,7 +106,11 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     return await ModelRoleVisibility.delete(this.fk_view_id, this.role);
   }
   static async delete(fk_view_id: string, role: string) {
-    // TODO: cache -> use <fk_view_id_1>:<role_1>
+    await NocoCache.deepDel(
+      CacheScope.MODEL_ROLE_VISIBILITY,
+      `${CacheScope.MODEL_ROLE_VISIBILITY}:${fk_view_id}:${role}`,
+      CacheDelDirection.CHILD_TO_PARENT
+    );
     return await Noco.ncMeta.metaDelete(
       null,
       null,
@@ -119,7 +137,8 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
-    const row = await Noco.ncMeta.metaInsert2(
+
+    await Noco.ncMeta.metaInsert2(
       null,
       null,
       MetaTable.MODEL_ROLE_VISIBILITY,
@@ -128,15 +147,13 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
 
     await NocoCache.appendToList(
       CacheScope.MODEL_ROLE_VISIBILITY,
-      [body.project_id],
+      [insertObj.project_id],
       `${CacheScope.MODEL_ROLE_VISIBILITY}:${body.fk_view_id}:${body.role}`
     );
 
-    await NocoCache.set(
-      `${CacheScope.MODEL_ROLE_VISIBILITY}:${body.fk_view_id}:${body.role}`,
-      row
-    );
-
-    return row;
+    return this.get({
+      fk_view_id: body.fk_view_id,
+      role: body.role
+    });
   }
 }

@@ -1,6 +1,6 @@
 import CacheMgr from './CacheMgr';
 import Redis from 'ioredis';
-import { CacheDelDirection, CacheGetType } from '../utils/globals';
+import { CacheDelDirection, CacheGetType, CacheScope } from '../utils/globals';
 
 export default class RedisCacheMgr extends CacheMgr {
   client: any;
@@ -8,7 +8,23 @@ export default class RedisCacheMgr extends CacheMgr {
   constructor(config: any) {
     super();
     this.client = new Redis(config);
+    // flush the existing db with selected key (Default: 0)
+    this.client.flushdb();
   }
+
+  // avoid circular structure to JSON
+  getCircularReplacer = () => {
+    const seen = new WeakSet();
+    return (_, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return;
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+  };
 
   // @ts-ignore
   async del(key: string): Promise<any> {
@@ -42,8 +58,8 @@ export default class RedisCacheMgr extends CacheMgr {
     } else if (type === CacheGetType.TYPE_STRING) {
       return await this.client.get(key);
     }
-    throw Error(`Invalid CacheGetType: ${type}`);
-    return Promise.resolve(true);
+    console.log(`Invalid CacheGetType: ${type}`);
+    return Promise.resolve(false);
   }
 
   // @ts-ignore
@@ -54,7 +70,10 @@ export default class RedisCacheMgr extends CacheMgr {
         if (Array.isArray(value) && value.length) {
           return this.client.sadd(key, value);
         }
-        return this.client.set(key, JSON.stringify(value));
+        return this.client.set(
+          key,
+          JSON.stringify(value, this.getCircularReplacer())
+        );
       }
       return this.client.set(key, value);
     } else {
@@ -126,10 +145,14 @@ export default class RedisCacheMgr extends CacheMgr {
     for (const o of list) {
       // construct key for Get
       // e.g. <scope>:<model_id_1>
-      const getKey = `${scope}:${o.id}`;
+      let getKey = `${scope}:${o.id}`;
+      // special case - MODEL_ROLE_VISIBILITY
+      if (scope === CacheScope.MODEL_ROLE_VISIBILITY) {
+        getKey = `${scope}:${o.id}:${o.role}`;
+      }
       // set Get Key
       console.log(`RedisCacheMgr::setList: setting key ${getKey}`);
-      await this.set(getKey, JSON.stringify(o));
+      await this.set(getKey, JSON.stringify(o, this.getCircularReplacer()));
       // push Get Key to List
       listOfGetKeys.push(getKey);
     }
@@ -175,7 +198,7 @@ export default class RedisCacheMgr extends CacheMgr {
       // delete list key
       return await this.del(key);
     } else {
-      throw Error(`Invalid deepDel direction found : ${direction}`);
+      console.log(`Invalid deepDel direction found : ${direction}`);
       return Promise.resolve(false);
     }
   }

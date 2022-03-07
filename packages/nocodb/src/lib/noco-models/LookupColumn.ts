@@ -29,14 +29,13 @@ export default class LookupColumn {
     data: Partial<LookupColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_LOOKUP, {
+    const { id } = await ncMeta.metaInsert2(null, null, MetaTable.COL_LOOKUP, {
       fk_column_id: data.fk_column_id,
       fk_relation_column_id: data.fk_relation_column_id,
       fk_lookup_column_id: data.fk_lookup_column_id
     });
 
-    await NocoCache.set(`${CacheScope.COL_LOOKUP}:${data.fk_column_id}`, row);
-    return new LookupColumn(row);
+    return this.read(id);
   }
 
   public static async read(columnId: string) {

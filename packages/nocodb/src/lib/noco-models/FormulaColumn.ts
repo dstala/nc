@@ -15,14 +15,13 @@ export default class FormulaColumn {
     data: Partial<FormulaColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
+    const { id } = await ncMeta.metaInsert2(null, null, MetaTable.COL_FORMULA, {
       fk_column_id: data.fk_column_id,
       formula_raw: data.formula_raw,
       formula: data.formula
     });
 
-    await NocoCache.set(`${CacheScope.COL_FORMULA}:${data.fk_column_id}`, row);
-    return new FormulaColumn(row);
+    return this.read(id);
   }
   public static async read(columnId: string) {
     let column =

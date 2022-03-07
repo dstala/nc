@@ -54,6 +54,7 @@ export default class Base implements BaseType {
       [base.projectId],
       `${CacheScope.BASE}:${id}`
     );
+
     return this.get(id);
   }
 

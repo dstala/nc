@@ -102,7 +102,7 @@ export default class GridViewColumn implements GridColumnType {
     body: Partial<GridViewColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const updateObj = extractProps(body, ['order', 'show', 'width']);    // get existing cache
+    const updateObj = extractProps(body, ['order', 'show', 'width']); // get existing cache
     const key = `${CacheScope.GRID_VIEW_COLUMN}:${columnId}`;
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
