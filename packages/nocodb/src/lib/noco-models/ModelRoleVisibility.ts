@@ -137,7 +137,8 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
-    const row = await Noco.ncMeta.metaInsert2(
+
+    await Noco.ncMeta.metaInsert2(
       null,
       null,
       MetaTable.MODEL_ROLE_VISIBILITY,
@@ -150,11 +151,9 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
       `${CacheScope.MODEL_ROLE_VISIBILITY}:${body.fk_view_id}:${body.role}`
     );
 
-    await NocoCache.set(
-      `${CacheScope.MODEL_ROLE_VISIBILITY}:${body.fk_view_id}:${body.role}`,
-      row
-    );
-
-    return row;
+    return this.get({
+      fk_view_id: body.fk_view_id,
+      role: body.role
+    });
   }
 }

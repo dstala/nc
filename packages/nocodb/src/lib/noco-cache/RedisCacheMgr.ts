@@ -1,6 +1,6 @@
 import CacheMgr from './CacheMgr';
 import Redis from 'ioredis';
-import { CacheDelDirection, CacheGetType } from '../utils/globals';
+import { CacheDelDirection, CacheGetType, CacheScope } from '../utils/globals';
 
 export default class RedisCacheMgr extends CacheMgr {
   client: any;
@@ -145,7 +145,11 @@ export default class RedisCacheMgr extends CacheMgr {
     for (const o of list) {
       // construct key for Get
       // e.g. <scope>:<model_id_1>
-      const getKey = `${scope}:${o.id}`;
+      let getKey = `${scope}:${o.id}`;
+      // special case - MODEL_ROLE_VISIBILITY
+      if (scope === CacheScope.MODEL_ROLE_VISIBILITY) {
+        getKey = `${scope}:${o.id}:${o.role}`;
+      }
       // set Get Key
       console.log(`RedisCacheMgr::setList: setting key ${getKey}`);
       await this.set(getKey, JSON.stringify(o, this.getCircularReplacer()));
