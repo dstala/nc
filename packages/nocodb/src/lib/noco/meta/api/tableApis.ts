@@ -65,10 +65,8 @@ export async function tableList(
   //   );
   // });
   const viewList = await xcVisibilityMetaGet(
-    // req.params.projectId,
-    // req.params.baseId,
-    null,
-    null
+    req.params.projectId,
+    req.params.baseId
   );
 
   // todo: optimise
