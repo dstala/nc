@@ -14,7 +14,7 @@ export default class SingleSelectColumn {
     data: Partial<SingleSelectColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const row = await ncMeta.metaInsert2(
+    const { id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.COL_SELECT_OPTIONS,
@@ -24,15 +24,13 @@ export default class SingleSelectColumn {
       }
     );
 
-    await NocoCache.set(`${CacheScope.COL_SELECT_OPTION}:${row.id}`, row);
-
     await NocoCache.appendToList(
       CacheScope.COL_SELECT_OPTION,
       [data.fk_column_id],
-      `${CacheScope.COL_SELECT_OPTION}:${row.id}`
+      `${CacheScope.COL_SELECT_OPTION}:${id}`
     );
 
-    return new SingleSelectColumn(row);
+    return this.read(id);
   }
 
   public static async read(columnId: string) {
