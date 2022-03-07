@@ -596,6 +596,14 @@ export default {
             }
           })
 
+          this.$store.commit('meta/MutMeta', {
+            key: this.nodes.tn,
+            value: null
+          })
+          this.$store.commit('meta/MutMeta', {
+            key: this.deleteId,
+            value: null
+          })
         } catch (e) {
           const msg = await this._extractSdkResponseErrorMsg(e)
           this.$toast.error(msg).goAway(3000)
