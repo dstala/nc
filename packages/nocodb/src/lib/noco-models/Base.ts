@@ -36,6 +36,7 @@ export default class Base implements BaseType {
       null,
       MetaTable.BASES,
       {
+        id: base?.id,
         alias: base.alias,
         host: base.host,
         port: base.port,

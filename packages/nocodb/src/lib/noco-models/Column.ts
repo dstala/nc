@@ -69,6 +69,7 @@ export default class Column implements ColumnType {
     ncMeta = Noco.ncMeta
   ) {
     const insertObj: any = {
+      id: column?.id,
       fk_model_id: column.fk_model_id,
       cn: column.cn,
       _cn: column._cn || column.cn,

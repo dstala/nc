@@ -254,7 +254,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
     data: any,
     ignoreIdGeneration?: boolean
   ): Promise<any> {
-    const id = this.genNanoid(target);
+    const id = data?.id || this.genNanoid(target);
     const insertObj = {
       ...(ignoreIdGeneration ? {} : { id }),
       created_at: this.knexConnection?.fn?.now(),
