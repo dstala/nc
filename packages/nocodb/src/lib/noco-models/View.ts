@@ -153,6 +153,7 @@ export default class View implements ViewType {
       )?.order || 0) + 1;
 
     const insertObj = {
+      id: view.id,
       title: view.title,
       show: true,
       is_default: view.is_default,

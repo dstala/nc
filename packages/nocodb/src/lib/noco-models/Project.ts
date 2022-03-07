@@ -40,6 +40,7 @@ export default class Project implements ProjectType {
       null,
       MetaTable.PROJECT,
       {
+        id: projectBody?.id,
         title: projectBody.title,
         prefix: projectBody.prefix,
         description: projectBody.description,

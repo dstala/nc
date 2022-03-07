@@ -492,6 +492,15 @@
         "description": "",
         "tags": [
           "meta"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "includeM2M"
+          }
         ]
       },
       "parameters": [

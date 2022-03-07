@@ -47,6 +47,7 @@ export default class Sort {
       )?.order || 0) + 1;
 
     const insertObj = {
+      id: sortObj.id,
       fk_view_id: sortObj.fk_view_id,
       fk_column_id: sortObj.fk_column_id,
       direction: sortObj.direction,

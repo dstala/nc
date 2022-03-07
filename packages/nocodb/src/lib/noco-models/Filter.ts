@@ -44,6 +44,7 @@ export default class Filter {
 
   public static async insert(filter: Partial<FilterType>) {
     const insertObj = {
+      id: filter.id,
       fk_view_id: filter.fk_view_id,
       fk_column_id: filter.fk_column_id,
       comparison_op: filter.comparison_op,

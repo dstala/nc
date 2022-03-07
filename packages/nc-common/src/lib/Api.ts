@@ -532,6 +532,12 @@ export type ProjectUserAddPayloadType = any;
 
 export type ProjectUserUpdatePayloadType = any;
 
+export interface ProjectModelVisibilityListParamsType {
+  includeM2M?: boolean;
+  projectId: string;
+  baseId: string;
+}
+
 export type ProjectModelVisibilitySetPayloadType = any;
 
 export interface ProjectListParamsType {
@@ -1114,13 +1120,13 @@ export class Api<
      * @response `200` `(any)[]` OK
      */
     projectModelVisibilityList: (
-      projectId: string,
-      baseId: string,
+      { projectId, baseId, ...query }: ProjectModelVisibilityListParamsType,
       params: RequestParams = {}
     ) =>
       this.request<any[], any>({
         path: `/projects/${projectId}/${baseId}/modelVisibility`,
         method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),
