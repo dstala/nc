@@ -415,7 +415,7 @@
             />
           </template>
         </div>
-        <template v-if="data && isGrid && isGallery">
+        <template v-if="data && (isGrid || isGallery)">
           <pagination
             v-model="page"
             :count="count"
