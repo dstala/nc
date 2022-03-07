@@ -3,6 +3,7 @@ export class OracleUi {
     return [
       {
         cn: 'id',
+        _cn: 'Id',
         dt: 'integer',
         dtx: 'integer',
         ct: 'int(11)',
@@ -25,6 +26,7 @@ export class OracleUi {
       },
       {
         cn: 'title',
+        _cn: 'Title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar(45)',

@@ -106,6 +106,7 @@ export class PgUi {
     return [
       {
         cn: 'id',
+        _cn: 'Id',
         dt: 'int4',
         dtx: 'integer',
         ct: 'int(11)',
@@ -128,6 +129,7 @@ export class PgUi {
       },
       {
         cn: 'title',
+        _cn: 'Title',
         dt: 'character varying',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -150,6 +152,7 @@ export class PgUi {
       },
       {
         cn: 'created_at',
+        _cn: 'CreatedAt',
         dt: 'timestamp',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -172,6 +175,7 @@ export class PgUi {
       },
       {
         cn: 'updated_at',
+        _cn: 'UpdatedAt',
         dt: 'timestamp',
         dtx: 'specificType',
         ct: 'varchar(45)',

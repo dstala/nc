@@ -43,6 +43,7 @@ export class MssqlUi {
     return [
       {
         cn: 'id',
+        _cn: 'Id',
         dt: 'int',
         dtx: 'integer',
         ct: 'int(11)',
@@ -65,6 +66,7 @@ export class MssqlUi {
       },
       {
         cn: 'title',
+        _cn: 'Title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -87,6 +89,7 @@ export class MssqlUi {
       },
       {
         cn: 'created_at',
+        _cn: 'CreatedAt',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -109,6 +112,7 @@ export class MssqlUi {
       },
       {
         cn: 'updated_at',
+        _cn: 'UpdatedAt',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar(45)',
