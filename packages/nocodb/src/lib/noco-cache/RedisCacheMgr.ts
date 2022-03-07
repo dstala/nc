@@ -8,6 +8,8 @@ export default class RedisCacheMgr extends CacheMgr {
   constructor(config: any) {
     super();
     this.client = new Redis(config);
+    // flush the existing db with selected key (Default: 0)
+    this.client.flushdb();
   }
 
   // avoid circular structure to JSON
