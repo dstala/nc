@@ -719,7 +719,7 @@ export default {
     },
     isDbRequired(column) {
       if (hiddenCols.includes(column.fk_column_id)) {
-        return true
+        return false
       }
 
       let isRequired =
@@ -737,8 +737,7 @@ export default {
               column.fk_column_id === c.colOptions.fk_child_column_id
           )) ||
         // primary column
-        (column.pk && !(column.ai || column.cdf))
-
+        (column.pk && !column.ai && !column.cdf)
       if (column.uidt === UITypes.LinkToAnotherRecord && column.colOptions.type === RelationTypes.BELONGS_TO) {
         const col = this.meta.columns.find(c => c.id === column.colOptions.fk_child_column_id)
         if ((col.rqd && !col.default) || this.localParams.fields[column.alias].required) {
