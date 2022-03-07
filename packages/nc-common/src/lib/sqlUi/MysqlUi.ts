@@ -47,6 +47,7 @@ export class MysqlUi {
     return [
       {
         cn: 'id',
+        _cn: 'Id',
         dt: 'int',
         dtx: 'integer',
         ct: 'int(11)',
@@ -69,6 +70,7 @@ export class MysqlUi {
       },
       {
         cn: 'title',
+        _cn: 'Title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -91,6 +93,7 @@ export class MysqlUi {
       },
       {
         cn: 'created_at',
+        _cn: 'CreatedAt',
         dt: 'timestamp',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -113,6 +116,7 @@ export class MysqlUi {
       },
       {
         cn: 'updated_at',
+        _cn: 'UpdatedAt',
         dt: 'timestamp',
         dtx: 'specificType',
         ct: 'varchar(45)',

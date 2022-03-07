@@ -41,6 +41,9 @@ export default {
     commentList: true,
     commentRow: true,
 
+    formViewGet: true,
+    projectInfoGet: true,
+
     // old
     xcTableAndViewList: true,
     xcAuditCreate: true,

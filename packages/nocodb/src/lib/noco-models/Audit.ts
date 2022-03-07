@@ -77,7 +77,8 @@ export default class Audit implements AuditType {
     const query = Noco.ncMeta
       .knex(MetaTable.AUDIT)
       .where('row_id', args.row_id)
-      .where('fk_model_id', args.fk_model_id);
+      .where('fk_model_id', args.fk_model_id)
+      .orderBy('created_at', 'desc');
 
     if ((args.comments_only as any) == 'true')
       query.where('op_type', AuditOperationTypes.COMMENT);
@@ -91,7 +92,10 @@ export default class Audit implements AuditType {
 
   static async projectAuditList(projectId: string) {
     return await Noco.ncMeta.metaList2(null, null, MetaTable.AUDIT, {
-      condition: { project_id: projectId }
+      condition: { project_id: projectId },
+      orderBy: {
+        created_at: 'desc'
+      }
     });
   }
   static async projectAuditCount(projectId: string): Promise<number> {

@@ -366,6 +366,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         await Column.insert({
           fk_model_id: models2[table.tn].id,
           ...column,
+          _cn: getColumnNameAlias(column.cn),
           order: colOrder++
         });
       }

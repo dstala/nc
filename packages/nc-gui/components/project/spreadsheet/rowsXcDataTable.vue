@@ -64,7 +64,7 @@
         relationPrimaryValue
       }}) -> {{ relationType === 'hm' ? ' Has Many ' : ' Belongs To ' }} -> {{ table }}</span>
       <div class="d-inline-flex">
-        <template v-if="_isUIAllowed('gridViewOptions')">
+        <div v-show="_isUIAllowed('gridViewOptions')">
           <fields
             v-if="!isForm"
             ref="fields"
@@ -84,7 +84,7 @@
           />
 
           <sort-list
-            v-if="!isForm"
+            v-if="!isForm && _isUIAllowed('gridViewOptions')"
             :is-locked="isLocked"
             :meta="meta"
             :view-id="selectedViewId"
@@ -93,7 +93,7 @@
           <!--        v-model="sortList"-->
           <!--        :field-list="[...realFieldList, ...formulaFieldList]"-->
           <column-filter
-            v-if="!isForm"
+            v-if="!isForm && _isUIAllowed('gridViewOptions')"
             v-model="filters"
             :meta="meta"
             :is-locked="isLocked"
@@ -102,7 +102,7 @@
             :view-id="selectedViewId"
             @updated="loadTableData"
           />
-        </template>
+        </div>
         <share-view-menu v-if="!isGallery" @share="$refs.drawer && $refs.drawer.genShareLink()" />
 
         <MoreActions
@@ -415,7 +415,7 @@
             />
           </template>
         </div>
-        <template v-if="data && isGrid && isGallery">
+        <template v-if="data && (isGrid || isGallery)">
           <pagination
             v-model="page"
             :count="count"

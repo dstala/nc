@@ -30,6 +30,7 @@ export class SqliteUi {
     return [
       {
         cn: 'id',
+        _cn: 'Id',
         dt: 'integer',
         dtx: 'integer',
         ct: 'int(11)',
@@ -52,6 +53,7 @@ export class SqliteUi {
       },
       {
         cn: 'title',
+        _cn: 'Title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar',
@@ -74,6 +76,7 @@ export class SqliteUi {
       },
       {
         cn: 'created_at',
+        _cn: 'CreatedAt',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar',
@@ -96,6 +99,7 @@ export class SqliteUi {
       },
       {
         cn: 'updated_at',
+        _cn: 'UpdatedAt',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar',
