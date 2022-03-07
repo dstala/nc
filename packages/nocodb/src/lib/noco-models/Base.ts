@@ -31,7 +31,7 @@ export default class Base implements BaseType {
   }
 
   public static async createBase(base: BaseType & { projectId: string }) {
-    const { id } = await Noco.ncMeta.metaInsert2(
+    const row = await Noco.ncMeta.metaInsert2(
       base.projectId,
       null,
       MetaTable.BASES,
@@ -51,9 +51,10 @@ export default class Base implements BaseType {
     await NocoCache.appendToList(
       CacheScope.BASE,
       [base.projectId],
-      `${CacheScope.BASE}:${id}`
+      `${CacheScope.BASE}:${row.id}`
     );
-    return this.get(id);
+    await NocoCache.set(`${CacheScope.BASE}:${base.projectId}`, row);
+    return row;
   }
 
   static async list(args: { projectId: string }): Promise<Base[]> {
