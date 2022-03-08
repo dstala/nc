@@ -20,7 +20,7 @@ export const genTest = (apiType, dbType) => {
             const verifyCsv = (retrievedRecords) => {
                 // expected output, statically configured
                 let storedRecords = [
-                    `Country,Country => City`,
+                    `Country,CityList`,
                     `Afghanistan,Kabul`,
                     `Algeria,"Batna,Bchar,Skikda"`,
                     `American Samoa,Tafuna`,

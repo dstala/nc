@@ -14,7 +14,7 @@ export const genTest = (apiType, dbType) => {
         cy.snipActiveModal("Modal_AddNewRow");
         cy.getActiveModal()
             .find("button")
-            .contains("Save row")
+            .contains("Save Row")
             .click({ force: true });
 
         cy.toastWait("updated successfully");
@@ -120,7 +120,7 @@ export const genTest = (apiType, dbType) => {
                 .type(updatedRandVal);
             cy.getActiveModal()
                 .find("button")
-                .contains("Save row")
+                .contains("Save Row")
                 .click({ force: true });
 
             cy.toastWait("updated successfully");

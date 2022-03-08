@@ -42,7 +42,7 @@ export const genTest = (apiType, dbType) => {
                 cy.get("#data-table-form-Country > input")
                     .first()
                     .type("Test Country");
-                cy.contains("Save row").filter("button").click();
+                cy.contains("Save Row").filter("button").click();
 
                 cy.toastWait("updated successfully");
 
@@ -189,7 +189,7 @@ export const genTest = (apiType, dbType) => {
 
         describe("Filter operations", () => {
             it("Create Filter", () => {
-                mainPage.filterField("Country", "is equal", "India");
+                mainPage.filterField("CountryId", "is equal", "44");
                 cy.get("td:contains(India)").should("exist");
 
                 // cy.get(".nc-filter-menu-btn").click();

@@ -69,9 +69,7 @@ export const genTest = (apiType, dbType) => {
                 cy.get("#data-table-form-City").drag(
                     "#data-table-form-LastUpdate"
                 );
-                cy.get('[title="City => Address"]').drag(
-                    ".nc-drag-n-drop-to-hide"
-                );
+                cy.get('[title="AddressList"]').drag(".nc-drag-n-drop-to-hide");
 
                 cy.get(".nc-form > .mx-auto")
                     .find('[type="checkbox"]')
@@ -129,8 +127,8 @@ export const genTest = (apiType, dbType) => {
                         // all fields, barring removed field should exist
                         cy.get('[title="City"]').should("exist");
                         cy.get('[title="LastUpdate"]').should("exist");
-                        cy.get('[title="Country <= City"]').should("exist");
-                        cy.get('[title="City => Address"]').should("not.exist");
+                        cy.get('[title="CountryRead"]').should("exist");
+                        cy.get('[title="AddressList"]').should("not.exist");
 
                         // order of LastUpdate & City field is retained
                         cy.get(".nc-field-wrapper")

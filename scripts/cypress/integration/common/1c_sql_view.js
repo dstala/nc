@@ -30,7 +30,7 @@ export const genTest = (apiType, dbType) => {
                     .contains("1913 Hanoi Way")
                     .should("exist");
                 mainPage
-                    .getCell(`ZipCode`, 1)
+                    .getCell(`Zip code`, 1)
                     .contains("35200")
                     .should("exist");
 
@@ -45,13 +45,13 @@ export const genTest = (apiType, dbType) => {
                     .contains("1121 Loja Avenue")
                     .should("exist");
                 mainPage
-                    .getCell(`ZipCode`, 2)
+                    .getCell(`Zip code`, 2)
                     .contains("17886")
                     .should("exist");
 
                 // Column operations: Hide
-                mainPage.hideField(`ZipCode`);
-                mainPage.unhideField(`ZipCode`);
+                mainPage.hideField(`Zip code`);
+                mainPage.unhideField(`Zip code`);
 
                 // Column operations: Sort
                 mainPage.sortField("Name", "Z -> A");
@@ -133,7 +133,7 @@ export const genTest = (apiType, dbType) => {
             }
         });
 
-        it(`SQL View List`, () => {
+        it.skip(`SQL View List`, () => {
             // confirm if other views exist
             //
             cy.openViewsTab("CustomerList", 25);

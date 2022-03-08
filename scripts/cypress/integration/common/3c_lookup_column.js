@@ -13,7 +13,7 @@ export const genTest = (apiType, dbType) => {
         // Run once before test- create project (rest/graphql)
         //
         before(() => {
-            // open a table to work on views
+            // open a  table to work on views
             //
             cy.openTableTab("City", 25);
         });
@@ -38,7 +38,7 @@ export const genTest = (apiType, dbType) => {
             cy.getActiveMenu().contains("Lookup").click();
 
             // Configure Child table & column names
-            fetchParentFromLabel("Child table");
+            fetchParentFromLabel("Child Table");
             cy.getActiveMenu().contains(childTable).click();
 
             fetchParentFromLabel("Child column");

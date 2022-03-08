@@ -224,7 +224,7 @@ export const genTest = (apiType, dbType) => {
                 const verifyCsv = (retrievedRecords) => {
                     // expected output, statically configured
                     let storedRecords = [
-                        `Address,District,PostalCode,Phone,Location,Address => Customer,Address => Staff,City <= Address,Address <=> Staff`,
+                        `Address,District,PostalCode,Phone,Location,CustomerList,StaffList,CityRead,StaffMMList`,
                         `1888 Kabul Drive,,20936,,1,,Ife,,`,
                         `1661 Abha Drive,,14400,,1,,Pudukkottai,,`,
                     ];
@@ -258,24 +258,24 @@ export const genTest = (apiType, dbType) => {
 
             it(`Share GRID view : Virtual column validation > has many`, () => {
                 // verify column headers
-                cy.get('[data-col="Address => Customer"]').should("exist");
-                cy.get('[data-col="Address => Staff"]').should("exist");
-                cy.get('[data-col="City <= Address"]').should("exist");
-                cy.get('[data-col="Address <=> Staff"]').should("exist");
+                cy.get('[data-col="CustomerList"]').should("exist");
+                cy.get('[data-col="StaffList"]').should("exist");
+                cy.get('[data-col="CityRead"]').should("exist");
+                cy.get('[data-col="StaffMMList"]').should("exist");
 
                 // has many field validation
                 mainPage
-                    .getCell("Address => Customer", 3)
+                    .getCell("CustomerList", 3)
                     .click()
                     .find("button.mdi-close-thick")
                     .should("not.exist");
                 mainPage
-                    .getCell("Address => Customer", 3)
+                    .getCell("CustomerList", 3)
                     .click()
                     .find("button.mdi-plus")
                     .should("not.exist");
                 mainPage
-                    .getCell("Address => Customer", 3)
+                    .getCell("CustomerList", 3)
                     .click()
                     .find("button.mdi-arrow-expand")
                     .click();
@@ -299,17 +299,17 @@ export const genTest = (apiType, dbType) => {
             it(`Share GRID view : Virtual column validation > belongs to`, () => {
                 // belongs to field validation
                 mainPage
-                    .getCell("City <= Address", 1)
+                    .getCell("CityRead", 1)
                     .click()
                     .find("button.mdi-close-thick")
                     .should("not.exist");
                 mainPage
-                    .getCell("City <= Address", 1)
+                    .getCell("CityRead", 1)
                     .click()
                     .find("button.mdi-arrow-expand")
                     .should("not.exist");
                 mainPage
-                    .getCell("City <= Address", 1)
+                    .getCell("CityRead", 1)
                     .find(".v-chip")
                     .contains("al-Ayn")
                     .should("exist");
@@ -318,17 +318,17 @@ export const genTest = (apiType, dbType) => {
             it(`Share GRID view : Virtual column validation > many to many`, () => {
                 // many-to-many field validation
                 mainPage
-                    .getCell("Address <=> Staff", 1)
+                    .getCell("StaffMMList", 1)
                     .click()
                     .find("button.mdi-close-thick")
                     .should("not.exist");
                 mainPage
-                    .getCell("Address <=> Staff", 1)
+                    .getCell("StaffMMList", 1)
                     .click()
                     .find("button.mdi-plus")
                     .should("not.exist");
                 mainPage
-                    .getCell("Address <=> Staff", 1)
+                    .getCell("StaffMMList", 1)
                     .click()
                     .find("button.mdi-arrow-expand")
                     .click();
@@ -415,7 +415,7 @@ export const genTest = (apiType, dbType) => {
                 .first()
                 .click()
                 .type("a");
-            cy.contains("Save row").filter("button").click({ force: true });
+            cy.contains("Save Row").filter("button").click({ force: true });
             cy.toastWait("updated successfully");
 
             // add column

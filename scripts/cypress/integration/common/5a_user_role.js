@@ -67,7 +67,7 @@ export const genTest = (apiType, dbType) => {
             // validate if it has 19 entries representing tables & views
             if (isPostgres())
                 cy.get(".nc-acl-table-row").should("have.length", 24);
-            else cy.get(".nc-acl-table-row").should("have.length", 19);
+            else cy.get(".nc-acl-table-row").should("have.length", 23);
 
             // disable table & view access
             //

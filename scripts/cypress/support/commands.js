@@ -47,6 +47,8 @@ Cypress.Commands.add("signinOrSignup", (_args) => {
         _args
     );
 
+    cy.wait(1000);
+
     // signin/signup
     cy.get("body").then(($body) => {
         // cy.wait(1000)
@@ -74,6 +76,13 @@ Cypress.Commands.add("signinOrSignup", (_args) => {
                     cy.snip("SignIn");
                     cy.get('button:contains("SIGN IN")').click();
                 }
+            } else if (url.includes("/signin")) {
+                cy.get('input[type="text"]', { timeout: 12000 }).type(
+                    args.username
+                );
+                cy.get('input[type="password"]').type(args.password);
+                cy.snip("SignIn");
+                cy.get('button:contains("SIGN IN")').click();
             }
         });
     });
@@ -175,7 +184,7 @@ Cypress.Commands.add("openTableTab", (tn, rc) => {
 Cypress.Commands.add("closeTableTab", (tn) => {
     cy.task("log", `[closeTableTab] ${tn}`);
     cy.get(`.project-tab`).contains(tn, { timeout: 10000 }).should("exist");
-    cy.get(`[href="#table||db||${tn}"]`).find("button.mdi-close").click();
+    cy.get(`[href="#table||||${tn}"]`).find("button.mdi-close").click();
 });
 
 Cypress.Commands.add("openOrCreateGqlProject", (_args) => {
@@ -344,10 +353,11 @@ Cypress.Commands.add("createColumn", (table, columnName) => {
 });
 
 Cypress.Commands.add("toastWait", (msg) => {
-    cy.get(".toasted:visible", { timout: 12000 }).contains(msg).should("exist");
-    cy.get(".toasted:visible", { timout: 12000 })
-        .contains(msg)
-        .should("not.exist");
+    // cy.get(".toasted:visible", { timout: 12000 }).contains(msg).should("exist");
+    // cy.get(".toasted:visible", { timout: 12000 })
+    //     .contains(msg)
+    //     .should("not.exist");
+    cy.wait(3000);
 });
 
 // vn: view name
@@ -382,7 +392,7 @@ Cypress.Commands.add("openViewsTab", (vn, rc) => {
 Cypress.Commands.add("closeViewsTab", (vn) => {
     cy.task("log", `[closeViewsTab] ${vn}`);
     cy.get(`.project-tab`).contains(vn, { timeout: 10000 }).should("exist");
-    cy.get(`[href="#view||db||${vn}"]`)
+    cy.get(`[href="#view||||${vn}"]`)
         .find("button.mdi-close")
         .click({ force: true });
 });
@@ -438,6 +448,116 @@ Cypress.Commands.add("snipActiveMenu", (filename) => {
         cy.screenshot(storeName, { overwrite: true });
     }
 });
+
+const getCoords = ($el) => {
+    const domRect = $el[0].getBoundingClientRect();
+    const coords = {
+        x: domRect.left + (domRect.width / 2 || 0),
+        y: domRect.top + (domRect.height / 2 || 0),
+    };
+
+    return coords;
+};
+
+const dragTo = (subject, to, opts) => {
+    opts = Cypress._.defaults(opts, {
+        // delay inbetween steps
+        delay: 0,
+        // interpolation between coords
+        steps: 0,
+        // >=10 steps
+        smooth: false,
+    });
+
+    if (opts.smooth) {
+        opts.steps = Math.max(opts.steps, 10);
+    }
+
+    const win = subject[0].ownerDocument.defaultView;
+
+    const elFromCoords = (coords) =>
+        win.document.elementFromPoint(coords.x, coords.y);
+    const winMouseEvent = win.MouseEvent;
+
+    const send = (type, coords, el) => {
+        el = el || elFromCoords(coords);
+
+        el.dispatchEvent(
+            new winMouseEvent(
+                type,
+                Object.assign(
+                    {},
+                    { clientX: coords.x, clientY: coords.y },
+                    { bubbles: true, cancelable: true }
+                )
+            )
+        );
+    };
+
+    const toSel = to;
+
+    function drag(from, to, steps = 1) {
+        const fromEl = elFromCoords(from);
+
+        const _log = Cypress.log({
+            $el: fromEl,
+            name: "drag to",
+            message: toSel,
+        });
+
+        _log.snapshot("before", { next: "after", at: 0 });
+
+        _log.set({ coords: to });
+
+        send("mouseover", from, fromEl);
+        send("mousedown", from, fromEl);
+
+        cy.then(() => {
+            return Cypress.Promise.try(() => {
+                if (steps > 0) {
+                    const dx = (to.x - from.x) / steps;
+                    const dy = (to.y - from.y) / steps;
+
+                    return Cypress.Promise.map(
+                        Array(steps).fill(),
+                        (v, i) => {
+                            i = steps - 1 - i;
+
+                            let _to = {
+                                x: from.x + dx * i,
+                                y: from.y + dy * i,
+                            };
+
+                            send("mousemove", _to, fromEl);
+
+                            return Cypress.Promise.delay(opts.delay);
+                        },
+                        { concurrency: 1 }
+                    );
+                }
+            }).then(() => {
+                send("mousemove", to, fromEl);
+                send("mouseover", to);
+                send("mousemove", to);
+                send("mouseup", to);
+                _log.snapshot("after", { at: 1 }).end();
+            });
+        });
+    }
+
+    const $el = subject;
+    const fromCoords = getCoords($el);
+    const toCoords = getCoords(cy.$$(to));
+
+    drag(fromCoords, toCoords, opts.steps);
+};
+
+Cypress.Commands.addAll(
+    { prevSubject: "element" },
+    {
+        dragTo,
+    }
+);
 
 // Drag n Drop
 // refer: https://stackoverflow.com/a/55409853
