@@ -135,7 +135,7 @@
           <span class="caption">          Update & Delete not allowed since the table doesn't have any primary key
           </span>
         </v-tooltip>
-        <lock-menu v-if="_isUIAllowed('view-type')" v-model="viewStatus.type" />
+        <lock-menu v-if="_isUIAllowed('view-type')" v-model="lockType" />
 
         <!--        <x-btn
           tooltip="Reload view data"
@@ -1549,6 +1549,20 @@ export default {
     }
   },
   computed: {
+    isLocked() {
+      return this.lockType === 'locked'
+    },
+    lockType: {
+      get() {
+        return this.selectedView && this.selectedView.lock_type
+      },
+      set(type) {
+        this.selectedView.lock_type = type
+        this.$api.meta.viewUpdate(this.selectedViewId, {
+          lock_type: type
+        })
+      }
+    },
     showSystemFields: {
       get() {
         return this.selectedView && this.selectedView.hide_system_fields

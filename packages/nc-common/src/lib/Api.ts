@@ -579,6 +579,7 @@ export interface ViewUpdatePayloadType {
   order?: string;
   title?: string;
   hide_system_fields?: boolean;
+  lock_type?: 'collaborative' | 'locked' | 'personal';
 }
 
 export type ViewColumnCreatePayloadType = any;

@@ -566,7 +566,8 @@ export default class View implements ViewType {
     const updateObj = extractProps(body, [
       'title',
       'order',
-      'hide_system_fields'
+      'hide_system_fields',
+      'lock_type'
     ]);
     // get existing cache
     const key = `${CacheScope.VIEW}:${viewId}`;

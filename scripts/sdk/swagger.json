@@ -1408,6 +1408,14 @@
                   },
                   "hide_system_fields": {
                     "type": "boolean"
+                  },
+                  "lock_type": {
+                    "type": "string",
+                    "enum": [
+                      "collaborative",
+                      "locked",
+                      "personal"
+                    ]
                   }
                 }
               }
