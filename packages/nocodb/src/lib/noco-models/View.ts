@@ -388,31 +388,40 @@ export default class View implements ViewType {
     const columns: Array<GridViewColumn | any> = [];
     const view = await this.get(viewId);
     let table;
+    let cacheScope;
     switch (view.type) {
       case ViewTypes.GRID:
         table = MetaTable.GRID_VIEW_COLUMNS;
+        cacheScope = CacheScope.GRID_VIEW_COLUMN;
         break;
       case ViewTypes.GALLERY:
         table = MetaTable.GALLERY_VIEW_COLUMNS;
+        cacheScope = CacheScope.GALLERY_VIEW_COLUMN;
         break;
       case ViewTypes.KANBAN:
         table = MetaTable.KANBAN_VIEW_COLUMNS;
+        cacheScope = CacheScope.KANBAN_VIEW_COLUMN;
         break;
       case ViewTypes.FORM:
         table = MetaTable.FORM_VIEW_COLUMNS;
+        cacheScope = CacheScope.FORM_VIEW_COLUMN;
         break;
     }
-
-    await ncMeta.metaUpdate(
-      null,
-      null,
-      table,
-      {
-        order: colData.order,
-        show: colData.show
-      },
-      colId
-    );
+    const updateObj = {
+      order: colData.order,
+      show: colData.show
+    };
+    // get existing cache
+    const key = `${cacheScope}:${colId}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update data
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
+    await ncMeta.metaUpdate(null, null, table, updateObj, colId);
 
     return columns;
   }
