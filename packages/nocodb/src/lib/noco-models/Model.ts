@@ -176,6 +176,11 @@ export default class Model implements TableType {
         modelList
       );
     }
+    modelList.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return modelList.map(m => new Model(m));
   }
 
