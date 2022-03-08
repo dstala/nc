@@ -100,7 +100,11 @@ export default class FormViewColumn implements FormColumnType {
         viewColumns
       );
     }
-
+    viewColumns.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return viewColumns?.map(v => new FormViewColumn(v));
   }
 

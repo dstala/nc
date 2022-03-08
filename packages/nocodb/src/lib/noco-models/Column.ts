@@ -364,6 +364,11 @@ export default class Column implements ColumnType {
       });
       await NocoCache.setList(CacheScope.COLUMN, [fk_model_id], columnsList);
     }
+    columnsList.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return Promise.all(
       columnsList.map(async m => {
         const column = new Column(m);

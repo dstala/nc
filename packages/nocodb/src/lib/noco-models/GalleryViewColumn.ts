@@ -96,7 +96,11 @@ export default class GalleryViewColumn {
       );
       await NocoCache.setList(CacheScope.GALLERY_VIEW_COLUMN, [viewId], views);
     }
-
+    views.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return views?.map(v => new GalleryViewColumn(v));
   }
 }

@@ -38,6 +38,11 @@ export default class GridViewColumn implements GridColumnType {
       );
       await NocoCache.setList(CacheScope.GRID_VIEW_COLUMN, [viewId], views);
     }
+    views.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return views?.map(v => new GridViewColumn(v));
   }
 
