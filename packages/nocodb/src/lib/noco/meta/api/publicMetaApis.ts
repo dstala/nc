@@ -36,7 +36,10 @@ export async function viewMetaGet(req: Request, res: Response, next) {
   // const columnsById = c;
 
   view.model.columns = view.columns
-    .filter(c => c.show)
+    .filter(c => {
+      const column = view.model.columnsById[c.fk_column_id];
+      return c.show || (column.rqd && !column.cdf && !column.ai);
+    })
     .map(
       c =>
         new Column({ ...c, ...view.model.columnsById[c.fk_column_id] } as any)

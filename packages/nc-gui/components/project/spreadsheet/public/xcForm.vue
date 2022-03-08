@@ -304,7 +304,7 @@ export default {
         this.view = this.viewMeta.view
         this.meta = this.viewMeta.model
         this.metas = this.viewMeta.relatedMetas
-        this.columns = this.meta.columns
+        this.columns = this.meta.columns.filter(c => c.show)
         this.client = this.viewMeta.client
       // try {
       //   // eslint-disable-next-line camelcase
@@ -460,7 +460,7 @@ export default {
       } else if (column.uidt === UITypes.LinkToAnotherRecord && column.colOptions && column.colOptions.type === RelationTypes.BELONGS_TO) {
         const col = this.meta.columns.find(c => c.id === column.colOptions.fk_child_column_id)
 
-        if ((col.rqd && !col.cdf) || column.required) {
+        if ((col && col.rqd && !col.cdf) || column.required) {
           obj.localState[col._cn] = { required }
         }
       } else if (isVirtualCol(column) && column.required) {
