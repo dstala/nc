@@ -1,9 +1,18 @@
 let t0 = require("./explicitLogin");
 let t01 = require("../common/00_pre_configurations");
-let t5a = require("../common/5a_user_role");
-let t5b = require("../common/5b_preview_role");
+let t1a = require("../common/1a_table_operations");
+let t1b = require("../common/1b_table_column_operations");
+let t1c = require("../common/1c_sql_view");
+let t1d = require("../common/1d_pg_table_view_drag_drop_reorder");
+let t1e = require("../common/1e_pg_meta_sync");
+let t2a = require("../common/2a_table_with_belongs_to_colulmn");
+let t2b = require("../common/2b_table_with_m2m_column");
+let t3a = require("../common/3a_filter_sort_fields_operations");
+let t3b = require("../common/3b_formula_column");
+let t3c = require("../common/3c_lookup_column");
+let t3d = require("../common/3d_rollup_column");
 const {
-  setCurrentMode,
+    setCurrentMode,
 } = require("../../support/page_objects/projectConstants");
 
 // use 0 as mode to execute individual files (debug mode, skip pre-configs)
@@ -11,18 +20,27 @@ const {
 const executionMode = 1;
 
 const nocoTestSuite = (apiType, dbType) => {
-  setCurrentMode(apiType, dbType);
-  if (0 == executionMode) {
-    t0.genTest(apiType, dbType);
-  } else {
-    t01.genTest(apiType, dbType);
-  }
+    setCurrentMode(apiType, dbType);
+    if (0 == executionMode) {
+        t0.genTest(apiType, dbType);
+    } else {
+        t01.genTest(apiType, dbType);
+    }
 
-  t5a.genTest(apiType, dbType);
-  t5b.genTest(apiType, dbType);
+    t1a.genTest(apiType, dbType);
+    t1b.genTest(apiType, dbType);
+    t1c.genTest(apiType, dbType);
+    t1d.genTest(apiType, dbType);
+    t1e.genTest(apiType, dbType);
+    t2a.genTest(apiType, dbType);
+    t2b.genTest(apiType, dbType);
+    t3a.genTest(apiType, dbType);
+    // t3b.genTest(apiType, dbType);
+    t3c.genTest(apiType, dbType);
+    t3d.genTest(apiType, dbType);
 };
 
-nocoTestSuite("rest", "xcdb");
+nocoTestSuite("rest", "postgres");
 
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd

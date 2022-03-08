@@ -1,9 +1,14 @@
 let t0 = require("./explicitLogin");
 let t01 = require("../common/00_pre_configurations");
-let t5a = require("../common/5a_user_role");
-let t5b = require("../common/5b_preview_role");
+let t6b = require("../common/6b_downloadCsv");
+let t6c = require("../common/6c_swagger_api");
+let t6d = require("../common/6d_language_validation");
+let t6e = require("../common/6e_project_operations");
+let t6f = require("../common/6f_attachments");
+let t6g = require("../common/6g_base_share");
+let t7a = require("../common/7a_create_project_from_excel");
 const {
-  setCurrentMode,
+    setCurrentMode,
 } = require("../../support/page_objects/projectConstants");
 
 // use 0 as mode to execute individual files (debug mode, skip pre-configs)
@@ -11,18 +16,28 @@ const {
 const executionMode = 1;
 
 const nocoTestSuite = (apiType, dbType) => {
-  setCurrentMode(apiType, dbType);
-  if (0 == executionMode) {
-    t0.genTest(apiType, dbType);
-  } else {
-    t01.genTest(apiType, dbType);
-  }
+    setCurrentMode(apiType, dbType);
+    if (0 == executionMode) {
+        t0.genTest(apiType, dbType);
+    } else {
+        t01.genTest(apiType, dbType);
+    }
 
-  t5a.genTest(apiType, dbType);
-  t5b.genTest(apiType, dbType);
+    t6b.genTest(apiType, dbType);
+    // language validation kept common under REST MISC Suite
+    // t6d.genTest(apiType, dbType);
+    t6c.genTest(apiType, dbType);
+    t6f.genTest(apiType, dbType);
+    t6g.genTest(apiType, dbType);
+    // **deletes created project, hence place it @ end
+    t6e.genTest(apiType, dbType);
+
+    // intended to keep this after earlier project deletion
+    // creates project using excel & deletes it
+    t7a.genTest(apiType, dbType);
 };
 
-nocoTestSuite("rest", "xcdb");
+nocoTestSuite("rest", "postgres");
 
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd
