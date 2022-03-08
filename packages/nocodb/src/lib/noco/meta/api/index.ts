@@ -27,24 +27,23 @@ import sharedBaseApis from './sharedBaseApis';
 import { initStrategies } from './userApi/initStrategies';
 import modelVisibilityApis from './modelVisibilityApis';
 import publicDataExportApis from './publicDataExportApis';
+import metaDiffApis from './metaDiffApis';
 
 export default function(router: Router) {
   initStrategies(router);
-
   projectApis(router);
   utilApis(router);
 
   router.use(columnApis);
-  router.use('/data/:viewId', dataApis);
+  router.use(dataApis);
   router.use(sortApis);
   router.use(filterApis);
   router.use(viewColumnApis);
-  router.use('/tables/:tableId/grids', gridViewApis);
-  router.use('/formColumns', formViewColumnApis);
-  router.use('/public/data/:publicDataUuid', publicDataApis);
-  router.use('/public/data/:publicDataUuid', publicDataExportApis);
-  router.use('/public/meta/:publicDataUuid', publicMetaApis);
-
+  router.use(gridViewApis);
+  router.use(formViewColumnApis);
+  router.use(publicDataApis);
+  router.use(publicDataExportApis);
+  router.use(publicMetaApis);
   router.use(gridViewColumnApis);
   router.use(tableApis);
   router.use(galleryViewApis);
@@ -58,5 +57,7 @@ export default function(router: Router) {
   router.use(projectUserApis);
   router.use(sharedBaseApis);
   router.use(modelVisibilityApis);
+  router.use(metaDiffApis);
+
   userApis(router);
 }

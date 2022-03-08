@@ -7,5 +7,5 @@ export async function columnUpdate(req: Request, res: Response) {
 }
 
 const router = Router({ mergeParams: true });
-router.put('/:formViewColumnId', ncMetaAclMw(columnUpdate));
+router.put('/formColumns/:formViewColumnId', ncMetaAclMw(columnUpdate));
 export default router;

@@ -244,10 +244,10 @@ async function dataDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/', ncMetaAclMw(dataList));
-router.post('/', ncMetaAclMw(dataInsert));
-router.get('/:rowId', ncMetaAclMw(dataRead));
-router.put('/:rowId', ncMetaAclMw(dataUpdate));
-router.delete('/:rowId', ncMetaAclMw(dataDelete));
-router.get('/:rowId/mm/:colId', ncMetaAclMw(mmList));
+router.get('/data/:viewId/', ncMetaAclMw(dataList));
+router.post('/data/:viewId/', ncMetaAclMw(dataInsert));
+router.get('/data/:viewId/:rowId', ncMetaAclMw(dataRead));
+router.put('/data/:viewId/:rowId', ncMetaAclMw(dataUpdate));
+router.delete('/data/:viewId/:rowId', ncMetaAclMw(dataDelete));
+router.get('/data/:viewId/:rowId/mm/:colId', ncMetaAclMw(mmList));
 export default router;

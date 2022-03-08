@@ -173,5 +173,5 @@ async function serializeCellValue({
 }
 
 const router = Router({ mergeParams: true });
-router.get('/export/csv', catchError(exportCsv));
+router.get('/public/data/:publicDataUuid/export/csv', catchError(exportCsv));
 export default router;

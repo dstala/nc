@@ -68,5 +68,5 @@ export async function viewMetaGet(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.post('/', catchError(viewMetaGet));
+router.post('/public/meta/:publicDataUuid/', catchError(viewMetaGet));
 export default router;

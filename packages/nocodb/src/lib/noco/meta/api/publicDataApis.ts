@@ -271,10 +271,13 @@ async function relDataList(req, res, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.post('/list', catchError(dataList));
-router.post('/relationTable/:tableId', catchError(relDataList));
+router.post('/public/data/:publicDataUuid/list', catchError(dataList));
 router.post(
-  '/create',
+  '/public/data/:publicDataUuid/relationTable/:tableId',
+  catchError(relDataList)
+);
+router.post(
+  '/public/data/:publicDataUuid/create',
   multer({
     storage: multer.diskStorage({})
   }).any(),
