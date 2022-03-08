@@ -22,10 +22,10 @@ const nocoTestSuite = (apiType, dbType) => {
         t01.genTest(apiType, dbType);
     }
 
-    t4a.genTest(apiType, dbType);
-    t4b.genTest(apiType, dbType);
-    t4c.genTest(apiType, dbType);
-    t4d.genTest(apiType, dbType);
+    // t4a.genTest(apiType, dbType);
+    // t4b.genTest(apiType, dbType);
+    // t4c.genTest(apiType, dbType);
+    // t4d.genTest(apiType, dbType);
     t4e.genTest(apiType, dbType);
     t4f.genTest(apiType, dbType);
 };

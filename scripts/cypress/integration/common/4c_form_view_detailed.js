@@ -228,7 +228,9 @@ export const genTest = (apiType, dbType) => {
 
             it(`Validate ${viewType}: Submit default, with valid Show message entry`, () => {
                 // clicking again on view name shows blank still. work around- toggling between two views
-                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country').click()
+                cy.get(`.nc-view-item.nc-grid-view-item`)
+                    .contains("Country")
+                    .click();
                 cy.get(`.nc-view-item.nc-${viewType}-view-item`)
                     .contains("Country1")
                     .click();
@@ -254,7 +256,9 @@ export const genTest = (apiType, dbType) => {
 
             it(`Validate ${viewType}: Submit default, Enable checkbox "Submit another form`, () => {
                 // clicking again on view name shows blank still. work around- toggling between two views
-                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country').click()
+                cy.get(`.nc-view-item.nc-grid-view-item`)
+                    .contains("Country")
+                    .click();
                 cy.get(`.nc-view-item.nc-${viewType}-view-item`)
                     .contains("Country1")
                     .click();
@@ -295,8 +299,12 @@ export const genTest = (apiType, dbType) => {
             });
 
             it(`Validate ${viewType}: Submit default, Enable checkbox "blank form after 5 seconds"`, () => {
-                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country').click()
-                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country1').click()
+                cy.get(`.nc-view-item.nc-grid-view-item`)
+                    .contains("Country")
+                    .click();
+                cy.get(`.nc-view-item.nc-${viewType}-view-item`)
+                    .contains("Country1")
+                    .click();
 
                 cy.get("#data-table-form-Country").type("_abc");
                 cy.get("#data-table-form-LastUpdate").click();
@@ -389,8 +397,8 @@ export const genTest = (apiType, dbType) => {
 
                 cy.get("#data-table-form-LastUpdate").should("exist");
                 // remove "LastUpdate field"
-                cy.get(".nc-form").find(".nc-field-remove-icon").eq(1).click();
-                cy.get("#data-table-form-lastUpdate").should("not.exist");
+                cy.get(".nc-form").find(".nc-field-remove-icon").eq(2).click();
+                cy.get("#data-table-form-LastUpdate").should("not.exist");
                 cy.get(".col-md-4")
                     .find(".pointer.item")
                     .contains("LastUpdate")
@@ -409,14 +417,14 @@ export const genTest = (apiType, dbType) => {
                     .contains("Country1")
                     .click();
                 // verify URL & copy it for subsequent test
-                cy.url().should("contain", `&view=Country1`);
+                cy.url().should("contain", `&view=vw_`);
                 cy.url().then((url) => {
                     cy.log(url);
                     formViewURL = url;
                 });
             });
 
-            it(`Validate ${viewType}: URL validation after re-access`, () => {
+            it.skip(`Validate ${viewType}: URL validation after re-access`, () => {
                 // visit URL
                 cy.log(formViewURL);
                 cy.visit(formViewURL, {
