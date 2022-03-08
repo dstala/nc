@@ -424,7 +424,7 @@
 import draggable from 'vuedraggable'
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
-import { UITypes, isVirtualCol, RelationTypes } from 'nc-common'
+import { UITypes, isVirtualCol, RelationTypes, getSystemColumns } from 'nc-common'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'
@@ -500,10 +500,7 @@ export default {
   },
   computed: {
     systemFieldsIds() {
-      return ((this.fields && this.fields.filter(col => col.uidt === UITypes.ForeignKey ||
-        col.cn === 'created_at' ||
-        col.cn === 'updated_at' ||
-        (col.pk && (col.ai || col.cdf)))) || []).map(c => c.fk_column_id)
+      return getSystemColumns(this.fields).map(c => c.fk_column_id)
     },
     emailMe: {
       get() {
@@ -712,10 +709,15 @@ export default {
     },
     async removeAllColumns() {
       for (const col of this.fields) {
-        if (this.isDbRequired(col)) { continue }
+        if (this.isDbRequired(col)) {
+          continue
+        }
         this.$set(col, 'show', false)
       }
-      await this.$api.meta.viewHideAllColumn({ viewId: this.viewId, ignoreIds: this.fields.filter(this.isDbRequired).map(f => f.fk_column_id) })
+      await this.$api.meta.viewHideAllColumn({
+        viewId: this.viewId,
+        ignoreIds: this.fields.filter(this.isDbRequired).map(f => f.fk_column_id)
+      })
     },
     isDbRequired(column) {
       if (hiddenCols.includes(column.fk_column_id)) {

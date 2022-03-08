@@ -20,4 +20,15 @@ const getSystemColumnsIds = (columns) => {
 }
 
 
-export {filterOutSystemColumns, getSystemColumnsIds}
+
+const getSystemColumns = (columns) =>
+  ((columns.filter(isSystemColumn)) || [])
+
+const isSystemColumn = (col) => col.uidt === UITypes.ForeignKey ||
+  col.cn === 'created_at' ||
+  col.cn === 'updated_at' ||
+  (col.pk && (col.ai || col.cdf)
+  )
+
+
+export {filterOutSystemColumns, getSystemColumnsIds, getSystemColumns,isSystemColumn}
