@@ -119,7 +119,11 @@ export default class View implements ViewType {
       });
       await NocoCache.setList(CacheScope.VIEW, [modelId], viewsList);
     }
-
+    viewsList.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return viewsList?.map(v => new View(v));
   }
 
