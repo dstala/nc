@@ -1036,13 +1036,6 @@
             }
           }
         },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {}
-            }
-          }
-        },
         "tags": [
           "Meta"
         ]

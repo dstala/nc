@@ -20,6 +20,7 @@ import {
 } from '../utils/globals';
 import View from './View';
 import { NcError } from '../noco/meta/api/helpers/catchError';
+import Audit from './Audit';
 
 export default class Model implements TableType {
   copy_enabled: boolean;
@@ -362,6 +363,8 @@ export default class Model implements TableType {
     //  lookup, relations, virtual cols - done
     //  columns - done
     //  table - done
+
+    await Audit.deleteRowComments(this.id);
 
     for (const view of await this.getViews(true)) {
       await view.delete();
