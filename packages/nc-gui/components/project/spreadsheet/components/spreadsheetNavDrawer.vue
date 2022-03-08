@@ -31,6 +31,7 @@
                     :value="view.id"
                     active-class="x-active--text"
                     :class="`body-2  view nc-view-item nc-draggable-child nc-${viewTypeAlias[view.type]}-view-item`"
+                    @click="$emit('rerender')"
                   >
                     <v-icon
                       v-if="_isUIAllowed('viewlist-drag-n-drop')"
