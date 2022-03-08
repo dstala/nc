@@ -879,7 +879,7 @@ export default {
       // if (this.selectedView && this.selectedView.show_as === 'kanban') {
       //   await this.loadKanbanData()
       // } else {
-      await this.loadTableData()
+      // await this.loadTableData()
       // }
       // }
       // this.mapFieldsAndShowFields()
@@ -887,7 +887,7 @@ export default {
       console.log(e)
     }
     this.searchField = this.primaryValueColumn
-    this.dataLoaded = true
+    // this.dataLoaded = true
     // await this.loadViews();
   },
   methods: {

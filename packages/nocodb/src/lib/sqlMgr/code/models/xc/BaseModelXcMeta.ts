@@ -10,6 +10,9 @@ abstract class BaseModelXcMeta extends BaseRender {
     const columnsArr = [];
 
     for (const column of args.columns) {
+      if (this.ctx?.belongsTo?.find(c => c.cn === column.cn))
+        column.uidt = UITypes.ForeignKey;
+
       const columnObj = {
         validate: {
           func: [],

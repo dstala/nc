@@ -13,10 +13,9 @@ import GalleryView from './GalleryView';
 import GridViewColumn from './GridViewColumn';
 import Sort from './Sort';
 import Filter from './Filter';
-import { ViewType, ViewTypes } from 'nc-common';
+import { isSystemColumn, ViewType, ViewTypes } from 'nc-common';
 import GalleryViewColumn from './GalleryViewColumn';
 import FormViewColumn from './FormViewColumn';
-import UITypes from '../sqlUi/UITypes';
 import Column from './Column';
 import NocoCache from '../noco-cache/NocoCache';
 import extractProps from '../noco/meta/api/helpers/extractProps';
@@ -246,14 +245,7 @@ export default class View implements ViewType {
       for (const vCol of columns) {
         let show = 'show' in vCol ? vCol.show : true;
         const col = await Column.get({ colId: vCol.fk_column_id || vCol.id });
-        if (
-          col &&
-          (col.uidt === UITypes.ForeignKey ||
-            col.cn === 'created_at' ||
-            col.cn === 'updated_at' ||
-            (col.pk && (col.ai || col.cdf)))
-        )
-          show = false;
+        if (isSystemColumn(col)) show = false;
         await View.insertColumn({
           order: order++,
           ...col,
@@ -276,6 +268,12 @@ export default class View implements ViewType {
     },
     ncMeta = Noco.ncMeta
   ) {
+    const insertObj = {
+      fk_column_id: param.fk_column_id,
+      fk_model_id: param.fk_model_id,
+      order: param.order,
+      show: param.show
+    };
     const views = await this.list(param.fk_model_id);
 
     for (const view of views) {
@@ -283,7 +281,7 @@ export default class View implements ViewType {
         case ViewTypes.GRID:
           await GridViewColumn.insert(
             {
-              ...param,
+              ...insertObj,
               fk_view_id: view.id
             },
             ncMeta
@@ -292,7 +290,7 @@ export default class View implements ViewType {
         case ViewTypes.GALLERY:
           await GalleryViewColumn.insert(
             {
-              ...param,
+              ...insertObj,
               fk_view_id: view.id
             },
             ncMeta
@@ -308,6 +306,13 @@ export default class View implements ViewType {
     show;
     fk_column_id;
   }) {
+    const insertObj = {
+      view_id: param.view_id,
+      order: param.order,
+      show: param.show,
+      fk_column_id: param.fk_column_id
+    };
+
     const view = await this.get(param.view_id);
 
     let col;
@@ -315,7 +320,7 @@ export default class View implements ViewType {
       case ViewTypes.GRID:
         {
           col = await GridViewColumn.insert({
-            ...param,
+            ...insertObj,
             fk_view_id: view.id
           });
         }
@@ -323,7 +328,7 @@ export default class View implements ViewType {
       case ViewTypes.GALLERY:
         {
           col = await GalleryViewColumn.insert({
-            ...param,
+            ...insertObj,
             fk_view_id: view.id
           });
         }
@@ -331,7 +336,7 @@ export default class View implements ViewType {
       case ViewTypes.FORM:
         {
           col = await FormViewColumn.insert({
-            ...param,
+            ...insertObj,
             fk_view_id: view.id
           });
         }

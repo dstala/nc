@@ -5,7 +5,7 @@ let t4b = require("../common/4b_table_view_share");
 let t4c = require("../common/4c_form_view_detailed");
 let t4d = require("../common/4d_table_view_grid_locked");
 let t4e = require("../common/4e_form_view_share");
-let t4f = require("../common/4f_grid_view_share");
+let t4f = require("../common/4f_pg_grid_view_share");
 const {
     setCurrentMode,
 } = require("../../support/page_objects/projectConstants");
@@ -30,7 +30,7 @@ const nocoTestSuite = (apiType, dbType) => {
     t4f.genTest(apiType, dbType);
 };
 
-nocoTestSuite("graphql", "xcdb");
+nocoTestSuite("rest", "postgres");
 
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd

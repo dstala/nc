@@ -17,7 +17,7 @@ export default {
       if (!this.meta) { return }
       let columnObj = _columnObj
       if (columnObj.uidt === UITypes.LinkToAnotherRecord && columnObj.colOptions && columnObj.colOptions.type === RelationTypes.BELONGS_TO) {
-        columnObj = this.meta.columns.find(c => c.fk_column_id === columnObj.colOptions.fk_child_column_id)
+        columnObj = this.meta.columns.find(c => c.id === columnObj.colOptions.fk_child_column_id)
       }
       return ((required || columnObj.rqd) &&
         (rowObj[columnObj._cn] === undefined || rowObj[columnObj._cn] === null) &&
@@ -26,10 +26,10 @@ export default {
     isRequired(_columnObj, rowObj, required = false) {
       let columnObj = _columnObj
       if (columnObj.uidt === UITypes.LinkToAnotherRecord && columnObj.colOptions && columnObj.colOptions.type === RelationTypes.BELONGS_TO) {
-        columnObj = this.meta.columns.find(c => c.fk_column_id === columnObj.colOptions.fk_child_column_id)
+        columnObj = this.meta.columns.find(c => c.id === columnObj.colOptions.fk_child_column_id)
       }
 
-      return ((required || columnObj.rqd) &&
+      return required || (columnObj && columnObj.rqd &&
         !columnObj.cdf)
     }
   }

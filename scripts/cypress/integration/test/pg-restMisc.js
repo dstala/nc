@@ -1,11 +1,12 @@
 let t0 = require("./explicitLogin");
 let t01 = require("../common/00_pre_configurations");
-let t4a = require("../common/4a_table_view_grid_gallery_form");
-let t4b = require("../common/4b_table_view_share");
-let t4c = require("../common/4c_form_view_detailed");
-let t4d = require("../common/4d_table_view_grid_locked");
-let t4e = require("../common/4e_form_view_share");
-let t4f = require("../common/4f_grid_view_share");
+let t6b = require("../common/6b_downloadCsv");
+let t6c = require("../common/6c_swagger_api");
+let t6d = require("../common/6d_language_validation");
+let t6e = require("../common/6e_project_operations");
+let t6f = require("../common/6f_attachments");
+let t6g = require("../common/6g_base_share");
+let t7a = require("../common/7a_create_project_from_excel");
 const {
     setCurrentMode,
 } = require("../../support/page_objects/projectConstants");
@@ -22,15 +23,21 @@ const nocoTestSuite = (apiType, dbType) => {
         t01.genTest(apiType, dbType);
     }
 
-    t4a.genTest(apiType, dbType);
-    t4b.genTest(apiType, dbType);
-    t4c.genTest(apiType, dbType);
-    t4d.genTest(apiType, dbType);
-    t4e.genTest(apiType, dbType);
-    t4f.genTest(apiType, dbType);
+    t6b.genTest(apiType, dbType);
+    // language validation kept common under REST MISC Suite
+    // t6d.genTest(apiType, dbType);
+    t6c.genTest(apiType, dbType);
+    t6f.genTest(apiType, dbType);
+    t6g.genTest(apiType, dbType);
+    // **deletes created project, hence place it @ end
+    t6e.genTest(apiType, dbType);
+
+    // intended to keep this after earlier project deletion
+    // creates project using excel & deletes it
+    t7a.genTest(apiType, dbType);
 };
 
-nocoTestSuite("graphql", "xcdb");
+nocoTestSuite("rest", "postgres");
 
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd

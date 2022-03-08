@@ -1,11 +1,16 @@
 let t0 = require("./explicitLogin");
 let t01 = require("../common/00_pre_configurations");
-let t4a = require("../common/4a_table_view_grid_gallery_form");
-let t4b = require("../common/4b_table_view_share");
-let t4c = require("../common/4c_form_view_detailed");
-let t4d = require("../common/4d_table_view_grid_locked");
-let t4e = require("../common/4e_form_view_share");
-let t4f = require("../common/4f_grid_view_share");
+let t1a = require("../common/1a_table_operations");
+let t1b = require("../common/1b_table_column_operations");
+let t1c = require("../common/1c_sql_view");
+let t1d = require("../common/1d_pg_table_view_drag_drop_reorder");
+let t1e = require("../common/1e_pg_meta_sync");
+let t2a = require("../common/2a_table_with_belongs_to_colulmn");
+let t2b = require("../common/2b_table_with_m2m_column");
+let t3a = require("../common/3a_filter_sort_fields_operations");
+let t3b = require("../common/3b_formula_column");
+let t3c = require("../common/3c_lookup_column");
+let t3d = require("../common/3d_rollup_column");
 const {
     setCurrentMode,
 } = require("../../support/page_objects/projectConstants");
@@ -22,15 +27,20 @@ const nocoTestSuite = (apiType, dbType) => {
         t01.genTest(apiType, dbType);
     }
 
-    t4a.genTest(apiType, dbType);
-    t4b.genTest(apiType, dbType);
-    t4c.genTest(apiType, dbType);
-    t4d.genTest(apiType, dbType);
-    t4e.genTest(apiType, dbType);
-    t4f.genTest(apiType, dbType);
+    t1a.genTest(apiType, dbType);
+    t1b.genTest(apiType, dbType);
+    t1c.genTest(apiType, dbType);
+    t1d.genTest(apiType, dbType);
+    t1e.genTest(apiType, dbType);
+    t2a.genTest(apiType, dbType);
+    t2b.genTest(apiType, dbType);
+    t3a.genTest(apiType, dbType);
+    // t3b.genTest(apiType, dbType);
+    t3c.genTest(apiType, dbType);
+    t3d.genTest(apiType, dbType);
 };
 
-nocoTestSuite("graphql", "xcdb");
+nocoTestSuite("rest", "postgres");
 
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd

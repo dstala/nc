@@ -12,35 +12,35 @@ let t3b = require("../common/3b_formula_column");
 let t3c = require("../common/3c_lookup_column");
 let t3d = require("../common/3d_rollup_column");
 const {
-  setCurrentMode,
+    setCurrentMode,
 } = require("../../support/page_objects/projectConstants");
 
 // use 0 as mode to execute individual files (debug mode, skip pre-configs)
 // use 1 mode if noco.db doesnt contain user credentials (full run over GIT)
 const executionMode = 1;
 
-const nocoTestSuite = (type, xcdb) => {
-  setCurrentMode(type, xcdb);
-  if (0 == executionMode) {
-    t0.genTest(type, xcdb);
-  } else {
-    t01.genTest(type, xcdb);
-  }
+const nocoTestSuite = (apiType, dbType) => {
+    setCurrentMode(apiType, dbType);
+    if (0 == executionMode) {
+        t0.genTest(apiType, dbType);
+    } else {
+        t01.genTest(apiType, dbType);
+    }
 
-  t1a.genTest(type, xcdb);
-  t1b.genTest(type, xcdb);
-  t1c.genTest(type, xcdb);
-  t1d.genTest(type, xcdb);
-  t1e.genTest(type, xcdb);
-  t2a.genTest(type, xcdb);
-  t2b.genTest(type, xcdb);
-  t3a.genTest(type, xcdb);
-  t3b.genTest(type, xcdb);
-  t3c.genTest(type, xcdb);
-  t3d.genTest(type, xcdb);
+    t1a.genTest(apiType, dbType);
+    t1b.genTest(apiType, dbType);
+    t1c.genTest(apiType, dbType);
+    t1d.genTest(apiType, dbType);
+    // exclude@ncv2 t1e.genTest(apiType, dbType);
+    t2a.genTest(apiType, dbType);
+    t2b.genTest(apiType, dbType);
+    t3a.genTest(apiType, dbType);
+    t3b.genTest(apiType, dbType);
+    t3c.genTest(apiType, dbType);
+    t3d.genTest(apiType, dbType);
 };
 
-nocoTestSuite("rest", false);
+nocoTestSuite("rest", "mysql");
 
 /**
  * @copyright Copyright (c) 2021, Xgene Cloud Ltd
