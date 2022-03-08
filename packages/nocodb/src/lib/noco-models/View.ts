@@ -393,31 +393,40 @@ export default class View implements ViewType {
     const columns: Array<GridViewColumn | any> = [];
     const view = await this.get(viewId);
     let table;
+    let cacheScope;
     switch (view.type) {
       case ViewTypes.GRID:
         table = MetaTable.GRID_VIEW_COLUMNS;
+        cacheScope = CacheScope.GRID_VIEW_COLUMN;
         break;
       case ViewTypes.GALLERY:
         table = MetaTable.GALLERY_VIEW_COLUMNS;
+        cacheScope = CacheScope.GALLERY_VIEW_COLUMN;
         break;
       case ViewTypes.KANBAN:
         table = MetaTable.KANBAN_VIEW_COLUMNS;
+        cacheScope = CacheScope.KANBAN_VIEW_COLUMN;
         break;
       case ViewTypes.FORM:
         table = MetaTable.FORM_VIEW_COLUMNS;
+        cacheScope = CacheScope.FORM_VIEW_COLUMN;
         break;
     }
-
-    await ncMeta.metaUpdate(
-      null,
-      null,
-      table,
-      {
-        order: colData.order,
-        show: colData.show
-      },
-      colId
-    );
+    const updateObj = {
+      order: colData.order,
+      show: colData.show
+    };
+    // get existing cache
+    const key = `${cacheScope}:${colId}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update data
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
+    await ncMeta.metaUpdate(null, null, table, updateObj, colId);
 
     return columns;
   }
@@ -472,7 +481,18 @@ export default class View implements ViewType {
   static async share(viewId, ncMeta = Noco.ncMeta) {
     const view = await this.get(viewId);
     if (!view.uuid) {
-      view.uuid = uuidv4();
+      const uuid = uuidv4();
+      view.uuid = uuid;
+      // get existing cache
+      const key = `${CacheScope.VIEW}:${view.id}`;
+      const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+      if (o) {
+        // update data
+        o.uuid = uuid;
+        // set cache
+        await NocoCache.set(key, o);
+      }
+      // set meta
       await ncMeta.metaUpdate(
         null,
         null,
@@ -492,6 +512,16 @@ export default class View implements ViewType {
     { password }: { password: string },
     ncMeta = Noco.ncMeta
   ) {
+    // get existing cache
+    const key = `${CacheScope.VIEW}:${viewId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update data
+      o.password = password;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     await ncMeta.metaUpdate(
       null,
       null,
@@ -504,6 +534,16 @@ export default class View implements ViewType {
   }
 
   static async sharedViewDelete(viewId, ncMeta = Noco.ncMeta) {
+    // get existing cache
+    const key = `${CacheScope.VIEW}:${viewId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update data
+      o.uuid = null;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     await ncMeta.metaUpdate(
       null,
       null,
@@ -523,13 +563,22 @@ export default class View implements ViewType {
     },
     ncMeta = Noco.ncMeta
   ) {
-    await ncMeta.metaUpdate(
-      null,
-      null,
-      MetaTable.VIEWS,
-      extractProps(body, ['title', 'order', 'hide_system_fields']),
-      viewId
-    );
+    const updateObj = extractProps(body, [
+      'title',
+      'order',
+      'hide_system_fields'
+    ]);
+    // get existing cache
+    const key = `${CacheScope.VIEW}:${viewId}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      // update data
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
+    await ncMeta.metaUpdate(null, null, MetaTable.VIEWS, updateObj, viewId);
   }
 
   // @ts-ignore
@@ -738,6 +787,7 @@ export default class View implements ViewType {
       });
       await NocoCache.setList(CacheScope.VIEW, [tableId], sharedViews);
     }
+    sharedViews = sharedViews.filter(v => v.uuid !== null);
     return sharedViews?.map(v => new View(v));
   }
 }
