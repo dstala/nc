@@ -70,28 +70,32 @@ export default class Hook implements HookType {
 
   static async list(param: {
     fk_model_id: string;
-    event?: 'After' | 'Before';
+    event?: 'after' | 'before';
     operation?: 'insert' | 'delete' | 'update';
   }) {
     let hooks = await NocoCache.getList(CacheScope.HOOK, [param.fk_model_id]);
     if (!hooks.length) {
       hooks = await Noco.ncMeta.metaList(null, null, MetaTable.HOOKS, {
         condition: {
-          fk_model_id: param.fk_model_id,
-          ...(param.event ? { event: param.event?.toLowerCase?.() } : {}),
-          ...(param.operation
-            ? { operation: param.operation?.toLowerCase?.() }
-            : {})
+          fk_model_id: param.fk_model_id
+          // ...(param.event ? { event: param.event?.toLowerCase?.() } : {}),
+          // ...(param.operation
+          //   ? { operation: param.operation?.toLowerCase?.() }
+          //   : {})
         }
       });
       await NocoCache.setList(CacheScope.HOOK, [param.fk_model_id], hooks);
     }
     // filter event & operation
     if (param.event) {
-      hooks = hooks.filter(h => h.event === param.event);
+      hooks = hooks.filter(
+        h => h.event?.toLowerCase() === param.event?.toLowerCase()
+      );
     }
     if (param.operation) {
-      hooks = hooks.filter(h => h.operation === param.operation);
+      hooks = hooks.filter(
+        h => h.operation?.toLowerCase() === param.operation?.toLowerCase()
+      );
     }
     return hooks?.map(h => new Hook(h));
   }

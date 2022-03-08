@@ -1060,7 +1060,7 @@ export default {
               return this.$toast.info('Primary column is empty please provide some value').goAway(3000)
             }
             if (this.meta.columns.some((col) => {
-              return !col.ai && col.rqd && (rowObj[col._cn] === undefined || rowObj[col._cn] === null) && !col.default
+              return !col.ai && col.rqd && (rowObj[col._cn] === undefined || rowObj[col._cn] === null) && !col.cdf
             })) {
               return
             }
@@ -1092,9 +1092,9 @@ export default {
             //
             //   row : ${e.message}`).goAway(3000)
             // }
+          } finally {
+            this.$set(this.data[row], 'saving', false)
           }
-
-          this.$set(this.data[row], 'saving', false)
         }
       }
     },
