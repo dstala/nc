@@ -18,7 +18,7 @@ import {
 import View from './View';
 import Noco from '../noco/Noco';
 
-export default class Column implements ColumnType {
+export default class Column<T = any> implements ColumnType {
   public fk_model_id: string;
   public project_id: string;
   public base_id: string;
@@ -47,7 +47,7 @@ export default class Column implements ColumnType {
   public dtxs: string;
   public au: boolean;
 
-  public colOptions: any;
+  public colOptions: T;
   public model: Model;
 
   public order: number;
@@ -674,5 +674,9 @@ export default class Column implements ColumnType {
         return JSON.parse(this.validate);
       } catch {}
     return null;
+  }
+
+  async delete(ncMeta = Noco.ncMeta) {
+    return await Column.delete(this.id, ncMeta);
   }
 }

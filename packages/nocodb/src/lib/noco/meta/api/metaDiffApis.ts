@@ -4,11 +4,14 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 import Model from '../../../noco-models/Model';
 import Project from '../../../noco-models/Project';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
-import { ModelTypes, UITypes } from 'nc-common';
+import { ModelTypes, RelationTypes, UITypes } from 'nc-common';
 import { Router } from 'express';
 import Base from '../../../noco-models/Base';
 import ModelXcMetaFactory from '../../../sqlMgr/code/models/xc/ModelXcMetaFactory';
 import Column from '../../../noco-models/Column';
+import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
+import { XcMetaDiffType } from '../handlers/xcMetaDiff';
+import { getUniqueColumnAliasName } from './helpers/getUniqueName';
 
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',
@@ -29,6 +32,7 @@ export enum MetaDiffType {
 }
 
 type MetaDiff = {
+  _tn?: string;
   tn: string;
   type: ModelTypes;
   detectedChanges: Array<MetaDiffChange>;
@@ -55,6 +59,34 @@ type MetaDiffChange = {
       id?: string;
       cn: string;
     }
+  | {
+      type:
+        | MetaDiffType.TABLE_COLUMN_TYPE_CHANGE
+        | MetaDiffType.TABLE_COLUMN_REMOVE;
+      tn?: string;
+      model?: Model;
+      id?: string;
+      cn: string;
+      column: Column;
+      colId?: string;
+    }
+  | {
+      type: MetaDiffType.TABLE_RELATION_REMOVE;
+      tn?: string;
+      rtn?: string;
+      cn?: string;
+      rcn?: string;
+      colId: string;
+      column: Column;
+    }
+  | {
+      type: MetaDiffType.TABLE_RELATION_ADD;
+      tn?: string;
+      rtn?: string;
+      cn?: string;
+      rcn?: string;
+      relationType: RelationTypes;
+    }
 );
 
 async function getMetaDiff(
@@ -63,6 +95,7 @@ async function getMetaDiff(
   base: Base
 ): Promise<Array<MetaDiff>> {
   const changes: Array<MetaDiff> = [];
+  const virtualRelationColumns: Column<LinkToAnotherRecordColumn>[] = [];
 
   // @ts-ignore
   const tableList = (await sqlClient.tableList())?.data?.list?.filter(t => {
@@ -75,6 +108,8 @@ async function getMetaDiff(
   const colListRef = {};
   // @ts-ignore
   const oldMetas = await base.getModels();
+  // @ts-ignore
+  const relationList = (await sqlClient.relationListAll())?.data?.list;
 
   // @ts-ignore
   const relationList = (await sqlClient.relationListAll())?.data?.list;
@@ -103,7 +138,7 @@ async function getMetaDiff(
 
     oldMetas.splice(oldMetaIdx, 1);
 
-    const tableProp = {
+    const tableProp: MetaDiff = {
       _tn: oldMeta._tn,
       tn: table.tn,
       type: ModelTypes.TABLE,
@@ -119,18 +154,6 @@ async function getMetaDiff(
     await oldMeta.getColumns(true);
 
     for (const column of colListRef[table.tn]) {
-      // virtual columns
-      if (
-        [
-          UITypes.LinkToAnotherRecord,
-          UITypes.Rollup,
-          UITypes.Lookup,
-          UITypes.Formula
-        ].includes(column.uidt)
-      ) {
-        continue;
-      }
-
       const oldColIdx = oldMeta.columns.findIndex(c => c.cn === column.cn);
 
       // new table
@@ -138,7 +161,8 @@ async function getMetaDiff(
         tableProp.detectedChanges.push({
           type: MetaDiffType.TABLE_COLUMN_ADD,
           msg: `New column(${column.cn})`,
-          cn: column.cn
+          cn: column.cn,
+          id: oldMeta.id
         });
         continue;
       }
@@ -150,7 +174,7 @@ async function getMetaDiff(
           type: MetaDiffType.TABLE_COLUMN_TYPE_CHANGE,
           msg: `Column type changed(${column.cn})`,
           cn: oldCol.cn,
-          id: oldCol.id,
+          id: oldMeta.id,
           column: oldCol
         });
       }
@@ -164,6 +188,10 @@ async function getMetaDiff(
           UITypes.Formula
         ].includes(column.uidt)
       ) {
+        if (column.uidt === UITypes.LinkToAnotherRecord) {
+          virtualRelationColumns.push(column);
+        }
+
         continue;
       }
 
@@ -171,8 +199,9 @@ async function getMetaDiff(
         type: MetaDiffType.TABLE_COLUMN_REMOVE,
         msg: `Column removed(${column.cn})`,
         cn: column.cn,
-        id: column.id,
-        column: column
+        id: oldMeta.id,
+        column: column,
+        colId: column.id
       });
     }
   }
@@ -193,6 +222,78 @@ async function getMetaDiff(
     });
   }
 
+  for (const relationCol of virtualRelationColumns) {
+    const colOpt = await relationCol.getColOptions<LinkToAnotherRecordColumn>();
+    const parentCol = await colOpt.getParentColumn();
+    const childCol = await colOpt.getChildColumn();
+    const parentModel = await parentCol.getModel();
+    const childModel = await childCol.getModel();
+
+    // todo: many to many
+    if (colOpt.type === RelationTypes.MANY_TO_MANY) continue;
+
+    const dbRelation = relationList.find(
+      r =>
+        r.cn === childCol.cn &&
+        r.tn === childModel.tn &&
+        r.rcn === parentCol.cn &&
+        r.rtn === parentModel.tn
+    );
+
+    if (dbRelation) {
+      dbRelation.found = dbRelation.found || {};
+      dbRelation.found[colOpt.type] = true;
+    } else {
+      changes
+        .find(
+          t =>
+            t.tn ===
+            (colOpt.type === RelationTypes.BELONGS_TO
+              ? childModel.tn
+              : parentModel.tn)
+        )
+        .detectedChanges.push({
+          type: XcMetaDiffType.TABLE_RELATION_REMOVE,
+          tn: childModel.tn,
+          rtn: parentModel.tn,
+          cn: childCol.cn,
+          rcn: parentCol.cn,
+          msg: `Relation removed`,
+          colId: relationCol.id,
+          column: relationCol
+        });
+    }
+  }
+
+  for (const relation of relationList) {
+    if (!relation?.found?.[RelationTypes.BELONGS_TO]) {
+      changes
+        .find(t => t.tn === relation.tn)
+        ?.detectedChanges.push({
+          type: XcMetaDiffType.TABLE_RELATION_ADD,
+          tn: relation.tn,
+          rtn: relation.rtn,
+          cn: relation.cn,
+          rcn: relation.rcn,
+          msg: `New relation added`,
+          relationType: RelationTypes.BELONGS_TO
+        });
+    }
+    if (!relation?.found?.[RelationTypes.HAS_MANY]) {
+      changes
+        .find(t => t.tn === relation.rtn)
+        ?.detectedChanges.push({
+          type: XcMetaDiffType.TABLE_RELATION_ADD,
+          tn: relation.tn,
+          rtn: relation.rtn,
+          cn: relation.cn,
+          rcn: relation.rcn,
+          msg: `New relation added`,
+          relationType: RelationTypes.BELONGS_TO
+        });
+    }
+  }
+
   return changes;
 }
 
@@ -210,6 +311,7 @@ export async function metaDiff(req, res) {
 export async function metaDiffSync(req, res) {
   const project = await Project.getWithInfo(req.params.projectId);
   const base = project.bases.find(b => b.id === req.params.baseId);
+  const virtualColumnInsert: Array<() => Promise<void>> = [];
 
   // @ts-ignore
   const sqlClient = NcConnectionMgrv2.getSqlClient(base);
@@ -256,11 +358,12 @@ export async function metaDiffSync(req, res) {
               }
             ).getObject();
 
-            const model = await Model.insert(project.id, base.id, meta);
+            // const model =
+            await Model.insert(project.id, base.id, meta);
 
-            for (const col of meta.columns) {
-              await Column.insert({ fk_model_id: model.id, ...col });
-            }
+            // for (const col of meta.columns) {
+            //   // await Column.insert({ fk_model_id: model.id, ...col });
+            // }
             for (const v of meta.v) {
               // todo
               console.log(v);
@@ -282,170 +385,80 @@ export async function metaDiffSync(req, res) {
               {}
             );
             column.uidt = metaFact.getUIDataType(column);
-            await Column.insert({ fk_column_id: change.id, ...column });
+            //todo: inflection
+            column._cn = column.cn;
+            await Column.insert({ fk_model_id: change.id, ...column });
           }
           // update old
           // populateParams.tableNames.push({ tn });
           // populateParams.oldMetas[tn] = oldMetas.find(m => m.tn === tn);
 
           break;
-        // case MetaDiffType.TABLE_COLUMN_TYPE_CHANGE:
-        //   // update type in old meta
-        //
-        //   populateParams.oldMetas[tn] = oldMetas.find(m => m.tn === tn);
-        //   populateParams.tableNames.push({
-        //     tn,
-        //     _tn: populateParams.oldMetas[tn]?._tn
-        //   });
-        //
-        //   break;
-        //         case MetaDiffType.TABLE_COLUMN_REMOVE:
-        //           {
-        //             const oldMetaIdx = oldMetas.findIndex(m => m.tn === tn);
-        //             if (oldMetaIdx === -1)
-        //               throw new Error('Old meta not found : ' + tn);
-        //
-        //             const oldMeta = oldMetas[oldMetaIdx];
-        //
-        //             populateParams.oldMetas[tn] = oldMeta;
-        //             populateParams.tableNames.push({
-        //               tn,
-        //               _tn: populateParams.oldMetas[tn]?._tn
-        //             });
-        //
-        //             const queryParams = oldQueryParams[oldMetaIdx];
-        //
-        //             const oldColumn = oldMeta.columns.find(c => c.cn === change?.cn);
-        //
-        //             const {
-        //               virtualViews,
-        //               virtualViewsParamsArr
-        //               // @ts-ignore
-        //             } = await this.extractSharedAndVirtualViewsParams(tn);
-        //             // virtual views param update
-        //             for (const qp of [queryParams, ...virtualViewsParamsArr]) {
-        //               if (!qp) continue;
-        //
-        //               // @ts-ignore
-        //               const {
-        //                 filters = {},
-        //                 sortList = [],
-        //                 showFields = {},
-        //                 fieldsOrder = [],
-        //                 extraViewParams = {}
-        //               } = qp;
-        //
-        //               /* update sort field */
-        //               /*   const sIndex = (sortList || []).findIndex(
-        //   v => v.field === oldColumn._cn
-        // );
-        // if (sIndex > -1) {
-        //   sortList.splice(sIndex, 1);
-        // }*/
-        //               for (const sort of sortList || []) {
-        //                 if (
-        //                   sort?.field === oldColumn.cn ||
-        //                   sort?.field === oldColumn._cn
-        //                 ) {
-        //                   sortList.splice(sortList.indexOf(sort), 1);
-        //                 }
-        //               }
-        //
-        //               /* update show field */
-        //               if (oldColumn.cn in showFields || oldColumn._cn in showFields) {
-        //                 delete showFields[oldColumn.cn];
-        //                 delete showFields[oldColumn._cn];
-        //               }
-        //               /* update filters */
-        //               // todo: remove only corresponding filter and compare field name
-        //               /* if (
-        //  filters &&
-        //  (JSON.stringify(filters)?.includes(`"${oldColumn.cn}"`) ||
-        //    JSON.stringify(filters)?.includes(`"${oldColumn._cn}"`))
-        // ) {
-        //  filters.splice(0, filters.length);
-        // }*/
-        //               for (const filter of filters) {
-        //                 if (
-        //                   filter?.field === oldColumn.cn ||
-        //                   filter?.field === oldColumn._cn
-        //                 ) {
-        //                   filters.splice(filters.indexOf(filter), 1);
-        //                 }
-        //               }
-        //
-        //               /* update fieldsOrder */
-        //               let index = fieldsOrder.indexOf(oldColumn.cn);
-        //               if (index > -1) {
-        //                 fieldsOrder.splice(index, 1);
-        //               }
-        //               index = fieldsOrder.indexOf(oldColumn._cn);
-        //               if (index > -1) {
-        //                 fieldsOrder.splice(index, 1);
-        //               }
-        //
-        //               /* update formView params */
-        //               //  extraViewParams.formParams.fields
-        //               if (extraViewParams?.formParams?.fields?.[oldColumn.cn]) {
-        //                 delete extraViewParams.formParams.fields[oldColumn.cn];
-        //               }
-        //               if (extraViewParams?.formParams?.fields?.[oldColumn._cn]) {
-        //                 delete extraViewParams.formParams.fields[oldColumn._cn];
-        //               }
-        //             }
-        //
-        //             // todo: enable
-        //             await this.updateSharedAndVirtualViewsParams(
-        //               virtualViewsParamsArr,
-        //               virtualViews
-        //             );
-        //
-        //             await this.metaQueryParamsUpdate(queryParams, tn);
-        //
-        //             // Delete lookup columns mapping to current column
-        //             // update column name in belongs to
-        //             if (oldMeta.belongsTo?.length) {
-        //               for (const bt of oldMeta.belongsTo) {
-        //                 // filter out lookup columns which maps to current col
-        //                 oldMetasRef[bt.rtn].v = oldMetasRef[bt.rtn].v?.filter(v => {
-        //                   if (v.lk && v.lk.ltn === tn && v.lk.lcn === oldColumn.cn) {
-        //                     relationTableMetas.add(oldMetasRef[bt.rtn]);
-        //                     return false;
-        //                   }
-        //                   return true;
-        //                 });
-        //               }
-        //             }
-        //
-        //             // update column name in has many
-        //             if (oldMeta.hasMany?.length) {
-        //               for (const hm of oldMeta.hasMany) {
-        //                 // filter out lookup columns which maps to current col
-        //                 oldMetasRef[hm.tn].v = oldMetasRef[hm.tn].v?.filter(v => {
-        //                   if (v.lk && v.lk.ltn === tn && v.lk.lcn === change.cn) {
-        //                     relationTableMetas.add(oldMetasRef[hm.tn]);
-        //                     return false;
-        //                   }
-        //                   return true;
-        //                 });
-        //               }
-        //             }
-        //
-        //             // update column name in many to many
-        //             if (oldMeta.manyToMany?.length) {
-        //               for (const mm of oldMeta.manyToMany) {
-        //                 // filter out lookup columns which maps to current col
-        //                 oldMetasRef[mm.rtn].v = oldMetasRef[mm.rtn].v?.filter(v => {
-        //                   if (v.lk && v.lk.ltn === tn && v.lk.lcn === change.cn) {
-        //                     relationTableMetas.add(oldMetasRef[mm.rtn]);
-        //                     return false;
-        //                   }
-        //                   return true;
-        //                 });
-        //               }
-        //             }
-        //           }
-        //           break;
+        case MetaDiffType.TABLE_COLUMN_TYPE_CHANGE:
+          {
+            const columns = (await sqlClient.columnList({ tn }))?.data?.list;
+            const column = columns.find(c => c.cn === change.cn);
+            const metaFact = ModelXcMetaFactory.create(
+              { client: base.type },
+              {}
+            );
+            column.uidt = metaFact.getUIDataType(column);
+            column._cn = change.column._cn;
+            await Column.update(change.column.id, column);
+          }
+          break;
+        case MetaDiffType.TABLE_COLUMN_REMOVE:
+          await change.column.delete();
+          break;
+        case MetaDiffType.TABLE_RELATION_REMOVE:
+          await change.column.delete();
+          break;
+        case MetaDiffType.TABLE_RELATION_ADD:
+          {
+            virtualColumnInsert.push(async () => {
+              const parentModel = await Model.getByIdOrName({ tn: change.rtn });
+              const childModel = await Model.getByIdOrName({ tn: change.tn });
+              const parentCol = await parentModel
+                .getColumns()
+                .then(cols => cols.find(c => c.cn === change.rcn));
+              const childCol = await childModel
+                .getColumns()
+                .then(cols => cols.find(c => c.cn === change.cn));
+
+              if (change.relationType === RelationTypes.BELONGS_TO) {
+                const _cn = getUniqueColumnAliasName(
+                  childModel.columns,
+                  `${parentModel._tn || parentModel.tn}Read`
+                );
+                await Column.insert<LinkToAnotherRecordColumn>({
+                  uidt: UITypes.LinkToAnotherRecord,
+                  _cn,
+                  fk_model_id: childModel.id,
+                  fk_related_model_id: parentModel.id,
+                  type: RelationTypes.BELONGS_TO,
+                  fk_parent_column_id: parentCol.id,
+                  fk_child_column_id: childCol.id,
+                  virtual: false
+                });
+              } else if (change.relationType === RelationTypes.HAS_MANY) {
+                const _cn = getUniqueColumnAliasName(
+                  childModel.columns,
+                  `${childModel._tn || childModel.tn}List`
+                );
+                await Column.insert<LinkToAnotherRecordColumn>({
+                  uidt: UITypes.LinkToAnotherRecord,
+                  _cn,
+                  fk_model_id: parentModel.id,
+                  fk_related_model_id: childModel.id,
+                  type: RelationTypes.HAS_MANY,
+                  fk_parent_column_id: parentCol.id,
+                  fk_child_column_id: childCol.id,
+                  virtual: false
+                });
+              }
+            });
+          }
+          break;
       }
     }
   }
