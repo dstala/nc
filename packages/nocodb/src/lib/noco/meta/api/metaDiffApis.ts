@@ -10,7 +10,6 @@ import Base from '../../../noco-models/Base';
 import ModelXcMetaFactory from '../../../sqlMgr/code/models/xc/ModelXcMetaFactory';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import { XcMetaDiffType } from '../handlers/xcMetaDiff';
 import { getUniqueColumnAliasName } from './helpers/getUniqueName';
 
 export enum MetaDiffType {
@@ -253,7 +252,7 @@ async function getMetaDiff(
               : parentModel.tn)
         )
         .detectedChanges.push({
-          type: XcMetaDiffType.TABLE_RELATION_REMOVE,
+          type: MetaDiffType.TABLE_RELATION_REMOVE,
           tn: childModel.tn,
           rtn: parentModel.tn,
           cn: childCol.cn,
@@ -270,7 +269,7 @@ async function getMetaDiff(
       changes
         .find(t => t.tn === relation.tn)
         ?.detectedChanges.push({
-          type: XcMetaDiffType.TABLE_RELATION_ADD,
+          type: MetaDiffType.TABLE_RELATION_ADD,
           tn: relation.tn,
           rtn: relation.rtn,
           cn: relation.cn,
@@ -283,7 +282,7 @@ async function getMetaDiff(
       changes
         .find(t => t.tn === relation.rtn)
         ?.detectedChanges.push({
-          type: XcMetaDiffType.TABLE_RELATION_ADD,
+          type: MetaDiffType.TABLE_RELATION_ADD,
           tn: relation.tn,
           rtn: relation.rtn,
           cn: relation.cn,
