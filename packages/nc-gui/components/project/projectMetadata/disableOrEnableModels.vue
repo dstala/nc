@@ -14,12 +14,12 @@
       </v-tab-item>
 
       <template v-for="(db,i) in bases">
-        <v-tab :key="db.id + i" :href="'#' + db.id" class="text-capitalize caption nc-meta-mgmt-metadata-tab">
+        <v-tab :key="db.id + i" :href="'#' + db.id + 'meta'" class="text-capitalize caption nc-meta-mgmt-metadata-tab">
           <!--          {{ db.connection.database | extractDbName }} {{ db.id }} -->
           Metadata
         </v-tab>
-        <v-tab-item :key="db.id + 't' + i" :value=" db.id">
-          <disable-or-enable-tables
+        <v-tab-item :key="db.id + 't' + i" :value="db.id + 'meta'">
+          <metaDiffSync
             :nodes="nodes"
             :db="db"
             :db-id="db.id"
@@ -123,7 +123,7 @@ import { mapGetters } from 'vuex'
 import XcMeta from '../settings/xcMeta'
 // import DisableOrEnableRelations from './sync/disableOrEnableRelations'
 import { isMetaTable } from '@/helpers/xutils'
-import DisableOrEnableTables from '@/components/project/projectMetadata/sync/disableOrEnableTables'
+import metaDiffSync from '~/components/project/projectMetadata/sync/metaDiffSync'
 import ToggleTableUiAcl from '@/components/project/projectMetadata/uiAcl/toggleTableUIAcl'
 // import ToggleRelationsUiAcl from '@/components/project/projectMetadata/uiAcl/toggleRelationsUIAcl'
 // import DisableOrEnableViews from '~/components/project/projectMetadata/sync/disableOrEnableViews'
@@ -134,7 +134,7 @@ export default {
     // DisableOrEnableViews,
     // ToggleRelationsUiAcl,
     ToggleTableUiAcl,
-    DisableOrEnableTables,
+    metaDiffSync,
     XcMeta
     // DisableOrEnableRelations
   },

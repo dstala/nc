@@ -567,6 +567,8 @@ export interface TableListParamsType {
   baseId: string;
 }
 
+export type MetaDiffSyncPayloadType = any;
+
 export interface TableUpdatePayloadType {
   _tn?: string;
 }
@@ -1337,6 +1339,49 @@ export class Api<
         path: `/projects/${projectId}/${baseId}/tables`,
         method: 'GET',
         query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name MetaDiffSync
+     * @request POST:/projects/{projectId}/{baseId}/metaDiff
+     * @response `200` `any` OK
+     */
+    metaDiffSync: (
+      projectId: string,
+      baseId: string,
+      data: MetaDiffSyncPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/${baseId}/metaDiff`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name MetaDiffGet
+     * @request GET:/projects/{projectId}/{baseId}/metaDiff
+     * @response `200` `any` OK
+     */
+    metaDiffGet: (
+      projectId: string,
+      baseId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/${baseId}/metaDiff`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 

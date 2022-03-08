@@ -233,14 +233,16 @@ export default class View implements ViewType {
       for (const sort of sorts) {
         await Sort.insert({
           ...sort,
-          fk_view_id: view_id
+          fk_view_id: view_id,
+          id: null
         });
       }
 
       for (const filter of filters.children) {
         await Filter.insert({
           ...filter,
-          fk_view_id: view_id
+          fk_view_id: view_id,
+          id: null
         });
       }
     }
@@ -255,7 +257,8 @@ export default class View implements ViewType {
           ...col,
           view_id,
           fk_column_id: vCol.fk_column_id || vCol.id,
-          show
+          show,
+          id: null
         });
       }
     }
@@ -309,12 +312,14 @@ export default class View implements ViewType {
     order;
     show;
     fk_column_id;
+    id?: string;
   }) {
     const insertObj = {
       view_id: param.view_id,
       order: param.order,
       show: param.show,
-      fk_column_id: param.fk_column_id
+      fk_column_id: param.fk_column_id,
+      id: param.id
     };
 
     const view = await this.get(param.view_id);

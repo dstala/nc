@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="dbAliasList[dbsTab]" fluid>
+  <v-container fluid>
     <v-card>
       <v-row>
         <!--                    <v-col cols="12">-->
@@ -74,14 +74,14 @@
                   <tr
                     v-for="model in diff"
                     v-show="!filter.trim() || (model.tn || model.title || '').toLowerCase().includes(filter.toLowerCase())"
-                    :key="model.title"
+                    :key="model.tn"
                     :class="`nc-metasync-row nc-metasync-row-${model.tn}`"
                   >
                     <!--                    v-if="model.alias.toLowerCase().indexOf(filter.toLowerCase()) > -1">-->
                     <td>
-                      <v-icon small :color="viewIcons[model.type==='table'?'grid':'view'].color" v-on="on">
+                      <!--                      <v-icon small :color="viewIcons[model.type==='table'?'grid':'view'].color" v-on="on">
                         {{ viewIcons[model.type === 'table' ? 'grid' : 'view'].icon }}
-                      </v-icon>
+                      </v-icon>-->
                       <v-tooltip bottom>
                         <template #activator="{on}">
                           <span v-on="on">{{ model.tn && model.tn.slice(prefix.length) }}</span>
@@ -270,17 +270,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-// import { isMetaTable } from '@/helpers/xutils'
-import XIcon from '@/components/global/xIcon'
-import XBtn from '@/components/global/xBtn'
 import viewIcons from '~/helpers/viewIcons'
 
 export default {
   name: 'DisableOrEnableTables',
-  components: {
-    XBtn,
-    XIcon
-  },
   props: ['nodes', 'db'],
   data: () => ({
     viewIcons,
@@ -299,6 +292,8 @@ export default {
   },
   methods: {
     async loadXcDiff() {
+      this.diff = (await this.$api.meta.metaDiffGet(this.$store.state.project.projectId, this.db.id)).data
+
       // this.diff = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   dbAlias: this.db.meta.dbAlias,
       //   env: this.$store.getters['project/GtrEnv']
