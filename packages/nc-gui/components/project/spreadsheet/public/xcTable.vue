@@ -78,12 +78,12 @@
 
         <v-spacer />
 
-        <v-btn outlined small text @click="reload">
+        <!--        <v-btn outlined small text @click="reload">
           <v-icon small class="mr-1" color="grey  darken-3">
             mdi-reload
           </v-icon>
           Reload
-        </v-btn>
+        </v-btn>-->
 
         <fields-menu v-model="showFields" :field-list="fieldList" :fields-order.sync="fieldsOrder" is-public :meta="meta" />
 
