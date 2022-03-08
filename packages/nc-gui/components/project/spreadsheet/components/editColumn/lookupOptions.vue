@@ -69,7 +69,7 @@ export default {
       if (!this.tables || !this.tables.length) { return [] }
 
       const refTables = this.meta.columns.filter(c =>
-        c.uidt === UITypes.LinkToAnotherRecord || c.uidt === UITypes.ForeignKey
+        c.uidt === UITypes.LinkToAnotherRecord
       ).map(c => ({
         col: c.colOptions,
         ...this.tables.find(t => t.id === c.colOptions.fk_related_model_id)

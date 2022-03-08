@@ -155,7 +155,7 @@ export default {
         this.$store.state.meta.metas &&
         this.$store.state.meta.metas[this.rollup.table.tn] &&
         this.$store.state.meta.metas[this.rollup.table.tn].columns
-      ) || []).filter(col => ![UITypes.Lookup, UITypes.Rollup, UITypes.ForeignKey, UITypes.LinkToAnotherRecord].includes(col.uidt))
+      ) || []).filter(col => ![UITypes.Lookup, UITypes.Rollup, UITypes.LinkToAnotherRecord].includes(col.uidt))
     }
   },
   async mounted() {
