@@ -256,14 +256,16 @@ export default class NcMetaIOImpl extends NcMetaIO {
   ): Promise<any> {
     const id = data?.id || this.genNanoid(target);
     const insertObj = {
-      created_at: this.knexConnection?.fn?.now(),
-      updated_at: this.knexConnection?.fn?.now(),
       ...data,
       ...(ignoreIdGeneration ? {} : { id })
     };
     if (base_id !== null) insertObj.base_id = base_id;
     if (project_id !== null) insertObj.project_id = project_id;
-    await this.knexConnection(target).insert(insertObj);
+    await this.knexConnection(target).insert({
+      created_at: this.knexConnection?.fn?.now(),
+      updated_at: this.knexConnection?.fn?.now(),
+      ...insertObj
+    });
     return insertObj;
   }
 
@@ -388,7 +390,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
 
     console.log(query.toQuery());
 
-    return query;
+    return await query;
   }
 
   public async metaDeleteAll(
