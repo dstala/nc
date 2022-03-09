@@ -11,6 +11,7 @@ import ModelXcMetaFactory from '../../../sqlMgr/code/models/xc/ModelXcMetaFactor
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import { getUniqueColumnAliasName } from './helpers/getUniqueName';
+import NcHelp from '../../../utils/NcHelp';
 
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',
@@ -248,7 +249,12 @@ async function getMetaDiff(
 
     if (dbRelation) {
       dbRelation.found = dbRelation.found || {};
-      dbRelation.found[colOpt.type] = true;
+
+      if (dbRelation.found[colOpt.type]) {
+        // todo: handle duplicate
+      } else {
+        dbRelation.found[colOpt.type] = true;
+      }
     } else {
       changes
         .find(
@@ -295,7 +301,7 @@ async function getMetaDiff(
           cn: relation.cn,
           rcn: relation.rcn,
           msg: `New relation added`,
-          relationType: RelationTypes.BELONGS_TO
+          relationType: RelationTypes.HAS_MANY
         });
     }
   }
@@ -617,6 +623,8 @@ export async function metaDiffSync(req, res) {
       }
     }
   }
+
+  await NcHelp.executeOperations(virtualColumnInsert, base.type);
 
   res.json({ msg: 'success' });
 }
