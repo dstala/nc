@@ -155,6 +155,7 @@ export default {
         await this.loadSortList()
       } else {
         this.sortList.splice(i, 1)
+        this.$emit('input', this.sortList)
       }
       this.$emit('updated')
     }
