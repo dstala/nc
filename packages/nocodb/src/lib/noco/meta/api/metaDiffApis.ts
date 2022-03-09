@@ -83,6 +83,15 @@ type MetaDiffChange = {
       column: Column;
     }
   | {
+      type: MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE;
+      tn?: string;
+      rtn?: string;
+      cn?: string;
+      rcn?: string;
+      colId: string;
+      column: Column;
+    }
+  | {
       type: MetaDiffType.TABLE_RELATION_ADD;
       tn?: string;
       rtn?: string;
@@ -237,58 +246,68 @@ async function getMetaDiff(
     const parentModel = await parentCol.getModel();
     const childModel = await childCol.getModel();
 
-    // todo: many to many
+    // many to many relation
     if (colOpt.type === RelationTypes.MANY_TO_MANY) {
-      /*
-       const rTable = tableList.find(t => t.tn === vCol.mm?.rtn);
-      const m2mTable = tableList.find(t => t.tn === vCol.mm?.vtn);
+      const m2mModel = await colOpt.getRelatedTable();
 
-      if (!rTable) {
-        viewProp.detectedChanges.push({
-          ...vCol,
-          type: XcMetaDiffType.VIEW_VIRTUAL_M2M_REMOVE,
-          msg: `Many to many removed(${vCol.mm?.rtn} removed)`
-        });
+      const relatedTable = tableList.find(t => t.tn === parentModel.tn);
+      const m2mTable = tableList.find(t => t.tn === m2mTable.tn);
+
+      if (!relatedTable) {
+        changes
+          .find(t => t.tn === childModel.tn)
+          .detectedChanges.push({
+            type: MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE,
+            msg: `Many to many removed(${relatedTable.tn} removed)`,
+            colId: relationCol.id,
+            column: relationCol
+          });
         continue;
       }
       if (!m2mTable) {
-        viewProp.detectedChanges.push({
-          ...vCol,
-          type: XcMetaDiffType.VIEW_VIRTUAL_M2M_REMOVE,
-          msg: `Many to many removed(${vCol.mm?.vtn} removed)`
-        });
+        changes
+          .find(t => t.tn === childModel.tn)
+          .detectedChanges.push({
+            type: MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE,
+            msg: `Many to many removed(${m2mModel.tn} removed)`,
+            colId: relationCol.id,
+            column: relationCol
+          });
         continue;
       }
 
       // verify columns
 
-      const pColumns = (colListRef[vCol.mm.tn] =
-        colListRef[vCol.mm.tn] ||
-        (await sqlClient.columnList({ tn: vCol.mm.tn }))?.data?.list);
+      const cColumns = (colListRef[childModel.tn] =
+        colListRef[childModel.tn] ||
+        (await sqlClient.columnList({ tn: childModel.tn }))?.data?.list);
 
-      const cColumns = (colListRef[vCol.mm.rtn] =
-        colListRef[vCol.mm.rtn] ||
-        (await sqlClient.columnList({ tn: vCol.mm.rtn }))?.data?.list);
+      const pColumns = (colListRef[parentModel.tn] =
+        colListRef[parentModel.tn] ||
+        (await sqlClient.columnList({ tn: parentModel.tn }))?.data?.list);
 
-      const vColumns = (colListRef[vCol.mm.vtn] =
-        colListRef[vCol.mm.vtn] ||
-        (await sqlClient.columnList({ tn: vCol.mm.vtn }))?.data?.list);
+      const vColumns = (colListRef[m2mTable.tn] =
+        colListRef[m2mTable.tn] ||
+        (await sqlClient.columnList({ tn: m2mTable.tn }))?.data?.list);
+
+      const m2mChildCol = await colOpt.getMMChildColumn();
+      const m2mParentCol = await colOpt.getMMParentColumn();
 
       if (
-        pColumns.every(c => c.cn !== vCol.mm.cn) ||
-        cColumns.every(c => c.cn !== vCol.mm.rcn) ||
-        vColumns.every(c => c.cn !== vCol.mm.vcn) ||
-        vColumns.every(c => c.cn !== vCol.mm.vrcn)
+        pColumns.every(c => c.cn !== parentCol.cn) ||
+        cColumns.every(c => c.cn !== childCol.cn) ||
+        vColumns.every(c => c.cn !== m2mChildCol.cn) ||
+        vColumns.every(c => c.cn !== m2mParentCol.cn)
       ) {
-        viewProp.detectedChanges.push({
-          ...vCol,
-          type: XcMetaDiffType.VIEW_VIRTUAL_M2M_REMOVE,
-          msg: `Many to many removed(One of the relation column removed)`
-        });
-        continue;
+        changes
+          .find(t => t.tn === childModel.tn)
+          .detectedChanges.push({
+            type: MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE,
+            msg: `Many to many removed(One of the relation column removed)`,
+            colId: relationCol.id,
+            column: relationCol
+          });
       }
-    }
-      * */
 
       continue;
     }
@@ -630,6 +649,7 @@ export async function metaDiffSync(req, res) {
           await change.column.delete();
           break;
         case MetaDiffType.TABLE_RELATION_REMOVE:
+        case MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE:
           await change.column.delete();
           break;
         case MetaDiffType.TABLE_RELATION_ADD:
