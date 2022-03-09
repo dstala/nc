@@ -478,7 +478,7 @@ export default {
         this.metas = this.viewMeta.relatedMetas
 
         this.sortList = this.viewMeta.sorts
-
+        this.viewName = this.viewMeta.title
       //
       //
       //   // eslint-disable-next-line camelcase

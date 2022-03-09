@@ -198,7 +198,7 @@ export const genTest = (apiType, dbType) => {
                 mainPage.clearSort();
                 mainPage
                     .getCell("District", 1)
-                    .contains("Southern Mindanao")
+                    .contains("West Bengali")
                     .should("exist");
             });
 

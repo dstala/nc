@@ -393,6 +393,7 @@
           <template v-else-if=" selectedView.type === viewTypes.FORM">
             <form-view
               :id="selectedViewId"
+              ref="formView"
               :key="selectedViewId + viewKey"
               :view-id="selectedViewId"
               :nodes="nodes"
@@ -447,6 +448,7 @@
         :load="loadViews"
         :hide-views="!relation"
         :show-advance-options.sync="showAdvanceOptions"
+        @rerender="viewKey++"
         :fields-order.sync="fieldsOrder"
         :view-status.sync="viewStatus"
         :columns-width.sync="columnsWidth"

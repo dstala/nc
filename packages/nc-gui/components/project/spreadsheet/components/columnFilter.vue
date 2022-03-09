@@ -117,7 +117,11 @@
             @change="saveOrUpdate(filter, i)"
           >
             <template #item="{item}">
-              <span class="caption font-weight-regular">{{ item._cn }}</span>
+              <span
+                :class="`caption font-weight-regular nc-filter-fld-${item._cn}`"
+              >
+                {{ item._cn }}
+              </span>
             </template>
           </v-select>
           <v-select

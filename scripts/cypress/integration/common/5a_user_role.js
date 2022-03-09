@@ -67,7 +67,7 @@ export const genTest = (apiType, dbType) => {
             // validate if it has 19 entries representing tables & views
             if (isPostgres())
                 cy.get(".nc-acl-table-row").should("have.length", 24);
-            else cy.get(".nc-acl-table-row").should("have.length", 23);
+            else cy.get(".nc-acl-table-row").should("have.length", 19);
 
             // disable table & view access
             //
@@ -196,7 +196,7 @@ export const genTest = (apiType, dbType) => {
                 const verifyCsv = (retrievedRecords) => {
                     // expected output, statically configured
                     let storedRecords = [
-                        `City,City => Address,Country <= City`,
+                        `City,AddressList,CountryRead`,
                         `A Corua (La Corua),939 Probolinggo Loop,Spain`,
                         `Abha,733 Mandaluyong Place,Saudi Arabia`,
                         `Abu Dhabi,535 Ahmadnagar Manor,United Arab Emirates`,

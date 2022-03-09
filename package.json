@@ -29,6 +29,7 @@
   "dependencies": {
     "ioredis-mock": "^7.1.0",
     "mysql2": "^2.3.3",
+    "pg": "^8.7.3",
     "sqlite3": "^5.0.2"
   }
 }

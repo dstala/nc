@@ -105,7 +105,7 @@ export function _editData(roleType, previewMode) {
             .next()
             .next()
             .click({ force: true });
-        cy.getActiveModal().find("button").contains("Save row").should("exist");
+        cy.getActiveModal().find("button").contains("Save Row").should("exist");
         cy.get("body").type("{esc}");
     } else {
         // update cell contents option using row expander should be disabled
@@ -118,7 +118,7 @@ export function _editData(roleType, previewMode) {
             .click({ force: true });
         cy.getActiveModal()
             .find("button:disabled")
-            .contains("Save row")
+            .contains("Save Row")
             .should("exist");
         cy.getActiveModal().find("button").contains("Cancel").click();
         cy.get("body").type("{esc}");
