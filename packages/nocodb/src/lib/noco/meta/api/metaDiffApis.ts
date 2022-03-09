@@ -322,9 +322,7 @@ async function getMetaDiff(
     }); // @ts-ignore
 
   for (const view of viewList) {
-    if (view.tn === 'nc_evolutions') continue;
-
-    const oldMetaIdx = oldTableMetas.findIndex(m => m.tn === view.tn);
+    const oldMetaIdx = oldViewMetas.findIndex(m => m.tn === view.tn);
 
     // new table
     if (oldMetaIdx === -1) {
@@ -341,9 +339,9 @@ async function getMetaDiff(
       continue;
     }
 
-    const oldMeta = oldTableMetas[oldMetaIdx];
+    const oldMeta = oldViewMetas[oldMetaIdx];
 
-    oldTableMetas.splice(oldMetaIdx, 1);
+    oldViewMetas.splice(oldMetaIdx, 1);
 
     const tableProp: MetaDiff = {
       _tn: oldMeta._tn,
