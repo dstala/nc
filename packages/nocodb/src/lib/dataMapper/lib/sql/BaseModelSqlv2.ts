@@ -1001,6 +1001,7 @@ class BaseModelSqlv2 {
         case 'Formula':
           {
             const formula = await column.getColOptions<FormulaColumn>();
+            if (formula.error) continue;
             const selectQb = await formulaQueryBuilderv2(
               formula.formula,
               null,

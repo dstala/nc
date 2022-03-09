@@ -300,6 +300,8 @@ const up = async knex => {
     table.text('formula').notNullable();
     table.text('formula_raw');
 
+    table.text('error');
+
     table.boolean('deleted');
     table.float('order');
     table.timestamps(true, true);

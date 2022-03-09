@@ -19,6 +19,7 @@ import View from './View';
 import Noco from '../noco/Noco';
 import Sort from './Sort';
 import Filter from './Filter';
+import addFormulaErrorIfMissingColumn from '../noco/meta/api/helpers/addFormulaErrorIfMissingColumn';
 
 export default class Column<T = any> implements ColumnType {
   public fk_model_id: string;
@@ -479,6 +480,32 @@ export default class Column<T = any> implements ColumnType {
       }
     }
     // todo: get formula column and mark as error
+    {
+      const formulaColumns = await ncMeta.metaList2(
+        null,
+        null,
+        MetaTable.COLUMNS,
+        {
+          condition: {
+            fk_model_id: col.fk_model_id,
+            uidt: UITypes.Formula
+          }
+        }
+      );
+
+      for (const formulaCol of formulaColumns) {
+        const formula = await new Column(formulaCol).getColOptions<
+          FormulaColumn
+        >();
+        if (
+          addFormulaErrorIfMissingColumn({
+            formula,
+            columnId: id
+          })
+        )
+          await FormulaColumn.update(formula.id, formula, ncMeta);
+      }
+    }
 
     //  if relation column check lookup and rollup and delete
     if (col.uidt === UITypes.LinkToAnotherRecord) {
