@@ -1,6 +1,6 @@
 import Noco from '../../lib/noco/Noco';
 import NocoCache from '../noco-cache/NocoCache';
-import { CacheScope, MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 
 export default class MultiSelectColumn {
   title: string;
@@ -14,7 +14,7 @@ export default class MultiSelectColumn {
     data: Partial<MultiSelectColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const { id } = await ncMeta.metaInsert2(
+    const { id: selectOptionId } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.COL_SELECT_OPTIONS,
@@ -27,10 +27,39 @@ export default class MultiSelectColumn {
     await NocoCache.appendToList(
       CacheScope.COL_SELECT_OPTION,
       [data.fk_column_id],
-      `${CacheScope.COL_SELECT_OPTION}:${id}`
+      `${CacheScope.COL_SELECT_OPTION}:${selectOptionId}`
     );
 
-    return this.read(id);
+    return this.get({ selectOptionId });
+  }
+
+  public static async get(
+    {
+      selectOptionId
+    }: {
+      selectOptionId: string;
+    },
+    ncMeta = Noco.ncMeta
+  ): Promise<MultiSelectColumn> {
+    let data =
+      selectOptionId &&
+      (await NocoCache.get(
+        `${CacheScope.COL_SELECT_OPTION}:${selectOptionId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!data) {
+      data = await ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.COL_SELECT_OPTIONS,
+        selectOptionId
+      );
+      await NocoCache.set(
+        `${CacheScope.COL_SELECT_OPTION}:${selectOptionId}`,
+        data
+      );
+    }
+    return data && new MultiSelectColumn(data);
   }
 
   public static async read(columnId: string) {
