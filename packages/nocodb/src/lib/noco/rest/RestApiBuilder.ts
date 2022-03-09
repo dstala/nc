@@ -37,7 +37,7 @@ import Column from '../../noco-models/Column';
 // import NocoTypeGenerator from '../noco-resolver/NocoTypeGenerator';
 // import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
 // import { RestCtrlv2 } from './RestCtrlv2';
-import registerRestCtrl from './registerRestCtrl';
+// import registerRestCtrl from './registerRestCtrl';
 import { MetaTable } from '../../utils/globals';
 // import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
@@ -384,12 +384,12 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
       await this.generateSwaggerJson(swaggerDoc);
     }
 
-    registerRestCtrl({
-      router: this.router,
-      dbAlias: this.dbAlias,
-      baseId: this.projectId,
-      dbDriver: this.dbDriver
-    });
+    // registerRestCtrl({
+    //   router: this.router,
+    //   dbAlias: this.dbAlias,
+    //   baseId: this.projectId,
+    //   dbDriver: this.dbDriver
+    // });
 
     // const minRouter = new RestCtrlMin(this.app,this.models,this.acls);
     // minRouter.mapRoutes(this.router)
@@ -1042,12 +1042,12 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
     //   }
     // );
 
-    registerRestCtrl({
-      router: this.router,
-      dbAlias: this.dbAlias,
-      baseId: this.projectId,
-      dbDriver: this.dbDriver
-    });
+    // registerRestCtrl({
+    //   router: this.router,
+    //   dbAlias: this.dbAlias,
+    //   baseId: this.projectId,
+    //   dbDriver: this.dbDriver
+    // });
   }
 
   // NOTE: xc-meta

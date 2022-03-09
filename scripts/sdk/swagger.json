@@ -5290,7 +5290,10 @@
           "_cn": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "uidt"
+        ]
       },
       "ColumnList": {
         "description": "",

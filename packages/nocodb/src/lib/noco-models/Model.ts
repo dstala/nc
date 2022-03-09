@@ -139,7 +139,7 @@ export default class Model implements TableType {
     );
 
     for (const column of model?.columns || []) {
-      await Column.insert({ ...column, fk_model_id: id, view }, ncMeta);
+      await Column.insert({ ...column, fk_model_id: id, view } as any, ncMeta);
     }
 
     return this.getWithInfo({ id });

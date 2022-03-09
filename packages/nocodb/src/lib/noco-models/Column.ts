@@ -68,7 +68,12 @@ export default class Column<T = any> implements ColumnType {
   }
 
   public static async insert<T>(
-    column: Partial<T> & { base_id?: string; [key: string]: any },
+    column: Partial<T> & {
+      base_id?: string;
+      [key: string]: any;
+      fk_model_id: string;
+      uidt: UITypes | string;
+    },
     ncMeta = Noco.ncMeta
   ) {
     const insertObj: any = {
@@ -717,6 +722,7 @@ export default class Column<T = any> implements ColumnType {
       dtxs: column.dtxs,
       au: column.au,
       pv: column.pv,
+      system: column.system,
       validate: null
     };
 

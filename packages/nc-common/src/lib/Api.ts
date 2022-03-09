@@ -201,7 +201,7 @@ export interface ColumnType {
   fk_model_id?: string;
   title?: string;
   alias?: string;
-  uidt?: string;
+  uidt: string;
   dt?: string;
   np?: string;
   ns?: string;

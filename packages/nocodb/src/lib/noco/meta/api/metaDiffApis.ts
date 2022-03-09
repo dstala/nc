@@ -4,7 +4,7 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 import Model from '../../../noco-models/Model';
 import Project from '../../../noco-models/Project';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
-import { ModelTypes, RelationTypes, UITypes } from 'nc-common';
+import { isVirtualCol, ModelTypes, RelationTypes } from 'nc-common';
 import { Router } from 'express';
 import Base from '../../../noco-models/Base';
 import ModelXcMetaFactory from '../../../sqlMgr/code/models/xc/ModelXcMetaFactory';
@@ -13,6 +13,7 @@ import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordC
 import { getUniqueColumnAliasName } from './helpers/getUniqueName';
 import NcHelp from '../../../utils/NcHelp';
 import getTableNameAlias, { getColumnNameAlias } from './helpers/getTableName';
+import UITypes from '../../../sqlUi/UITypes';
 
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',
@@ -248,10 +249,10 @@ async function getMetaDiff(
 
     // many to many relation
     if (colOpt.type === RelationTypes.MANY_TO_MANY) {
-      const m2mModel = await colOpt.getRelatedTable();
+      const m2mModel = await colOpt.getMMModel();
 
       const relatedTable = tableList.find(t => t.tn === parentModel.tn);
-      const m2mTable = tableList.find(t => t.tn === m2mTable.tn);
+      const m2mTable = tableList.find(t => t.tn === m2mModel.tn);
 
       if (!relatedTable) {
         changes
@@ -311,6 +312,8 @@ async function getMetaDiff(
 
       continue;
     }
+
+    if (relationCol.colOptions.virtual) continue;
 
     const dbRelation = relationList.find(
       r =>
@@ -704,7 +707,117 @@ export async function metaDiffSync(req, res) {
 
   await NcHelp.executeOperations(virtualColumnInsert, base.type);
 
+  // populate m2m relations
+  await extractAndGenerateManyToManyRelations(await base.getModels());
+
   res.json({ msg: 'success' });
+}
+
+async function isMMRelationAvailable(
+  model: Model,
+  assocModel: Model,
+  belongsToCol: Column<LinkToAnotherRecordColumn>
+) {
+  let isAvail = false;
+  const colChildOpt = await belongsToCol.getColOptions<
+    LinkToAnotherRecordColumn
+  >();
+  for (const col of await model.getColumns()) {
+    if (col.uidt === UITypes.LinkToAnotherRecord) {
+      const colOpt = await col.getColOptions<LinkToAnotherRecordColumn>();
+      if (
+        colOpt.type === RelationTypes.MANY_TO_MANY &&
+        colOpt.fk_mm_model_id === assocModel.id &&
+        colOpt.fk_child_column_id === colChildOpt.fk_child_column_id &&
+        colOpt.fk_mm_child_column_id === colChildOpt.fk_parent_column_id
+      ) {
+        isAvail = true;
+        break;
+      }
+    }
+  }
+  return isAvail;
+}
+
+// @ts-ignore
+async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
+  for (const assocModel of metasArr) {
+    await assocModel.getColumns();
+    // check if table is a Bridge table(or Associative Table) by checking
+    // number of foreign keys and columns
+
+    const normalColumns = assocModel.columns.filter(c => !isVirtualCol(c));
+    const belongsToCols: Column<LinkToAnotherRecordColumn>[] = [];
+    for (const col of assocModel.columns) {
+      if (col.uidt == UITypes.LinkToAnotherRecord) {
+        const colOpt = await col.getColOptions<LinkToAnotherRecordColumn>();
+        if (colOpt?.type === RelationTypes.BELONGS_TO) belongsToCols.push(col);
+      }
+    }
+
+    // todo: impl proper way to identify m2m relation
+    if (belongsToCols?.length === 2 && normalColumns.length < 5) {
+      const modelA = await belongsToCols[0].colOptions.getRelatedTable();
+      const modelB = await belongsToCols[1].colOptions.getRelatedTable();
+
+      await modelA.getColumns();
+      await modelB.getColumns();
+
+      // check tableA already have the relation or not
+      const isRelationAvailInA = await isMMRelationAvailable(
+        modelA,
+        assocModel,
+        belongsToCols[0]
+      );
+      const isRelationAvailInB = await isMMRelationAvailable(
+        modelB,
+        assocModel,
+        belongsToCols[1]
+      );
+
+      if (!isRelationAvailInA) {
+        await Column.insert<LinkToAnotherRecordColumn>({
+          _cn: getUniqueColumnAliasName(modelA.columns, `${modelB._tn}MMList`),
+          fk_model_id: modelA.id,
+          fk_mm_model_id: assocModel.id,
+          fk_child_column_id: belongsToCols[0].colOptions.fk_parent_column_id,
+          fk_parent_column_id: belongsToCols[1].colOptions.fk_parent_column_id,
+          fk_mm_child_column_id: belongsToCols[0].colOptions.fk_child_column_id,
+          fk_mm_parent_column_id:
+            belongsToCols[1].colOptions.fk_child_column_id,
+          type: RelationTypes.MANY_TO_MANY,
+          uidt: UITypes.LinkToAnotherRecord
+        });
+      }
+      if (!isRelationAvailInB) {
+        await Column.insert<LinkToAnotherRecordColumn>({
+          _cn: getUniqueColumnAliasName(modelB.columns, `${modelA._tn}MMList`),
+          fk_model_id: modelB.id,
+          fk_mm_model_id: assocModel.id,
+          fk_child_column_id: belongsToCols[1].colOptions.fk_parent_column_id,
+          fk_parent_column_id: belongsToCols[0].colOptions.fk_parent_column_id,
+          fk_mm_child_column_id: belongsToCols[1].colOptions.fk_child_column_id,
+          fk_mm_parent_column_id:
+            belongsToCols[0].colOptions.fk_child_column_id,
+          type: RelationTypes.MANY_TO_MANY,
+          uidt: UITypes.LinkToAnotherRecord
+        });
+      }
+
+      // todo: set assoc table as mm table
+
+      await Column.update(belongsToCols[0].id, {
+        ...belongsToCols[0],
+        ...belongsToCols[0].colOptions,
+        system: true
+      });
+      await Column.update(belongsToCols[1].id, {
+        ...belongsToCols[1],
+        ...belongsToCols[1].colOptions,
+        system: true
+      });
+    }
+  }
 }
 
 const router = Router();
