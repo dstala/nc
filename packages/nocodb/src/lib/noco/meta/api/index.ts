@@ -28,6 +28,7 @@ import { initStrategies } from './userApi/initStrategies';
 import modelVisibilityApis from './modelVisibilityApis';
 import publicDataExportApis from './publicDataExportApis';
 import metaDiffApis from './metaDiffApis';
+import cacheApis from './cacheApis';
 
 export default function(router: Router) {
   initStrategies(router);
@@ -58,6 +59,7 @@ export default function(router: Router) {
   router.use(sharedBaseApis);
   router.use(modelVisibilityApis);
   router.use(metaDiffApis);
+  router.use(cacheApis);
 
   userApis(router);
 }

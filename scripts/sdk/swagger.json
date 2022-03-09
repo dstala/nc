@@ -4018,6 +4018,31 @@
         ],
         "description": ""
       }
+    },
+    "/cache": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [
+          "Meta"
+        ],
+        "responses": {},
+        "operationId": "cache-get",
+        "description": "Get All K/V pairs in NocoCache"
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "cache-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Delete All K/V pairs in NocoCache",
+        "tags": [
+          "Meta"
+        ]
+      },
+      "parameters": []
     }
   },
   "components": {
@@ -5407,7 +5432,18 @@
           "order": {
             "type": "number"
           }
-        }
+        },
+        "examples": [
+          {
+            "id": "string",
+            "type": "string",
+            "virtual": true,
+            "fk_column_id": "string",
+            "title": "string",
+            "color": "string",
+            "order": 0
+          }
+        ]
       },
       "Grid": {
         "title": "Grid",

@@ -2758,6 +2758,36 @@ export class Api<
         format: 'json',
         ...params,
       }),
+
+    /**
+     * @description Get All K/V pairs in NocoCache
+     *
+     * @tags Meta
+     * @name CacheGet
+     * @summary Your GET endpoint
+     * @request GET:/cache
+     */
+    cacheGet: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/cache`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * @description Delete All K/V pairs in NocoCache
+     *
+     * @tags Meta
+     * @name CacheDelete
+     * @request DELETE:/cache
+     * @response `200` `void` OK
+     */
+    cacheDelete: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/cache`,
+        method: 'DELETE',
+        ...params,
+      }),
   };
   projects = {
     /**

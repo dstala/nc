@@ -220,4 +220,12 @@ export default class RedisMockCacheMgr extends CacheMgr {
     list.push(key);
     return this.set(listKey, list);
   }
+
+  async destroy(): Promise<boolean> {
+    return this.client.flushdb();
+  }
+
+  async export(): Promise<any> {
+    // TODO:
+  }
 }
