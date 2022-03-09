@@ -291,7 +291,8 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
               fk_mm_child_column_id,
               fk_mm_parent_column_id,
               order: colOrder++,
-              fk_related_model_id: column.hm ? tnId : rtnId
+              fk_related_model_id: column.hm ? tnId : rtnId,
+              system: column.system
             });
           } catch (e) {
             console.log(e);
@@ -474,10 +475,16 @@ async function getManyToManyRelations(
   // Update metadata of tables which have manytomany relation
   // and recreate basemodel with new meta information
   for (const meta of metas) {
+    const mmBtRelation = meta.v.find(
+      vc => !(vc.hm && meta.manyToMany.some(mm => vc.hm.tn === mm.vtn))
+    );
+    if (mmBtRelation) mmBtRelation.system = true;
+
     meta.v = [
-      ...meta.v.filter(
-        vc => !(vc.hm && meta.manyToMany.some(mm => vc.hm.tn === mm.vtn))
-      ),
+      ...meta.v,
+      //   .filter(
+      //   // vc => !(vc.hm && meta.manyToMany.some(mm => vc.hm.tn === mm.vtn))
+      // ),
       // todo: ignore duplicate m2m relations
       // todo: optimize, just compare associative table(Vtn)
       ...meta.manyToMany

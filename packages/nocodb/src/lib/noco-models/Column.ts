@@ -95,7 +95,8 @@ export default class Column<T = any> implements ColumnType {
       pv: column.pv,
       order: column.order,
       project_id: column.project_id,
-      base_id: column.base_id
+      base_id: column.base_id,
+      system: column.system
     };
 
     if (column.validate) {

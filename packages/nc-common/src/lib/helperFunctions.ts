@@ -28,6 +28,7 @@ const isSystemColumn = (col) => col.uidt === UITypes.ForeignKey ||
   col.cn === 'created_at' ||
   col.cn === 'updated_at' ||
   (col.pk && (col.ai || col.cdf)
+    || col.system
   )
 
 
