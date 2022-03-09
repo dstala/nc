@@ -14,7 +14,7 @@ export default class MultiSelectColumn {
     data: Partial<MultiSelectColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const { id: selectOptionId } = await ncMeta.metaInsert2(
+    const { id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.COL_SELECT_OPTIONS,
@@ -27,20 +27,13 @@ export default class MultiSelectColumn {
     await NocoCache.appendToList(
       CacheScope.COL_SELECT_OPTION,
       [data.fk_column_id],
-      `${CacheScope.COL_SELECT_OPTION}:${selectOptionId}`
+      `${CacheScope.COL_SELECT_OPTION}:${id}`
     );
 
-    return this.get({ selectOptionId });
+    return this.get(id);
   }
 
-  public static async get(
-    {
-      selectOptionId
-    }: {
-      selectOptionId: string;
-    },
-    ncMeta = Noco.ncMeta
-  ): Promise<MultiSelectColumn> {
+  public static async get(selectOptionId: string): Promise<MultiSelectColumn> {
     let data =
       selectOptionId &&
       (await NocoCache.get(
@@ -48,7 +41,7 @@ export default class MultiSelectColumn {
         CacheGetType.TYPE_OBJECT
       ));
     if (!data) {
-      data = await ncMeta.metaGet2(
+      data = await Noco.ncMeta.metaGet2(
         null,
         null,
         MetaTable.COL_SELECT_OPTIONS,
