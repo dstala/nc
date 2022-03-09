@@ -17,6 +17,8 @@ import {
 } from '../utils/globals';
 import View from './View';
 import Noco from '../noco/Noco';
+import Sort from './Sort';
+import Filter from './Filter';
 
 export default class Column<T = any> implements ColumnType {
   public fk_model_id: string;
@@ -455,11 +457,72 @@ export default class Column<T = any> implements ColumnType {
   static async delete(id, ncMeta = Noco.ncMeta) {
     const col = await this.get({ colId: id }, ncMeta);
 
-    // todo: redis del - sort, filter, grid column, columns
-    // todo: delete from view column list
-    // todo: delete from sort list
-    // todo: delete from filter list
+    // todo: or instead of delete reset related foreign key value to null and handle in BaseModel
 
+    // get lookup columns and delete
+    {
+      const lookups = await ncMeta.metaList2(null, null, MetaTable.COL_LOOKUP, {
+        condition: { fk_lookup_column_id: id }
+      });
+      for (const lookup of lookups) {
+        await Column.delete(lookup.fk_column_id, ncMeta);
+      }
+    }
+
+    // get rollup column and delete
+    {
+      const rollups = await ncMeta.metaList2(null, null, MetaTable.COL_ROLLUP, {
+        condition: { fk_rollup_column_id: id }
+      });
+      for (const rollup of rollups) {
+        await Column.delete(rollup.fk_column_id, ncMeta);
+      }
+    }
+    // todo: get formula column and mark as error
+
+    //  if relation column check lookup and rollup and delete
+    if (col.uidt === UITypes.LinkToAnotherRecord) {
+      // get lookup columns using relation and delete
+      const lookups = await ncMeta.metaList2(null, null, MetaTable.COL_LOOKUP, {
+        condition: { fk_relation_column_id: id }
+      });
+      for (const lookup of lookups) {
+        await Column.delete(lookup.fk_column_id, ncMeta);
+      }
+
+      // get rollup columns using relation and delete
+      const rollups = await ncMeta.metaList2(null, null, MetaTable.COL_ROLLUP, {
+        condition: { fk_relation_column_id: id }
+      });
+      for (const rollup of rollups) {
+        await Column.delete(rollup.fk_column_id, ncMeta);
+      }
+    }
+
+    // delete sorts
+    {
+      const sorts = await ncMeta.metaList2(null, null, MetaTable.SORT, {
+        condition: {
+          fk_column_id: id
+        }
+      });
+      for (const sort of sorts) {
+        await Sort.delete(sort.id, ncMeta);
+      }
+    }
+    // delete filters
+    {
+      const filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
+        condition: {
+          fk_column_id: id
+        }
+      });
+      for (const filter of filters) {
+        await Filter.delete(filter.id, ncMeta);
+      }
+    }
+
+    // Delete from view columns
     let colOptionTableName = null;
     let cacheScopeName = null;
     switch (col.uidt) {
@@ -528,6 +591,7 @@ export default class Column<T = any> implements ColumnType {
       `${CacheScope.GALLERY_VIEW_COLUMN}:${col.id}`,
       CacheDelDirection.CHILD_TO_PARENT
     );
+
     await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, col.id);
     await NocoCache.deepDel(
       CacheScope.COLUMN,

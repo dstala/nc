@@ -238,7 +238,60 @@ async function getMetaDiff(
     const childModel = await childCol.getModel();
 
     // todo: many to many
-    if (colOpt.type === RelationTypes.MANY_TO_MANY) continue;
+    if (colOpt.type === RelationTypes.MANY_TO_MANY) {
+      /*
+       const rTable = tableList.find(t => t.tn === vCol.mm?.rtn);
+      const m2mTable = tableList.find(t => t.tn === vCol.mm?.vtn);
+
+      if (!rTable) {
+        viewProp.detectedChanges.push({
+          ...vCol,
+          type: XcMetaDiffType.VIEW_VIRTUAL_M2M_REMOVE,
+          msg: `Many to many removed(${vCol.mm?.rtn} removed)`
+        });
+        continue;
+      }
+      if (!m2mTable) {
+        viewProp.detectedChanges.push({
+          ...vCol,
+          type: XcMetaDiffType.VIEW_VIRTUAL_M2M_REMOVE,
+          msg: `Many to many removed(${vCol.mm?.vtn} removed)`
+        });
+        continue;
+      }
+
+      // verify columns
+
+      const pColumns = (colListRef[vCol.mm.tn] =
+        colListRef[vCol.mm.tn] ||
+        (await sqlClient.columnList({ tn: vCol.mm.tn }))?.data?.list);
+
+      const cColumns = (colListRef[vCol.mm.rtn] =
+        colListRef[vCol.mm.rtn] ||
+        (await sqlClient.columnList({ tn: vCol.mm.rtn }))?.data?.list);
+
+      const vColumns = (colListRef[vCol.mm.vtn] =
+        colListRef[vCol.mm.vtn] ||
+        (await sqlClient.columnList({ tn: vCol.mm.vtn }))?.data?.list);
+
+      if (
+        pColumns.every(c => c.cn !== vCol.mm.cn) ||
+        cColumns.every(c => c.cn !== vCol.mm.rcn) ||
+        vColumns.every(c => c.cn !== vCol.mm.vcn) ||
+        vColumns.every(c => c.cn !== vCol.mm.vrcn)
+      ) {
+        viewProp.detectedChanges.push({
+          ...vCol,
+          type: XcMetaDiffType.VIEW_VIRTUAL_M2M_REMOVE,
+          msg: `Many to many removed(One of the relation column removed)`
+        });
+        continue;
+      }
+    }
+      * */
+
+      continue;
+    }
 
     const dbRelation = relationList.find(
       r =>

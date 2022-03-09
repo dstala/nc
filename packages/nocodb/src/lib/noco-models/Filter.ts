@@ -146,14 +146,14 @@ export default class Filter {
     );
   }
 
-  static async delete(id: string) {
+  static async delete(id: string, ncMeta = Noco.ncMeta) {
     const filter = await this.get(id);
 
     const deleteRecursively = async (filter: Filter) => {
       if (!filter) return;
       for (const f of (await filter?.getChildren()) || [])
         await deleteRecursively(f);
-      await Noco.ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
+      await ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
       await NocoCache.deepDel(
         CacheScope.FILTER_EXP,
         `${CacheScope.FILTER_EXP}:${filter.id}`,
