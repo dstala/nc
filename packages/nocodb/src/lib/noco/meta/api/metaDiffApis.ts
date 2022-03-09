@@ -12,6 +12,7 @@ import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import { getUniqueColumnAliasName } from './helpers/getUniqueName';
 import NcHelp from '../../../utils/NcHelp';
+import getTableNameAlias, { getColumnNameAlias } from './helpers/getTableName';
 
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',
@@ -469,8 +470,11 @@ export async function metaDiffSync(req, res) {
             const ctx = {
               dbType: base.type,
               tn,
-              _tn: tn,
-              columns,
+              _tn: getTableNameAlias(tn, project.prefix),
+              columns: columns.map(c => ({
+                ...c,
+                _cn: getColumnNameAlias(c.cn)
+              })),
               relations,
               hasMany,
               belongsTo,
@@ -506,8 +510,11 @@ export async function metaDiffSync(req, res) {
             const ctx = {
               dbType: base.type,
               tn,
-              _tn: tn,
-              columns,
+              _tn: getTableNameAlias(tn, project.prefix),
+              columns: columns.map(c => ({
+                ...c,
+                _cn: getColumnNameAlias(c.cn)
+              })),
               relations: [],
               hasMany: [],
               belongsTo: [],
@@ -543,7 +550,7 @@ export async function metaDiffSync(req, res) {
             );
             column.uidt = metaFact.getUIDataType(column);
             //todo: inflection
-            column._cn = column.cn;
+            column._cn = getColumnNameAlias(column.cn);
             await Column.insert({ fk_model_id: change.id, ...column });
           }
           // update old
