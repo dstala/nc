@@ -42,17 +42,17 @@ type MetaDiffChange = {
   // type: MetaDiffType;
 } & (
   | {
-      type: MetaDiffType.TABLE_NEW;
+      type: MetaDiffType.TABLE_NEW | MetaDiffType.VIEW_NEW;
       tn?: string;
     }
   | {
-      type: MetaDiffType.TABLE_REMOVE;
+      type: MetaDiffType.TABLE_REMOVE | MetaDiffType.VIEW_REMOVE;
       tn?: string;
       model?: Model;
       id?: string;
     }
   | {
-      type: MetaDiffType.TABLE_COLUMN_ADD;
+      type: MetaDiffType.TABLE_COLUMN_ADD | MetaDiffType.VIEW_COLUMN_ADD;
       tn?: string;
       model?: Model;
       id?: string;
@@ -61,7 +61,9 @@ type MetaDiffChange = {
   | {
       type:
         | MetaDiffType.TABLE_COLUMN_TYPE_CHANGE
-        | MetaDiffType.TABLE_COLUMN_REMOVE;
+        | MetaDiffType.VIEW_COLUMN_TYPE_CHANGE
+        | MetaDiffType.TABLE_COLUMN_REMOVE
+        | MetaDiffType.VIEW_COLUMN_REMOVE;
       tn?: string;
       model?: Model;
       id?: string;
@@ -105,10 +107,15 @@ async function getMetaDiff(
   });
 
   const colListRef = {};
-  // @ts-ignore
   const oldMetas = await base.getModels();
   // @ts-ignore
-  const relationList = (await sqlClient.relationListAll())?.data?.list;
+  const oldTableMetas: Model[] = [];
+  const oldViewMetas: Model[] = [];
+
+  for (const model of oldMetas) {
+    if (model.type === ModelTypes.TABLE) oldTableMetas.push(model);
+    else if (model.type === ModelTypes.VIEW) oldViewMetas.push(model);
+  }
 
   // @ts-ignore
   const relationList = (await sqlClient.relationListAll())?.data?.list;
@@ -116,7 +123,7 @@ async function getMetaDiff(
   for (const table of tableList) {
     if (table.tn === 'nc_evolutions') continue;
 
-    const oldMetaIdx = oldMetas.findIndex(m => m.tn === table.tn);
+    const oldMetaIdx = oldTableMetas.findIndex(m => m.tn === table.tn);
 
     // new table
     if (oldMetaIdx === -1) {
@@ -133,9 +140,9 @@ async function getMetaDiff(
       continue;
     }
 
-    const oldMeta = oldMetas[oldMetaIdx];
+    const oldMeta = oldTableMetas[oldMetaIdx];
 
-    oldMetas.splice(oldMetaIdx, 1);
+    oldTableMetas.splice(oldMetaIdx, 1);
 
     const tableProp: MetaDiff = {
       _tn: oldMeta._tn,
@@ -205,7 +212,7 @@ async function getMetaDiff(
     }
   }
 
-  for (const model of oldMetas) {
+  for (const model of oldTableMetas) {
     changes.push({
       tn: model.tn,
       type: ModelTypes.TABLE,
@@ -293,6 +300,125 @@ async function getMetaDiff(
     }
   }
 
+  // views
+  // @ts-ignore
+  const viewList = (await sqlClient.viewList())?.data?.list
+    ?.map(v => {
+      v.type = 'view';
+      v.tn = v.view_name;
+      return v;
+    })
+    .filter(t => {
+      if (project?.prefix) {
+        return t.tn?.startsWith(project?.prefix);
+      }
+      return true;
+    }); // @ts-ignore
+
+  for (const view of viewList) {
+    if (view.tn === 'nc_evolutions') continue;
+
+    const oldMetaIdx = oldTableMetas.findIndex(m => m.tn === view.tn);
+
+    // new table
+    if (oldMetaIdx === -1) {
+      changes.push({
+        tn: view.tn,
+        type: ModelTypes.VIEW,
+        detectedChanges: [
+          {
+            type: MetaDiffType.VIEW_NEW,
+            msg: `New view`
+          }
+        ]
+      });
+      continue;
+    }
+
+    const oldMeta = oldTableMetas[oldMetaIdx];
+
+    oldTableMetas.splice(oldMetaIdx, 1);
+
+    const tableProp: MetaDiff = {
+      _tn: oldMeta._tn,
+      tn: view.tn,
+      type: ModelTypes.VIEW,
+      detectedChanges: []
+    };
+    changes.push(tableProp);
+
+    // check for column change
+    colListRef[view.tn] = (
+      await sqlClient.columnList({ tn: view.tn })
+    )?.data?.list;
+
+    await oldMeta.getColumns(true);
+
+    for (const column of colListRef[view.tn]) {
+      const oldColIdx = oldMeta.columns.findIndex(c => c.cn === column.cn);
+
+      // new table
+      if (oldColIdx === -1) {
+        tableProp.detectedChanges.push({
+          type: MetaDiffType.VIEW_COLUMN_ADD,
+          msg: `New column(${column.cn})`,
+          cn: column.cn,
+          id: oldMeta.id
+        });
+        continue;
+      }
+
+      const [oldCol] = oldMeta.columns.splice(oldColIdx, 1);
+
+      if (oldCol.dt !== column.dt) {
+        tableProp.detectedChanges.push({
+          type: MetaDiffType.TABLE_COLUMN_TYPE_CHANGE,
+          msg: `Column type changed(${column.cn})`,
+          cn: oldCol.cn,
+          id: oldMeta.id,
+          column: oldCol
+        });
+      }
+    }
+    for (const column of oldMeta.columns) {
+      if (
+        [
+          UITypes.LinkToAnotherRecord,
+          UITypes.Rollup,
+          UITypes.Lookup,
+          UITypes.Formula
+        ].includes(column.uidt)
+      ) {
+        continue;
+      }
+
+      tableProp.detectedChanges.push({
+        type: MetaDiffType.VIEW_COLUMN_REMOVE,
+        msg: `Column removed(${column.cn})`,
+        cn: column.cn,
+        id: oldMeta.id,
+        column: column,
+        colId: column.id
+      });
+    }
+  }
+
+  for (const model of oldViewMetas) {
+    changes.push({
+      tn: model.tn,
+      type: ModelTypes.TABLE,
+      detectedChanges: [
+        {
+          type: MetaDiffType.VIEW_REMOVE,
+          msg: `Table removed`,
+          tn: model.tn,
+          id: model.id,
+          model
+        }
+      ]
+    });
+  }
+
   return changes;
 }
 
@@ -370,12 +496,40 @@ export async function metaDiffSync(req, res) {
             }
           }
           break;
+        case MetaDiffType.VIEW_NEW:
+          {
+            const columns = (await sqlClient.columnList({ tn }))?.data?.list;
+            const ctx = {
+              dbType: base.type,
+              tn,
+              _tn: tn,
+              columns,
+              relations: [],
+              hasMany: [],
+              belongsTo: [],
+              project_id: project.id
+            };
+
+            /* create models from table metadata */
+            const meta = ModelXcMetaFactory.create(
+              { client: base.type },
+              {
+                dir: '',
+                ctx,
+                filename: ''
+              }
+            ).getObject();
+            await Model.insert(project.id, base.id, meta);
+          }
+          break;
         case MetaDiffType.TABLE_REMOVE:
+        case MetaDiffType.VIEW_REMOVE:
           {
             await change.model.delete();
           }
           break;
         case MetaDiffType.TABLE_COLUMN_ADD:
+        case MetaDiffType.VIEW_COLUMN_ADD:
           {
             const columns = (await sqlClient.columnList({ tn }))?.data?.list;
             const column = columns.find(c => c.cn === change.cn);
@@ -394,6 +548,7 @@ export async function metaDiffSync(req, res) {
 
           break;
         case MetaDiffType.TABLE_COLUMN_TYPE_CHANGE:
+        case MetaDiffType.VIEW_COLUMN_TYPE_CHANGE:
           {
             const columns = (await sqlClient.columnList({ tn }))?.data?.list;
             const column = columns.find(c => c.cn === change.cn);
@@ -407,6 +562,7 @@ export async function metaDiffSync(req, res) {
           }
           break;
         case MetaDiffType.TABLE_COLUMN_REMOVE:
+        case MetaDiffType.VIEW_COLUMN_REMOVE:
           await change.column.delete();
           break;
         case MetaDiffType.TABLE_RELATION_REMOVE:
