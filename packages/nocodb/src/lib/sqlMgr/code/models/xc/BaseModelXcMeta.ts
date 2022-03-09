@@ -4,7 +4,7 @@ import UITypes from '../../../../sqlUi/UITypes';
 abstract class BaseModelXcMeta extends BaseRender {
   protected abstract _getAbstractType(column: any): any;
 
-  protected abstract _getUIDataType(column: any): any;
+  public abstract getUIDataType(column: any): any;
 
   public getXcColumnsObject(args) {
     const columnsArr = [];
@@ -24,7 +24,7 @@ abstract class BaseModelXcMeta extends BaseRender {
         type: this._getAbstractType(column),
         dt: column.dt,
 
-        uidt: column.uidt || this._getUIDataType(column),
+        uidt: column.uidt || this.getUIDataType(column),
         uip: column.uip,
         uicn: column.uicn,
         ...column

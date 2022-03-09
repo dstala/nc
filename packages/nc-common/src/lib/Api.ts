@@ -567,8 +567,6 @@ export interface TableListParamsType {
   baseId: string;
 }
 
-export type MetaDiffSyncPayloadType = any;
-
 export interface TableUpdatePayloadType {
   _tn?: string;
 }
@@ -1353,14 +1351,11 @@ export class Api<
     metaDiffSync: (
       projectId: string,
       baseId: string,
-      data: MetaDiffSyncPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
         path: `/projects/${projectId}/${baseId}/metaDiff`,
         method: 'POST',
-        body: data,
-        type: ContentType.Json,
         format: 'json',
         ...params,
       }),

@@ -344,10 +344,11 @@ export default {
 */
     async syncMetaDiff() {
       try {
-        await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-          dbAlias: this.db.meta.dbAlias,
-          env: this.$store.getters['project/GtrEnv']
-        }, 'xcMetaDiffSync', {}])
+        await this.$api.meta.metaDiffSync(this.$store.state.project.projectId, this.db.id)
+        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
+        //   dbAlias: this.db.meta.dbAlias,
+        //   env: this.$store.getters['project/GtrEnv']
+        // }, 'xcMetaDiffSync', {}])
         this.$toast.success('Table metadata recreated successfully').goAway(3000)
         await this.loadXcDiff()
 

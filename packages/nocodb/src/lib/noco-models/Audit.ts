@@ -106,4 +106,10 @@ export default class Audit implements AuditType {
         .count('id', { as: 'count' })
     )?.count;
   }
+
+  static async deleteRowComments(fk_model_id: string, ncMeta = Noco.ncMeta) {
+    return ncMeta.metaDelete(null, null, MetaTable.AUDIT, {
+      fk_model_id
+    });
+  }
 }
