@@ -22,6 +22,7 @@ import View from '../../../noco-models/View';
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
+  isSystemColumn,
   RelationTypes,
   ViewTypes
 } from 'nc-common';
@@ -446,7 +447,11 @@ class BaseModelSqlv2 {
     }
   }*/
 
-  public async defaultResolverReq(query?: any, extractOnlyPrimaries = false) {
+  public async defaultResolverReq(
+    query?: any,
+    extractOnlyPrimaries = false,
+    includePkByDefault = true
+  ) {
     await this.model.getColumns();
     if (extractOnlyPrimaries) {
       return {
@@ -468,13 +473,18 @@ class BaseModelSqlv2 {
     if (fields && fields !== '*') {
       return fields.split(',').reduce((obj, f) => ({ ...obj, [f]: 1 }), {});
     }
+    const view = await View.get(this.viewId);
 
     return this.model.getColumns().then(columns =>
       Promise.resolve(
         columns.reduce(
           (obj, col) => ({
             ...obj,
-            [col._cn]: allowedCols && !col.pk ? allowedCols[col.id] : 1
+            [col._cn]:
+              allowedCols && (!includePkByDefault || !col.pk)
+                ? allowedCols[col.id] &&
+                  (!isSystemColumn(col) || view.show_system_fields)
+                : 1
           }),
           {}
         )

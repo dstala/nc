@@ -1461,7 +1461,7 @@
                   "title": {
                     "type": "string"
                   },
-                  "hide_system_fields": {
+                  "show_system_fields": {
                     "type": "boolean"
                   },
                   "lock_type": {

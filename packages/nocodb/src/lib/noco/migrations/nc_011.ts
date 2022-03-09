@@ -321,7 +321,7 @@ const up = async knex => {
     table.string('title');
     table.integer('type');
     table.boolean('is_default');
-    table.boolean('hide_system_fields');
+    table.boolean('show_system_fields');
     table.string('lock_type').defaultTo('collaborative');
 
     table.string('uuid');

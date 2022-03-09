@@ -448,13 +448,13 @@
         :load="loadViews"
         :hide-views="!relation"
         :show-advance-options.sync="showAdvanceOptions"
-        @rerender="viewKey++"
         :fields-order.sync="fieldsOrder"
         :view-status.sync="viewStatus"
         :columns-width.sync="columnsWidth"
         :show-system-fields.sync="showSystemFields"
         :extra-view-params.sync="extraViewParams"
         :views.sync="meta.views"
+        @rerender="viewKey++"
         @generateNewViewKey="generateNewViewKey"
         @mapFieldsAndShowFields="mapFieldsAndShowFields"
         @loadTableData="loadTableData"
@@ -1567,13 +1567,13 @@ export default {
     },
     showSystemFields: {
       get() {
-        return this.selectedView && this.selectedView.hide_system_fields
+        return this.selectedView && this.selectedView.show_system_fields
       },
       set(v) {
         if (this.selectedView) {
-          this.selectedView.hide_system_fields = v
+          this.selectedView.show_system_fields = v
           this.$api.meta.viewUpdate(this.selectedViewId, {
-            hide_system_fields: v
+            show_system_fields: v
           })
         }
       }

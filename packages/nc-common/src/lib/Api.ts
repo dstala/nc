@@ -578,7 +578,7 @@ export interface TableReorderPayloadType {
 export interface ViewUpdatePayloadType {
   order?: string;
   title?: string;
-  hide_system_fields?: boolean;
+  show_system_fields?: boolean;
   lock_type?: 'collaborative' | 'locked' | 'personal';
 }
 

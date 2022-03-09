@@ -5,7 +5,7 @@ import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { nocoExecute } from '../../noco-resolver/NocoExecute';
 import papaparse from 'papaparse';
-import { UITypes } from 'nc-common';
+import { isSystemColumn, UITypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
@@ -29,7 +29,8 @@ async function exportCsv(req: Request, res: Response, next) {
     .map(
       c =>
         new Column({ ...c, ...view.model.columnsById[c.fk_column_id] } as any)
-    ) as any;
+    )
+    .filter(column => !isSystemColumn(column) || view.show_system_fields);
 
   if (!model) return next(new Error('Table not found'));
 
@@ -42,7 +43,7 @@ async function exportCsv(req: Request, res: Response, next) {
 
   const key = `${model._tn}List`;
   const requestObj = {
-    [key]: await baseModel.defaultResolverReq(req.query)
+    [key]: await baseModel.defaultResolverReq(req.query, false, false)
   };
 
   let offset = +req.query.offset || 0;
@@ -83,6 +84,7 @@ async function exportCsv(req: Request, res: Response, next) {
       const csvRow = { ...row };
 
       for (const column of view.model.columns) {
+        if (isSystemColumn(column) && !view.show_system_fields) continue;
         csvRow[column._cn] = await serializeCellValue({
           value: row[column._cn],
           column

@@ -40,6 +40,7 @@ export default class View implements ViewType {
   filter: Filter;
   project_id?: string;
   base_id?: string;
+  show_system_fields?: boolean;
 
   constructor(data: View) {
     Object.assign(this, data);
@@ -569,13 +570,14 @@ export default class View implements ViewType {
     body: {
       title: string;
       order: number;
+      show_system_fields?: boolean;
     },
     ncMeta = Noco.ncMeta
   ) {
     const updateObj = extractProps(body, [
       'title',
       'order',
-      'hide_system_fields',
+      'show_system_fields',
       'lock_type'
     ]);
     // get existing cache
