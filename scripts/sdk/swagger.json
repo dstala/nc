@@ -2896,6 +2896,86 @@
         ]
       }
     },
+    "/public/data/{uuid}/{rowId}/{relationType}/{columnId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "uuid",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "rowId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string",
+            "enum": [
+              "mm",
+              "hm"
+            ]
+          },
+          "name": "relationType",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "columnId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "data-nested-list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Public"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "limit"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "offset"
+          }
+        ]
+      }
+    },
     "public/data/{uuid}/create": {
       "parameters": [
         {
@@ -4018,6 +4098,31 @@
         ],
         "description": ""
       }
+    },
+    "/cache": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [
+          "Meta"
+        ],
+        "responses": {},
+        "operationId": "cache-get",
+        "description": "Get All K/V pairs in NocoCache"
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "cache-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Delete All K/V pairs in NocoCache",
+        "tags": [
+          "Meta"
+        ]
+      },
+      "parameters": []
     }
   },
   "components": {
@@ -5407,7 +5512,18 @@
           "order": {
             "type": "number"
           }
-        }
+        },
+        "examples": [
+          {
+            "id": "string",
+            "type": "string",
+            "virtual": true,
+            "fk_column_id": "string",
+            "title": "string",
+            "color": "string",
+            "order": 0
+          }
+        ]
       },
       "Grid": {
         "title": "Grid",

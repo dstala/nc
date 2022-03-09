@@ -115,6 +115,7 @@
 </template>
 
 <script>
+import { RelationTypes } from 'nc-common'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
 
 export default {
@@ -178,23 +179,48 @@ export default {
   methods: {
     async loadData() {
       if ((!this.isForm && this.isPublic) && this.$route.params.id) {
-        this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedChildDataGet', {
-          password: this.password,
-          limit: this.size,
-          tn: this.tn,
-          view_id: this.$route.params.id,
-          row_id: this.rowId,
-          offset: this.size * (this.page - 1),
-          query: this.query,
-          _cn: this.column._cn,
-          ptn: this.parentMeta.tn,
-          ctn: this.meta.tn,
-          type: this.type
-        }])
+        // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedChildDataGet', {
+        //   password: this.password,
+        //   limit: this.size,
+        //   tn: this.tn,
+        //   view_id: this.$route.params.id,
+        //   row_id: this.rowId,
+        //   offset: this.size * (this.page - 1),
+        //   query: this.query,
+        //   _cn: this.column._cn,
+        //   ptn: this.parentMeta.tn,
+        //   ctn: this.meta.tn,
+        //   type: this.type
+        // }])
+
+        if (this.column && this.column.colOptions && this.column.colOptions.type === RelationTypes.MANY_TO_MANY) {
+          this.data = (await this.$api.public.dataNestedList({
+            uuid: this.$route.params.id,
+            relationType: 'mm',
+            rowId: this.rowId,
+            limit: this.size,
+            offset: this.size * (this.page - 1),
+            query: this.query,
+            columnId: this.column.fk_column_id
+          }, {})).data.data
+        } else {
+          this.data = (await this.$api.public.dataNestedList({
+            uuid: this.$route.params.id,
+            relationType: 'hm',
+            rowId: this.rowId,
+            limit: this.size,
+            offset: this.size * (this.page - 1),
+            query: this.query,
+            columnId: this.column.fk_column_id
+          }, {})).data.data
+        }
+
         return
       }
 
-      if (this.isNew) { return }
+      if (this.isNew) {
+        return
+      }
       if (this.column && this.column.colOptions && this.column.colOptions.type === 'mm') {
         this.data = (await this.$api.data.mmList(
           this.column.fk_model_id,

@@ -5,7 +5,7 @@ import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import View from '../../../noco-models/View';
-import catchError from './helpers/catchError';
+import catchError, { NcError } from './helpers/catchError';
 import multer from 'multer';
 import { ErrorMessages, UITypes, ViewTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
@@ -26,25 +26,19 @@ export async function dataList(req: Request, res: Response, next) {
       id: view?.fk_model_id
     });
 
-    console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
-    console.time('BaseModel.get');
+
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
       viewId: view?.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
 
-    console.timeEnd('BaseModel.get');
-
-    console.time('BaseModel.defaultResolverReq');
     const key = `${model._tn}List`;
     const requestObj = {
       [key]: await baseModel.defaultResolverReq(req.query)
     };
-    console.timeEnd('BaseModel.defaultResolverReq');
 
-    console.time('nocoExecute');
     const data = (
       await nocoExecute(
         requestObj,
@@ -59,8 +53,6 @@ export async function dataList(req: Request, res: Response, next) {
     )?.[key];
 
     const count = await baseModel.count(req.query);
-
-    console.timeEnd('nocoExecute');
 
     res.json({
       data: new PagedResponseImpl(data, {
@@ -87,15 +79,15 @@ async function dataInsert(
   //   });
   //   if (!model) return next(new Error('Table not found'));
   //
-  //   console.timeEnd('Model.get');
+  //
   //   const base = await Base.get(model.base_id);
-  //   console.time('BaseModel.get');
+  //
   //   const baseModel = await Model.getBaseModelSQL({
   //     id: model.id,
   //     dbDriver: NcConnectionMgrv2.get(base)
   //   });
   //
-  //   console.timeEnd('BaseModel.get');
+  //
   //   res.json(await baseModel.insert(req.body));
   // } catch (e) {
   //   console.log(e);
@@ -195,7 +187,7 @@ async function relDataList(req, res, next) {
     return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
-  const column = await Column.get({ colId: req.params.tableId });
+  const column = await Column.get({ colId: req.params.columnId });
   const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
 
   const model = await colOptions.getRelatedTable();
@@ -224,25 +216,19 @@ async function relDataList(req, res, next) {
   //       }
   //     : {};
 
-  console.timeEnd('Model.get');
   const base = await Base.get(model.base_id);
-  console.time('BaseModel.get');
+
   const baseModel = await Model.getBaseModelSQL({
     id: model.id,
     viewId: view?.id,
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
-  console.timeEnd('BaseModel.get');
-
-  console.time('BaseModel.defaultResolverReq');
   const key = `${model._tn}List`;
   const requestObj = {
     [key]: await baseModel.defaultResolverReq(req.query, true)
   };
-  console.timeEnd('BaseModel.defaultResolverReq');
 
-  console.time('nocoExecute');
   const data = (
     await nocoExecute(
       requestObj,
@@ -258,7 +244,133 @@ async function relDataList(req, res, next) {
 
   const count = await baseModel.count(req.query);
 
-  console.timeEnd('nocoExecute');
+  res.json({
+    data: new PagedResponseImpl(data, {
+      // todo:
+      totalRows: count,
+      pageSize: 25,
+      page: 1
+    })
+  });
+}
+
+export async function mmList(req: Request, res: Response): Promise<any> {
+  const view = await View.getByUUID(req.params.publicDataUuid);
+
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
+  const column = await Column.get({ colId: req.params.columnId });
+
+  if (column.fk_model_id !== view.fk_model_id)
+    NcError.badRequest("Column doesn't belongs to the model");
+
+  // const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
+
+  const base = await Base.get(view.base_id);
+  const baseModel = await Model.getBaseModelSQL({
+    viewId: view?.id,
+    id: view?.fk_model_id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = column._cn;
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async _args => {
+          return (
+            await baseModel._getGroupedManyToManyList({
+              colId: req.params.columnId,
+              parentIds: [req.params.rowId]
+            })
+          )?.[0];
+        }
+      },
+      {},
+      req.query
+    )
+  )?.[key];
+
+  const count = (
+    await baseModel._getGroupedManyToManyCount({
+      colId: req.params.columnId,
+      parentIds: [req.params.rowId]
+    })
+  )?.[0]?.count;
+
+  res.json({
+    data: new PagedResponseImpl(data, {
+      // todo:
+      totalRows: count,
+      pageSize: 25,
+      page: 1
+    })
+  });
+}
+
+export async function hmList(req: Request, res: Response): Promise<any> {
+  const view = await View.getByUUID(req.params.publicDataUuid);
+
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
+  const column = await Column.get({ colId: req.params.columnId });
+
+  if (column.fk_model_id !== view.fk_model_id)
+    NcError.badRequest("Column doesn't belongs to the model");
+
+  // const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
+
+  const base = await Base.get(view.base_id);
+  const baseModel = await Model.getBaseModelSQL({
+    viewId: view?.id,
+    id: view?.fk_model_id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = column._cn;
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async _args => {
+          return (
+            await baseModel.hasManyListGQL({
+              colId: req.params.columnId,
+              ids: [req.params.rowId]
+            })
+          )?.[req.params.rowId];
+        }
+      },
+      {},
+      req.query
+    )
+  )?.[key];
+
+  const count = (
+    await baseModel.hasManyListCount({
+      colId: req.params.columnId,
+      ids: [req.params.rowId]
+    })
+  )?.[0]?.count;
 
   res.json({
     data: new PagedResponseImpl(data, {
@@ -273,7 +385,7 @@ async function relDataList(req, res, next) {
 const router = Router({ mergeParams: true });
 router.post('/public/data/:publicDataUuid/list', catchError(dataList));
 router.post(
-  '/public/data/:publicDataUuid/relationTable/:tableId',
+  '/public/data/:publicDataUuid/relationTable/:columnId',
   catchError(relDataList)
 );
 router.post(
@@ -283,4 +395,14 @@ router.post(
   }).any(),
   catchError(dataInsert)
 );
+
+router.get(
+  '/public/data/:publicDataUuid/:rowId/mm/:columnId',
+  catchError(mmList)
+);
+router.get(
+  '/public/data/:publicDataUuid/:rowId/hm/:columnId',
+  catchError(hmList)
+);
+
 export default router;

@@ -614,6 +614,15 @@ export interface DataListParamsType {
   uuid: string;
 }
 
+export interface DataNestedListParamsType {
+  limit?: string;
+  offset?: string;
+  uuid: string;
+  rowId: string;
+  relationType: 'mm' | 'hm';
+  columnId: string;
+}
+
 export interface DataCreatePayloadType {
   data?: any;
   password?: string;
@@ -2758,6 +2767,36 @@ export class Api<
         format: 'json',
         ...params,
       }),
+
+    /**
+     * @description Get All K/V pairs in NocoCache
+     *
+     * @tags Meta
+     * @name CacheGet
+     * @summary Your GET endpoint
+     * @request GET:/cache
+     */
+    cacheGet: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/cache`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * @description Delete All K/V pairs in NocoCache
+     *
+     * @tags Meta
+     * @name CacheDelete
+     * @request DELETE:/cache
+     * @response `200` `void` OK
+     */
+    cacheDelete: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/cache`,
+        method: 'DELETE',
+        ...params,
+      }),
   };
   projects = {
     /**
@@ -2824,6 +2863,33 @@ export class Api<
         query: query,
         body: data,
         type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
+     * @name DataNestedList
+     * @request GET:/public/data/{uuid}/{rowId}/{relationType}/{columnId}
+     * @response `200` `any` OK
+     * @response `0` `any`
+     */
+    dataNestedList: (
+      {
+        uuid,
+        rowId,
+        relationType,
+        columnId,
+        ...query
+      }: DataNestedListParamsType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/public/data/${uuid}/${rowId}/${relationType}/${columnId}`,
+        method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),
