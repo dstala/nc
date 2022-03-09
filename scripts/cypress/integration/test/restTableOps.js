@@ -31,7 +31,7 @@ const nocoTestSuite = (apiType, dbType) => {
     t1b.genTest(apiType, dbType);
     t1c.genTest(apiType, dbType);
     t1d.genTest(apiType, dbType);
-    // exclude@ncv2 t1e.genTest(apiType, dbType);
+    t1e.genTest(apiType, dbType);
     t2a.genTest(apiType, dbType);
     t2b.genTest(apiType, dbType);
     t3a.genTest(apiType, dbType);
