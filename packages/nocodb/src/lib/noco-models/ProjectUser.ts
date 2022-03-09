@@ -20,7 +20,7 @@ export default class ProjectUser {
     projectUser: Partial<ProjectUser>,
     ncMeta = Noco.ncMeta
   ) {
-    const row = await ncMeta.metaInsert2(
+    const { project_id, fk_user_id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.PROJECT_USERS,
@@ -35,12 +35,10 @@ export default class ProjectUser {
     await NocoCache.appendToList(
       CacheScope.PROJECT_USER,
       [projectUser.project_id, projectUser.fk_user_id],
-      `${CacheScope.PROJECT_USER}:${row.id}`
+      `${CacheScope.PROJECT_USER}:${project_id}:${fk_user_id}`
     );
 
-    await NocoCache.set(`${CacheScope.PROJECT_USER}:${row.id}`, row);
-
-    return row;
+    return this.get(project_id, fk_user_id, ncMeta);
   }
 
   // public static async update(id, user: Partial<ProjectUser>, ncMeta = Noco.ncMeta) {

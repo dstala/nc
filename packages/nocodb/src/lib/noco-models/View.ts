@@ -119,7 +119,11 @@ export default class View implements ViewType {
       });
       await NocoCache.setList(CacheScope.VIEW, [modelId], viewsList);
     }
-
+    viewsList.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return viewsList?.map(v => new View(v));
   }
 
@@ -705,15 +709,17 @@ export default class View implements ViewType {
     const table = this.extractViewColumnsTableName(view);
     const scope = this.extractViewColumnsTableNameScope(view);
     // get existing cache
-    const key = `${scope}:${viewId}`;
-    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    if (o) {
-      // update data
-      o.show = true;
-      // set cache
-      await NocoCache.set(key, o);
+    const dataList = await NocoCache.getList(scope, [viewId]);
+    if (dataList?.length) {
+      for (const o of dataList) {
+        if (!ignoreColdIds?.length || !ignoreColdIds.includes(o.fk_column_id)) {
+          // set data
+          o.show = true;
+          // set cache
+          await NocoCache.set(`${scope}:${o.id}`, o);
+        }
+      }
     }
-    // set meta
     return await ncMeta.metaUpdate(
       null,
       null,
@@ -743,13 +749,16 @@ export default class View implements ViewType {
     const table = this.extractViewColumnsTableName(view);
     const scope = this.extractViewColumnsTableNameScope(view);
     // get existing cache
-    const key = `${scope}:${viewId}`;
-    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    if (o) {
-      // update data
-      o.show = false;
-      // set cache
-      await NocoCache.set(key, o);
+    const dataList = await NocoCache.getList(scope, [viewId]);
+    if (dataList?.length) {
+      for (const o of dataList) {
+        if (!ignoreColdIds?.length || !ignoreColdIds.includes(o.fk_column_id)) {
+          // set data
+          o.show = false;
+          // set cache
+          await NocoCache.set(`${scope}:${o.id}`, o);
+        }
+      }
     }
     // set meta
     return await ncMeta.metaUpdate(

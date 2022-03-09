@@ -94,6 +94,11 @@ export default class Sort {
       });
       await NocoCache.setList(CacheScope.SORT, [viewId], sortList);
     }
+    sortList.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return sortList.map(s => new Sort(s));
   }
 

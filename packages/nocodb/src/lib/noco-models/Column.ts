@@ -119,6 +119,8 @@ export default class Column implements ColumnType {
       insertObj
     );
 
+    const col = await this.get({ colId: row.id });
+
     await NocoCache.appendToList(
       CacheScope.COLUMN,
       [column.fk_model_id],
@@ -137,9 +139,7 @@ export default class Column implements ColumnType {
       ncMeta
     );
 
-    return this.get({
-      colId: row.id
-    });
+    return col;
   }
 
   private static async insertColOption<T>(
@@ -304,10 +304,10 @@ export default class Column implements ColumnType {
         res = await LinkToAnotherRecordColumn.read(this.id);
         break;
       case UITypes.MultiSelect:
-        res = await MultiSelectColumn.read(this.id);
+        res = await MultiSelectColumn.get(this.id);
         break;
       case UITypes.SingleSelect:
-        res = await SingleSelectColumn.read(this.id);
+        res = await SingleSelectColumn.get(this.id);
         break;
       case UITypes.Formula:
         res = await FormulaColumn.read(this.id);
@@ -364,6 +364,11 @@ export default class Column implements ColumnType {
       });
       await NocoCache.setList(CacheScope.COLUMN, [fk_model_id], columnsList);
     }
+    columnsList.sort(
+      (a, b) =>
+        (a.order != null ? a.order : Infinity) -
+        (b.order != null ? b.order : Infinity)
+    );
     return Promise.all(
       columnsList.map(async m => {
         const column = new Column(m);

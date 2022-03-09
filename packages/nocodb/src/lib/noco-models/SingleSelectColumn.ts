@@ -1,6 +1,6 @@
 import Noco from '../../lib/noco/Noco';
 import NocoCache from '../noco-cache/NocoCache';
-import { CacheScope, MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 
 export default class SingleSelectColumn {
   title: string;
@@ -30,7 +30,29 @@ export default class SingleSelectColumn {
       `${CacheScope.COL_SELECT_OPTION}:${id}`
     );
 
-    return this.read(id);
+    return this.get(id);
+  }
+
+  public static async get(selectOptionId: string): Promise<SingleSelectColumn> {
+    let data =
+      selectOptionId &&
+      (await NocoCache.get(
+        `${CacheScope.COL_SELECT_OPTION}:${selectOptionId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!data) {
+      data = await Noco.ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.COL_SELECT_OPTIONS,
+        selectOptionId
+      );
+      await NocoCache.set(
+        `${CacheScope.COL_SELECT_OPTION}:${selectOptionId}`,
+        data
+      );
+    }
+    return data && new SingleSelectColumn(data);
   }
 
   public static async read(columnId: string) {
