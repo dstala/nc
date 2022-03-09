@@ -229,12 +229,14 @@ const parseConditionV2 = async (
             qb = qb.where(field, customWhereClause ? '<' : '>', val);
             break;
           case 'ge':
+          case 'gte':
             qb = qb.where(field, customWhereClause ? '<=' : '>=', val);
             break;
           case 'lt':
             qb = qb.where(field, customWhereClause ? '>' : '<', val);
             break;
           case 'le':
+          case 'lte':
             qb = qb.where(field, customWhereClause ? '>=' : '<=', val);
             break;
 
