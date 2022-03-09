@@ -82,4 +82,14 @@ export default class NocoCache {
     if (this.cacheDisabled) return Promise.resolve(true);
     return this.client.appendToList(scope, subListKeys, key);
   }
+
+  public static async destroy(): Promise<boolean> {
+    if (this.cacheDisabled) return Promise.resolve(true);
+    return this.client.destroy();
+  }
+
+  public static async export(): Promise<any> {
+    if (this.cacheDisabled) return Promise.resolve({});
+    return this.client.export();
+  }
 }

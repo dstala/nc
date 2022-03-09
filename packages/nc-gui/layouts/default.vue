@@ -325,7 +325,7 @@
                 <v-icon key="terminal-dash" small>
                   mdi-content-copy
                 </v-icon>&nbsp;
-                <span class="font-weight-regular caption">Copy auth token</span>
+                <span class="font-weight-regular caption">Copy Auth Token</span>
               </v-list-item-title>
             </v-list-item>
 
@@ -357,11 +357,27 @@
             <v-list-item v-if="isDashboard" v-ge="['Sign Out','']" dense @click="copyProjectInfo">
               <v-list-item-title>
                 <v-icon small>
-                  mdi-information-outline
+                  mdi-content-copy
                 </v-icon>&nbsp; <span class="font-weight-regular caption">Copy Project info</span>
               </v-list-item-title>
             </v-list-item>
-
+            <v-divider />
+            <v-list-item dense @click="exportCache">
+              <v-list-item-title>
+                <v-icon small>
+                  mdi-export
+                </v-icon>&nbsp; <span class="font-weight-regular caption">Export Cache</span>
+              </v-list-item-title>
+            </v-list-item>
+            <v-divider />
+            <v-list-item dense @click="deleteCache">
+              <v-list-item-title>
+                <v-icon small>
+                  mdi-delete
+                </v-icon>&nbsp; <span class="font-weight-regular caption">Delete Cache</span>
+              </v-list-item-title>
+            </v-list-item>
+            <v-divider />
             <v-list-item v-if="isDashboard" dense @click.stop="settingsTabAdd">
               <v-list-item-title>
                 <v-icon key="terminal-dash" small>
@@ -546,8 +562,8 @@
 </template>
 
 <script>
-import ReleaseInfo from '@/components/releaseInfo'
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import ReleaseInfo from '@/components/releaseInfo'
 import 'splitpanes/dist/splitpanes.css'
 import ChangeEnv from '../components/changeEnv'
 import XBtn from '../components/global/xBtn'
@@ -561,6 +577,7 @@ import Language from '~/components/utils/language'
 import Loader from '~/components/loader'
 // import TemplatesModal from '~/components/templates/templatesModal'
 // import BetterUX from '~/components/utils/betterUX'
+import FileSaver from 'file-saver'
 
 export default {
   components: {
@@ -1028,6 +1045,28 @@ export default {
         const data = (await this.$api.meta.projectMetaGet(this.$store.state.project.projectId)).data// await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'ncProjectInfo'])
         copyTextToClipboard(Object.entries(data).map(([k, v]) => `${k}: **${v}**`).join('\n'))
         this.$toast.info('Copied project info to clipboard').goAway(3000)
+      } catch (e) {
+        console.log(e)
+        this.$toast.error(e.message).goAway(3000)
+      }
+    },
+    async exportCache() {
+      try {
+        const data = (await this.$api.meta.cacheGet()).data
+        const blob = new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' })
+        FileSaver.saveAs(blob, 'cache_exported.json')
+        this.$toast.info('Copied Cache to clipboard').goAway(3000)
+        console.log(data)
+      } catch (e) {
+        console.log(e)
+        this.$toast.error(e.message).goAway(3000)
+      }
+    },
+    async deleteCache() {
+      try {
+        const data = (await this.$api.meta.cacheDelete()).data
+        this.$toast.info('Deleted Cache').goAway(3000)
+        console.log(data)
       } catch (e) {
         console.log(e)
         this.$toast.error(e.message).goAway(3000)

@@ -20,4 +20,6 @@ export default abstract class CacheMgr {
     subListKeys: string[],
     key: string
   ): Promise<boolean>;
+  public abstract destroy(): Promise<boolean>;
+  public abstract export(): Promise<any>;
 }
