@@ -53,19 +53,21 @@ export default class FormulaColumn {
     formula: Partial<FormulaColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    // todo: redis del/update - verify
-    await NocoCache.del(`${CacheScope.COL_FORMULA}:${formula.fk_column_id}`);
-    await ncMeta.metaUpdate(
-      null,
-      null,
-      MetaTable.COL_FORMULA,
-      extractProps(formula, [
-        'formula',
-        'formula_raw',
-        'fk_column_id',
-        'error'
-      ]),
-      id
-    );
+    const updateObj = extractProps(formula, [
+      'formula',
+      'formula_raw',
+      'fk_column_id',
+      'error'
+    ]);
+    // get existing cache
+    const key = `${CacheScope.COL_FORMULA}:${id}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    if (o) {
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
+    await ncMeta.metaUpdate(null, null, MetaTable.COL_FORMULA, updateObj, id);
   }
 }
