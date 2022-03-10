@@ -20,14 +20,26 @@ export default class RollupColumn {
     data: Partial<RollupColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const row = await ncMeta.metaInsert2(null, null, MetaTable.COL_ROLLUP, {
+    await ncMeta.metaInsert2(null, null, MetaTable.COL_ROLLUP, {
       fk_column_id: data.fk_column_id,
       fk_relation_column_id: data.fk_relation_column_id,
       fk_rollup_column_id: data.fk_rollup_column_id,
       rollup_function: data.rollup_function
     });
-    await NocoCache.set(`${CacheScope.COL_ROLLUP}:${data.fk_column_id}`, row);
-    return new RollupColumn(row);
+
+    await NocoCache.appendToList(
+      CacheScope.COL_ROLLUP,
+      [data.fk_rollup_column_id],
+      `${CacheScope.COL_ROLLUP}:${data.fk_column_id}`
+    );
+
+    await NocoCache.appendToList(
+      CacheScope.COL_ROLLUP,
+      [data.fk_relation_column_id],
+      `${CacheScope.COL_ROLLUP}:${data.fk_column_id}`
+    );
+
+    return this.read(data.fk_column_id);
   }
 
   public static async read(columnId: string) {

@@ -112,6 +112,15 @@ export default class Filter {
           )
         );
       }
+      if (filter.fk_column_id) {
+        p.push(
+          NocoCache.appendToList(
+            CacheScope.FILTER_EXP,
+            [filter.fk_column_id],
+            key
+          )
+        );
+      }
       await Promise.all(p);
     }
     return new Filter(value);

@@ -222,10 +222,27 @@ export default class RedisMockCacheMgr extends CacheMgr {
   }
 
   async destroy(): Promise<boolean> {
+    console.log('RedisCacheMgr::destroy: destroy redis');
     return this.client.flushdb();
   }
 
   async export(): Promise<any> {
-    // TODO:
+    console.log('RedisCacheMgr::export: export data');
+    const data = await this.client.keys('*');
+    const res = {};
+    return await Promise.all(
+      data.map(async k => {
+        const val = await this.get(
+          k,
+          k.slice(-4) === 'list'
+            ? CacheGetType.TYPE_ARRAY
+            : CacheGetType.TYPE_OBJECT
+        );
+        res[k] = val;
+      })
+    ).then(() => {
+      console.log(res);
+      return res;
+    });
   }
 }
