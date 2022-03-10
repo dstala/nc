@@ -138,7 +138,7 @@ export default {
     async createSharedBase(roles = 'viewer') {
       try {
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink', { roles }])
-        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles })).data
+        const sharedBase = (await this.$api.meta.sharedBaseUpdate(this.$store.state.project.projectId, { roles })).data
 
         this.base = sharedBase || {}
       } catch (e) {
@@ -156,7 +156,7 @@ export default {
     },
     async recreate() {
       try {
-        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles })).data
+        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles: this.base.roles || 'viewer' })).data
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink'])
         this.base = sharedBase || {}

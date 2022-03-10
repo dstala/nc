@@ -35,6 +35,32 @@ async function createSharedBaseLink(req, res): Promise<any> {
   Tele.emit('evt', { evt_type: 'sharedBase:generated-link' });
   res.json(data);
 }
+async function updateSharedBaseLink(req, res): Promise<any> {
+  const project = await Project.get(req.params.projectId);
+
+  let roles = req.body?.roles;
+  if (!roles || (roles !== 'editor' && roles !== 'viewer')) {
+    roles = 'viewer';
+  }
+
+  if (!project) {
+    NcError.badRequest('Invalid project id');
+  }
+  const data: any = {
+    uuid: project.uuid || uuidv4(),
+    password: req.body?.password,
+    roles
+  };
+
+  // todo : redis del
+
+  await Project.update(project.id, data);
+
+  data.url = `${req.ncSiteUrl}${config.dashboardPath}#/nc/base/${data.uuid}`;
+  delete data.password;
+  Tele.emit('evt', { evt_type: 'sharedBase:generated-link' });
+  res.json(data);
+}
 
 async function disableSharedBaseLink(req, res): Promise<any> {
   const project = await Project.get(req.params.projectId);
@@ -82,6 +108,10 @@ router.get('/projects/:projectId/sharedBase', ncMetaAclMw(getSharedBaseLink));
 router.post(
   '/projects/:projectId/sharedBase',
   ncMetaAclMw(createSharedBaseLink)
+);
+router.put(
+  '/projects/:projectId/sharedBase',
+  ncMetaAclMw(updateSharedBaseLink)
 );
 router.delete(
   '/projects/:projectId/sharedBase',

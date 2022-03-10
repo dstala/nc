@@ -802,6 +802,36 @@
             }
           }
         }
+      },
+      "put": {
+        "summary": "",
+        "operationId": "shared-base-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roles": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ],
+        "description": ""
       }
     },
     "/public/sharedBase/{sharedBaseUuid}": {

@@ -553,6 +553,11 @@ export interface SharedBaseCreatePayloadType {
   password?: string;
 }
 
+export interface SharedBaseUpdatePayloadType {
+  roles?: string;
+  password?: string;
+}
+
 export interface UploadPayloadType {
   files?: any;
   json?: string;
@@ -1288,6 +1293,27 @@ export class Api<
         body: data,
         type: ContentType.Json,
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name SharedBaseUpdate
+     * @request PUT:/projects/{projectId}/sharedBase
+     * @response `200` `void` OK
+     */
+    sharedBaseUpdate: (
+      projectId: string,
+      data: SharedBaseUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/sharedBase`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
