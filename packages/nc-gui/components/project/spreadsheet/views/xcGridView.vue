@@ -354,7 +354,10 @@ export default {
       }
     },
     ids() {
-      return this.data.map(({ oldRow }) => this.meta.columns.filter(c => c.pk).map(c => oldRow[c._cn]).join('___'))
+      return (this.meta &&
+        this.meta.columns &&
+        this.data &&
+        this.data.map(({ oldRow }) => this.meta.columns.filter(c => c.pk).map(c => oldRow[c._cn]).join('___'))) || []
     },
     haveHasManyrelation() {
       return !!Object.keys(this.hasMany).length
