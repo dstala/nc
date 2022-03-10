@@ -274,7 +274,7 @@ export default {
     async loadFilter() {
       let filters = []
 
-      if (this.viewId) {
+      if (this.viewId && this._isUIAllowed('filterSync')) {
         const data = this.parentId
           ? (await this.$api.meta.filterChildrenRead(this.viewId, this.parentId))
           : (await this.$api.meta.filterRead(this.viewId))
@@ -307,7 +307,7 @@ export default {
       this.saveOrUpdate(this.filters[index], index)
     },
     async saveOrUpdate(filter, i) {
-      if (this.shared) {
+      if (this.shared || !this._isUIAllowed('filterSync')) {
         // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
       } else if (filter.id) {
         await this.$api.meta.filterUpdate(this.viewId, filter.id, {
@@ -323,7 +323,7 @@ export default {
       this.$emit('updated')
     },
     async deleteFilter(filter, i) {
-      if (this.shared) {
+      if (this.shared || !this._isUIAllowed('filterSync')) {
         this.filters.splice(i, 1)
         // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
       } else if (filter.id) {

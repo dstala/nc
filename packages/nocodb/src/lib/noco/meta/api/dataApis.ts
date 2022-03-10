@@ -9,7 +9,6 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function dataList(req: Request, res: Response, next) {
   try {
-    console.time('Model.get');
     const view = await View.get(req.params.viewId);
 
     const model = await Model.getByIdOrName({
@@ -18,26 +17,27 @@ export async function dataList(req: Request, res: Response, next) {
 
     if (!model) return next(new Error('Table not found'));
 
-    console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
 
-    console.time('BaseModel.get');
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
       viewId: view?.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
 
-    console.timeEnd('BaseModel.get');
-
-    console.time('BaseModel.defaultResolverReq');
     const key = `${model._tn}List`;
     const requestObj = {
       [key]: await baseModel.defaultResolverReq(req.query)
     };
-    console.timeEnd('BaseModel.defaultResolverReq');
 
-    console.time('nocoExecute');
+    const listArgs: any = { ...req.query };
+    try {
+      listArgs.filterArr = JSON.parse(listArgs.filterArrJson);
+    } catch (e) {}
+    try {
+      listArgs.sortArr = JSON.parse(listArgs.sortArrJson);
+    } catch (e) {}
+
     const data = (
       await nocoExecute(
         requestObj,
@@ -47,13 +47,11 @@ export async function dataList(req: Request, res: Response, next) {
           }
         },
         {},
-        req.query
+        listArgs
       )
     )?.[key];
 
-    const count = await baseModel.count(req.query);
-
-    console.timeEnd('nocoExecute');
+    const count = await baseModel.count(listArgs);
 
     res.json({
       data: new PagedResponseImpl(data, {
@@ -70,7 +68,6 @@ export async function dataList(req: Request, res: Response, next) {
 }
 
 export async function mmList(req: Request, res: Response, next) {
-  console.time('Model.get');
   const view = await View.get(req.params.viewId);
 
   const model = await Model.getByIdOrName({
@@ -79,25 +76,19 @@ export async function mmList(req: Request, res: Response, next) {
 
   if (!model) return next(new Error('Table not found'));
 
-  console.timeEnd('Model.get');
   const base = await Base.get(model.base_id);
-  console.time('BaseModel.get');
+
   const baseModel = await Model.getBaseModelSQL({
     id: model.id,
     viewId: view?.id,
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
-  console.timeEnd('BaseModel.get');
-
-  console.time('BaseModel.defaultResolverReq');
   const key = `${model._tn}List`;
   const requestObj: any = {
     [key]: 1
   };
-  console.timeEnd('BaseModel.defaultResolverReq');
 
-  console.time('nocoExecute');
   const data = (
     await nocoExecute(
       requestObj,
@@ -123,8 +114,6 @@ export async function mmList(req: Request, res: Response, next) {
     })
   )?.[0]?.count;
 
-  console.timeEnd('nocoExecute');
-
   res.json({
     data: new PagedResponseImpl(data, {
       // todo:
@@ -142,15 +131,14 @@ async function dataRead(req: Request, res: Response, next) {
     });
     if (!model) return next(new Error('Table not found'));
 
-    console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
-    console.time('BaseModel.get');
+
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
     const key = `${model._tn}Read`;
-    console.timeEnd('BaseModel.get');
+
     res.json(
       (
         await nocoExecute(
@@ -181,15 +169,13 @@ async function dataInsert(req: Request, res: Response, next) {
     });
     if (!model) return next(new Error('Table not found'));
 
-    console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
-    console.time('BaseModel.get');
+
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
 
-    console.timeEnd('BaseModel.get');
     res.json(await baseModel.insert(req.body, null, req));
   } catch (e) {
     console.log(e);
@@ -204,15 +190,13 @@ async function dataUpdate(req: Request, res: Response, next) {
     });
     if (!model) return next(new Error('Table not found'));
 
-    console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
-    console.time('BaseModel.get');
+
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
 
-    console.timeEnd('BaseModel.get');
     res.json(await baseModel.updateByPk(req.params.rowId, req.body, null, req));
   } catch (e) {
     console.log(e);
@@ -227,15 +211,13 @@ async function dataDelete(req: Request, res: Response, next) {
     });
     if (!model) return next(new Error('Table not found'));
 
-    console.timeEnd('Model.get');
     const base = await Base.get(model.base_id);
-    console.time('BaseModel.get');
+
     const baseModel = await Model.getBaseModelSQL({
       id: model.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
 
-    console.timeEnd('BaseModel.get');
     res.json(await baseModel.delByPk(req.params.rowId, null, req));
   } catch (e) {
     console.log(e);

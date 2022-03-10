@@ -321,7 +321,7 @@ export default {
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     async saveOrUpdate(field, i) {
-      if (!this.isPublic) {
+      if (!this.isPublic && this._isUIAllowed('fieldsSync')) {
         if (field.id) {
           await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
         } else {

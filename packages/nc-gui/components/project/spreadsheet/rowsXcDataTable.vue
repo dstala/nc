@@ -64,7 +64,7 @@
         relationPrimaryValue
       }}) -> {{ relationType === 'hm' ? ' Has Many ' : ' Belongs To ' }} -> {{ table }}</span>
       <div class="d-inline-flex">
-        <div v-show="_isUIAllowed('gridViewOptions')">
+        <div>
           <fields
             v-if="!isForm"
             ref="fields"
@@ -84,7 +84,8 @@
           />
 
           <sort-list
-            v-if="!isForm && _isUIAllowed('gridViewOptions')"
+            v-if="!isForm "
+            v-model="sortList"
             :is-locked="isLocked"
             :meta="meta"
             :view-id="selectedViewId"
@@ -93,7 +94,7 @@
           <!--        v-model="sortList"-->
           <!--        :field-list="[...realFieldList, ...formulaFieldList]"-->
           <column-filter
-            v-if="!isForm && _isUIAllowed('gridViewOptions')"
+            v-if="!isForm "
             v-model="filters"
             :meta="meta"
             :is-locked="isLocked"
@@ -1151,7 +1152,8 @@ export default {
             row_id: id,
             value: rowObj[column._cn],
             prev_value: oldRow[column._cn]
-          }).then(() => {})
+          }).then(() => {
+          })
 
           this.$set(this.data[row], 'row', { ...rowObj, ...newData })
 
@@ -1340,7 +1342,9 @@ export default {
       this.loadTableDataDeb(this)
     },
     async loadTableDataFn() {
-      if (this.isForm) { return }
+      if (this.isForm) {
+        return
+      }
       this.loadingData = true
       try {
         // if (this.api) {
@@ -1351,7 +1355,11 @@ export default {
         } = (await this.$api.data.list(
           this.selectedViewId || this.meta.views[0].id,
           {
-            query: this.queryParams
+            query: {
+              ...this.queryParams,
+              ...(this._isUIAllowed('sortSync') ? {} : { sortArrJson: JSON.stringify(this.sortList) }),
+              ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
+            }
           })).data.data
 
         this.count = pageInfo.totalRows// count

@@ -126,7 +126,7 @@ export default {
       this.sortList = this.sortList.slice()
     },
     async loadSortList() {
-      if (!this.shared) {
+      if (!this.shared) { // && !this._isUIAllowed('sortSync')) {
         let sortList = []
 
         if (this.viewId) {
@@ -138,7 +138,7 @@ export default {
       }
     },
     async saveOrUpdate(sort, i) {
-      if (!this.shared) {
+      if (!this.shared && this._isUIAllowed('sortSync')) {
         if (sort.id) {
           await this.$api.meta.sortUpdate(this.viewId, sort.id, sort)
         } else {
@@ -150,7 +150,7 @@ export default {
       this.$emit('updated')
     },
     async deleteSort(sort, i) {
-      if (!this.shared && sort.id) {
+      if (!this.shared && sort.id && this._isUIAllowed('sortSync')) {
         await this.$api.meta.sortDelete(this.viewId, sort.id)
         await this.loadSortList()
       } else {

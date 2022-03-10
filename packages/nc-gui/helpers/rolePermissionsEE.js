@@ -9,7 +9,10 @@ export default {
     tableAttachment: true,
     tableRowUpdate: true,
     rowComments: true,
-    gridViewOptions: true
+    gridViewOptions: true,
+    sortSync: true,
+    fieldsSync: true,
+    filterSync: true
   },
   commenter: {
     airTable: true,
