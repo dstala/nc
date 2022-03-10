@@ -18,6 +18,7 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 import { xcVisibilityMetaGet } from './modelVisibilityApis';
 import View from '../../../noco-models/View';
 import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
+import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
@@ -130,6 +131,8 @@ export async function tableCreate(
       description: `created table ${req.body.tn} with alias ${req.body._tn}  `,
       ip: (req as any).clientIp
     }).then(() => {});
+
+    mapDefaultPrimaryValue(req.body.columns);
 
     res.json(
       await Model.insert(project.id, base.id, {

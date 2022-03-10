@@ -27,6 +27,7 @@ import NcMetaIO from '../NcMetaIO';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import { NcError } from './helpers/catchError';
 import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
+import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 
@@ -688,6 +689,7 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
       await Column.delete(req.params.columnId);
     }
   }
+
   Audit.insert({
     project_id: base.project_id,
     op_type: AuditOperationTypes.TABLE_COLUMN,
@@ -698,6 +700,14 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
   }).then(() => {});
 
   await table.getColumns(true);
+
+  const primaryValueColumn = mapDefaultPrimaryValue(table.columns);
+  if (primaryValueColumn) {
+    await Model.updatePrimaryColumn(
+      primaryValueColumn.fk_model_id,
+      primaryValueColumn.id
+    );
+  }
 
   // await ncMeta.commit();
   // await sqlMgr.commit();

@@ -14,6 +14,7 @@ import { getUniqueColumnAliasName } from './helpers/getUniqueName';
 import NcHelp from '../../../utils/NcHelp';
 import getTableNameAlias, { getColumnNameAlias } from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
+import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
 
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',
@@ -28,8 +29,8 @@ export enum MetaDiffType {
   VIEW_COLUMN_REMOVE = 'VIEW_COLUMN_REMOVE',
   TABLE_RELATION_ADD = 'TABLE_RELATION_ADD',
   TABLE_RELATION_REMOVE = 'TABLE_RELATION_REMOVE',
-  TABLE_VIRTUAL_RELATION_ADD = 'TABLE_VIRTUAL_RELATION_ADD',
-  TABLE_VIRTUAL_RELATION_REMOVE = 'TABLE_VIRTUAL_RELATION_REMOVE',
+  // TABLE_VIRTUAL_RELATION_ADD = 'TABLE_VIRTUAL_RELATION_ADD',
+  // TABLE_VIRTUAL_RELATION_REMOVE = 'TABLE_VIRTUAL_RELATION_REMOVE',
   TABLE_VIRTUAL_M2M_REMOVE = 'TABLE_VIRTUAL_M2M_REMOVE'
 }
 
@@ -565,6 +566,8 @@ export async function metaDiffSync(req, res) {
                 filename: ''
               }
             ).getObject();
+
+            mapDefaultPrimaryValue(meta.columns);
 
             // const model =
             await Model.insert(project.id, base.id, meta);
