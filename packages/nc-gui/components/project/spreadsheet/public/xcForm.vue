@@ -369,7 +369,7 @@ export default {
       } catch (e) {
         if (e.response && e.response.status === 404) {
           this.notFound = true
-        } else if (e.response && e.response.data === ErrorMessages.INVALID_SHARED_VIEW_PASSWORD) {
+        } else if (await this._extractSdkResponseErrorMsg(e) === ErrorMessages.INVALID_SHARED_VIEW_PASSWORD) {
           this.showPasswordModal = true
         }
       }
