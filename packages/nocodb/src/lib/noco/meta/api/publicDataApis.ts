@@ -11,15 +11,15 @@ import { ErrorMessages, UITypes, ViewTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 
-export async function dataList(req: Request, res: Response, next) {
+export async function dataList(req: Request, res: Response) {
   try {
     const view = await View.getByUUID(req.params.publicDataUuid);
 
-    if (!view) return next(new Error('Not found'));
-    if (view.type !== ViewTypes.GRID) return next(new Error('Not found'));
+    if (!view) NcError.notFound('Not found');
+    if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
 
     if (view.password && view.password !== req.body?.password) {
-      return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+      return NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
     }
 
     const model = await Model.getByIdOrName({
@@ -180,14 +180,14 @@ async function dataInsert(
   res.json(await baseModel.nestedInsert(insertObject, null));
 }
 
-async function relDataList(req, res, next) {
+async function relDataList(req, res) {
   const view = await View.getByUUID(req.params.publicDataUuid);
 
-  if (!view) return next(new Error('Not found'));
-  if (view.type !== ViewTypes.FORM) return next(new Error('Not found'));
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.FORM) NcError.notFound('Not found');
 
   if (view.password && view.password !== req.body?.password) {
-    return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
   const column = await Column.get({ colId: req.params.columnId });
@@ -264,7 +264,7 @@ export async function mmList(req: Request, res: Response): Promise<any> {
   if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
 
   if (view.password && view.password !== req.body?.password) {
-    return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
   const column = await Column.get({ colId: req.params.columnId });
@@ -328,7 +328,7 @@ export async function hmList(req: Request, res: Response): Promise<any> {
   if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
 
   if (view.password && view.password !== req.body?.password) {
-    return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
   const column = await Column.get({ colId: req.params.columnId });

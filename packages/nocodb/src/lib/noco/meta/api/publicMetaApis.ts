@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express';
-import catchError from './helpers/catchError';
+import catchError, { NcError } from './helpers/catchError';
 import View from '../../../noco-models/View';
 import Model from '../../../noco-models/Model';
 import UITypes from '../../../sqlUi/UITypes';
@@ -7,16 +7,16 @@ import { ErrorMessages, LinkToAnotherRecordType } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import Base from '../../../noco-models/Base';
 
-export async function viewMetaGet(req: Request, res: Response, next) {
+export async function viewMetaGet(req: Request, res: Response) {
   const view: View & {
     relatedMetas?: { [ket: string]: Model };
     client?: string;
   } = await View.getByUUID(req.params.publicDataUuid);
 
-  if (!view) return next(new Error('Not found'));
+  if (!view) NcError.notFound('Not found');
 
   if (view.password && view.password !== req.body?.password) {
-    return res.status(403).json(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
   }
 
   await view.getFilters();

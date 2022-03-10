@@ -5,17 +5,21 @@ import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { nocoExecute } from '../../noco-resolver/NocoExecute';
 import papaparse from 'papaparse';
-import { isSystemColumn, UITypes, ViewTypes } from 'nc-common';
+import { ErrorMessages, isSystemColumn, UITypes, ViewTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
-import catchError from './helpers/catchError';
+import catchError, { NcError } from './helpers/catchError';
 
-async function exportCsv(req: Request, res: Response, next) {
+async function exportCsv(req: Request, res: Response) {
   const view = await View.getByUUID(req.params.publicDataUuid);
 
-  if (!view) return next(new Error('Not found'));
-  if (view.type !== ViewTypes.GRID) return next(new Error('Not found'));
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
 
   const model = await view.getModelWithInfo();
   await view.getColumns();
@@ -28,7 +32,7 @@ async function exportCsv(req: Request, res: Response, next) {
     )
     .filter(column => !isSystemColumn(column) || view.show_system_fields);
 
-  if (!model) return next(new Error('Table not found'));
+  if (!model) NcError.notFound('Table not found');
 
   const base = await Base.get(model.base_id);
   const baseModel = await Model.getBaseModelSQL({

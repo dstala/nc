@@ -596,7 +596,7 @@ export default {
         //     })
         //   }
       } catch (e) {
-        if (e.message === 'Not found' || e.message === 'Meta not found') {
+        if (e.response && e.response.status === 404) {
           this.notFound = true
         } else if (e.response && e.response.data === ErrorMessages.INVALID_SHARED_VIEW_PASSWORD) {
           this.showPasswordModal = true
@@ -654,7 +654,7 @@ export default {
           rowMeta: {}
         }))
       } catch (e) {
-        if ((e.response && e.response.data === 'Not found') || (e.response && e.response.data === 'Meta not found')) {
+        if (e.response && e.response.status === 404) {
           this.notFound = true
         } else if (e.response && e.response.data === ErrorMessages.INVALID_SHARED_VIEW_PASSWORD) {
           this.showPasswordModal = true
