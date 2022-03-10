@@ -61,7 +61,7 @@
                 mdi-link-variant-remove
               </x-icon>
               <x-icon
-                v-if="!isPublic && !mm && !bt && !readOnly && _isUIAllowed('xcDatatableEditable')"
+                v-if="!isPublic && type === RelationTypes.HAS_MANY && !readOnly && _isUIAllowed('xcDatatableEditable')"
                 :tooltip="`Delete row in '${meta._tn}'`"
                 :color="['error','grey']"
                 small
@@ -152,6 +152,7 @@ export default {
     password: String
   },
   data: () => ({
+    RelationTypes,
     data: null,
     page: 1
   }),

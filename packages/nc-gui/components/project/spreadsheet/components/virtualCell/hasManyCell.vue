@@ -287,14 +287,15 @@ export default {
         } else {
           const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
           try {
-            await this.childApi.delete(id)
+            // await this.childApi.delete(id)
+            await this.$api.data.delete(this.childMeta.id, id)
             this.dialogShow = false
             this.$emit('loadTableData')
             if ((this.childListModal || this.isForm) && this.$refs.childList) {
               this.$refs.childList.loadData()
             }
           } catch (e) {
-            this.$toast.error(e.message)
+            this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
           }
         }
       }

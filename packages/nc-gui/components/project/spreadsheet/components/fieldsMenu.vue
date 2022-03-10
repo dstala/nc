@@ -336,7 +336,9 @@ export default {
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
     },
     async showAll() {
-      if (!this.isPublic) { await this.$api.meta.viewShowAllColumn({ viewId: this.viewId }) }
+      if (!this.isPublic) {
+        await this.$api.meta.viewShowAllColumn({ viewId: this.viewId })
+      }
       for (const f of this.fields) {
         f.show = true
       }
@@ -346,7 +348,9 @@ export default {
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = true, o), {})
     },
     async hideAll() {
-      if (!this.isPublic) { await this.$api.meta.viewHideAllColumn({ viewId: this.viewId }) }
+      if (!this.isPublic) {
+        await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
+      }
       for (const f of this.fields) {
         f.show = false
       }

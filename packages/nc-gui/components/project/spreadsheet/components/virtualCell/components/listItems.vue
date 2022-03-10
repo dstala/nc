@@ -49,7 +49,7 @@
               @click="$emit('add',ch)"
             >
               <v-card-text class="primary-value textColor--text text--lighten-2 d-flex">
-                <span class="font-weight-bold"> {{ ch[primaryCol] || ch }}&nbsp;</span>
+                <span class="font-weight-bold"> {{ ch[primaryCol] || (ch &&Object.values(ch).slice(0,1).join()) }}&nbsp;</span>
                 <span
                   v-if="primaryKey"
                   class="grey--text caption primary-key "
