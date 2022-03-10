@@ -2867,10 +2867,16 @@
                     "type": "string"
                   },
                   "sorts": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Sort"
+                    }
                   },
                   "filters": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Filter"
+                    }
                   }
                 }
               }
@@ -3052,7 +3058,7 @@
           "required": true
         }
       ],
-      "get": {
+      "post": {
         "summary": "",
         "operationId": "csv-export",
         "description": "",
@@ -3075,7 +3081,33 @@
         },
         "tags": [
           "public"
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "filters": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Filter"
+                    }
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Sort"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "public/data/{uuid}/relationTable/{relationColumnId}": {

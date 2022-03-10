@@ -52,7 +52,10 @@ export async function dataList(req: Request, res: Response, next) {
       )
     )?.[key];
 
-    const count = await baseModel.count(req.query);
+    const count = await baseModel.count({
+      ...req.query,
+      filterArr: req.body?.filters
+    });
 
     res.json({
       data: new PagedResponseImpl(data, {

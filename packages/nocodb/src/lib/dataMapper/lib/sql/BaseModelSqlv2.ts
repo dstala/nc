@@ -401,7 +401,7 @@ class BaseModelSqlv2 {
   }
 
   public async count(
-    args: { where?: string; limit? } = {},
+    args: { where?: string; limit?; filterArr?: Filter[] } = {},
     ignoreFilterSort = false
   ): Promise<any> {
     await this.model.getColumns();
@@ -418,7 +418,10 @@ class BaseModelSqlv2 {
     // todo: replace with view id
     if (!ignoreFilterSort && this.viewId) {
       await conditionV2(
-        await Filter.rootFilterList({ viewId: this.viewId }),
+        [
+          ...(await Filter.rootFilterList({ viewId: this.viewId })),
+          ...(args.filterArr || [])
+        ],
         qb,
         this.dbDriver
       );

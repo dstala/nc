@@ -100,7 +100,7 @@
         />
 
         <sort-list-menu
-          v-model="sortList"
+          v-model="sorts"
           :meta="meta"
           :shared="true"
           :field-list="realFieldList"
@@ -120,6 +120,7 @@
           :query-params="{...queryParams, showFields}"
           :public-view-id="$route.params.id"
           :meta="meta"
+          :req-payload="{filters, sorts, password}"
         />
 
         <!--      <v-menu>
@@ -296,7 +297,7 @@ export default {
     fieldFilter: '',
 
     filters: [],
-    sortList: [],
+    sorts: [],
 
     data: [],
     spreadsheet: null,
@@ -509,7 +510,7 @@ export default {
       this.filters = this.filters.slice()
     },
     addSort() {
-      this.sortList.push({
+      this.sorts.push({
         field: '',
         order: ''
       })
@@ -524,7 +525,7 @@ export default {
         this.meta = this.viewMeta.model
         this.metas = this.viewMeta.relatedMetas
 
-        this.sortList = this.viewMeta.sorts
+        this.sorts = this.viewMeta.sorts
         this.viewName = this.viewMeta.title
         //
         //
@@ -554,7 +555,7 @@ export default {
         //   this.query_params = qp
         //   this.dbAlias = dbAlias
         //   this.metas = relatedTableMetas
-        //   this.sortList = qp.sortList || []
+        //   this.sorts = qp.sorts || []
         //
         //   this.showFields = this.query_params.showFields || {}
         //
@@ -628,7 +629,7 @@ export default {
           uuid: this.$route.params.id
         }, {
           password: this.password,
-          sorts: this.sortList && this.sortList.map(({
+          sorts: this.sorts && this.sorts.map(({
             fk_column_id,
             direction
           }) => ({

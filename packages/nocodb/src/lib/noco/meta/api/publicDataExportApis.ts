@@ -67,7 +67,7 @@ async function exportCsv(req: Request, res: Response, next) {
           }
         },
         {},
-        req.query
+        { ...req.query, sortArr: req.body?.sorts, filterArr: req.body?.filters }
       )
     )?.[key];
 
@@ -174,5 +174,5 @@ async function serializeCellValue({
 }
 
 const router = Router({ mergeParams: true });
-router.get('/public/data/:publicDataUuid/export/csv', catchError(exportCsv));
+router.post('/public/data/:publicDataUuid/export/csv', catchError(exportCsv));
 export default router;

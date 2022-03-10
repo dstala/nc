@@ -118,7 +118,8 @@ export default {
     selectedView: Object,
     publicViewId: String,
     queryParams: Object,
-    isView: Boolean
+    isView: Boolean,
+    reqPayload: Object
   },
   data() {
     return {
@@ -256,7 +257,7 @@ export default {
           // ])
           let res
           if (this.publicViewId) {
-            res = await this.$api.public.csvExport(this.publicViewId, ExportTypes.CSV, {
+            res = await this.$api.public.csvExport(this.publicViewId, ExportTypes.CSV, this.reqPayload, {
               responseType: 'blob'
             })
           } else {

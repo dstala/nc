@@ -604,8 +604,8 @@ export type CreatePayloadType = any;
 
 export interface DataListPayloadType {
   password?: string;
-  sorts?: string;
-  filters?: string;
+  sorts?: SortType[];
+  filters?: FilterType[];
 }
 
 export interface DataListParamsType {
@@ -626,6 +626,12 @@ export interface DataNestedListParamsType {
 export interface DataCreatePayloadType {
   data?: any;
   password?: string;
+}
+
+export interface CsvExportBodyType {
+  password?: string;
+  filters?: FilterType[];
+  sorts?: SortType[];
 }
 
 export interface DataRelationListPayloadType {
@@ -2921,17 +2927,20 @@ export class Api<
      *
      * @tags public
      * @name CsvExport
-     * @request GET:/public/data/{uuid}/export/{type}
+     * @request POST:/public/data/{uuid}/export/{type}
      * @response `200` `any` OK
      */
     csvExport: (
       uuid: string,
       type: 'csv' | 'excel',
+      data: CsvExportBodyType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
         path: `/public/data/${uuid}/export/${type}`,
-        method: 'GET',
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
