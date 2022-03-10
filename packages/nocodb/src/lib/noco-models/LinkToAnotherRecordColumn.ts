@@ -71,32 +71,27 @@ export default class LinkToAnotherRecordColumn {
     data: Partial<LinkToAnotherRecordColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const { id } = await ncMeta.metaInsert2(
-      null,
-      null,
-      MetaTable.COL_RELATIONS,
-      {
-        fk_column_id: data.fk_column_id,
+    await ncMeta.metaInsert2(null, null, MetaTable.COL_RELATIONS, {
+      fk_column_id: data.fk_column_id,
 
-        // ref_db_alias
-        type: data.type,
-        // db_type:
+      // ref_db_alias
+      type: data.type,
+      // db_type:
 
-        fk_child_column_id: data.fk_child_column_id,
-        fk_parent_column_id: data.fk_parent_column_id,
+      fk_child_column_id: data.fk_child_column_id,
+      fk_parent_column_id: data.fk_parent_column_id,
 
-        fk_mm_model_id: data.fk_mm_model_id,
-        fk_mm_child_column_id: data.fk_mm_child_column_id,
-        fk_mm_parent_column_id: data.fk_mm_parent_column_id,
+      fk_mm_model_id: data.fk_mm_model_id,
+      fk_mm_child_column_id: data.fk_mm_child_column_id,
+      fk_mm_parent_column_id: data.fk_mm_parent_column_id,
 
-        ur: data.ur,
-        dr: data.dr,
+      ur: data.ur,
+      dr: data.dr,
 
-        fk_index_name: data.fk_index_name,
-        fk_related_model_id: data.fk_related_model_id
-      }
-    );
-    return this.read(id);
+      fk_index_name: data.fk_index_name,
+      fk_related_model_id: data.fk_related_model_id
+    });
+    return this.read(data.fk_column_id);
   }
 
   public static async read(columnId: string) {

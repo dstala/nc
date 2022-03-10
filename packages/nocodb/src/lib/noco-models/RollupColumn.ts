@@ -39,7 +39,7 @@ export default class RollupColumn {
       `${CacheScope.COL_ROLLUP}:${data.fk_column_id}`
     );
 
-    return new RollupColumn(data.fk_column_id);
+    return this.read(data.fk_column_id);
   }
 
   public static async read(columnId: string) {
