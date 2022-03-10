@@ -1142,12 +1142,12 @@ class BaseModelSqlv2 {
 
   async _wherePk(id) {
     await this.model.getColumns();
-    // const ids = (id + '').split('___');
-    // const where = {};
-    // // for (let i = 0; i < this.model.length; ++i) {
-    //   where[this.model?.[i]?.cn] = ids[i];
-    // }
-    return { [this.model.primaryKey.cn]: id };
+    const ids = (id + '').split('___');
+    const where = {};
+    for (let i = 0; i < this.model.primaryKeys.length; ++i) {
+      where[this.model.primaryKeys[i].cn] = ids[i];
+    }
+    return where;
   }
 
   public get tnPath() {

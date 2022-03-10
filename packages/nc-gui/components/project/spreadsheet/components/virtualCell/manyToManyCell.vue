@@ -303,25 +303,26 @@ export default {
       this.childListModal = true
     },
     async unlinkChild(child) {
-      // if (this.isNew) {
-      //   this.localState.splice(this.localState.indexOf(child), 1)
-      //   this.$emit('update:localState', [...this.localState])
-      //   return
-      // }
-      // await Promise.all([this.loadChildMeta(), this.loadAssociateTableMeta()])
-      //
-      // const _pcn = this.meta.columns.find(c => c.cn === this.mm.cn)._cn
-      // const _ccn = this.childMeta.columns.find(c => c.cn === this.mm.rcn)._cn
-      //
-      // const apcn = this.assocMeta.columns.find(c => c.cn === this.mm.vcn).cn
-      // const accn = this.assocMeta.columns.find(c => c.cn === this.mm.vrcn).cn
-      //
-      // const id = this.assocMeta.columns.filter(c => c.cn === apcn || c.cn === accn).map(c => c.cn === apcn ? this.row[_pcn] : child[_ccn]).join('___')
+      if (this.isNew) {
+        this.localState.splice(this.localState.indexOf(child), 1)
+        this.$emit('update:localState', [...this.localState])
+        return
+      }
+      await Promise.all([this.loadChildMeta(), this.loadAssociateTableMeta()])
+
+      const _pcn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
+      const _ccn = this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id)._cn
+
+      const apcn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id).cn
+      const accn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id).cn
+
+      const id = this.assocMeta.columns.filter(c => c.cn === apcn || c.cn === accn).map(c => c.cn === apcn ? this.row[_pcn] : child[_ccn]).join('___')
       // await this.assocApi.delete(id)
-      // this.$emit('loadTableData')
-      // if ((this.childListModal || this.isForm) && this.$refs.childList) {
-      //   this.$refs.childList.loadData()
-      // }
+      await this.$api.data.delete(this.assocMeta.id, id)
+      this.$emit('loadTableData')
+      if ((this.childListModal || this.isForm) && this.$refs.childList) {
+        this.$refs.childList.loadData()
+      }
     },
     async removeChild(child) {
       this.dialogShow = true

@@ -89,6 +89,11 @@ export default class Model implements TableType {
     return this.columns?.find(c => c.pk);
   }
 
+  public get primaryKeys(): Column[] {
+    if (!this.columns) return null;
+    return this.columns?.filter(c => c.pk);
+  }
+
   public get primaryValue(): Column {
     if (!this.columns) return null;
     const pCol = this.columns?.find(c => c.pv);
