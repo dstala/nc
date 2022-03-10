@@ -11,7 +11,7 @@ import { packageVersion } from 'nc-help';
 import NcMetaIO from './NcMetaIO';
 import { defaultConnectionConfig } from '../../utils/NcConfigFactory';
 import ncCreateLookup from './handlersv2/ncCreateLookup';
-import ncGetMeta from './handlersv2/ncGetMeta';
+// import ncGetMeta from './handlersv2/ncGetMeta';
 
 export default class NcMetaMgrv2 {
   public projectConfigs = {};
@@ -363,7 +363,7 @@ export default class NcMetaMgrv2 {
           result = await ncCreateLookup.call(this.getContext(args), args);
           break;
         case 'ncGetMeta':
-          result = await ncGetMeta.call(this.getContext(args), args);
+          // result = await ncGetMeta.call(this.getContext(args), args);
           break;
 
         default:

@@ -3,7 +3,9 @@ import Model from '../../../noco-models/Model';
 
 export default async function(this: NcContextV2, { args }: any) {
   const meta = await Model.getByIdOrName({
-    tn: args.tn
+    tn: args.tn,
+    project_id: args.project_id,
+    base_id: args.id
   });
   await meta.getColumns();
 

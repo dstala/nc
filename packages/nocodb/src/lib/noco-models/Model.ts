@@ -241,7 +241,9 @@ export default class Model implements TableType {
   public static async getByIdOrName(
     args:
       | {
-          tn?: string;
+          project_id: string;
+          base_id: string;
+          tn: string;
         }
       | {
           id?: string;

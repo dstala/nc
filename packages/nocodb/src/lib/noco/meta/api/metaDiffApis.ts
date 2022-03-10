@@ -667,8 +667,16 @@ export async function metaDiffSync(req, res) {
         case MetaDiffType.TABLE_RELATION_ADD:
           {
             virtualColumnInsert.push(async () => {
-              const parentModel = await Model.getByIdOrName({ tn: change.rtn });
-              const childModel = await Model.getByIdOrName({ tn: change.tn });
+              const parentModel = await Model.getByIdOrName({
+                project_id: base.project_id,
+                base_id: base.id,
+                tn: change.rtn
+              });
+              const childModel = await Model.getByIdOrName({
+                project_id: base.project_id,
+                base_id: base.id,
+                tn: change.tn
+              });
               const parentCol = await parentModel
                 .getColumns()
                 .then(cols => cols.find(c => c.cn === change.rcn));

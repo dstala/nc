@@ -601,7 +601,9 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
             });
           }
           this.models2[table.tn] = await Model.getByIdOrName({
-            tn: table.tn
+            tn: table.tn,
+            project_id: this.projectId,
+            base_id: this.getDbAlias()
           });
           virtualColumnsInsert.push(async () => {
             for (const column of meta.v) {
