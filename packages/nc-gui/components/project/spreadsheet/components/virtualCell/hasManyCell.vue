@@ -307,14 +307,18 @@ export default {
       }
 
       await this.loadChildMeta()
-      const column = this.childMeta.columns.find(c => c.cn === this.hm.cn)
+      const column = this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)
+
       if (column.rqd) {
         this.$toast.info('Unlink is not possible, instead add to another record.').goAway(3000)
         return
       }
       const _cn = column._cn
       const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-      await this.childApi.update(id, { [_cn]: null }, child)
+      // await this.childApi.update(id, { [_cn]: null }, child)
+
+      await this.$api.data.update(this.childMeta.id, id, { [_cn]: null })
+
       this.$emit('loadTableData')
       if ((this.childListModal || this.isForm) && this.$refs.childList) {
         this.$refs.childList.loadData()
