@@ -314,7 +314,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
 
   // views
 
-  const views = (await sqlClient.viewList())?.data?.list
+  let views = (await sqlClient.viewList())?.data?.list
     // ?.filter(({ tn }) => !IGNORE_TABLES.includes(tn))
     ?.map(v => {
       v.order = ++order;
@@ -322,6 +322,14 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       v._tn = getTableNameAlias(v.tn, project.prefix);
       return v;
     });
+
+  /* filter based on prefix */
+  if (project?.prefix) {
+    views = tables.filter(t => {
+      return t?.tn?.startsWith(project?.prefix);
+    });
+  }
+
   const viewMetasInsert = views.map(table => {
     return async () => {
       const columns = (await sqlClient.columnList({ tn: table.tn }))?.data
