@@ -69,6 +69,12 @@ export default class Sort {
       `${CacheScope.SORT}:${row.id}`
     );
 
+    await NocoCache.appendToList(
+      CacheScope.SORT,
+      [sortObj.fk_column_id],
+      `${CacheScope.SORT}:${row.id}`
+    );
+
     return this.get(row.id, ncMeta);
   }
 

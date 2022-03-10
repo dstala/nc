@@ -467,9 +467,12 @@ export default class Column<T = any> implements ColumnType {
 
     // get lookup columns and delete
     {
-      const lookups = await ncMeta.metaList2(null, null, MetaTable.COL_LOOKUP, {
-        condition: { fk_lookup_column_id: id }
-      });
+      let lookups = await NocoCache.getList(CacheScope.COL_LOOKUP, [id]);
+      if (!lookups.length) {
+        lookups = await ncMeta.metaList2(null, null, MetaTable.COL_LOOKUP, {
+          condition: { fk_lookup_column_id: id }
+        });
+      }
       for (const lookup of lookups) {
         await Column.delete(lookup.fk_column_id, ncMeta);
       }
@@ -477,26 +480,30 @@ export default class Column<T = any> implements ColumnType {
 
     // get rollup column and delete
     {
-      const rollups = await ncMeta.metaList2(null, null, MetaTable.COL_ROLLUP, {
-        condition: { fk_rollup_column_id: id }
-      });
+      let rollups = await NocoCache.getList(CacheScope.COL_ROLLUP, [id]);
+      if (!rollups.length) {
+        rollups = await ncMeta.metaList2(null, null, MetaTable.COL_ROLLUP, {
+          condition: { fk_rollup_column_id: id }
+        });
+      }
       for (const rollup of rollups) {
         await Column.delete(rollup.fk_column_id, ncMeta);
       }
     }
-    // todo: get formula column and mark as error
+
     {
-      const formulaColumns = await ncMeta.metaList2(
-        null,
-        null,
-        MetaTable.COLUMNS,
-        {
+      let formulaColumns = await NocoCache.getList(CacheScope.COLUMN, [
+        col.fk_model_id
+      ]);
+      if (!formulaColumns.length) {
+        formulaColumns = await ncMeta.metaList2(null, null, MetaTable.COLUMNS, {
           condition: {
             fk_model_id: col.fk_model_id,
             uidt: UITypes.Formula
           }
-        }
-      );
+        });
+      }
+      formulaColumns = formulaColumns.filter(c => c.uidt === UITypes.Formula);
 
       for (const formulaCol of formulaColumns) {
         const formula = await new Column(formulaCol).getColOptions<
@@ -515,17 +522,23 @@ export default class Column<T = any> implements ColumnType {
     //  if relation column check lookup and rollup and delete
     if (col.uidt === UITypes.LinkToAnotherRecord) {
       // get lookup columns using relation and delete
-      const lookups = await ncMeta.metaList2(null, null, MetaTable.COL_LOOKUP, {
-        condition: { fk_relation_column_id: id }
-      });
+      let lookups = await NocoCache.getList(CacheScope.COL_LOOKUP, [id]);
+      if (!lookups.length) {
+        lookups = await ncMeta.metaList2(null, null, MetaTable.COL_LOOKUP, {
+          condition: { fk_relation_column_id: id }
+        });
+      }
       for (const lookup of lookups) {
         await Column.delete(lookup.fk_column_id, ncMeta);
       }
 
       // get rollup columns using relation and delete
-      const rollups = await ncMeta.metaList2(null, null, MetaTable.COL_ROLLUP, {
-        condition: { fk_relation_column_id: id }
-      });
+      let rollups = await NocoCache.getList(CacheScope.COL_ROLLUP, [id]);
+      if (!rollups.length) {
+        rollups = await ncMeta.metaList2(null, null, MetaTable.COL_ROLLUP, {
+          condition: { fk_relation_column_id: id }
+        });
+      }
       for (const rollup of rollups) {
         await Column.delete(rollup.fk_column_id, ncMeta);
       }
@@ -533,22 +546,28 @@ export default class Column<T = any> implements ColumnType {
 
     // delete sorts
     {
-      const sorts = await ncMeta.metaList2(null, null, MetaTable.SORT, {
-        condition: {
-          fk_column_id: id
-        }
-      });
+      let sorts = await NocoCache.getList(CacheScope.SORT, [id]);
+      if (!sorts.length) {
+        sorts = await ncMeta.metaList2(null, null, MetaTable.SORT, {
+          condition: {
+            fk_column_id: id
+          }
+        });
+      }
       for (const sort of sorts) {
         await Sort.delete(sort.id, ncMeta);
       }
     }
     // delete filters
     {
-      const filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: {
-          fk_column_id: id
-        }
-      });
+      let filters = await NocoCache.getList(CacheScope.FILTER_EXP, [id]);
+      if (!filters.length) {
+        filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
+          condition: {
+            fk_column_id: id
+          }
+        });
+      }
       for (const filter of filters) {
         await Filter.delete(filter.id, ncMeta);
       }
