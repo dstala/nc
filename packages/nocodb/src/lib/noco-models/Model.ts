@@ -353,17 +353,6 @@ export default class Model implements TableType {
   }
 
   async delete(ncMeta = Noco.ncMeta): Promise<boolean> {
-    // todo: table delete
-    // todo: delete
-    //  sort, filters - done
-    //  views
-    //    views col
-    //    views filter & sort
-    //    shared view url
-    //  lookup, relations, virtual cols - done
-    //  columns - done
-    //  table - done
-
     await Audit.deleteRowComments(this.id);
 
     for (const view of await this.getViews(true)) {

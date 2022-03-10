@@ -731,8 +731,8 @@ async function isMMRelationAvailable(
       if (
         colOpt.type === RelationTypes.MANY_TO_MANY &&
         colOpt.fk_mm_model_id === assocModel.id &&
-        colOpt.fk_child_column_id === colChildOpt.fk_child_column_id &&
-        colOpt.fk_mm_child_column_id === colChildOpt.fk_parent_column_id
+        colOpt.fk_child_column_id === colChildOpt.fk_parent_column_id &&
+        colOpt.fk_mm_child_column_id === colChildOpt.fk_child_column_id
       ) {
         isAvail = true;
         break;
@@ -782,6 +782,7 @@ async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
         await Column.insert<LinkToAnotherRecordColumn>({
           _cn: getUniqueColumnAliasName(modelA.columns, `${modelB._tn}MMList`),
           fk_model_id: modelA.id,
+          fk_related_model_id: modelB.id,
           fk_mm_model_id: assocModel.id,
           fk_child_column_id: belongsToCols[0].colOptions.fk_parent_column_id,
           fk_parent_column_id: belongsToCols[1].colOptions.fk_parent_column_id,
@@ -796,6 +797,7 @@ async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
         await Column.insert<LinkToAnotherRecordColumn>({
           _cn: getUniqueColumnAliasName(modelB.columns, `${modelA._tn}MMList`),
           fk_model_id: modelB.id,
+          fk_related_model_id: modelA.id,
           fk_mm_model_id: assocModel.id,
           fk_child_column_id: belongsToCols[1].colOptions.fk_parent_column_id,
           fk_parent_column_id: belongsToCols[0].colOptions.fk_parent_column_id,
@@ -808,17 +810,6 @@ async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
       }
 
       // todo: set assoc table as mm table and relations as system relation
-
-      // await Column.update(belongsToCols[0].id, {
-      //   ...belongsToCols[0],
-      //   ...belongsToCols[0].colOptions,
-      //   system: true
-      // });
-      // await Column.update(belongsToCols[1].id, {
-      //   ...belongsToCols[1],
-      //   ...belongsToCols[1].colOptions,
-      //   system: true
-      // });
     }
   }
 }
