@@ -570,7 +570,10 @@ export async function metaDiffSync(req, res) {
             mapDefaultPrimaryValue(meta.columns);
 
             // const model =
-            await Model.insert(project.id, base.id, meta);
+            await Model.insert(project.id, base.id, {
+              ...meta,
+              type: ModelTypes.TABLE
+            });
 
             // for (const col of meta.columns) {
             //   // await Column.insert({ fk_model_id: model.id, ...col });
@@ -608,7 +611,10 @@ export async function metaDiffSync(req, res) {
                 filename: ''
               }
             ).getObject();
-            await Model.insert(project.id, base.id, meta);
+            await Model.insert(project.id, base.id, {
+              ...meta,
+              type: ModelTypes.VIEW
+            });
           }
           break;
         case MetaDiffType.TABLE_REMOVE:
