@@ -204,6 +204,7 @@ export default {
             columnId: this.column.fk_column_id
           }, {})).data.data
         } else {
+          debugger
           this.data = (await this.$api.public.dataNestedList({
             uuid: this.$route.params.id,
             relationType: 'hm',
