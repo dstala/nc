@@ -1,22 +1,13 @@
 import UITypes from "./UITypes";
-import {RelationTypes} from "./globals";
+// import {RelationTypes} from "./globals";
 
 
-const systemCols = ['created_at', 'updated_at']
+// const systemCols = ['created_at', 'updated_at']
 const filterOutSystemColumns = (columns) => {
-  return (columns && columns.filter(c => !(c.pk && c.ai) &&
-    !((columns).some(c1 =>
-      c1.uidt === UITypes.LinkToAnotherRecord &&
-      c1.colOptions.type === RelationTypes.BELONGS_TO &&
-      c.id === c1.colOptions.fk_child_column_id)) &&
-    !systemCols.includes(c.cn))) || []
+  return (columns && columns.filter(c => !isSystemColumn(c))) || []
 }
 const getSystemColumnsIds = (columns) => {
-  return ((columns && columns.filter(c => (c.pk && c.ai) ||((columns).some(c1 =>
-      c1.uidt === UITypes.LinkToAnotherRecord &&
-      c1.colOptions.type === RelationTypes.BELONGS_TO &&
-      c.id === c1.colOptions.fk_child_column_id)) ||
-    systemCols.includes(c.cn))) || []).map(c => c.id)
+  return ((columns && columns.filter(isSystemColumn)) || []).map(c => c.id)
 }
 
 
@@ -24,7 +15,8 @@ const getSystemColumnsIds = (columns) => {
 const getSystemColumns = (columns) =>
   ((columns.filter(isSystemColumn)) || [])
 
-const isSystemColumn = (col) => col.uidt === UITypes.ForeignKey ||
+const isSystemColumn = (col) =>
+  col.uidt === UITypes.ForeignKey ||
   col.cn === 'created_at' ||
   col.cn === 'updated_at' ||
   (col.pk && (col.ai || col.cdf)

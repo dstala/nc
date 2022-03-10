@@ -17,6 +17,7 @@ import {
   AuditOperationSubTypes,
   AuditOperationTypes,
   LinkToAnotherRecordType,
+  RelationTypes,
   TableType
 } from 'nc-common';
 import Audit from '../../../noco-models/Audit';
@@ -33,6 +34,54 @@ export enum Altered {
   NEW_COLUMN = 1,
   DELETE_COLUMN = 4,
   UPDATE_COLUMN = 8
+}
+
+async function createHmAndBtColumn(
+  child: Model,
+  parent: Model,
+  childColumn: Column,
+  type?: RelationTypes,
+  alias?: string,
+  isSystemCol = false
+) {
+  // save bt column
+  {
+    const _cn = getUniqueColumnAliasName(
+      await child.getColumns(),
+      type === 'bt' ? alias : `${parent._tn}Read`
+    );
+    await Column.insert<LinkToAnotherRecordColumn>({
+      _cn,
+
+      fk_model_id: child.id,
+      // ref_db_alias
+      uidt: UITypes.LinkToAnotherRecord,
+      type: 'bt',
+      // db_type:
+
+      fk_child_column_id: childColumn.id,
+      fk_parent_column_id: parent.primaryKey.id,
+      fk_related_model_id: parent.id,
+      system: isSystemCol
+    });
+  }
+  // save hm column
+  {
+    const _cn = getUniqueColumnAliasName(
+      await parent.getColumns(),
+      type === 'hm' ? alias : `${child._tn}List`
+    );
+    await Column.insert({
+      _cn,
+      fk_model_id: parent.id,
+      uidt: UITypes.LinkToAnotherRecord,
+      type: 'hm',
+      fk_child_column_id: childColumn.id,
+      fk_parent_column_id: parent.primaryKey.id,
+      fk_related_model_id: child.id,
+      system: isSystemCol
+    });
+  }
 }
 
 export async function columnAdd(req: Request, res: Response<TableType>, next) {
@@ -205,43 +254,13 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
                 parentColumn: parent.primaryKey.cn
               });
             }
-
-            // save bt column
-            {
-              const _cn = getUniqueColumnAliasName(
-                await child.getColumns(),
-                req.body.type === 'hm' ? `${parent._tn}Read` : req.body._cn
-              );
-              await Column.insert<LinkToAnotherRecordColumn>({
-                _cn,
-
-                fk_model_id: child.id,
-                // ref_db_alias
-                uidt: UITypes.LinkToAnotherRecord,
-                type: 'bt',
-                // db_type:
-
-                fk_child_column_id: childColumn.id,
-                fk_parent_column_id: parent.primaryKey.id,
-                fk_related_model_id: parent.id
-              });
-            }
-            // save hm column
-            {
-              const _cn = getUniqueColumnAliasName(
-                await child.getColumns(),
-                req.body.type === 'bt' ? `${parent._tn}List` : req.body._cn
-              );
-              await Column.insert({
-                _cn,
-                fk_model_id: parent.id,
-                uidt: UITypes.LinkToAnotherRecord,
-                type: 'hm',
-                fk_child_column_id: childColumn.id,
-                fk_parent_column_id: parent.primaryKey.id,
-                fk_related_model_id: child.id
-              });
-            }
+            await createHmAndBtColumn(
+              child,
+              parent,
+              childColumn,
+              req.body.type,
+              req.body._cn
+            );
           } else if (req.body.type === 'mm') {
             const aTn = `${project?.prefix ?? ''}_nc_m2m_${randomID()}`;
             const aTnAlias = aTn;
@@ -325,10 +344,27 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
               c => c.cn === childCn
             );
 
+            await createHmAndBtColumn(
+              assocModel,
+              child,
+              childCol,
+              null,
+              null,
+              true
+            );
+            await createHmAndBtColumn(
+              assocModel,
+              parent,
+              parentCol,
+              null,
+              null,
+              true
+            );
+
             await Column.insert({
               _cn: getUniqueColumnAliasName(
                 await child.getColumns(),
-                `${child._tn}List`
+                `${child._tn}MMList`
               ),
               uidt: UITypes.LinkToAnotherRecord,
               type: 'mm',
@@ -348,7 +384,7 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
             await Column.insert({
               _cn: getUniqueColumnAliasName(
                 await parent.getColumns(),
-                req.body._cn ?? `${parent._tn}List`
+                req.body._cn ?? `${parent._tn}MMList`
               ),
 
               uidt: UITypes.LinkToAnotherRecord,

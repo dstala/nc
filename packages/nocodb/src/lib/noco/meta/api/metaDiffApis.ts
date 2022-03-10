@@ -804,18 +804,18 @@ async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
         });
       }
 
-      // todo: set assoc table as mm table
+      // todo: set assoc table as mm table and relations as system relation
 
-      await Column.update(belongsToCols[0].id, {
-        ...belongsToCols[0],
-        ...belongsToCols[0].colOptions,
-        system: true
-      });
-      await Column.update(belongsToCols[1].id, {
-        ...belongsToCols[1],
-        ...belongsToCols[1].colOptions,
-        system: true
-      });
+      // await Column.update(belongsToCols[0].id, {
+      //   ...belongsToCols[0],
+      //   ...belongsToCols[0].colOptions,
+      //   system: true
+      // });
+      // await Column.update(belongsToCols[1].id, {
+      //   ...belongsToCols[1],
+      //   ...belongsToCols[1].colOptions,
+      //   system: true
+      // });
     }
   }
 }
