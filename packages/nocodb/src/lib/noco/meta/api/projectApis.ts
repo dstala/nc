@@ -484,7 +484,7 @@ async function getManyToManyRelations(
   // and recreate basemodel with new meta information
   for (const meta of metas) {
     const mmBtRelation = meta.v.find(
-      vc => !(vc.hm && meta.manyToMany.some(mm => vc.hm.tn === mm.vtn))
+      vc => vc.hm && meta.manyToMany.some(mm => vc.hm.tn === mm.vtn)
     );
     if (mmBtRelation) mmBtRelation.system = true;
 
