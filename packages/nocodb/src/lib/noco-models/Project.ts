@@ -85,6 +85,9 @@ export default class Project implements ProjectType {
       });
       await NocoCache.setList(CacheScope.PROJECT, [], projectList);
     }
+    projectList = projectList.filter(
+      p => p.deleted === 0 || p.deleted === false || p.deleted === null
+    );
     return projectList.map(m => new Project(m));
   }
 
@@ -129,6 +132,12 @@ export default class Project implements ProjectType {
         projectId
       );
       await NocoCache.set(`${CacheScope.PROJECT}:${projectId}`, projectData);
+      if (projectData.uuid) {
+        await NocoCache.set(
+          `${CacheScope.PROJECT}:${projectData.uuid}`,
+          projectId
+        );
+      }
     }
     if (projectData) {
       const project = new Project(projectData);
@@ -143,12 +152,10 @@ export default class Project implements ProjectType {
     // get existing cache
     const key = `${CacheScope.PROJECT}:${projectId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    if (o) {
-      // update data
-      o.deleted = true;
-      // set cache
-      await NocoCache.set(key, o);
+    if (o.uuid) {
+      await NocoCache.del(`${CacheScope.PROJECT}:${o.uuid}`);
     }
+    await NocoCache.del(`${CacheScope.PROJECT}:${projectId}`);
 
     // remove item in cache list
     await NocoCache.deepDel(
@@ -191,6 +198,13 @@ export default class Project implements ProjectType {
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
       // update data
+      if (o.uuid && updateObj.uuid && o.uuid !== updateObj.uuid) {
+        await NocoCache.del(`${CacheScope.PROJECT}:${o.uuid}`);
+        await NocoCache.set(
+          `${CacheScope.PROJECT}:${updateObj.uuid}`,
+          projectId
+        );
+      }
       o = { ...o, ...updateObj };
       // set cache
       await NocoCache.set(key, o);
@@ -210,6 +224,10 @@ export default class Project implements ProjectType {
     for (const base of bases) {
       await base.delete(ncMeta);
     }
+    const project = await this.get(projectId);
+    if (project.uuid) {
+      await NocoCache.del(`${CacheScope.PROJECT}:${project.uuid}`);
+    }
     await NocoCache.deepDel(
       CacheScope.PROJECT,
       `${CacheScope.PROJECT}:${projectId}`,
@@ -219,18 +237,21 @@ export default class Project implements ProjectType {
   }
 
   static async getByUuid(uuid) {
-    let projectData =
+    const projectId =
       uuid &&
       (await NocoCache.get(
         `${CacheScope.PROJECT}:${uuid}`,
         CacheGetType.TYPE_OBJECT
       ));
-    if (!projectData) {
+    let projectData = null;
+    if (!projectId) {
       projectData = await Noco.ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
         uuid
       });
-      await NocoCache.set(`${CacheScope.PROJECT}:${uuid}`, projectData);
+      await NocoCache.set(`${CacheScope.PROJECT}:${uuid}`, projectData?.id);
+    } else {
+      return this.get(projectId);
     }
-    return projectData && new Project(projectData);
+    return projectData?.id && this.get(projectData?.id);
   }
 }
