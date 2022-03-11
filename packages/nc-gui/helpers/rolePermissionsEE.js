@@ -12,6 +12,7 @@ export default {
     gridViewOptions: true,
     sortSync: true,
     fieldsSync: true,
+    gridColUpdate: true,
     filterSync: true
   },
   commenter: {

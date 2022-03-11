@@ -706,9 +706,11 @@ export default {
         return
       }
       this.$set(this.gridViewCols[colId], 'width', size)
-      await this.$api.meta.gridColumnUpdate(gridColId, {
-        width: size
-      })
+      if (this._isUIAllowed('gridColUpdate')) {
+        await this.$api.meta.gridColumnUpdate(gridColId, {
+          width: size
+        })
+      }
       // this.$emit('update:columnsWidth', { ...this.columnsWidth, [col]: size })
     },
     onXcResizing(_cn, width) {

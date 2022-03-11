@@ -43,6 +43,7 @@ export default {
 
     formViewGet: true,
     projectInfoGet: true,
+    gridColumnUpdate: true,
 
     // old
     xcTableAndViewList: true,
