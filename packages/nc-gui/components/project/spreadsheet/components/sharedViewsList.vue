@@ -109,6 +109,7 @@
 </template>
 
 <script>
+import { ViewTypes } from 'nc-common'
 import viewIcons from '~/helpers/viewIcons'
 
 export default {
@@ -167,10 +168,10 @@ export default {
     sharedViewUrl(view) {
       let viewType
       switch (view.type) {
-        case 'form':
+        case ViewTypes.FORM:
           viewType = 'form'
           break
-        case 'kanban':
+        case ViewTypes.KANBAN:
           viewType = 'kanban'
           break
         default:
