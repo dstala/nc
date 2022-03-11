@@ -116,7 +116,7 @@
         :query-params="childQueryParams"
         :is-new.sync="isNewChild"
         :breadcrumbs="breadcrumbs"
-        @cancel="selectedChild = null"
+        @cancel="selectedChild = null; expandFormModal =false"
         @input="onChildSave"
       />
     </v-dialog>

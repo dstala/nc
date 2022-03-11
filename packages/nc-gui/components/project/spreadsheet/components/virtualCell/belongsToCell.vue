@@ -94,7 +94,7 @@
         :is-new.sync="isNewParent"
         icon-color="warning"
         :breadcrumbs="breadcrumbs"
-        @cancel="selectedParent = null"
+        @cancel="selectedParent = null; expandFormModal =false"
         @input="onParentSave"
       />
     </v-dialog>

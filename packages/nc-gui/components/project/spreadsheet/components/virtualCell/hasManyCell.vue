@@ -126,7 +126,7 @@
         :is-new.sync="isNewChild"
         :disabled-columns="disabledChildColumns"
         :breadcrumbs="breadcrumbs"
-        @cancel="selectedChild = null"
+        @cancel="selectedChild = null; expandFormModal =false"
         @input="onChildSave"
       />
     </v-dialog>
