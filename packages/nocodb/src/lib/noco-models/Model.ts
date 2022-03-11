@@ -457,7 +457,27 @@ export default class Model implements TableType {
     );
   }
 
-  return;
+  static async markAsMmTable(tableId, isMm = true, ncMeta = Noco.ncMeta) {
+    // get existing cache
+    const key = `${CacheScope.MODEL}:${tableId}`;
+    const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    if (o) {
+      o.mm = isMm;
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
+    return await ncMeta.metaUpdate(
+      null,
+      null,
+      MetaTable.MODELS,
+      {
+        mm: isMm
+      },
+      tableId
+    );
+  }
 
   async getAliasColMapping() {
     return (await this.getColumns()).reduce((o, c) => {

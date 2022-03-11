@@ -823,7 +823,9 @@ async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
         });
       }
 
-      // todo: set assoc table as mm table and relations as system relation
+      await Model.markAsMmTable(assocModel.id, true);
+    } else {
+      if (assocModel.mm) await Model.markAsMmTable(assocModel.id, false);
     }
   }
 }
