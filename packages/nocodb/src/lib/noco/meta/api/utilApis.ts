@@ -12,8 +12,7 @@ export async function testConnection(req: Request, res: Response) {
   res.json(await SqlMgrv2.testConnection(req.body));
 }
 export async function appInfo(_req: Request, res: Response) {
-  let projectHasAdmin = false;
-  projectHasAdmin = !(await User.isFirst());
+  const projectHasAdmin = !(await User.isFirst());
   const result = {
     authType: 'jwt',
     projectHasAdmin,

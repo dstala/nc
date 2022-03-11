@@ -1175,8 +1175,8 @@ class BaseModelSqlv2 {
     return this.dbDriver.clientType();
   }
 
-  async nestedInsert(data, trx = null, cookie?) {
-    const driver = trx ? trx : await this.dbDriver.transaction();
+  async nestedInsert(data, _trx = null, cookie?) {
+    // const driver = trx ? trx : await this.dbDriver.transaction();
     try {
       const insertObj = await this.model.mapAliasToColumn(data);
 
@@ -1213,7 +1213,7 @@ class BaseModelSqlv2 {
                 await childModel.getColumns();
 
                 postInsertOps.push(async () => {
-                  await driver(childModel.tn)
+                  await this.dbDriver(childModel.tn)
                     .update({
                       [childCol.cn]: rowId
                     })
@@ -1238,7 +1238,7 @@ class BaseModelSqlv2 {
                   [parentMMCol.cn]: r[parentModel.primaryKey._cn],
                   [childMMCol.cn]: rowId
                 }));
-                await driver(mmModel.tn).insert(rows);
+                await this.dbDriver(mmModel.tn).insert(rows);
               });
             }
           }
@@ -1247,7 +1247,7 @@ class BaseModelSqlv2 {
 
       await this.validate(insertObj);
 
-      await this.beforeInsert(insertObj, driver, cookie);
+      await this.beforeInsert(insertObj, this.dbDriver, cookie);
 
       let response;
       const query = this.dbDriver(this.tnPath).insert(insertObj);
@@ -1289,19 +1289,19 @@ class BaseModelSqlv2 {
           response[this.model.primaryKey.cn];
       await Promise.all(postInsertOps.map(f => f()));
 
-      if (!trx) {
-        await driver.commit();
-      }
+      // if (!trx) {
+      //   await driver.commit();
+      // }
 
-      await this.afterInsert(response, driver, cookie);
+      await this.afterInsert(response, this.dbDriver, cookie);
 
       return response;
     } catch (e) {
       console.log(e);
       // await this.errorInsert(e, data, trx, cookie);
-      if (!trx) {
-        await driver.rollback(e);
-      }
+      // if (!trx) {
+      //   await driver.rollback(e);
+      // }
       throw e;
     }
   }
