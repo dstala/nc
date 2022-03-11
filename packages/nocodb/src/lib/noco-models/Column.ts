@@ -309,9 +309,6 @@ export default class Column<T = any> implements ColumnType {
       case UITypes.LinkToAnotherRecord:
         res = await LinkToAnotherRecordColumn.read(this.id);
         break;
-      case UITypes.ForeignKey:
-        res = await LinkToAnotherRecordColumn.read(this.id);
-        break;
       case UITypes.MultiSelect:
         res = await MultiSelectColumn.get(this.id);
         break;
@@ -680,7 +677,6 @@ export default class Column<T = any> implements ColumnType {
         break;
       }
 
-      case UITypes.ForeignKey:
       case UITypes.LinkToAnotherRecord: {
         await ncMeta.metaDelete(null, null, MetaTable.COL_RELATIONS, {
           fk_column_id: colId
