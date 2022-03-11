@@ -33,22 +33,15 @@ const up = async knex => {
     // table.string('project_id', 128);
     table.string('project_id', 128);
     table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
-
     table.string('alias');
-    table.string('host');
-    table.integer('port');
-    table.string('username');
-    table.string('password');
-    table.string('database');
-    table.text('url');
-    table.text('params');
+    table.text('config');
 
+    table.text('meta');
     table.boolean('is_meta');
-
     table.string('type');
 
     // todo: type
-    table.text('ssl');
+    // table.text('ssl');
 
     table.timestamps(true, true);
   });

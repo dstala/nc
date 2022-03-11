@@ -1674,14 +1674,7 @@ export default {
 
       const result = (await this.$api.meta.projectCreate({
         title: projectJson.title,
-        bases: [{
-          type: con.client,
-          database: con.connection.database,
-          host: con.connection.host,
-          port: con.connection.port,
-          username: con.connection.user,
-          password: con.connection.password
-        }],
+        bases: [{ type: con.client, config: con }],
         external: true
       })).data
 

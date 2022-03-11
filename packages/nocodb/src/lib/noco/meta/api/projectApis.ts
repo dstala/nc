@@ -39,9 +39,7 @@ export async function projectGet(
 
   // delete datasource connection details
   project.bases?.forEach(b => {
-    ['host', 'port', 'username', 'password', 'url', 'params', 'ssl'].forEach(
-      k => delete b[k]
-    );
+    ['config'].forEach(k => delete b[k]);
   });
 
   res.json(project);
@@ -97,11 +95,7 @@ async function projectCreate(
       projectBody.bases = [
         {
           type: db?.client,
-          database: db?.connection.database,
-          // host: db?.connection.host,
-          // port: db?.connection.port,
-          // username: db?.connection.user,
-          // password: db?.connection.password,
+          config: null,
           is_meta: true
         }
       ];

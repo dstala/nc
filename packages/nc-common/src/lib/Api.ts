@@ -67,16 +67,9 @@ export interface BaseType {
   id?: string;
   project_id?: string;
   alias?: string;
-  host?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  database?: string;
-  url?: string;
-  params?: string;
   type?: string;
-  ssl?: string;
   is_meta?: boolean;
+  config?: any;
 }
 
 export interface BaseReqType {

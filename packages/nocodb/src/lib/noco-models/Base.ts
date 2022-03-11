@@ -9,17 +9,12 @@ import {
 import Model from './Model';
 import { BaseType } from 'nc-common';
 import NocoCache from '../noco-cache/NocoCache';
+import CryptoJS from 'crypto-js';
 
 // todo: hide credentials
 export default class Base implements BaseType {
   public alias?: string;
-  public host?: string;
-  public port?: number;
-  public username?: string;
-  public password?: string;
-  public database?: string;
-  public url?: string;
-  public params?: string;
+  public config?: any;
   public type?: string;
   public is_meta?: boolean;
 
@@ -38,13 +33,17 @@ export default class Base implements BaseType {
       {
         id: base?.id,
         alias: base.alias,
-        host: base.host,
-        port: base.port,
-        username: base.username,
-        password: base.password,
-        database: base.database,
-        url: base.url,
-        params: base.params,
+        // host: base.host,
+        // port: base.port,
+        // username: base.username,
+        // password: base.password,
+        // database: base.database,
+        // url: base.url,
+        // params: base.params,
+        config: CryptoJS.AES.encrypt(
+          JSON.stringify(base.config),
+          Noco.getConfig()?.auth?.jwt?.secret
+        ).toString(),
         type: base.type,
         is_meta: base.is_meta
       }
@@ -98,16 +97,12 @@ export default class Base implements BaseType {
     }
 
     // todo: construct with props
-    return {
-      client: this.type,
-      connection: {
-        host: this.host ?? 'localhost',
-        port: this.port ?? 3303,
-        user: this.username ?? 'root',
-        password: this.password ?? 'password',
-        database: this.database ?? 'dummy_db'
-      }
-    };
+    return JSON.parse(
+      CryptoJS.AES.decrypt(
+        this.config,
+        Noco.getConfig()?.auth?.jwt?.secret
+      ).toString(CryptoJS.enc.Utf8)
+    );
   }
   getProject(): Promise<Project> {
     return Project.get(this.project_id);

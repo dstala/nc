@@ -4436,37 +4436,14 @@
           "alias": {
             "type": "string"
           },
-          "host": {
-            "type": "string"
-          },
-          "port": {
-            "type": "number"
-          },
-          "username": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "database": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          },
-          "params": {
-            "type": "string"
-          },
           "type": {
-            "type": "string"
-          },
-          "ssl": {
             "type": "string"
           },
           "is_meta": {
             "type": "boolean",
             "readOnly": true
-          }
+          },
+          "config": {}
         }
       },
       "BaseReq": {
