@@ -79,8 +79,8 @@ export default class Model implements TableType {
   }
 
   // @ts-ignore
-  public async getViews(force = false): Promise<View[]> {
-    this.views = await View.listWithInfo(this.id);
+  public async getViews(force = false, ncMeta = Noco.ncMeta): Promise<View[]> {
+    this.views = await View.listWithInfo(this.id, ncMeta);
     return this.views;
   }
 
@@ -147,7 +147,7 @@ export default class Model implements TableType {
       await Column.insert({ ...column, fk_model_id: id, view } as any, ncMeta);
     }
 
-    return this.getWithInfo({ id });
+    return this.getWithInfo({ id }, ncMeta);
   }
 
   public static async list(
@@ -190,19 +190,22 @@ export default class Model implements TableType {
     return modelList.map(m => new Model(m));
   }
 
-  public static async listWithInfo({
-    project_id,
-    db_alias
-  }: {
-    project_id: string;
-    db_alias: string;
-  }): Promise<Model[]> {
+  public static async listWithInfo(
+    {
+      project_id,
+      db_alias
+    }: {
+      project_id: string;
+      db_alias: string;
+    },
+    ncMeta = Noco.ncMeta
+  ): Promise<Model[]> {
     let modelList = await NocoCache.getList(CacheScope.MODEL, [
       project_id,
       db_alias
     ]);
     if (!modelList.length) {
-      modelList = await Noco.ncMeta.metaList2(
+      modelList = await ncMeta.metaList2(
         project_id,
         db_alias,
         MetaTable.MODELS
@@ -285,13 +288,16 @@ export default class Model implements TableType {
     return null;
   }
 
-  public static async getWithInfo({
-    tn,
-    id
-  }: {
-    tn?: string;
-    id?: string;
-  }): Promise<Model> {
+  public static async getWithInfo(
+    {
+      tn,
+      id
+    }: {
+      tn?: string;
+      id?: string;
+    },
+    ncMeta = Noco.ncMeta
+  ): Promise<Model> {
     let modelData =
       id &&
       (await NocoCache.get(
@@ -299,7 +305,7 @@ export default class Model implements TableType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!modelData) {
-      modelData = await Noco.ncMeta.metaGet2(
+      modelData = await ncMeta.metaGet2(
         null,
         null,
         MetaTable.MODELS,
@@ -315,27 +321,33 @@ export default class Model implements TableType {
     }
     if (modelData) {
       const m = new Model(modelData);
-      const columns = await m.getColumns();
-      await m.getViews();
+      const columns = await m.getColumns(false, ncMeta);
+      await m.getViews(false, ncMeta);
       m.columnsById = columns.reduce((agg, c) => ({ ...agg, [c.id]: c }), {});
       return m;
     }
     return null;
   }
 
-  public static async getBaseModelSQL(args: {
-    id?: string;
-    tn?: string;
-    viewId?: string;
-    dbDriver: XKnex;
-    model?: Model;
-  }): Promise<BaseModelSqlv2> {
+  public static async getBaseModelSQL(
+    args: {
+      id?: string;
+      tn?: string;
+      viewId?: string;
+      dbDriver: XKnex;
+      model?: Model;
+    },
+    ncMeta = Noco.ncMeta
+  ): Promise<BaseModelSqlv2> {
     const model =
       args?.model ||
-      (await this.getByIdOrName({
-        id: args.id,
-        tn: args.tn
-      }));
+      (await this.getByIdOrName(
+        {
+          id: args.id,
+          tn: args.tn
+        },
+        ncMeta
+      ));
 
     // if (
     //   this.baseModels?.[model.base_id]?.[model.db_alias]?.[args.tn || args.id]

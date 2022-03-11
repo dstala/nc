@@ -34,37 +34,55 @@ export default class LinkToAnotherRecordColumn {
     Object.assign(this, data);
   }
 
-  public async getChildColumn(): Promise<Column> {
-    return (this.childColumn = await Column.get({
-      colId: this.fk_child_column_id
-    }));
+  public async getChildColumn(ncMeta = Noco.ncMeta): Promise<Column> {
+    return (this.childColumn = await Column.get(
+      {
+        colId: this.fk_child_column_id
+      },
+      ncMeta
+    ));
   }
 
-  public async getMMChildColumn(): Promise<Column> {
-    return (this.mmChildColumn = await Column.get({
-      colId: this.fk_mm_child_column_id
-    }));
+  public async getMMChildColumn(ncMeta = Noco.ncMeta): Promise<Column> {
+    return (this.mmChildColumn = await Column.get(
+      {
+        colId: this.fk_mm_child_column_id
+      },
+      ncMeta
+    ));
   }
 
-  public async getParentColumn(): Promise<Column> {
-    return (this.parentColumn = await Column.get({
-      colId: this.fk_parent_column_id
-    }));
+  public async getParentColumn(ncMeta = Noco.ncMeta): Promise<Column> {
+    return (this.parentColumn = await Column.get(
+      {
+        colId: this.fk_parent_column_id
+      },
+      ncMeta
+    ));
   }
-  public async getMMParentColumn(): Promise<Column> {
-    return (this.mmParentColumn = await Column.get({
-      colId: this.fk_mm_parent_column_id
-    }));
+  public async getMMParentColumn(ncMeta = Noco.ncMeta): Promise<Column> {
+    return (this.mmParentColumn = await Column.get(
+      {
+        colId: this.fk_mm_parent_column_id
+      },
+      ncMeta
+    ));
   }
-  public async getMMModel(): Promise<Model> {
-    return (this.mmModel = await Model.getByIdOrName({
-      id: this.fk_mm_model_id
-    }));
+  public async getMMModel(ncMeta = Noco.ncMeta): Promise<Model> {
+    return (this.mmModel = await Model.getByIdOrName(
+      {
+        id: this.fk_mm_model_id
+      },
+      ncMeta
+    ));
   }
-  public async getRelatedTable(): Promise<Model> {
-    return (this.relatedTable = await Model.getByIdOrName({
-      id: this.fk_related_model_id
-    }));
+  public async getRelatedTable(ncMeta = Noco.ncMeta): Promise<Model> {
+    return (this.relatedTable = await Model.getByIdOrName(
+      {
+        id: this.fk_related_model_id
+      },
+      ncMeta
+    ));
   }
 
   public static async insert(
@@ -91,10 +109,10 @@ export default class LinkToAnotherRecordColumn {
       fk_index_name: data.fk_index_name,
       fk_related_model_id: data.fk_related_model_id
     });
-    return this.read(data.fk_column_id);
+    return this.read(data.fk_column_id, ncMeta);
   }
 
-  public static async read(columnId: string) {
+  public static async read(columnId: string, ncMeta = Noco.ncMeta) {
     let colData =
       columnId &&
       (await NocoCache.get(
@@ -102,7 +120,7 @@ export default class LinkToAnotherRecordColumn {
         CacheGetType.TYPE_OBJECT
       ));
     if (!colData) {
-      colData = await Noco.ncMeta.metaGet2(
+      colData = await ncMeta.metaGet2(
         null, //,
         null, //model.db_alias
         MetaTable.COL_RELATIONS,

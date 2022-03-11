@@ -46,12 +46,18 @@ export default class View implements ViewType {
     Object.assign(this, data);
   }
 
-  async getModel(): Promise<Model> {
-    return (this.model = await Model.getByIdOrName({ id: this.fk_model_id }));
+  async getModel(ncMeta = Noco.ncMeta): Promise<Model> {
+    return (this.model = await Model.getByIdOrName(
+      { id: this.fk_model_id },
+      ncMeta
+    ));
   }
 
-  async getModelWithInfo(): Promise<Model> {
-    return (this.model = await Model.getWithInfo({ id: this.fk_model_id }));
+  async getModelWithInfo(ncMeta = Noco.ncMeta): Promise<Model> {
+    return (this.model = await Model.getWithInfo(
+      { id: this.fk_model_id },
+      ncMeta
+    ));
   }
 
   async getView<T>(): Promise<T> {
@@ -72,27 +78,27 @@ export default class View implements ViewType {
     return <T>this.view;
   }
 
-  async getViewWithInfo(): Promise<
-    FormView | GridView | KanbanView | GalleryView
-  > {
+  async getViewWithInfo(
+    ncMeta = Noco.ncMeta
+  ): Promise<FormView | GridView | KanbanView | GalleryView> {
     switch (this.type) {
       case ViewTypes.GRID:
-        this.view = await GridView.getWithInfo(this.id);
+        this.view = await GridView.getWithInfo(this.id, ncMeta);
         break;
       case ViewTypes.KANBAN:
-        this.view = await KanbanView.get(this.id);
+        this.view = await KanbanView.get(this.id, ncMeta);
         break;
       case ViewTypes.GALLERY:
-        this.view = await GalleryView.get(this.id);
+        this.view = await GalleryView.get(this.id, ncMeta);
         break;
       case ViewTypes.FORM:
-        this.view = await FormView.get(this.id);
+        this.view = await FormView.get(this.id, ncMeta);
         break;
     }
     return this.view;
   }
 
-  public static async get(viewId: string) {
+  public static async get(viewId: string, ncMeta = Noco.ncMeta) {
     let view =
       viewId &&
       (await NocoCache.get(
@@ -100,17 +106,17 @@ export default class View implements ViewType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.VIEWS, viewId);
+      view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, viewId);
       await NocoCache.set(`${CacheScope.VIEW}:${viewId}`, view);
     }
 
     return view && new View(view);
   }
 
-  public static async list(modelId: string) {
+  public static async list(modelId: string, ncMeta = Noco.ncMeta) {
     let viewsList = await NocoCache.getList(CacheScope.VIEW, [modelId]);
     if (!viewsList.length) {
-      viewsList = await Noco.ncMeta.metaList2(null, null, MetaTable.VIEWS, {
+      viewsList = await ncMeta.metaList2(null, null, MetaTable.VIEWS, {
         condition: {
           fk_model_id: modelId
         },
@@ -128,14 +134,17 @@ export default class View implements ViewType {
     return viewsList?.map(v => new View(v));
   }
 
-  public async getFilters() {
-    return (this.filter = (await Filter.getFilterObject({
-      viewId: this.id
-    })) as any);
+  public async getFilters(ncMeta = Noco.ncMeta) {
+    return (this.filter = (await Filter.getFilterObject(
+      {
+        viewId: this.id
+      },
+      ncMeta
+    )) as any);
   }
 
-  public async getSorts() {
-    return (this.sorts = await Sort.list({ viewId: this.id }));
+  public async getSorts(ncMeta = Noco.ncMeta) {
+    return (this.sorts = await Sort.list({ viewId: this.id }, ncMeta));
   }
 
   static async insert(
@@ -168,13 +177,13 @@ export default class View implements ViewType {
       base_id: view.base_id
     };
     if (!(view.project_id && view.base_id)) {
-      const model = await Model.getByIdOrName({ id: view.fk_model_id });
+      const model = await Model.getByIdOrName({ id: view.fk_model_id }, ncMeta);
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
 
     const copyFormView =
-      view.copy_from_id && (await View.get(view.copy_from_id));
+      view.copy_from_id && (await View.get(view.copy_from_id, ncMeta));
 
     const { id: view_id } = await ncMeta.metaInsert2(
       null,
@@ -191,22 +200,31 @@ export default class View implements ViewType {
 
     switch (view.type) {
       case ViewTypes.GRID:
-        await GridView.insert({
-          ...(view as GridView),
-          fk_view_id: view_id
-        });
+        await GridView.insert(
+          {
+            ...(view as GridView),
+            fk_view_id: view_id
+          },
+          ncMeta
+        );
         break;
       case ViewTypes.GALLERY:
-        await GalleryView.insert({
-          ...view,
-          fk_view_id: view_id
-        });
+        await GalleryView.insert(
+          {
+            ...view,
+            fk_view_id: view_id
+          },
+          ncMeta
+        );
         break;
       case ViewTypes.FORM:
-        await FormView.insert({
-          ...view,
-          fk_view_id: view_id
-        });
+        await FormView.insert(
+          {
+            ...view,
+            fk_view_id: view_id
+          },
+          ncMeta
+        );
         break;
       // case ViewTypes.KANBAN:
       //   await KanbanView.insert({
@@ -223,28 +241,34 @@ export default class View implements ViewType {
     }
 
     let columns: any[] = await (
-      await Model.getByIdOrName({ id: view.fk_model_id })
-    ).getColumns();
+      await Model.getByIdOrName({ id: view.fk_model_id }, ncMeta)
+    ).getColumns(false, ncMeta);
 
     if (copyFormView) {
-      const sorts = await copyFormView.getSorts();
-      const filters = await copyFormView.getFilters();
-      columns = await copyFormView.getColumns();
+      const sorts = await copyFormView.getSorts(ncMeta);
+      const filters = await copyFormView.getFilters(ncMeta);
+      columns = await copyFormView.getColumns(ncMeta);
 
       for (const sort of sorts) {
-        await Sort.insert({
-          ...sort,
-          fk_view_id: view_id,
-          id: null
-        });
+        await Sort.insert(
+          {
+            ...sort,
+            fk_view_id: view_id,
+            id: null
+          },
+          ncMeta
+        );
       }
 
       for (const filter of filters.children) {
-        await Filter.insert({
-          ...filter,
-          fk_view_id: view_id,
-          id: null
-        });
+        await Filter.insert(
+          {
+            ...filter,
+            fk_view_id: view_id,
+            id: null
+          },
+          ncMeta
+        );
       }
     }
     {
@@ -264,7 +288,7 @@ export default class View implements ViewType {
       }
     }
 
-    return View.get(view_id);
+    return View.get(view_id, ncMeta);
   }
 
   static async insertColumnToAllViews(
@@ -282,7 +306,7 @@ export default class View implements ViewType {
       order: param.order,
       show: param.show
     };
-    const views = await this.list(param.fk_model_id);
+    const views = await this.list(param.fk_model_id, ncMeta);
 
     for (const view of views) {
       switch (view.type) {
@@ -356,39 +380,40 @@ export default class View implements ViewType {
     return col;
   }
 
-  static async listWithInfo(id: string) {
-    const list = await this.list(id);
+  static async listWithInfo(id: string, ncMeta = Noco.ncMeta) {
+    const list = await this.list(id, ncMeta);
     for (const item of list) {
-      await item.getViewWithInfo();
+      await item.getViewWithInfo(ncMeta);
     }
     return list;
   }
 
   static async getColumns(
-    viewId: string
+    viewId: string,
+    ncMeta = Noco.ncMeta
   ): Promise<Array<GridViewColumn | any>> {
     let columns: Array<GridViewColumn | any> = [];
-    const view = await this.get(viewId);
+    const view = await this.get(viewId, ncMeta);
 
     // todo:  just get - order & show props
     switch (view.type) {
       case ViewTypes.GRID:
-        columns = await GridViewColumn.list(viewId);
+        columns = await GridViewColumn.list(viewId, ncMeta);
         break;
 
       case ViewTypes.GALLERY:
-        columns = await GalleryViewColumn.list(viewId);
+        columns = await GalleryViewColumn.list(viewId, ncMeta);
         break;
       case ViewTypes.FORM:
-        columns = await FormViewColumn.list(viewId);
+        columns = await FormViewColumn.list(viewId, ncMeta);
         break;
     }
 
     return columns;
   }
 
-  async getColumns() {
-    return (this.columns = await View.getColumns(this.id));
+  async getColumns(ncMeta = Noco.ncMeta) {
+    return (this.columns = await View.getColumns(this.id, ncMeta));
   }
 
   static async updateColumn(

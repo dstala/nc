@@ -31,7 +31,7 @@ export default class FormView implements FormType {
     Object.assign(this, data);
   }
 
-  public static async get(viewId: string) {
+  public static async get(viewId: string, ncMeta = Noco.ncMeta) {
     let view =
       viewId &&
       (await NocoCache.get(
@@ -39,7 +39,7 @@ export default class FormView implements FormType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
+      view = await ncMeta.metaGet2(null, null, MetaTable.FORM_VIEW, {
         fk_view_id: viewId
       });
       await NocoCache.set(`${CacheScope.FORM_VIEW}:${viewId}`, view);
@@ -47,7 +47,7 @@ export default class FormView implements FormType {
     return view && new FormView(view);
   }
 
-  static async insert(view: Partial<FormView>) {
+  static async insert(view: Partial<FormView>, ncMeta = Noco.ncMeta) {
     const insertObj = {
       fk_view_id: view.fk_view_id,
       project_id: view.project_id,
@@ -58,18 +58,16 @@ export default class FormView implements FormType {
       insertObj.project_id = viewRef.project_id;
       insertObj.base_id = viewRef.base_id;
     }
-    await Noco.ncMeta.metaInsert2(
-      null,
-      null,
-      MetaTable.FORM_VIEW,
-      insertObj,
-      true
-    );
+    await ncMeta.metaInsert2(null, null, MetaTable.FORM_VIEW, insertObj, true);
 
-    return this.get(view.fk_view_id);
+    return this.get(view.fk_view_id, ncMeta);
   }
 
-  static async update(formId: string, body: Partial<FormView>) {
+  static async update(
+    formId: string,
+    body: Partial<FormView>,
+    ncMeta = Noco.ncMeta
+  ) {
     // get existing cache
     const key = `${CacheScope.FORM_VIEW}:${formId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
@@ -89,7 +87,7 @@ export default class FormView implements FormType {
       await NocoCache.set(key, o);
     }
     // update meta
-    return await Noco.ncMeta.metaUpdate(
+    return await ncMeta.metaUpdate(
       null,
       null,
       MetaTable.FORM_VIEW,
@@ -112,13 +110,13 @@ export default class FormView implements FormType {
     );
   }
 
-  async getColumns() {
-    return (this.columns = await FormViewColumn.list(this.fk_view_id));
+  async getColumns(ncMeta = Noco.ncMeta) {
+    return (this.columns = await FormViewColumn.list(this.fk_view_id, ncMeta));
   }
 
-  static async getWithInfo(formViewId: string) {
-    const form = await this.get(formViewId);
-    await form.getColumns();
+  static async getWithInfo(formViewId: string, ncMeta = Noco.ncMeta) {
+    const form = await this.get(formViewId, ncMeta);
+    await form.getColumns(ncMeta);
     return form;
   }
 }

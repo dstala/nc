@@ -29,6 +29,7 @@ export default class User implements UserType {
 
   public static async insert(user: Partial<User>, ncMeta = Noco.ncMeta) {
     const insertObj = extractProps(user, [
+      'id',
       'email',
       'password',
       'salt',

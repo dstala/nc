@@ -76,12 +76,15 @@ export default class FormViewColumn implements FormColumnType {
     return this.get(id);
   }
 
-  public static async list(viewId: string): Promise<FormViewColumn[]> {
+  public static async list(
+    viewId: string,
+    ncMeta = Noco.ncMeta
+  ): Promise<FormViewColumn[]> {
     let viewColumns = await NocoCache.getList(CacheScope.FORM_VIEW_COLUMN, [
       viewId
     ]);
     if (!viewColumns.length) {
-      viewColumns = await Noco.ncMeta.metaList2(
+      viewColumns = await ncMeta.metaList2(
         null,
         null,
         MetaTable.FORM_VIEW_COLUMNS,

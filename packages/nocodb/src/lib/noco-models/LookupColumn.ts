@@ -47,10 +47,10 @@ export default class LookupColumn {
       `${CacheScope.COL_LOOKUP}:${data.fk_column_id}`
     );
 
-    return this.read(data.fk_column_id);
+    return this.read(data.fk_column_id, ncMeta);
   }
 
-  public static async read(columnId: string) {
+  public static async read(columnId: string, ncMeta = Noco.ncMeta) {
     let colData =
       columnId &&
       (await NocoCache.get(
@@ -58,7 +58,7 @@ export default class LookupColumn {
         CacheGetType.TYPE_OBJECT
       ));
     if (!colData) {
-      colData = await Noco.ncMeta.metaGet2(
+      colData = await ncMeta.metaGet2(
         null, //,
         null, //model.db_alias,
         MetaTable.COL_LOOKUP,

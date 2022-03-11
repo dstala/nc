@@ -20,6 +20,7 @@ import Noco from '../noco/Noco';
 import Sort from './Sort';
 import Filter from './Filter';
 import addFormulaErrorIfMissingColumn from '../noco/meta/api/helpers/addFormulaErrorIfMissingColumn';
+import { NcError } from '../noco/meta/api/helpers/catchError';
 
 export default class Column<T = any> implements ColumnType {
   public fk_model_id: string;
@@ -76,6 +77,8 @@ export default class Column<T = any> implements ColumnType {
     },
     ncMeta = Noco.ncMeta
   ) {
+    if (!column.fk_model_id) NcError.badRequest('Missing model id');
+
     const insertObj: any = {
       id: column?.id,
       fk_model_id: column.fk_model_id,
@@ -114,7 +117,10 @@ export default class Column<T = any> implements ColumnType {
     }
 
     if (!(column.project_id && column.base_id)) {
-      const model = await Model.getByIdOrName({ id: column.fk_model_id });
+      const model = await Model.getByIdOrName(
+        { id: column.fk_model_id },
+        ncMeta
+      );
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
@@ -128,7 +134,7 @@ export default class Column<T = any> implements ColumnType {
       insertObj
     );
 
-    const col = await this.get({ colId: row.id });
+    const col = await this.get({ colId: row.id }, ncMeta);
 
     await NocoCache.appendToList(
       CacheScope.COLUMN,
@@ -296,27 +302,27 @@ export default class Column<T = any> implements ColumnType {
     }
   }
 
-  public async getColOptions<T>(): Promise<T> {
+  public async getColOptions<T>(ncMeta = Noco.ncMeta): Promise<T> {
     let res: any;
 
     switch (this.uidt) {
       case UITypes.Lookup:
-        res = await LookupColumn.read(this.id);
+        res = await LookupColumn.read(this.id, ncMeta);
         break;
       case UITypes.Rollup:
-        res = await RollupColumn.read(this.id);
+        res = await RollupColumn.read(this.id, ncMeta);
         break;
       case UITypes.LinkToAnotherRecord:
-        res = await LinkToAnotherRecordColumn.read(this.id);
+        res = await LinkToAnotherRecordColumn.read(this.id, ncMeta);
         break;
       case UITypes.MultiSelect:
-        res = await MultiSelectColumn.get(this.id);
+        res = await MultiSelectColumn.get(this.id, ncMeta);
         break;
       case UITypes.SingleSelect:
-        res = await SingleSelectColumn.get(this.id);
+        res = await SingleSelectColumn.get(this.id, ncMeta);
         break;
       case UITypes.Formula:
-        res = await FormulaColumn.read(this.id);
+        res = await FormulaColumn.read(this.id, ncMeta);
         break;
       // default:
       //   res = await DbColumn.read(this.id);
@@ -378,7 +384,7 @@ export default class Column<T = any> implements ColumnType {
     return Promise.all(
       columnsList.map(async m => {
         const column = new Column(m);
-        await column.getColOptions();
+        await column.getColOptions(ncMeta);
         return column;
       })
     );
@@ -449,7 +455,7 @@ export default class Column<T = any> implements ColumnType {
     }
     if (colData) {
       const column = new Column(colData);
-      await column.getColOptions();
+      await column.getColOptions(ncMeta);
       return column;
     }
     return null;

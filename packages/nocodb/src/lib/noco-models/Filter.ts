@@ -34,15 +34,21 @@ export default class Filter {
     Object.assign(this, data);
   }
 
-  public async getModel(): Promise<Model> {
+  public async getModel(ncMeta = Noco.ncMeta): Promise<Model> {
     return this.fk_view_id
-      ? (await View.get(this.fk_view_id)).getModel()
-      : Model.getByIdOrName({
-          id: this.fk_model_id
-        });
+      ? (await View.get(this.fk_view_id, ncMeta)).getModel(ncMeta)
+      : Model.getByIdOrName(
+          {
+            id: this.fk_model_id
+          },
+          ncMeta
+        );
   }
 
-  public static async insert(filter: Partial<FilterType>) {
+  public static async insert(
+    filter: Partial<FilterType>,
+    ncMeta = Noco.ncMeta
+  ) {
     const insertObj = {
       id: filter.id,
       fk_view_id: filter.fk_view_id,
@@ -58,12 +64,12 @@ export default class Filter {
       base_id: filter.base_id
     };
     if (!(filter.project_id && filter.base_id)) {
-      const model = await Column.get({ colId: filter.fk_column_id });
+      const model = await Column.get({ colId: filter.fk_column_id }, ncMeta);
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
 
-    const row = await Noco.ncMeta.metaInsert2(
+    const row = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.FILTER_EXP,
@@ -77,7 +83,11 @@ export default class Filter {
     return await this.redisPostInsert(row.id, filter);
   }
 
-  static async redisPostInsert(id, filter: Partial<FilterType>) {
+  static async redisPostInsert(
+    id,
+    filter: Partial<FilterType>,
+    ncMeta = Noco.ncMeta
+  ) {
     if (!(id && filter.fk_view_id)) {
       throw new Error(
         `Mandatory fields missing in FITLER_EXP cache population : id(${id}), fk_view_id(${filter.fk_view_id}), fk_parent_id(${filter.fk_view_id})`
@@ -87,7 +97,7 @@ export default class Filter {
     let value = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (!value) {
       /* get from db */
-      value = await Noco.ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, id);
+      value = await ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, id);
       // pushing calls for Promise.all
       const p = [];
       /* store in redis */
@@ -126,7 +136,7 @@ export default class Filter {
     return new Filter(value);
   }
 
-  static async update(id, filter: Partial<Filter>) {
+  static async update(id, filter: Partial<Filter>, ncMeta = Noco.ncMeta) {
     const updateObj = {
       fk_column_id: filter.fk_column_id,
       comparison_op: filter.comparison_op,
@@ -146,13 +156,7 @@ export default class Filter {
       await NocoCache.set(key, o);
     }
     // set meta
-    await Noco.ncMeta.metaUpdate(
-      null,
-      null,
-      MetaTable.FILTER_EXP,
-      updateObj,
-      id
-    );
+    await ncMeta.metaUpdate(null, null, MetaTable.FILTER_EXP, updateObj, id);
   }
 
   static async delete(id: string, ncMeta = Noco.ncMeta) {
@@ -179,14 +183,14 @@ export default class Filter {
     });
   }
 
-  public async getGroup(): Promise<Filter> {
+  public async getGroup(ncMeta = Noco.ncMeta): Promise<Filter> {
     if (!this.fk_parent_id) return null;
     let filterObj = await NocoCache.get(
       `${CacheScope.FILTER_EXP}:${this.fk_parent_id}`,
       2
     );
     if (!filterObj) {
-      filterObj = await Noco.ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
+      filterObj = await ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
         id: this.fk_parent_id
       });
       await NocoCache.set(
@@ -197,23 +201,18 @@ export default class Filter {
     return filterObj && new Filter(filterObj);
   }
 
-  public async getChildren(): Promise<Filter[]> {
+  public async getChildren(ncMeta = Noco.ncMeta): Promise<Filter[]> {
     if (this.children) return this.children;
     if (!this.is_group) return null;
     let childFilters = await NocoCache.getList(CacheScope.FILTER_EXP, [
       this.id
     ]);
     if (!childFilters.length) {
-      childFilters = await Noco.ncMeta.metaList2(
-        null,
-        null,
-        MetaTable.FILTER_EXP,
-        {
-          condition: {
-            fk_parent_id: this.id
-          }
+      childFilters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
+        condition: {
+          fk_parent_id: this.id
         }
-      );
+      });
       await NocoCache.setList(CacheScope.FILTER_EXP, [this.id], childFilters);
     }
     return childFilters && childFilters.map(f => new Filter(f));
@@ -226,7 +225,7 @@ export default class Filter {
   // }): Promise<Filter> {
   //   if (!viewId) return null;
   //
-  //   const filterObj = await Noco.ncMeta.metaGet2(
+  //   const filterObj = await ncMeta.metaGet2(
   //     null,
   //     null,
   //     MetaTable.FILTER_EXP,
@@ -323,45 +322,41 @@ export default class Filter {
     return filterObj && new Filter(filterObj);
   }
 
-  static async rootFilterList({ viewId }: { viewId: any }) {
+  static async rootFilterList(
+    { viewId }: { viewId: any },
+    ncMeta = Noco.ncMeta
+  ) {
     let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [viewId]);
     if (!filterObjs.length) {
-      filterObjs = await Noco.ncMeta.metaList2(
-        null,
-        null,
-        MetaTable.FILTER_EXP,
-        {
-          condition: { fk_view_id: viewId }
-        }
-      );
+      filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
+        condition: { fk_view_id: viewId }
+      });
       await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filterObjs);
     }
     return filterObjs?.map(f => new Filter(f));
   }
 
-  static async parentFilterList({
-    viewId,
-    parentId
-  }: {
-    viewId: any;
-    parentId: any;
-  }) {
+  static async parentFilterList(
+    {
+      viewId,
+      parentId
+    }: {
+      viewId: any;
+      parentId: any;
+    },
+    ncMeta = Noco.ncMeta
+  ) {
     let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [
       viewId,
       parentId
     ]);
     if (!filterObjs.length) {
-      filterObjs = await Noco.ncMeta.metaList2(
-        null,
-        null,
-        MetaTable.FILTER_EXP,
-        {
-          condition: {
-            fk_parent_id: parentId,
-            fk_view_id: viewId
-          }
+      filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
+        condition: {
+          fk_parent_id: parentId,
+          fk_view_id: viewId
         }
-      );
+      });
       await NocoCache.setList(
         CacheScope.FILTER_EXP,
         [viewId, parentId],

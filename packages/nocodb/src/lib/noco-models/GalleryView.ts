@@ -31,7 +31,7 @@ export default class GalleryView implements GalleryType {
     Object.assign(this, data);
   }
 
-  public static async get(viewId: string) {
+  public static async get(viewId: string, ncMeta = Noco.ncMeta) {
     let view =
       viewId &&
       (await NocoCache.get(
@@ -39,7 +39,7 @@ export default class GalleryView implements GalleryType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.GALLERY_VIEW, {
+      view = await ncMeta.metaGet2(null, null, MetaTable.GALLERY_VIEW, {
         fk_view_id: viewId
       });
       await NocoCache.set(`${CacheScope.GALLERY_VIEW}:${viewId}`, view);
@@ -48,7 +48,7 @@ export default class GalleryView implements GalleryType {
     return view && new GalleryView(view);
   }
 
-  static async insert(view: Partial<GalleryView>) {
+  static async insert(view: Partial<GalleryView>, ncMeta = Noco.ncMeta) {
     const columns = await View.get(view.fk_view_id)
       .then(v => v?.getModel())
       .then(m => m.getColumns());
@@ -66,7 +66,7 @@ export default class GalleryView implements GalleryType {
       insertObj.base_id = viewRef.base_id;
     }
 
-    await Noco.ncMeta.metaInsert2(
+    await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GALLERY_VIEW,
@@ -74,14 +74,18 @@ export default class GalleryView implements GalleryType {
       true
     );
 
-    return this.get(view.fk_view_id);
+    return this.get(view.fk_view_id, ncMeta);
   }
 
-  static async update(galleryId: string, body: Partial<GalleryView>) {
+  static async update(
+    galleryId: string,
+    body: Partial<GalleryView>,
+    ncMeta = Noco.ncMeta
+  ) {
     // get existing cache
     const key = `${CacheScope.GALLERY_VIEW}:${galleryId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    if(o) {
+    if (o) {
       o.title = body.title;
       o.next_enabled = body.next_enabled;
       o.prev_enabled = body.prev_enabled;
@@ -97,7 +101,7 @@ export default class GalleryView implements GalleryType {
       await NocoCache.set(key, o);
     }
     // update meta
-    return await Noco.ncMeta.metaUpdate(
+    return await ncMeta.metaUpdate(
       null,
       null,
       MetaTable.GALLERY_VIEW,

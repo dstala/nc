@@ -42,7 +42,7 @@ export default class RollupColumn {
     return this.read(data.fk_column_id);
   }
 
-  public static async read(columnId: string) {
+  public static async read(columnId: string, ncMeta = Noco.ncMeta) {
     let column =
       columnId &&
       (await NocoCache.get(
@@ -50,7 +50,7 @@ export default class RollupColumn {
         CacheGetType.TYPE_OBJECT
       ));
     if (!column) {
-      column = await Noco.ncMeta.metaGet2(
+      column = await ncMeta.metaGet2(
         null, //,
         null, //model.db_alias,
         MetaTable.COL_ROLLUP,
@@ -61,11 +61,11 @@ export default class RollupColumn {
     return column ? new RollupColumn(column) : null;
   }
 
-  public async getRollupColumn(): Promise<Column> {
-    return Column.get({ colId: this.fk_rollup_column_id });
+  public async getRollupColumn(ncMeta = Noco.ncMeta): Promise<Column> {
+    return Column.get({ colId: this.fk_rollup_column_id }, ncMeta);
   }
 
-  public async getRelationColumn(): Promise<Column> {
-    return Column.get({ colId: this.fk_relation_column_id });
+  public async getRelationColumn(ncMeta = Noco.ncMeta): Promise<Column> {
+    return Column.get({ colId: this.fk_relation_column_id }, ncMeta);
   }
 }

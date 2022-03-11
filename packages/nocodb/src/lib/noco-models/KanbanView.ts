@@ -13,8 +13,8 @@ export default class KanbanView {
     Object.assign(this, data);
   }
 
-  public static async get(viewId: string) {
-    const view = await Noco.ncMeta.metaGet2(null, null, MetaTable.KANBAN_VIEW, {
+  public static async get(viewId: string, ncMeta = Noco.ncMeta) {
+    const view = await ncMeta.metaGet2(null, null, MetaTable.KANBAN_VIEW, {
       fk_view_id: viewId
     });
 

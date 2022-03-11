@@ -26,7 +26,7 @@ export default class FormulaColumn {
 
     return this.read(data.fk_column_id);
   }
-  public static async read(columnId: string) {
+  public static async read(columnId: string, ncMeta = Noco.ncMeta) {
     let column =
       columnId &&
       (await NocoCache.get(
@@ -34,7 +34,7 @@ export default class FormulaColumn {
         CacheGetType.TYPE_OBJECT
       ));
     if (!column) {
-      column = await Noco.ncMeta.metaGet2(
+      column = await ncMeta.metaGet2(
         null, //,
         null, //model.db_alias,
         MetaTable.COL_FORMULA,

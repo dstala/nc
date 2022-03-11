@@ -20,22 +20,20 @@ export default class GridViewColumn implements GridColumnType {
     Object.assign(this, data);
   }
 
-  public static async list(viewId: string): Promise<GridViewColumn[]> {
+  public static async list(
+    viewId: string,
+    ncMeta = Noco.ncMeta
+  ): Promise<GridViewColumn[]> {
     let views = await NocoCache.getList(CacheScope.GRID_VIEW_COLUMN, [viewId]);
     if (!views.length) {
-      views = await Noco.ncMeta.metaList2(
-        null,
-        null,
-        MetaTable.GRID_VIEW_COLUMNS,
-        {
-          condition: {
-            fk_view_id: viewId
-          },
-          orderBy: {
-            order: 'asc'
-          }
+      views = await ncMeta.metaList2(null, null, MetaTable.GRID_VIEW_COLUMNS, {
+        condition: {
+          fk_view_id: viewId
+        },
+        orderBy: {
+          order: 'asc'
         }
-      );
+      });
       await NocoCache.setList(CacheScope.GRID_VIEW_COLUMN, [viewId], views);
     }
     views.sort(
@@ -46,7 +44,7 @@ export default class GridViewColumn implements GridColumnType {
     return views?.map(v => new GridViewColumn(v));
   }
 
-  public static async get(gridViewColumnId: string) {
+  public static async get(gridViewColumnId: string, ncMeta = Noco.ncMeta) {
     let view =
       gridViewColumnId &&
       (await NocoCache.get(
@@ -54,7 +52,7 @@ export default class GridViewColumn implements GridColumnType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(
+      view = await ncMeta.metaGet2(
         null,
         null,
         MetaTable.GRID_VIEW_COLUMNS,
@@ -81,7 +79,7 @@ export default class GridViewColumn implements GridColumnType {
     };
 
     if (!(column.project_id && column.base_id)) {
-      const viewRef = await View.get(column.fk_view_id);
+      const viewRef = await View.get(column.fk_view_id, ncMeta);
       insertObj.project_id = viewRef.project_id;
       insertObj.base_id = viewRef.base_id;
     }
@@ -99,7 +97,7 @@ export default class GridViewColumn implements GridColumnType {
       `${CacheScope.GRID_VIEW_COLUMN}:${id}`
     );
 
-    return this.get(id);
+    return this.get(id, ncMeta);
   }
 
   static async update(

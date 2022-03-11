@@ -25,7 +25,7 @@ export default class GridView {
     return (this.columns = await GridViewColumn.list(this.fk_view_id));
   }
 
-  public static async get(viewId: string) {
+  public static async get(viewId: string, ncMeta = Noco.ncMeta) {
     let view =
       viewId &&
       (await NocoCache.get(
@@ -33,7 +33,7 @@ export default class GridView {
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(null, null, MetaTable.GRID_VIEW, {
+      view = await ncMeta.metaGet2(null, null, MetaTable.GRID_VIEW, {
         fk_view_id: viewId
       });
       await NocoCache.set(`${CacheScope.GRID_VIEW}:${viewId}`, view);
@@ -42,31 +42,25 @@ export default class GridView {
     return view && new GridView(view);
   }
 
-  static async insert(view: Partial<GridView>) {
+  static async insert(view: Partial<GridView>, ncMeta = Noco.ncMeta) {
     const insertObj = {
       fk_view_id: view.fk_view_id,
       project_id: view.project_id,
       base_id: view.base_id
     };
     if (!(view.project_id && view.base_id)) {
-      const viewRef = await View.get(view.fk_view_id);
+      const viewRef = await View.get(view.fk_view_id, ncMeta);
       insertObj.project_id = viewRef.project_id;
       insertObj.base_id = viewRef.base_id;
     }
 
-    await Noco.ncMeta.metaInsert2(
-      null,
-      null,
-      MetaTable.GRID_VIEW,
-      insertObj,
-      true
-    );
+    await ncMeta.metaInsert2(null, null, MetaTable.GRID_VIEW, insertObj, true);
 
-    return this.get(view.fk_view_id);
+    return this.get(view.fk_view_id, ncMeta);
   }
 
-  static async getWithInfo(id: string) {
-    const view = await this.get(id);
+  static async getWithInfo(id: string, ncMeta = Noco.ncMeta) {
+    const view = await this.get(id, ncMeta);
     return view;
   }
 }

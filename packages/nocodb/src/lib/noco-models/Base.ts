@@ -25,8 +25,11 @@ export default class Base implements BaseType {
     Object.assign(this, base);
   }
 
-  public static async createBase(base: BaseType & { projectId: string }) {
-    const { id } = await Noco.ncMeta.metaInsert2(
+  public static async createBase(
+    base: BaseType & { projectId: string },
+    ncMeta = Noco.ncMeta
+  ) {
+    const { id } = await ncMeta.metaInsert2(
       base.projectId,
       null,
       MetaTable.BASES,
@@ -54,15 +57,18 @@ export default class Base implements BaseType {
       `${CacheScope.BASE}:${id}`
     );
 
-    return this.get(id);
+    return this.get(id, ncMeta);
   }
 
-  static async list(args: { projectId: string }): Promise<Base[]> {
+  static async list(
+    args: { projectId: string },
+    ncMeta = Noco.ncMeta
+  ): Promise<Base[]> {
     let baseDataList = await NocoCache.getList(CacheScope.BASE, [
       args.projectId
     ]);
     if (!baseDataList.length) {
-      baseDataList = await Noco.ncMeta.metaList2(
+      baseDataList = await ncMeta.metaList2(
         args.projectId,
         null,
         MetaTable.BASES
@@ -71,7 +77,7 @@ export default class Base implements BaseType {
     }
     return baseDataList?.map(baseData => new Base(baseData));
   }
-  static async get(id: string): Promise<Base> {
+  static async get(id: string, ncMeta = Noco.ncMeta): Promise<Base> {
     let baseData =
       id &&
       (await NocoCache.get(
@@ -79,7 +85,7 @@ export default class Base implements BaseType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!baseData) {
-      baseData = await Noco.ncMeta.metaGet2(null, null, MetaTable.BASES, id);
+      baseData = await ncMeta.metaGet2(null, null, MetaTable.BASES, id);
       await NocoCache.set(`${CacheScope.BASE}:${id}`, baseData);
     }
     return baseData && new Base(baseData);
@@ -104,8 +110,8 @@ export default class Base implements BaseType {
       ).toString(CryptoJS.enc.Utf8)
     );
   }
-  getProject(): Promise<Project> {
-    return Project.get(this.project_id);
+  getProject(ncMeta = Noco.ncMeta): Promise<Project> {
+    return Project.get(this.project_id, ncMeta);
   }
 
   async delete(ncMeta = Noco.ncMeta) {
@@ -127,7 +133,10 @@ export default class Base implements BaseType {
     return await ncMeta.metaDelete(null, null, MetaTable.BASES, this.id);
   }
 
-  async getModels() {
-    return await Model.list({ project_id: this.project_id, base_id: this.id });
+  async getModels(ncMeta = Noco.ncMeta) {
+    return await Model.list(
+      { project_id: this.project_id, base_id: this.id },
+      ncMeta
+    );
   }
 }
