@@ -1,4 +1,3 @@
-import XcCache from '../../../plugins/adapters/cache/XcCache';
 import User from '../../../../noco-models/User';
 import ProjectUser from '../../../../noco-models/ProjectUser';
 import { promisify } from 'util';
@@ -17,6 +16,8 @@ const jwtOptions = {
 };
 import bcrypt from 'bcryptjs';
 import Project from '../../../../noco-models/Project';
+import NocoCache from '../../../../noco-cache/NocoCache';
+import { CacheGetType, CacheScope } from '../../../../utils/globals';
 
 export function initStrategies(router): void {
   passport.serializeUser(function(
@@ -62,20 +63,23 @@ export function initStrategies(router): void {
         ...jwtOptions,
         passReqToCallback: true
       },
-      (req, jwtPayload, done) => {
-        // todo : redis-get
+      async (req, jwtPayload, done) => {
         const keyVals = [jwtPayload?.email];
         if (req.ncProjectId) {
           keyVals.push(req.ncProjectId);
         }
         const key = keyVals.join('___');
-        const cachedVal = XcCache.get(key);
+        const cachedVal = await NocoCache.get(
+          `${CacheScope.USER}:${key}`,
+          CacheGetType.TYPE_OBJECT
+        );
+
         if (cachedVal) {
           return done(null, cachedVal);
         }
 
         User.getByEmail(jwtPayload?.email)
-          .then(user => {
+          .then(async user => {
             if (req.ncProjectId) {
               // this.xcMeta
               //   .metaGet(req.ncProjectId, null, 'nc_projects_users', {
@@ -83,22 +87,20 @@ export function initStrategies(router): void {
               //   })
 
               ProjectUser.get(req.ncProjectId, user.id)
-                .then(projectUser => {
+                .then(async projectUser => {
                   user.roles = projectUser?.roles || 'user';
                   user.roles =
                     user.roles === 'owner' ? 'owner,creator' : user.roles;
                   // + (user.roles ? `,${user.roles}` : '');
 
-                  // todo : redis-set
-                  XcCache.set(key, user);
+                  await NocoCache.set(`${CacheScope.USER}:${key}`, user);
                   done(null, user);
                 })
                 .catch(e => done(e));
             } else {
               // const roles = projectUser?.roles ? JSON.parse(projectUser.roles) : {guest: true};
               if (user) {
-                // todo : redis-set
-                XcCache.set(key, user);
+                await NocoCache.set(`${CacheScope.USER}:${key}`, user);
                 return done(null, user);
               } else {
                 return done(new Error('User not found'));
@@ -147,16 +149,12 @@ export function initStrategies(router): void {
       if (req.headers['xc-shared-base-id']) {
         // const cacheKey = `nc_shared_bases||${req.headers['xc-shared-base-id']}`;
 
-        // todo : redis get
-        let sharedProject = null; // XcCache.get(cacheKey);
+        let sharedProject = null;
 
         if (!sharedProject) {
           sharedProject = await Project.getByUuid(
             req.headers['xc-shared-base-id']
           );
-
-          // todo : redis set
-          // XcCache.set(cacheKey, { roles: sharedProject?.roles });
         }
         user = {
           roles: sharedProject?.roles

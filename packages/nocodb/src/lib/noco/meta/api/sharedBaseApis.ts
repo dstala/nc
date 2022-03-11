@@ -26,8 +26,6 @@ async function createSharedBaseLink(req, res): Promise<any> {
     roles
   };
 
-  // todo : redis del
-
   await Project.update(project.id, data);
 
   data.url = `${req.ncSiteUrl}${config.dashboardPath}#/nc/base/${data.uuid}`;
@@ -52,8 +50,6 @@ async function updateSharedBaseLink(req, res): Promise<any> {
     roles
   };
 
-  // todo : redis del
-
   await Project.update(project.id, data);
 
   data.url = `${req.ncSiteUrl}${config.dashboardPath}#/nc/base/${data.uuid}`;
@@ -71,8 +67,6 @@ async function disableSharedBaseLink(req, res): Promise<any> {
   const data: any = {
     uuid: null
   };
-
-  // todo : redis del
 
   await Project.update(project.id, data);
   res.json({ uuid: null });
