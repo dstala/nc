@@ -538,12 +538,14 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
           defaultView.title
         ] = queryParams;
 
+        const viewColumns = await View.getColumns(defaultView.id, ncMeta);
+
         for (const [_cn, column] of Object.entries(
           projectModelColumnAliasRefs[model.tn]
         )) {
           await View.updateColumn(
             defaultView.id,
-            column.id,
+            viewColumns.find(c => column.id === c.fk_column_id),
             {
               order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
               show: queryParams?.showFields?.[_cn]
