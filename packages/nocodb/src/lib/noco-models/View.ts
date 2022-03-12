@@ -426,7 +426,7 @@ export default class View implements ViewType {
     ncMeta = Noco.ncMeta
   ): Promise<Array<GridViewColumn | any>> {
     const columns: Array<GridViewColumn | any> = [];
-    const view = await this.get(viewId);
+    const view = await this.get(viewId, ncMeta);
     let table;
     let cacheScope;
     switch (view.type) {
@@ -593,9 +593,10 @@ export default class View implements ViewType {
   static async update(
     viewId: string,
     body: {
-      title: string;
-      order: number;
+      title?: string;
+      order?: number;
       show_system_fields?: boolean;
+      lock_type?: string;
     },
     ncMeta = Noco.ncMeta
   ) {
