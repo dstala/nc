@@ -16,6 +16,7 @@ import GridView from '../../../noco-models/GridView';
 import KanbanView from '../../../noco-models/KanbanView';
 import FormView from '../../../noco-models/FormView';
 import GalleryView from '../../../noco-models/GalleryView';
+import Sort from '../../../noco-models/Sort';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -231,6 +232,27 @@ type ObjViewRefv1 = {
     };
   };
 };
+type ObjViewQPRefv1 = {
+  [projectId: string]: {
+    [tableName: string]: {
+      [viewName: string]: QueryParamsv1;
+    };
+  };
+};
+
+// @ts-ignore
+const filterV1toV2ConditionMap = {
+  'is like': 'like',
+  '>': 'gt',
+  '<': 'lt',
+  '>=': 'gte',
+  '<=': 'lte',
+  'is equal': 'eq',
+  'is not null': 'notNull',
+  'is null': 'null',
+  'is not equal': 'neq',
+  'is not like': 'nlike'
+};
 
 async function migrateProjectModels(ncMeta = Noco.ncMeta) {
   const metas: ModelMetav1[] = await ncMeta.metaList(null, null, 'nc_models');
@@ -241,6 +263,7 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
   const objModelColumnRef: ObjModelColumnRefv1 = {};
   const objModelColumnAliasRef: ObjModelColumnAliasRefv1 = {};
   const objViewRef: ObjViewRefv1 = {};
+  const objViewQPRef: ObjViewQPRefv1 = {};
 
   const virtualRelationColumnInsert: Array<() => Promise<any>> = [];
   const virtualColumnInsert: Array<() => Promise<any>> = [];
@@ -288,9 +311,12 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
         objModelColumnAliasRef[project.id][model.tn] || {};
 
       objViewRef[project.id] = objViewRef[project.id] || {};
-
       objViewRef[project.id][modelData.title] =
         objViewRef[project.id][modelData.title] || {};
+
+      objViewQPRef[project.id] = objViewQPRef[project.id] || {};
+      objViewQPRef[project.id][modelData.title] =
+        objViewQPRef[project.id][modelData.title] || {};
 
       // migrate table columns
       for (const columnMeta of meta.columns) {
@@ -507,6 +533,9 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
         objViewRef[project.id][modelData.title][
           defaultView.title
         ] = defaultView;
+        objViewQPRef[project.id][modelData.title][
+          defaultView.title
+        ] = queryParams;
 
         for (const [_cn, column] of Object.entries(
           projectModelColumnAliasRefs[model.tn]
@@ -547,7 +576,20 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
       objModelRef,
       objModelColumnAliasRef,
       objModelColumnRef,
-      objViewRef
+      objViewRef,
+      objViewQPRef
+    },
+    ncMeta
+  );
+
+  await migrateViewsParams(
+    {
+      views,
+      objModelRef,
+      objModelColumnAliasRef,
+      objModelColumnRef,
+      objViewRef,
+      objViewQPRef
     },
     ncMeta
   );
@@ -559,46 +601,18 @@ async function migrateProjectModelViews(
     objModelRef,
     // objModelColumnRef,
     objModelColumnAliasRef,
-    objViewRef
-  }: // ...ctx
-  {
+    objViewRef,
+    objViewQPRef
+  }: {
     views: ModelMetav1[];
     objModelRef: ObjModelRefv1;
     objModelColumnRef: ObjModelColumnRefv1;
     objModelColumnAliasRef: ObjModelColumnAliasRefv1;
     objViewRef: ObjViewRefv1;
+    objViewQPRef: ObjViewQPRefv1;
   },
   ncMeta
 ) {
-  /**
-  {
-  "id": 27,
-  "project_id": "samplerest_iv3f",
-  "db_alias": "db",
-  "title": "Address1",
-  "alias": null,
-  "type": "vtable",
-  "meta": null,
-  "schema": null,
-  "schema_previous": null,
-  "services": null,
-  "messages": null,
-  "enabled": 1,
-  "parent_model_title": "nc_iv3f__address",
-  "show_as": "grid",
-  "query_params": "{\"filters\":[],\"sortList\":[],\"showFields\":{\"Address\":true,\"Address2\":true,\"District\":true,\"PostalCode\":true,\"Phone\":true,\"LastUpdate\":true,\"Address => Customer\":true,\"Address => Staff\":true,\"City <= Address\":true,\"Address <=> Staff\":true,\"addressBtCityIdLookUp\":true,\"addressHmStaffIdLookUp\":true,\"formualPhonePostalcode\":true,\"addressHmCustomerIdLookUp\":true,\"addressHmCustomerIdRollUpCount\":true},\"fieldsOrder\":[\"Address\",\"Address2\",\"District\",\"PostalCode\",\"Phone\",\"LastUpdate\",\"Address => Customer\",\"Address => Staff\",\"City <= Address\",\"Address <=> Staff\",\"addressBtCityIdLookUp\",\"addressHmStaffIdLookUp\",\"formualPhonePostalcode\",\"addressHmCustomerIdLookUp\",\"addressHmCustomerIdRollUpCount\"],\"viewStatus\":{},\"columnsWidth\":{},\"extraViewParams\":{}}",
-  "list_idx": null,
-  "tags": null,
-  "pinned": null,
-  "created_at": "2022-03-12 11:54:51",
-  "updated_at": "2022-03-12 11:54:58",
-  "mm": null,
-  "m_to_m_meta": null,
-  "order": null,
-  "view_order": 2
-}
-  * */
-
   for (const viewData of views) {
     const project = await Project.getWithInfo(viewData.project_id, ncMeta);
     // @ts-ignore
@@ -609,6 +623,10 @@ async function migrateProjectModelViews(
     if (viewData.query_params) {
       queryParams = JSON.parse(viewData.query_params);
     }
+
+    objViewQPRef[project.id][viewData.parent_model_title][
+      viewData.title
+    ] = queryParams;
 
     const insertObj: Partial<View> &
       Partial<GridView | KanbanView | FormView | GalleryView> = {
@@ -657,54 +675,44 @@ async function migrateProjectModelViews(
   }
 }
 
-/***
- *
- users
- - copy users
+// migrate sort & filter
+async function migrateViewsParams(
+  {
+    // views,
+    // objModelRef,
+    objModelColumnAliasRef,
+    objViewRef,
+    objViewQPRef
+  }: {
+    views: ModelMetav1[];
+    objModelRef: ObjModelRefv1;
+    objModelColumnRef: ObjModelColumnRefv1;
+    objModelColumnAliasRef: ObjModelColumnAliasRefv1;
+    objViewRef: ObjViewRefv1;
+    objViewQPRef: ObjViewQPRefv1;
+  },
+  ncMeta
+) {
+  for (const projectId of Object.keys(objViewRef)) {
+    for (const tn of Object.keys(objViewRef[projectId])) {
+      for (const [viewTitle, view] of Object.entries(
+        objViewRef[projectId][tn]
+      )) {
+        const queryParams = objViewQPRef[projectId][tn][viewTitle];
 
- projects
- - copy project
- - create bases
- project user roles
- - map users to project
-
- models
- - create model data and column data
-
- views
- - create views and view columns
- - set order , visibility
-
- fields
- - populate view columns
-
- filters
- - copy view filters
-
- sorts
- - copy view sorts
-
- plugins configuration
- - copy plugin configurations
-
- audits
- -
-
- todo: api tokens
- - add migration
- - copy api tokens
-
- webhooks
- - copy webhooks
-
- model_role_ui_acl
- - copy ui acl
-
- shared views
- - copy shared views id to corresponding view
-
- shared base
- - copy shared base id
-
-
- */
+        // migrate view sort list
+        for (const sort of queryParams.sortList || []) {
+          await Sort.insert(
+            {
+              fk_column_id:
+                objModelColumnAliasRef[projectId][tn][sort.field].id,
+              direction: sort.order === '-' ? 'desc' : 'asc',
+              fk_view_id: view.id
+            },
+            ncMeta
+          );
+        }
+      }
+    }
+  }
+}

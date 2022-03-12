@@ -56,7 +56,7 @@ export default class Sort {
       order
     };
     if (!(sortObj.project_id && sortObj.base_id)) {
-      const model = await Column.get({ colId: sortObj.fk_column_id });
+      const model = await Column.get({ colId: sortObj.fk_column_id }, ncMeta);
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
