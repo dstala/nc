@@ -10,6 +10,7 @@ import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordC
 import UITypes from '../../../sqlUi/UITypes';
 import NcHelp from '../../../utils/NcHelp';
 import { substituteColumnNameWithIdInFormula } from '../../meta/api/helpers/formulaHelpers';
+import RollupColumn from '../../../noco-models/RollupColumn';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -89,7 +90,7 @@ async function migrateProjectUsers(ncMeta = Noco.ncMeta) {
 
 interface Rollupv1 {
   _cn: string;
-  rollup: {
+  rl: {
     type: string;
     tn: string;
     cn: string;
@@ -103,6 +104,7 @@ interface Rollupv1 {
     _rltn: string;
     rlcn: string;
     _rlcn: string;
+    fn: string;
   };
 }
 
@@ -318,9 +320,54 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
                 ncMeta
               );
             } else if (_columnMeta.rl) {
-              // todo: migrate rollup column
-              // @ts-ignore
+              //  migrate rollup column
               const columnMeta: Rollupv1 = _columnMeta;
+
+              const colBody: Partial<RollupColumn & Column> = {
+                _cn: columnMeta._cn,
+                rollup_function: columnMeta.rl.fn
+              };
+
+              colBody.fk_rollup_column_id =
+                projectModelColumnRefs[columnMeta.rl.rltn][
+                  columnMeta.rl.rlcn
+                ].id;
+
+              const columns = Object.values(projectModelColumnRefs[model.tn]);
+
+              // extract related(virtual relation) column id
+              for (const col of columns) {
+                if (col.uidt === UITypes.LinkToAnotherRecord) {
+                  const colOpt = await col.getColOptions<
+                    LinkToAnotherRecordColumn
+                  >(ncMeta);
+                  if (
+                    colOpt.type === columnMeta.rl.type &&
+                    colOpt.fk_child_column_id ===
+                      projectModelColumnRefs[columnMeta.rl.tn][columnMeta.rl.cn]
+                        .id &&
+                    colOpt.fk_parent_column_id ===
+                      projectModelColumnRefs[columnMeta.rl.rtn][
+                        columnMeta.rl.rcn
+                      ].id &&
+                    (colOpt.type !== 'mm' ||
+                      colOpt.fk_mm_model_id ===
+                        projectModelRefs[columnMeta.rl.vtn].id)
+                  ) {
+                    colBody.fk_relation_column_id = col.id;
+                    break;
+                  }
+                }
+              }
+
+              await Column.insert(
+                {
+                  uidt: UITypes.Rollup,
+                  ...colBody,
+                  fk_model_id: model.id
+                },
+                ncMeta
+              );
             } else if (_columnMeta.formula) {
               const columnMeta: Formulav1 = _columnMeta;
               //  migrate formula column

@@ -39,7 +39,7 @@ export default class RollupColumn {
       `${CacheScope.COL_ROLLUP}:${data.fk_column_id}`
     );
 
-    return this.read(data.fk_column_id);
+    return this.read(data.fk_column_id, ncMeta);
   }
 
   public static async read(columnId: string, ncMeta = Noco.ncMeta) {
