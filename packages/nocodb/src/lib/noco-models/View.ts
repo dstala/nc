@@ -242,7 +242,7 @@ export default class View implements ViewType {
 
     let columns: any[] = await (
       await Model.getByIdOrName({ id: view.fk_model_id }, ncMeta)
-    ).getColumns(false, ncMeta);
+    ).getColumns(ncMeta);
 
     if (copyFormView) {
       const sorts = await copyFormView.getSorts(ncMeta);

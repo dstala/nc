@@ -64,11 +64,7 @@ export default class Model implements TableType {
     Object.assign(this, data);
   }
 
-  public async getColumns(
-    // @ts-ignore
-    force = false,
-    ncMeta = Noco.ncMeta
-  ): Promise<Column[]> {
+  public async getColumns(ncMeta = Noco.ncMeta): Promise<Column[]> {
     this.columns = await Column.list(
       {
         fk_model_id: this.id
@@ -321,7 +317,7 @@ export default class Model implements TableType {
     }
     if (modelData) {
       const m = new Model(modelData);
-      const columns = await m.getColumns(false, ncMeta);
+      const columns = await m.getColumns(ncMeta);
       await m.getViews(false, ncMeta);
       m.columnsById = columns.reduce((agg, c) => ({ ...agg, [c.id]: c }), {});
       return m;
@@ -378,7 +374,7 @@ export default class Model implements TableType {
       await view.delete();
     }
 
-    for (const col of await this.getColumns(false, ncMeta)) {
+    for (const col of await this.getColumns(ncMeta)) {
       let colOptionTableName = null;
       let cacheScopeName = null;
       switch (col.uidt) {

@@ -24,7 +24,7 @@ export default class FormulaColumn {
       error: data.error
     });
 
-    return this.read(data.fk_column_id);
+    return this.read(data.fk_column_id, ncMeta);
   }
   public static async read(columnId: string, ncMeta = Noco.ncMeta) {
     let column =

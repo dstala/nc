@@ -170,7 +170,7 @@ async function getMetaDiff(
       await sqlClient.columnList({ tn: table.tn })
     )?.data?.list;
 
-    await oldMeta.getColumns(true);
+    await oldMeta.getColumns();
 
     for (const column of colListRef[table.tn]) {
       const oldColIdx = oldMeta.columns.findIndex(c => c.cn === column.cn);
@@ -433,7 +433,7 @@ async function getMetaDiff(
       await sqlClient.columnList({ tn: view.tn })
     )?.data?.list;
 
-    await oldMeta.getColumns(true);
+    await oldMeta.getColumns();
 
     for (const column of colListRef[view.tn]) {
       const oldColIdx = oldMeta.columns.findIndex(c => c.cn === column.cn);

@@ -194,7 +194,7 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
         break;
 
       case UITypes.LinkToAnotherRecord:
-      case UITypes.ForeignKey:
+        // case UITypes.ForeignKey:
         {
           validateParams(['parentId', 'childId', 'type'], req.body);
 
@@ -441,7 +441,7 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
         break;
     }
 
-    await table.getColumns(true);
+    await table.getColumns();
 
     Audit.insert({
       project_id: base.project_id,
@@ -548,7 +548,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
     ip: (req as any).clientIp
   }).then(() => {});
 
-  await table.getColumns(true);
+  await table.getColumns();
 
   res.json(table);
 }
@@ -699,7 +699,7 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
     ip: (req as any).clientIp
   }).then(() => {});
 
-  await table.getColumns(true);
+  await table.getColumns();
 
   const primaryValueColumn = mapDefaultPrimaryValue(table.columns);
   if (primaryValueColumn) {

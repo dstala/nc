@@ -9,6 +9,7 @@ import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import UITypes from '../../../sqlUi/UITypes';
 import NcHelp from '../../../utils/NcHelp';
+import { substituteColumnNameWithIdInFormula } from '../../meta/api/helpers/formulaHelpers';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -221,17 +222,33 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
               // todo: migrate rollup column
             } else if (columnMeta.formula) {
               // todo: migrate formula column
+              const colBody: any = {
+                _cn: columnMeta._cn
+              };
+              colBody.formula = await substituteColumnNameWithIdInFormula(
+                columnMeta.formula.value,
+                await model.getColumns(ncMeta)
+              );
+              colBody.formula_raw = columnMeta.formula.value;
+              await Column.insert(
+                {
+                  uidt: UITypes.Formula,
+                  ...colBody,
+                  fk_model_id: model.id
+                },
+                ncMeta
+              );
             }
           });
         }
       }
 
       viewsInsert.push(async () => {
-        // insert default view data here
+        // todo: insert default view data here
       });
     } else {
       viewsInsert.push(async () => {
-        // insert view data here
+        // todo: insert view data here
       });
     }
   }
