@@ -29,6 +29,7 @@ export default async function(ctx: NcUpgraderCtx) {
   const migrationCtx = await migrateProjectModels(ncMeta);
 
   await migrateUIAcl(migrationCtx, ncMeta);
+  await migrateSharedBase(ncMeta);
 
   // const projects = await ctx.ncMeta.projectList();
   //
@@ -767,6 +768,28 @@ async function migrateUIAcl(ctx: MigrateCtxV1, ncMeta: any) {
         role: acl.role,
         fk_view_id,
         disabled: acl.disabled
+      },
+      ncMeta
+    );
+  }
+}
+
+async function migrateSharedBase(ncMeta: any) {
+  const sharedBases: Array<{
+    roles: string;
+    shared_base_id: string;
+    enabled: boolean;
+    project_id: string;
+    password: string;
+  }> = await ncMeta.metaList(null, null, 'nc_shared_bases');
+
+  for (const sharedBase of sharedBases) {
+    await Project.update(
+      sharedBase.project_id,
+      {
+        uuid: sharedBase.shared_base_id,
+        password: sharedBase.password,
+        roles: sharedBase.roles
       },
       ncMeta
     );
