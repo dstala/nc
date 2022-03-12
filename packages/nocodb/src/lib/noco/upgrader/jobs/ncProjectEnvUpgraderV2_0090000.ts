@@ -20,6 +20,7 @@ import Sort from '../../../noco-models/Sort';
 import Filter from '../../../noco-models/Filter';
 import ModelRoleVisibility from '../../../noco-models/ModelRoleVisibility';
 import { MetaTable } from '../../../utils/globals';
+import Hook from '../../../noco-models/Hook';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -33,6 +34,7 @@ export default async function(ctx: NcUpgraderCtx) {
   await migrateSharedViews(migrationCtx, ncMeta);
   await migrateSharedBase(ncMeta);
   await migratePlugins(ncMeta);
+  await migrateWebhooks(migrationCtx, ncMeta);
 
   // const projects = await ctx.ncMeta.projectList();
   //
@@ -860,5 +862,58 @@ async function migratePlugins(ncMeta: any) {
       creator_website: plugin.creator_website,
       price: plugin.price
     });
+  }
+}
+
+async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
+  const hooks: Array<{
+    project_id: string;
+    db_alias: string;
+    title: string;
+    description: string;
+    env: string;
+    tn: string;
+    type: string;
+    event: 'After' | 'Before';
+    operation: 'delete' | 'update' | 'insert';
+    async: boolean;
+    payload: string;
+    url: string;
+    headers: string;
+    condition: string;
+    notification: string;
+    retries: number;
+    retry_interval: number;
+    timeout: number;
+    active: boolean;
+  }> = await ncMeta.metaList(null, null, 'nc_hooks');
+
+  for (const hook of hooks) {
+    if (!hook.project_id) {
+      continue;
+    }
+    await Hook.insert(
+      {
+        fk_model_id: ctx.objModelRef[hook.project_id][hook.tn].id,
+        project_id: hook.project_id,
+        title: hook.title,
+        description: hook.description,
+        env: hook.env,
+        type: hook.type,
+        event: hook.event,
+        operation: hook.operation,
+        async: hook.async,
+        payload: hook.payload,
+        url: hook.url,
+        headers: hook.headers,
+        condition: hook.condition,
+        notification: hook.notification,
+        retries: hook.retries,
+        retry_interval: hook.retry_interval,
+        timeout: hook.timeout,
+        active: hook.active
+      },
+      ncMeta
+    );
   }
 }

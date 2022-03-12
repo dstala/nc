@@ -19,7 +19,7 @@ export default class Hook implements HookType {
   event?: 'After' | 'Before';
   operation?: 'insert' | 'delete' | 'update';
   async?: boolean;
-  payload?: boolean;
+  payload?: string;
   url?: string;
   headers?: string;
   condition?: string;
@@ -36,7 +36,7 @@ export default class Hook implements HookType {
     Object.assign(this, hook);
   }
 
-  public static async get(hookId: string) {
+  public static async get(hookId: string, ncMeta = Noco.ncMeta) {
     let hook =
       hookId &&
       (await NocoCache.get(
@@ -44,14 +44,14 @@ export default class Hook implements HookType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!hook) {
-      hook = await Noco.ncMeta.metaGet2(null, null, MetaTable.HOOKS, hookId);
+      hook = await ncMeta.metaGet2(null, null, MetaTable.HOOKS, hookId);
       await NocoCache.set(`${CacheScope.HOOK}:${hookId}`, hook);
     }
     return hook && new Hook(hook);
   }
 
   // public static async insert(hook: Partial<Hook>) {
-  //   const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.HOOKS, {
+  //   const { id } = await ncMeta.metaInsert2(null, null, MetaTable.HOOKS, {
   //     // user: hook.user,
   //     // ip: hook.ip,
   //     // base_id: hook.base_id,
@@ -68,14 +68,17 @@ export default class Hook implements HookType {
   //   return this.get(id);
   // }
 
-  static async list(param: {
-    fk_model_id: string;
-    event?: 'after' | 'before';
-    operation?: 'insert' | 'delete' | 'update';
-  }) {
+  static async list(
+    param: {
+      fk_model_id: string;
+      event?: 'after' | 'before';
+      operation?: 'insert' | 'delete' | 'update';
+    },
+    ncMeta = Noco.ncMeta
+  ) {
     let hooks = await NocoCache.getList(CacheScope.HOOK, [param.fk_model_id]);
     if (!hooks.length) {
-      hooks = await Noco.ncMeta.metaList(null, null, MetaTable.HOOKS, {
+      hooks = await ncMeta.metaList(null, null, MetaTable.HOOKS, {
         condition: {
           fk_model_id: param.fk_model_id
           // ...(param.event ? { event: param.event?.toLowerCase?.() } : {}),
@@ -100,7 +103,7 @@ export default class Hook implements HookType {
     return hooks?.map(h => new Hook(h));
   }
 
-  public static async insert(hook: Partial<Hook>) {
+  public static async insert(hook: Partial<Hook>, ncMeta = Noco.ncMeta) {
     const insertObj = {
       fk_model_id: hook.fk_model_id,
       title: hook.title,
@@ -130,12 +133,12 @@ export default class Hook implements HookType {
     };
 
     if (!(hook.project_id && hook.base_id)) {
-      const model = await Model.getByIdOrName({ id: hook.fk_model_id });
+      const model = await Model.getByIdOrName({ id: hook.fk_model_id }, ncMeta);
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
 
-    const { id } = await Noco.ncMeta.metaInsert2(
+    const { id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.HOOKS,
@@ -148,10 +151,14 @@ export default class Hook implements HookType {
       `${CacheScope.HOOK}:${id}`
     );
 
-    return this.get(id);
+    return this.get(id, ncMeta);
   }
 
-  public static async update(hookId: string, hook: Partial<Hook>) {
+  public static async update(
+    hookId: string,
+    hook: Partial<Hook>,
+    ncMeta = Noco.ncMeta
+  ) {
     const updateObj = {
       title: hook.title,
       description: hook.description,
@@ -187,19 +194,13 @@ export default class Hook implements HookType {
       await NocoCache.set(key, o);
     }
     // set meta
-    await Noco.ncMeta.metaUpdate(
-      null,
-      null,
-      MetaTable.HOOKS,
-      updateObj,
-      hookId
-    );
+    await ncMeta.metaUpdate(null, null, MetaTable.HOOKS, updateObj, hookId);
 
-    return this.get(hookId);
+    return this.get(hookId, ncMeta);
   }
 
-  static async delete(hookId: any) {
-    return await Noco.ncMeta.metaDelete(null, null, MetaTable.HOOKS, hookId);
+  static async delete(hookId: any, ncMeta = Noco.ncMeta) {
+    return await ncMeta.metaDelete(null, null, MetaTable.HOOKS, hookId);
     await NocoCache.deepDel(
       CacheScope.HOOK,
       `${CacheScope.HOOK}:${hookId}`,

@@ -6206,7 +6206,7 @@
             "type": "boolean"
           },
           "payload": {
-            "type": "boolean"
+            "type": "string"
           },
           "url": {
             "type": "string"

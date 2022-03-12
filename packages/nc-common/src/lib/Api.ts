@@ -454,7 +454,7 @@ export interface HookType {
   event?: 'After' | 'Before';
   operation?: 'insert' | 'delete' | 'update';
   async?: boolean;
-  payload?: boolean;
+  payload?: string;
   url?: string;
   headers?: string;
   condition?: string;
