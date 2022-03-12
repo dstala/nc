@@ -6,6 +6,9 @@ import ProjectUser from '../../../noco-models/ProjectUser';
 import Model from '../../../noco-models/Model';
 import { ModelTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
+import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
+import UITypes from '../../../sqlUi/UITypes';
+import NcHelp from '../../../utils/NcHelp';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -101,6 +104,8 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
     };
   } = {};
 
+  const virtualRelationColumnInsert: Array<() => Promise<any>> = [];
+  const virtualColumnInsert: Array<() => Promise<any>> = [];
   const viewsInsert: Array<() => Promise<any>> = [];
 
   for (const modelData of metas) {
@@ -121,6 +126,7 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
         project.id,
         baseId,
         {
+          order: modelData.order,
           tn: modelData.title,
           _tn: modelData.alias,
           type: modelData.type === 'table' ? ModelTypes.TABLE : ModelTypes.VIEW
@@ -129,15 +135,20 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
       );
       models.push(model);
 
-      objModelRef[project.id] = objModelRef[project.id] || {};
+      const projectModelRefs = (objModelRef[project.id] =
+        objModelRef[project.id] || {});
       objModelRef[project.id][model.tn] = model;
 
-      objModelColumnRef[project.id] = objModelColumnRef[project.id] || {};
+      const projectModelColumnRefs = (objModelColumnRef[project.id] =
+        objModelColumnRef[project.id] || {});
       objModelColumnRef[project.id][model.tn] =
         objModelColumnRef[project.id][model.tn] || {};
 
       // migrate table columns
       for (const columnMeta of meta.columns) {
+        // relation column insert
+        virtualRelationColumnInsert.push(async () => {});
+
         const column = await Column.insert(
           {
             ...columnMeta,
@@ -149,6 +160,72 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
         objModelColumnRef[project.id][model.tn][column.cn] = column;
       }
 
+      // migrate table virtual columns
+      for (const columnMeta of meta.v) {
+        if (columnMeta.mm || columnMeta.hm || columnMeta.bt) {
+          virtualRelationColumnInsert.push(async () => {
+            const rel = columnMeta.hm || columnMeta.bt || columnMeta.mm;
+
+            const rel_column_id =
+              projectModelColumnRefs?.[rel.tn]?.[rel.cn]?.id;
+
+            const tnId = projectModelRefs?.[rel.tn]?.id;
+
+            const ref_rel_column_id =
+              projectModelColumnRefs?.[rel.rtn]?.[rel.rcn]?.id;
+
+            const rtnId = projectModelRefs?.[rel.rtn]?.id;
+
+            let fk_mm_model_id;
+            let fk_mm_child_column_id;
+            let fk_mm_parent_column_id;
+
+            if (columnMeta.mm) {
+              fk_mm_model_id = projectModelRefs?.[rel.vtn]?.id;
+              fk_mm_child_column_id =
+                projectModelColumnRefs?.[rel.vtn]?.[rel.vcn]?.id;
+              fk_mm_parent_column_id =
+                projectModelColumnRefs?.[rel.vtn]?.[rel.vrcn]?.id;
+            }
+            const column = await Column.insert<LinkToAnotherRecordColumn>(
+              {
+                project_id: project.id,
+                db_alias: baseId,
+                fk_model_id: model.id,
+                cn: columnMeta.cn,
+                _cn: columnMeta._cn,
+                uidt: UITypes.LinkToAnotherRecord,
+                type: columnMeta.hm ? 'hm' : columnMeta.mm ? 'mm' : 'bt',
+                fk_child_column_id: rel_column_id,
+                fk_parent_column_id: ref_rel_column_id,
+                fk_index_name: rel.fkn,
+                ur: rel.ur,
+                dr: rel.dr,
+                fk_mm_model_id,
+                fk_mm_child_column_id,
+                fk_mm_parent_column_id,
+                fk_related_model_id: columnMeta.hm ? tnId : rtnId,
+                system: columnMeta.system
+              },
+              ncMeta
+            );
+
+            objModelColumnRef[project.id][model.tn][column.cn] = column;
+          });
+        } else {
+          // other virtual columns insert
+          virtualColumnInsert.push(async () => {
+            if (columnMeta.lk) {
+              // todo: migrate lookup column
+            } else if (columnMeta.rl) {
+              // todo: migrate rollup column
+            } else if (columnMeta.formula) {
+              // todo: migrate formula column
+            }
+          });
+        }
+      }
+
       viewsInsert.push(async () => {
         // insert default view data here
       });
@@ -158,6 +235,12 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
       });
     }
   }
+
+  const type = Noco.getConfig()?.meta?.db?.client;
+
+  await NcHelp.executeOperations(virtualRelationColumnInsert, type);
+  await NcHelp.executeOperations(virtualColumnInsert, type);
+  await NcHelp.executeOperations(viewsInsert, type);
 }
 
 /***
