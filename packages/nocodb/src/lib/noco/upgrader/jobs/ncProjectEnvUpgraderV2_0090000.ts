@@ -202,9 +202,6 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
 
       // migrate table columns
       for (const columnMeta of meta.columns) {
-        // relation column insert
-        virtualRelationColumnInsert.push(async () => {});
-
         const column = await Column.insert(
           {
             ...columnMeta,
@@ -268,7 +265,9 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
               ncMeta
             );
 
-            objModelColumnRef[project.id][model.tn][column.cn] = column;
+            objModelColumnRef[project.id][model.tn][
+              column.cn || column._cn
+            ] = column;
           });
         } else {
           // other virtual columns insert
@@ -309,6 +308,10 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
                     break;
                   }
                 }
+              }
+
+              if (!colBody.fk_relation_column_id) {
+                throw new Error('relation not found');
               }
 
               await Column.insert(
@@ -360,6 +363,9 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
                 }
               }
 
+              if (!colBody.fk_relation_column_id) {
+                throw new Error('relation not found');
+              }
               await Column.insert(
                 {
                   uidt: UITypes.Rollup,
