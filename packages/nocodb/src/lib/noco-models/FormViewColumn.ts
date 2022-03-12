@@ -24,7 +24,7 @@ export default class FormViewColumn implements FormColumnType {
 
   uuid?: any;
 
-  public static async get(formViewId: string) {
+  public static async get(formViewId: string, ncMeta = Noco.ncMeta) {
     let view =
       formViewId &&
       (await NocoCache.get(
@@ -32,7 +32,7 @@ export default class FormViewColumn implements FormColumnType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(
+      view = await ncMeta.metaGet2(
         null,
         null,
         MetaTable.FORM_VIEW_COLUMNS,
@@ -44,11 +44,11 @@ export default class FormViewColumn implements FormColumnType {
     return view && new FormViewColumn(view);
   }
 
-  static async insert(column: Partial<FormViewColumn>) {
+  static async insert(column: Partial<FormViewColumn>, ncMeta = Noco.ncMeta) {
     const insertObj = {
       fk_view_id: column.fk_view_id,
       fk_column_id: column.fk_column_id,
-      order: await Noco.ncMeta.metaGetNextOrder(MetaTable.FORM_VIEW_COLUMNS, {
+      order: await ncMeta.metaGetNextOrder(MetaTable.FORM_VIEW_COLUMNS, {
         fk_view_id: column.fk_view_id
       }),
       show: column.show,
@@ -57,12 +57,12 @@ export default class FormViewColumn implements FormColumnType {
     };
 
     if (!(column.project_id && column.base_id)) {
-      const viewRef = await View.get(column.fk_view_id);
+      const viewRef = await View.get(column.fk_view_id, ncMeta);
       insertObj.project_id = viewRef.project_id;
       insertObj.base_id = viewRef.base_id;
     }
 
-    const { id } = await Noco.ncMeta.metaInsert2(
+    const { id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.FORM_VIEW_COLUMNS,
@@ -73,7 +73,7 @@ export default class FormViewColumn implements FormColumnType {
       [column.fk_view_id],
       `${CacheScope.FORM_VIEW_COLUMN}:${id}`
     );
-    return this.get(id);
+    return this.get(id, ncMeta);
   }
 
   public static async list(

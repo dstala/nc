@@ -275,16 +275,22 @@ export default class View implements ViewType {
       let order = 1;
       for (const vCol of columns) {
         let show = 'show' in vCol ? vCol.show : true;
-        const col = await Column.get({ colId: vCol.fk_column_id || vCol.id });
+        const col = await Column.get(
+          { colId: vCol.fk_column_id || vCol.id },
+          ncMeta
+        );
         if (isSystemColumn(col)) show = false;
-        await View.insertColumn({
-          order: order++,
-          ...col,
-          view_id,
-          fk_column_id: vCol.fk_column_id || vCol.id,
-          show,
-          id: null
-        });
+        await View.insertColumn(
+          {
+            order: order++,
+            ...col,
+            view_id,
+            fk_column_id: vCol.fk_column_id || vCol.id,
+            show,
+            id: null
+          },
+          ncMeta
+        );
       }
     }
 
@@ -332,13 +338,16 @@ export default class View implements ViewType {
     }
   }
 
-  static async insertColumn(param: {
-    view_id: any;
-    order;
-    show;
-    fk_column_id;
-    id?: string;
-  }) {
+  static async insertColumn(
+    param: {
+      view_id: any;
+      order;
+      show;
+      fk_column_id;
+      id?: string;
+    },
+    ncMeta = Noco.ncMeta
+  ) {
     const insertObj = {
       view_id: param.view_id,
       order: param.order,
@@ -347,32 +356,41 @@ export default class View implements ViewType {
       id: param.id
     };
 
-    const view = await this.get(param.view_id);
+    const view = await this.get(param.view_id, ncMeta);
 
     let col;
     switch (view.type) {
       case ViewTypes.GRID:
         {
-          col = await GridViewColumn.insert({
-            ...insertObj,
-            fk_view_id: view.id
-          });
+          col = await GridViewColumn.insert(
+            {
+              ...insertObj,
+              fk_view_id: view.id
+            },
+            ncMeta
+          );
         }
         break;
       case ViewTypes.GALLERY:
         {
-          col = await GalleryViewColumn.insert({
-            ...insertObj,
-            fk_view_id: view.id
-          });
+          col = await GalleryViewColumn.insert(
+            {
+              ...insertObj,
+              fk_view_id: view.id
+            },
+            ncMeta
+          );
         }
         break;
       case ViewTypes.FORM:
         {
-          col = await FormViewColumn.insert({
-            ...insertObj,
-            fk_view_id: view.id
-          });
+          col = await FormViewColumn.insert(
+            {
+              ...insertObj,
+              fk_view_id: view.id
+            },
+            ncMeta
+          );
         }
         break;
     }

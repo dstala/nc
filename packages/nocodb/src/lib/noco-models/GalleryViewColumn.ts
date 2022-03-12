@@ -18,7 +18,7 @@ export default class GalleryViewColumn {
     Object.assign(this, data);
   }
 
-  public static async get(galleryViewColumnId: string) {
+  public static async get(galleryViewColumnId: string, ncMeta = Noco.ncMeta) {
     let view =
       galleryViewColumnId &&
       (await NocoCache.get(
@@ -26,7 +26,7 @@ export default class GalleryViewColumn {
         CacheGetType.TYPE_OBJECT
       ));
     if (!view) {
-      view = await Noco.ncMeta.metaGet2(
+      view = await ncMeta.metaGet2(
         null,
         null,
         MetaTable.GALLERY_VIEW_COLUMNS,
@@ -55,7 +55,7 @@ export default class GalleryViewColumn {
     };
 
     if (!(column.project_id && column.base_id)) {
-      const viewRef = await View.get(column.fk_view_id);
+      const viewRef = await View.get(column.fk_view_id, ncMeta);
       insertObj.project_id = viewRef.project_id;
       insertObj.base_id = viewRef.base_id;
     }
@@ -73,7 +73,7 @@ export default class GalleryViewColumn {
       `${CacheScope.GALLERY_VIEW_COLUMN}:${id}`
     );
 
-    return this.get(id);
+    return this.get(id, ncMeta);
   }
 
   public static async list(

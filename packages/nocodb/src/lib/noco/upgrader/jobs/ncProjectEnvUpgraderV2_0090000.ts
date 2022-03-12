@@ -4,7 +4,7 @@ import User from '../../../noco-models/User';
 import Project from '../../../noco-models/Project';
 import ProjectUser from '../../../noco-models/ProjectUser';
 import Model from '../../../noco-models/Model';
-import { ModelTypes } from 'nc-common';
+import { ModelTypes, ViewTypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import UITypes from '../../../sqlUi/UITypes';
@@ -12,6 +12,10 @@ import NcHelp from '../../../utils/NcHelp';
 import { substituteColumnNameWithIdInFormula } from '../../meta/api/helpers/formulaHelpers';
 import RollupColumn from '../../../noco-models/RollupColumn';
 import View from '../../../noco-models/View';
+import GridView from '../../../noco-models/GridView';
+import KanbanView from '../../../noco-models/KanbanView';
+import FormView from '../../../noco-models/FormView';
+import GalleryView from '../../../noco-models/GalleryView';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -181,7 +185,7 @@ interface ModelMetav1 {
   db_alias: string;
   title: string;
   alias: string;
-  type: string;
+  type: 'table' | 'vtable' | 'view';
   meta: string;
   schema: string;
   schema_previous: string;
@@ -189,7 +193,7 @@ interface ModelMetav1 {
   messages: string;
   enabled: boolean;
   parent_model_title: string;
-  show_as: 'table' | 'vtable' | 'view';
+  show_as: 'grid' | 'gallery' | 'form';
   query_params: string;
   list_idx: number;
   tags: string;
@@ -200,35 +204,48 @@ interface ModelMetav1 {
   view_order: number;
 }
 
+type ObjModelColumnRefv1 = {
+  [projectId: string]: {
+    [tableName: string]: {
+      [columnName: string]: Column;
+    };
+  };
+};
+type ObjModelColumnAliasRefv1 = {
+  [projectId: string]: {
+    [tableName: string]: {
+      [columnAlias: string]: Column;
+    };
+  };
+};
+
+type ObjModelRefv1 = {
+  [projectId: string]: {
+    [tableName: string]: Model;
+  };
+};
+type ObjViewRefv1 = {
+  [projectId: string]: {
+    [tableName: string]: {
+      [viewName: string]: View;
+    };
+  };
+};
+
 async function migrateProjectModels(ncMeta = Noco.ncMeta) {
   const metas: ModelMetav1[] = await ncMeta.metaList(null, null, 'nc_models');
   const models: Model[] = [];
 
   // variable for keeping all
-  const objModelRef: {
-    [projectId: string]: {
-      [tableName: string]: Model;
-    };
-  } = {};
-  const objModelColumnRef: {
-    [projectId: string]: {
-      [tableName: string]: {
-        [columnName: string]: Column;
-      };
-    };
-  } = {};
-  const objModelColumnAliasRef: {
-    [projectId: string]: {
-      [tableName: string]: {
-        [columnAlias: string]: Column;
-      };
-    };
-  } = {};
+  const objModelRef: ObjModelRefv1 = {};
+  const objModelColumnRef: ObjModelColumnRefv1 = {};
+  const objModelColumnAliasRef: ObjModelColumnAliasRefv1 = {};
+  const objViewRef: ObjViewRefv1 = {};
 
   const virtualRelationColumnInsert: Array<() => Promise<any>> = [];
   const virtualColumnInsert: Array<() => Promise<any>> = [];
   const defaultViewsUpdate: Array<() => Promise<any>> = [];
-  const viewsInsert: Array<() => Promise<any>> = [];
+  const views: ModelMetav1[] = [];
 
   for (const modelData of metas) {
     // @ts-ignore
@@ -269,6 +286,11 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
         objModelColumnAliasRef[project.id] || {});
       objModelColumnAliasRef[project.id][model.tn] =
         objModelColumnAliasRef[project.id][model.tn] || {};
+
+      objViewRef[project.id] = objViewRef[project.id] || {};
+
+      objViewRef[project.id][modelData.title] =
+        objViewRef[project.id][modelData.title] || {};
 
       // migrate table columns
       for (const columnMeta of meta.columns) {
@@ -482,6 +504,10 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
           views => views[0]
         );
 
+        objViewRef[project.id][modelData.title][
+          defaultView.title
+        ] = defaultView;
+
         for (const [_cn, column] of Object.entries(
           projectModelColumnAliasRefs[model.tn]
         )) {
@@ -505,9 +531,7 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
         );
       });
     } else {
-      viewsInsert.push(async () => {
-        // todo: insert view data here
-      });
+      views.push(modelData);
     }
   }
 
@@ -516,7 +540,121 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
   await NcHelp.executeOperations(virtualRelationColumnInsert, type);
   await NcHelp.executeOperations(virtualColumnInsert, type);
   await NcHelp.executeOperations(defaultViewsUpdate, type);
-  await NcHelp.executeOperations(viewsInsert, type);
+
+  await migrateProjectModelViews(
+    {
+      views,
+      objModelRef,
+      objModelColumnAliasRef,
+      objModelColumnRef,
+      objViewRef
+    },
+    ncMeta
+  );
+}
+
+async function migrateProjectModelViews(
+  {
+    views,
+    objModelRef,
+    // objModelColumnRef,
+    objModelColumnAliasRef,
+    objViewRef
+  }: // ...ctx
+  {
+    views: ModelMetav1[];
+    objModelRef: ObjModelRefv1;
+    objModelColumnRef: ObjModelColumnRefv1;
+    objModelColumnAliasRef: ObjModelColumnAliasRefv1;
+    objViewRef: ObjViewRefv1;
+  },
+  ncMeta
+) {
+  /**
+  {
+  "id": 27,
+  "project_id": "samplerest_iv3f",
+  "db_alias": "db",
+  "title": "Address1",
+  "alias": null,
+  "type": "vtable",
+  "meta": null,
+  "schema": null,
+  "schema_previous": null,
+  "services": null,
+  "messages": null,
+  "enabled": 1,
+  "parent_model_title": "nc_iv3f__address",
+  "show_as": "grid",
+  "query_params": "{\"filters\":[],\"sortList\":[],\"showFields\":{\"Address\":true,\"Address2\":true,\"District\":true,\"PostalCode\":true,\"Phone\":true,\"LastUpdate\":true,\"Address => Customer\":true,\"Address => Staff\":true,\"City <= Address\":true,\"Address <=> Staff\":true,\"addressBtCityIdLookUp\":true,\"addressHmStaffIdLookUp\":true,\"formualPhonePostalcode\":true,\"addressHmCustomerIdLookUp\":true,\"addressHmCustomerIdRollUpCount\":true},\"fieldsOrder\":[\"Address\",\"Address2\",\"District\",\"PostalCode\",\"Phone\",\"LastUpdate\",\"Address => Customer\",\"Address => Staff\",\"City <= Address\",\"Address <=> Staff\",\"addressBtCityIdLookUp\",\"addressHmStaffIdLookUp\",\"formualPhonePostalcode\",\"addressHmCustomerIdLookUp\",\"addressHmCustomerIdRollUpCount\"],\"viewStatus\":{},\"columnsWidth\":{},\"extraViewParams\":{}}",
+  "list_idx": null,
+  "tags": null,
+  "pinned": null,
+  "created_at": "2022-03-12 11:54:51",
+  "updated_at": "2022-03-12 11:54:58",
+  "mm": null,
+  "m_to_m_meta": null,
+  "order": null,
+  "view_order": 2
+}
+  * */
+
+  for (const viewData of views) {
+    const project = await Project.getWithInfo(viewData.project_id, ncMeta);
+    // @ts-ignore
+    const baseId = project.bases[0].id;
+
+    // @ts-ignore
+    let queryParams: QueryParamsv1 = {};
+    if (viewData.query_params) {
+      queryParams = JSON.parse(viewData.query_params);
+    }
+
+    const insertObj: Partial<View> &
+      Partial<GridView | KanbanView | FormView | GalleryView> = {
+      title: viewData.title,
+      show: true,
+      order: viewData.view_order,
+      fk_model_id: objModelRef[project.id][viewData.parent_model_title].id,
+      project_id: project.id,
+      base_id: baseId
+    };
+
+    if (viewData.show_as === 'grid') {
+      insertObj.type = ViewTypes.GRID;
+    } else if (viewData.show_as === 'gallery') {
+      insertObj.type = ViewTypes.GALLERY;
+
+      // todo: add fk_cover_image_col_id
+    } else if (viewData.show_as === 'form') {
+      insertObj.type = ViewTypes.FORM;
+    } else throw new Error('not implemented');
+
+    const view = await View.insert(insertObj, ncMeta);
+    objViewRef[project.id][viewData.parent_model_title][view.title] = view;
+
+    for (const [_cn, column] of Object.entries(
+      objModelColumnAliasRef[project.id][viewData.parent_model_title]
+    )) {
+      await View.updateColumn(
+        view.id,
+        column.id,
+        {
+          order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
+          show: queryParams?.showFields?.[_cn]
+        },
+        ncMeta
+      );
+    }
+    await View.update(
+      view.id,
+      {
+        show_system_fields: queryParams.showSystemFields,
+        order: viewData.view_order
+      },
+      ncMeta
+    );
+  }
 }
 
 /***

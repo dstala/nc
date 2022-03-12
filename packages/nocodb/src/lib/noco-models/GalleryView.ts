@@ -49,9 +49,9 @@ export default class GalleryView implements GalleryType {
   }
 
   static async insert(view: Partial<GalleryView>, ncMeta = Noco.ncMeta) {
-    const columns = await View.get(view.fk_view_id)
-      .then(v => v?.getModel())
-      .then(m => m.getColumns());
+    const columns = await View.get(view.fk_view_id, ncMeta)
+      .then(v => v?.getModel(ncMeta))
+      .then(m => m.getColumns(ncMeta));
 
     const insertObj = {
       project_id: view.project_id,
