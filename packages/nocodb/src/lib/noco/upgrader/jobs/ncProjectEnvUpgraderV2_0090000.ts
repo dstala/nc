@@ -18,6 +18,7 @@ import FormView from '../../../noco-models/FormView';
 import GalleryView from '../../../noco-models/GalleryView';
 import Sort from '../../../noco-models/Sort';
 import Filter from '../../../noco-models/Filter';
+import ModelRoleVisibility from '../../../noco-models/ModelRoleVisibility';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -25,7 +26,9 @@ export default async function(ctx: NcUpgraderCtx) {
   await migrateUsers(ncMeta);
   await migrateProjects(ncMeta);
   await migrateProjectUsers(ncMeta);
-  await migrateProjectModels(ncMeta);
+  const migrationCtx = await migrateProjectModels(ncMeta);
+
+  await migrateUIAcl(migrationCtx, ncMeta);
 
   // const projects = await ctx.ncMeta.projectList();
   //
@@ -241,6 +244,15 @@ type ObjViewQPRefv1 = {
   };
 };
 
+interface MigrateCtxV1 {
+  views: ModelMetav1[];
+  objModelRef: ObjModelRefv1;
+  objModelColumnRef: ObjModelColumnRefv1;
+  objModelColumnAliasRef: ObjModelColumnAliasRefv1;
+  objViewRef: ObjViewRefv1;
+  objViewQPRef: ObjViewQPRefv1;
+}
+
 // @ts-ignore
 const filterV1toV2CompOpMap = {
   'is like': 'like',
@@ -255,7 +267,9 @@ const filterV1toV2CompOpMap = {
   'is not like': 'nlike'
 };
 
-async function migrateProjectModels(ncMeta = Noco.ncMeta) {
+async function migrateProjectModels(
+  ncMeta = Noco.ncMeta
+): Promise<MigrateCtxV1> {
   const metas: ModelMetav1[] = await ncMeta.metaList(null, null, 'nc_models');
   const models: Model[] = [];
 
@@ -596,6 +610,15 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
     },
     ncMeta
   );
+
+  return {
+    views,
+    objModelRef,
+    objModelColumnAliasRef,
+    objModelColumnRef,
+    objViewRef,
+    objViewQPRef
+  };
 }
 
 async function migrateProjectModelViews(
@@ -606,14 +629,7 @@ async function migrateProjectModelViews(
     objModelColumnAliasRef,
     objViewRef,
     objViewQPRef
-  }: {
-    views: ModelMetav1[];
-    objModelRef: ObjModelRefv1;
-    objModelColumnRef: ObjModelColumnRefv1;
-    objModelColumnAliasRef: ObjModelColumnAliasRefv1;
-    objViewRef: ObjViewRefv1;
-    objViewQPRef: ObjViewQPRefv1;
-  },
+  }: MigrateCtxV1,
   ncMeta
 ) {
   for (const viewData of views) {
@@ -654,12 +670,14 @@ async function migrateProjectModelViews(
     const view = await View.insert(insertObj, ncMeta);
     objViewRef[project.id][viewData.parent_model_title][view.title] = view;
 
+    const viewColumns = await View.getColumns(view.id, ncMeta);
+
     for (const [_cn, column] of Object.entries(
       objModelColumnAliasRef[project.id][viewData.parent_model_title]
     )) {
       await View.updateColumn(
         view.id,
-        column.id,
+        viewColumns.find(c => column.id === c.fk_column_id),
         {
           order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
           show: queryParams?.showFields?.[_cn]
@@ -680,20 +698,7 @@ async function migrateProjectModelViews(
 
 // migrate sort & filter
 async function migrateViewsParams(
-  {
-    // views,
-    // objModelRef,
-    objModelColumnAliasRef,
-    objViewRef,
-    objViewQPRef
-  }: {
-    views: ModelMetav1[];
-    objModelRef: ObjModelRefv1;
-    objModelColumnRef: ObjModelColumnRefv1;
-    objModelColumnAliasRef: ObjModelColumnAliasRefv1;
-    objViewRef: ObjViewRefv1;
-    objViewQPRef: ObjViewQPRefv1;
-  },
+  { objModelColumnAliasRef, objViewRef, objViewQPRef }: MigrateCtxV1,
   ncMeta
 ) {
   for (const projectId of Object.keys(objViewRef)) {
@@ -731,5 +736,39 @@ async function migrateViewsParams(
         }
       }
     }
+  }
+}
+
+async function migrateUIAcl(ctx: MigrateCtxV1, ncMeta: any) {
+  const uiAclList: Array<{
+    role: string;
+    title: string;
+    type: 'vtable' | 'table' | 'view';
+    disabled: boolean;
+    tn: string;
+    parent_model_title: string;
+    project_id: string;
+  }> = await ncMeta.metaList(null, null, 'nc_disabled_models_for_role');
+
+  for (const acl of uiAclList) {
+    let fk_view_id;
+    if (acl.type === 'vtable') {
+      fk_view_id =
+        ctx.objViewRef[acl.project_id][acl.parent_model_title][acl.title].id;
+    } else {
+      fk_view_id =
+        ctx.objViewRef[acl.project_id][acl.title][
+          ctx.objModelRef[acl.project_id][acl.title]._tn
+        ].id || ctx.objViewRef[acl.project_id][acl.title][acl.title].id;
+    }
+
+    await ModelRoleVisibility.insert(
+      {
+        role: acl.role,
+        fk_view_id,
+        disabled: acl.disabled
+      },
+      ncMeta
+    );
   }
 }

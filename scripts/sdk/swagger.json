@@ -6317,7 +6317,7 @@
             "type": "string"
           },
           "disabled": {
-            "type": "string"
+            "type": "boolean"
           }
         }
       }

@@ -493,7 +493,7 @@ export interface ModelRoleVisibilityType {
   fk_model_id?: string;
   fk_view_id?: string;
   role?: string;
-  disabled?: string;
+  disabled?: boolean;
 }
 
 export interface SigninPayloadType {

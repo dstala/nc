@@ -16,7 +16,7 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
   // fk_model_id?: string;
   fk_view_id?: string;
   role?: string;
-  disabled?: string;
+  disabled?: boolean;
 
   constructor(body: Partial<ModelRoleVisibilityType>) {
     Object.assign(this, body);
@@ -41,7 +41,10 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     return data?.map(baseData => new ModelRoleVisibility(baseData));
   }
 
-  static async get(args: { role: string; fk_view_id: any }) {
+  static async get(
+    args: { role: string; fk_view_id: any },
+    ncMeta = Noco.ncMeta
+  ) {
     let data =
       args.fk_view_id &&
       args.role &&
@@ -50,7 +53,7 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!data) {
-      data = await Noco.ncMeta.metaGet2(
+      data = await ncMeta.metaGet2(
         null,
         null,
         MetaTable.MODEL_ROLE_VISIBILITY,
@@ -122,7 +125,10 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     );
   }
 
-  static async insert(body: Partial<ModelRoleVisibilityType>) {
+  static async insert(
+    body: Partial<ModelRoleVisibilityType>,
+    ncMeta = Noco.ncMeta
+  ) {
     const insertObj = {
       role: body.role,
       disabled: body.disabled,
@@ -133,12 +139,12 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
     };
 
     if (!(body.project_id && body.base_id)) {
-      const model = await Model.getByIdOrName({ id: body.fk_model_id });
+      const model = await Model.getByIdOrName({ id: body.fk_model_id }, ncMeta);
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
 
-    await Noco.ncMeta.metaInsert2(
+    await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.MODEL_ROLE_VISIBILITY,
@@ -151,9 +157,12 @@ export default class ModelRoleVisibility implements ModelRoleVisibilityType {
       `${CacheScope.MODEL_ROLE_VISIBILITY}:${body.fk_view_id}:${body.role}`
     );
 
-    return this.get({
-      fk_view_id: body.fk_view_id,
-      role: body.role
-    });
+    return this.get(
+      {
+        fk_view_id: body.fk_view_id,
+        role: body.role
+      },
+      ncMeta
+    );
   }
 }
