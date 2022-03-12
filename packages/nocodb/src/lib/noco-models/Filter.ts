@@ -77,10 +77,12 @@ export default class Filter {
     );
     if (filter?.children?.length) {
       await Promise.all(
-        filter.children.map(f => this.insert({ ...f, fk_parent_id: row.id }))
+        filter.children.map(f =>
+          this.insert({ ...f, fk_parent_id: row.id }, ncMeta)
+        )
       );
     }
-    return await this.redisPostInsert(row.id, filter);
+    return await this.redisPostInsert(row.id, filter, ncMeta);
   }
 
   static async redisPostInsert(

@@ -17,6 +17,7 @@ import KanbanView from '../../../noco-models/KanbanView';
 import FormView from '../../../noco-models/FormView';
 import GalleryView from '../../../noco-models/GalleryView';
 import Sort from '../../../noco-models/Sort';
+import Filter from '../../../noco-models/Filter';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -241,7 +242,7 @@ type ObjViewQPRefv1 = {
 };
 
 // @ts-ignore
-const filterV1toV2ConditionMap = {
+const filterV1toV2CompOpMap = {
   'is like': 'like',
   '>': 'gt',
   '<': 'lt',
@@ -706,8 +707,22 @@ async function migrateViewsParams(
             {
               fk_column_id:
                 objModelColumnAliasRef[projectId][tn][sort.field].id,
-              direction: sort.order === '-' ? 'desc' : 'asc',
-              fk_view_id: view.id
+              fk_view_id: view.id,
+              direction: sort.order === '-' ? 'desc' : 'asc'
+            },
+            ncMeta
+          );
+        }
+
+        // migrate view filter list
+        for (const filter of queryParams.filters || []) {
+          await Filter.insert(
+            {
+              fk_column_id:
+                objModelColumnAliasRef[projectId][tn][filter.field].id,
+              fk_view_id: view.id,
+              comparison_op: filterV1toV2CompOpMap[filter.op],
+              value: filter.value
             },
             ncMeta
           );
