@@ -58,6 +58,7 @@ async function migrateProjects(ncMeta = Noco.ncMeta) {
       is_meta: !!projectConfig.prefix,
       title: projectConfig?.title,
       bases: projectConfig?.envs?._noco?.db?.map(d => ({
+        is_meta: !!projectConfig.prefix,
         type: d.client,
         config: d
       }))
