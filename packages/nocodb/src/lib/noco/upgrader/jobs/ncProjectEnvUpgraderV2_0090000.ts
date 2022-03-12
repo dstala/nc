@@ -19,6 +19,7 @@ import GalleryView from '../../../noco-models/GalleryView';
 import Sort from '../../../noco-models/Sort';
 import Filter from '../../../noco-models/Filter';
 import ModelRoleVisibility from '../../../noco-models/ModelRoleVisibility';
+import { MetaTable } from '../../../utils/globals';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -31,6 +32,7 @@ export default async function(ctx: NcUpgraderCtx) {
   await migrateUIAcl(migrationCtx, ncMeta);
   await migrateSharedViews(migrationCtx, ncMeta);
   await migrateSharedBase(ncMeta);
+  await migratePlugins(ncMeta);
 
   // const projects = await ctx.ncMeta.projectList();
   //
@@ -834,5 +836,29 @@ async function migrateSharedBase(ncMeta: any) {
       },
       ncMeta
     );
+  }
+}
+
+async function migratePlugins(ncMeta: any) {
+  const plugins: Array<any> = await ncMeta.metaList(null, null, 'nc_plugins');
+
+  for (const plugin of plugins) {
+    await ncMeta.metaInsert2(null, null, MetaTable.PLUGIN, {
+      title: plugin.title,
+      description: plugin.description,
+      active: plugin.active,
+      version: plugin.version,
+      docs: plugin.docs,
+      status: plugin.status,
+      status_details: plugin.status_details,
+      logo: plugin.logo,
+      tags: plugin.tags,
+      category: plugin.category,
+      input: plugin.input,
+      input_schema: plugin.input_schema,
+      creator: plugin.creator,
+      creator_website: plugin.creator_website,
+      price: plugin.price
+    });
   }
 }

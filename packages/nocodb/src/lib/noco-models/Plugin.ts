@@ -27,8 +27,13 @@ export default class Plugin implements PluginType {
   }
 
   public static async get(pluginId: string, ncMeta = Noco.ncMeta) {
-    const audit = await ncMeta.metaGet2(null, null, MetaTable.PLUGIN, pluginId);
-    return audit && new Plugin(audit);
+    const plugin = await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.PLUGIN,
+      pluginId
+    );
+    return plugin && new Plugin(plugin);
   }
 
   static async list(ncMeta = Noco.ncMeta) {
