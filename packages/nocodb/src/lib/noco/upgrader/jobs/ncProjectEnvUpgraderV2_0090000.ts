@@ -87,6 +87,59 @@ async function migrateProjectUsers(ncMeta = Noco.ncMeta) {
   }
 }
 
+interface Rollupv1 {
+  _cn: string;
+  rollup: {
+    type: string;
+    tn: string;
+    cn: string;
+    vtn: string;
+    vrcn: string;
+    rcn: string;
+    rtn: string;
+    vcn: string;
+    _rtn: string;
+    rltn: string;
+    _rltn: string;
+    rlcn: string;
+    _rlcn: string;
+  };
+}
+
+interface Formulav1 {
+  _cn: string;
+  formula: {
+    value: string;
+    tree: any;
+  };
+}
+
+interface Lookupv1 {
+  _cn: string;
+  lk: {
+    type: string;
+    tn: string;
+    cn: string;
+    vtn: string;
+    vrcn: string;
+    rcn: string;
+    rtn: string;
+    vcn: string;
+    _rtn: string;
+    ltn: string;
+    _ltn: string;
+    lcn: string;
+    _lcn: string;
+  };
+}
+
+interface LinkToAnotherRecordv1 {
+  _cn: string;
+  hm?: any;
+  bt?: any;
+  mm?: any;
+}
+
 async function migrateProjectModels(ncMeta = Noco.ncMeta) {
   const metas: any[] = await ncMeta.metaList(null, null, 'nc_models');
   const models: Model[] = [];
@@ -162,8 +215,9 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
       }
 
       // migrate table virtual columns
-      for (const columnMeta of meta.v) {
-        if (columnMeta.mm || columnMeta.hm || columnMeta.bt) {
+      for (const _columnMeta of meta.v) {
+        if (_columnMeta.mm || _columnMeta.hm || _columnMeta.bt) {
+          const columnMeta: LinkToAnotherRecordv1 = _columnMeta;
           virtualRelationColumnInsert.push(async () => {
             const rel = columnMeta.hm || columnMeta.bt || columnMeta.mm;
 
@@ -182,18 +236,18 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
             let fk_mm_parent_column_id;
 
             if (columnMeta.mm) {
-              fk_mm_model_id = projectModelRefs?.[rel.vtn]?.id;
+              fk_mm_model_id = projectModelRefs[rel.vtn].id;
               fk_mm_child_column_id =
-                projectModelColumnRefs?.[rel.vtn]?.[rel.vcn]?.id;
+                projectModelColumnRefs[rel.vtn][rel.vcn].id;
               fk_mm_parent_column_id =
-                projectModelColumnRefs?.[rel.vtn]?.[rel.vrcn]?.id;
+                projectModelColumnRefs[rel.vtn][rel.vrcn].id;
             }
             const column = await Column.insert<LinkToAnotherRecordColumn>(
               {
                 project_id: project.id,
                 db_alias: baseId,
                 fk_model_id: model.id,
-                cn: columnMeta.cn,
+                // cn: columnMeta.cn,
                 _cn: columnMeta._cn,
                 uidt: UITypes.LinkToAnotherRecord,
                 type: columnMeta.hm ? 'hm' : columnMeta.mm ? 'mm' : 'bt',
@@ -205,8 +259,9 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
                 fk_mm_model_id,
                 fk_mm_child_column_id,
                 fk_mm_parent_column_id,
-                fk_related_model_id: columnMeta.hm ? tnId : rtnId,
-                system: columnMeta.system
+                fk_related_model_id: columnMeta.hm ? tnId : rtnId
+                // todo: mapping system field
+                // system: columnMeta.system
               },
               ncMeta
             );
@@ -216,12 +271,59 @@ async function migrateProjectModels(ncMeta = Noco.ncMeta) {
         } else {
           // other virtual columns insert
           virtualColumnInsert.push(async () => {
-            if (columnMeta.lk) {
-              // todo: migrate lookup column
-            } else if (columnMeta.rl) {
+            //  migrate lookup column
+            if (_columnMeta.lk) {
+              const columnMeta: Lookupv1 = _columnMeta;
+
+              const colBody: any = {
+                _cn: columnMeta._cn
+              };
+
+              colBody.fk_lookup_column_id =
+                projectModelColumnRefs[columnMeta.lk.ltn][columnMeta.lk.lcn].id;
+
+              const columns = Object.values(projectModelColumnRefs[model.tn]);
+
+              // extract related(virtual relation) column id
+              for (const col of columns) {
+                if (col.uidt === UITypes.LinkToAnotherRecord) {
+                  const colOpt = await col.getColOptions<
+                    LinkToAnotherRecordColumn
+                  >(ncMeta);
+                  if (
+                    colOpt.type === columnMeta.lk.type &&
+                    colOpt.fk_child_column_id ===
+                      projectModelColumnRefs[columnMeta.lk.tn][columnMeta.lk.cn]
+                        .id &&
+                    colOpt.fk_parent_column_id ===
+                      projectModelColumnRefs[columnMeta.lk.rtn][
+                        columnMeta.lk.rcn
+                      ].id &&
+                    (colOpt.type !== 'mm' ||
+                      colOpt.fk_mm_model_id ===
+                        projectModelRefs[columnMeta.lk.vtn].id)
+                  ) {
+                    colBody.fk_relation_column_id = col.id;
+                    break;
+                  }
+                }
+              }
+
+              await Column.insert(
+                {
+                  uidt: UITypes.Lookup,
+                  ...colBody,
+                  fk_model_id: model.id
+                },
+                ncMeta
+              );
+            } else if (_columnMeta.rl) {
               // todo: migrate rollup column
-            } else if (columnMeta.formula) {
-              // todo: migrate formula column
+              // @ts-ignore
+              const columnMeta: Rollupv1 = _columnMeta;
+            } else if (_columnMeta.formula) {
+              const columnMeta: Formulav1 = _columnMeta;
+              //  migrate formula column
               const colBody: any = {
                 _cn: columnMeta._cn
               };
