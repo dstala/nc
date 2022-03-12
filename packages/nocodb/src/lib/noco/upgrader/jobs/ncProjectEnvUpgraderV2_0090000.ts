@@ -29,6 +29,7 @@ export default async function(ctx: NcUpgraderCtx) {
   const migrationCtx = await migrateProjectModels(ncMeta);
 
   await migrateUIAcl(migrationCtx, ncMeta);
+  await migrateSharedViews(migrationCtx, ncMeta);
   await migrateSharedBase(ncMeta);
 
   // const projects = await ctx.ncMeta.projectList();
@@ -271,6 +272,8 @@ const filterV1toV2CompOpMap = {
 async function migrateProjectModels(
   ncMeta = Noco.ncMeta
 ): Promise<MigrateCtxV1> {
+  // @ts-ignore
+
   const metas: ModelMetav1[] = await ncMeta.metaList(null, null, 'nc_models');
   const models: Model[] = [];
 
@@ -768,6 +771,44 @@ async function migrateUIAcl(ctx: MigrateCtxV1, ncMeta: any) {
         role: acl.role,
         fk_view_id,
         disabled: acl.disabled
+      },
+      ncMeta
+    );
+  }
+}
+
+async function migrateSharedViews(ctx: MigrateCtxV1, ncMeta: any) {
+  const sharedViews: Array<{
+    model_name: string;
+    view_type: 'vtable' | 'table' | 'view';
+    view_id: string;
+    password: string;
+    view_name: string;
+    project_id: string;
+  }> = await ncMeta.metaList(null, null, 'nc_shared_views');
+
+  for (const sharedView of sharedViews) {
+    let fk_view_id;
+    if (sharedView.view_type !== 'table' && sharedView.view_type !== 'view') {
+      fk_view_id =
+        ctx.objViewRef[sharedView.project_id][sharedView.model_name][
+          sharedView.view_name
+        ].id;
+    } else {
+      fk_view_id =
+        ctx.objViewRef[sharedView.project_id][sharedView.model_name][
+          ctx.objModelRef[sharedView.project_id][sharedView.model_name]._tn
+        ].id ||
+        ctx.objViewRef[sharedView.project_id][sharedView.model_name][
+          sharedView.model_name
+        ].id;
+    }
+
+    await View.update(
+      fk_view_id,
+      {
+        uuid: sharedView.view_id,
+        password: sharedView.password
       },
       ncMeta
     );

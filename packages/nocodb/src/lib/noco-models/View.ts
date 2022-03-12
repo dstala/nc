@@ -615,6 +615,8 @@ export default class View implements ViewType {
       order?: number;
       show_system_fields?: boolean;
       lock_type?: string;
+      password?: string;
+      uuid?: string;
     },
     ncMeta = Noco.ncMeta
   ) {
@@ -622,7 +624,9 @@ export default class View implements ViewType {
       'title',
       'order',
       'show_system_fields',
-      'lock_type'
+      'lock_type',
+      'password',
+      'uuid'
     ]);
     // get existing cache
     const key = `${CacheScope.VIEW}:${viewId}`;
