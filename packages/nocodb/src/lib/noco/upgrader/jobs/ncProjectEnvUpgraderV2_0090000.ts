@@ -249,7 +249,7 @@ const filterV1toV2CompOpMap = {
   '>=': 'gte',
   '<=': 'lte',
   'is equal': 'eq',
-  'is not null': 'notNull',
+  'is not null': 'notnull',
   'is null': 'null',
   'is not equal': 'neq',
   'is not like': 'nlike'
