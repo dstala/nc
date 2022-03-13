@@ -78,7 +78,7 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
 
   public async init(): Promise<void> {
     await super.init();
-    return await this.loadRoutes(null);
+    // return await this.loadRoutes(null);
   }
 
   public async loadRoutes(customRoutes: any): Promise<any> {

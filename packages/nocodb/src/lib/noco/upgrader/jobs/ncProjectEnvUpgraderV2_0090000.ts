@@ -24,9 +24,24 @@ import Hook from '../../../noco-models/Hook';
 import FormViewColumn from '../../../noco-models/FormViewColumn';
 import GridViewColumn from '../../../noco-models/GridViewColumn';
 import { getUniqueColumnAliasName } from '../../meta/api/helpers/getUniqueName';
+import NcProjectBuilderEE from '../../NcProjectBuilderEE';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
+
+  const projects = await ctx.ncMeta.projectList();
+
+  for (const project of projects) {
+    // const projectConfig = JSON.parse(project.config);
+
+    const projectBuilder = new NcProjectBuilderEE(
+      { ...this, ncMeta: ctx.ncMeta },
+      this.config,
+      project
+    );
+
+    await projectBuilder.init();
+  }
 
   await migrateUsers(ncMeta);
   await migrateProjects(ncMeta);
@@ -38,25 +53,6 @@ export default async function(ctx: NcUpgraderCtx) {
   await migrateSharedBase(ncMeta);
   await migratePlugins(ncMeta);
   await migrateWebhooks(migrationCtx, ncMeta);
-
-  // const projects = await ctx.ncMeta.projectList();
-  //
-  // for (const project of projects) {
-  //   const projectConfig = JSON.parse(project.config);
-  //
-  //   /*    const projectBuilder = new NcProjectBuilder(this, this.config, project);
-  //   this.projectBuilders.push(projectBuilder);
-  //   let i = 0;
-  //   for (const builder of this.projectBuilders) {
-  //     if (
-  //       projects[i].status === 'started' ||
-  //       projects[i].status === 'starting'
-  //     ) {
-  //       await builder.init();
-  //     }
-  //     i++;
-  //   }*/
-  // }
 }
 
 async function migrateUsers(ncMeta = Noco.ncMeta) {
