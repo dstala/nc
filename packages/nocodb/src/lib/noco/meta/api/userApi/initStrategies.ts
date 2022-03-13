@@ -6,6 +6,7 @@ import { Strategy as CustomStrategy } from 'passport-custom';
 import { Strategy } from 'passport-jwt';
 import passport from 'passport';
 import { ExtractJwt } from 'passport-jwt';
+import { Strategy as AuthTokenStrategy } from 'passport-auth-token';
 
 const PassportLocalStrategy = require('passport-local').Strategy;
 // todo: read from database
@@ -18,8 +19,27 @@ import bcrypt from 'bcryptjs';
 import Project from '../../../../noco-models/Project';
 import NocoCache from '../../../../noco-cache/NocoCache';
 import { CacheGetType, CacheScope } from '../../../../utils/globals';
+import ApiToken from '../../../../noco-models/ApiToken';
 
 export function initStrategies(router): void {
+  passport.use(
+    'authtoken',
+    new AuthTokenStrategy({ headerFields: ['xc-token'] }, (token, done) => {
+      ApiToken.getByToken(token)
+        .then(apiToken => {
+          if (apiToken) {
+            done(null, { roles: 'editor' });
+          } else {
+            return done({ msg: 'Invalid tok' });
+          }
+        })
+        .catch(e => {
+          console.log(e);
+          done({ msg: 'Invalid tok' });
+        });
+    })
+  );
+
   passport.serializeUser(function(
     {
       id,

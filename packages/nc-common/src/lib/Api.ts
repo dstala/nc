@@ -496,6 +496,12 @@ export interface ModelRoleVisibilityType {
   disabled?: boolean;
 }
 
+export interface ApiTokenType {
+  id?: string;
+  token?: string;
+  description?: string;
+}
+
 export interface SigninPayloadType {
   email: string;
   password: string;
@@ -693,6 +699,10 @@ export interface PluginTestPayloadType {
 }
 
 export type TestConnectionPayloadType = any;
+
+export interface ApiTokenCreatePayloadType {
+  description?: string;
+}
 
 import axios, {
   AxiosInstance,
@@ -2819,6 +2829,64 @@ export class Api<
     cacheDelete: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/cache`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name ApiTokenList
+     * @summary Your GET endpoint
+     * @request GET:/projects/{projectId}/apiTokens
+     * @response `200` `(ApiTokenType)[]` OK
+     */
+    apiTokenList: (projectId: string, params: RequestParams = {}) =>
+      this.request<ApiTokenType[], any>({
+        path: `/projects/${projectId}/apiTokens`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name ApiTokenCreate
+     * @request POST:/projects/{projectId}/apiTokens
+     * @response `200` `void` OK
+     * @response `201` `ApiTokenType` Created
+     */
+    apiTokenCreate: (
+      projectId: string,
+      data: ApiTokenCreatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/apiTokens`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags meta
+     * @name ApiTokenDelete
+     * @request DELETE:/projects/{projectId}/apiTokens/{tokenId}
+     * @response `200` `void` OK
+     */
+    apiTokenDelete: (
+      projectId: string,
+      tokenId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/apiTokens/${tokenId}`,
         method: 'DELETE',
         ...params,
       }),

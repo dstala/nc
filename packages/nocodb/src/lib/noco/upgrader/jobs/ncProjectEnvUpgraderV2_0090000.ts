@@ -114,7 +114,6 @@ export interface ShowFieldsv1 {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ViewStatusv1 {}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ColumnsWidthv1 {
   [columnAlias: string]: string;
 }

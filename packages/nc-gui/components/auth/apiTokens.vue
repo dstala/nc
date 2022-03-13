@@ -149,12 +149,12 @@ export default {
       this.$toast.info('Copied to clipboard').goAway(1000)
     },
     async loadApiTokens() {
-      this.tokens = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenList'])
+      this.tokens = (await this.$api.meta.apiTokenList(this.$store.state.project.projectId)).data// await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenList'])
     },
     async generateToken() {
       try {
         this.newTokenDialog = false
-        this.tokens = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenCreate', this.tokenObj])
+        await this.$api.meta.apiTokenCreate(this.$store.state.project.projectId, this.tokenObj) // await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenCreate', this.tokenObj])
         this.$toast.success('Token generated successfully').goAway(3000)
         this.tokenObj = {}
         await this.loadApiTokens()
@@ -165,7 +165,8 @@ export default {
     },
     async deleteToken(item) {
       try {
-        this.tokens = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenDelete', { id: item.id }])
+        await this.$api.meta.apiTokenDelete(this.$store.state.project.projectId, item.id)
+        // this.tokens = //await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenDelete', { id: item.id }])
         this.$toast.success('Token deleted successfully').goAway(3000)
         await this.loadApiTokens()
       } catch (e) {

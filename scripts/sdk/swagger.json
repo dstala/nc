@@ -4185,6 +4185,108 @@
         ]
       },
       "parameters": []
+    },
+    "/projects/{projectId}/apiTokens": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [
+          "meta"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiToken"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "api-token-list"
+      },
+      "post": {
+        "summary": "",
+        "operationId": "api-token-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiToken"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/projects/{projectId}/apiTokens/{tokenId}": {
+      "delete": {
+        "summary": "",
+        "operationId": "api-token-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "meta"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tokenId",
+          "in": "path",
+          "required": true
+        }
+      ]
     }
   },
   "components": {
@@ -6318,6 +6420,21 @@
           },
           "disabled": {
             "type": "boolean"
+          }
+        }
+      },
+      "ApiToken": {
+        "title": "ApiToken",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
           }
         }
       }
