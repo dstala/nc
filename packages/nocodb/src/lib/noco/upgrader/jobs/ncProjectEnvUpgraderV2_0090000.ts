@@ -21,6 +21,7 @@ import Filter from '../../../noco-models/Filter';
 import ModelRoleVisibility from '../../../noco-models/ModelRoleVisibility';
 import { MetaTable } from '../../../utils/globals';
 import Hook from '../../../noco-models/Hook';
+import FormViewColumn from '../../../noco-models/FormViewColumn';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -129,6 +130,7 @@ export interface ExtraViewParamsv1 {
     };
     fields: {
       [columnAlias: string]: {
+        help: string;
         required: boolean;
         label?: string;
         description?: string;
@@ -696,7 +698,6 @@ async function migrateProjectModelViews(
       // todo: add fk_cover_image_col_id
     } else if (viewData.show_as === 'form') {
       insertObj.type = ViewTypes.FORM;
-      insertObj.title = queryParams.extraViewParams?.formParams?.name;
       insertObj.heading = queryParams.extraViewParams?.formParams?.name;
       insertObj.subheading =
         queryParams.extraViewParams?.formParams?.description;
@@ -721,15 +722,35 @@ async function migrateProjectModelViews(
     for (const [_cn, column] of Object.entries(
       objModelColumnAliasRef[project.id][viewData.parent_model_title]
     )) {
-      await View.updateColumn(
-        view.id,
-        viewColumns.find(c => column.id === c.fk_column_id),
-        {
-          order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
-          show: queryParams?.showFields?.[_cn]
-        },
-        ncMeta
-      );
+      const viewColumn = viewColumns.find(c => column.id === c.fk_column_id);
+      const order = queryParams?.fieldsOrder?.indexOf(_cn) + 1;
+      const show = queryParams?.showFields?.[_cn];
+      if (viewData.show_as === 'form') {
+        const columnParams =
+          queryParams?.extraViewParams?.formParams?.fields?.[_cn];
+        await FormViewColumn.update(
+          viewColumn.id,
+          {
+            help: columnParams?.help,
+            label: columnParams?.label,
+            required: columnParams?.required,
+            description: columnParams?.description,
+            order,
+            show
+          },
+          ncMeta
+        );
+      } else {
+        await View.updateColumn(
+          view.id,
+          viewColumn.id,
+          {
+            order,
+            show
+          },
+          ncMeta
+        );
+      }
     }
     await View.update(
       view.id,

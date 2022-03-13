@@ -111,7 +111,11 @@ export default class FormViewColumn implements FormColumnType {
     return viewColumns?.map(v => new FormViewColumn(v));
   }
 
-  static async update(columnId: string, body: Partial<FormViewColumn>) {
+  static async update(
+    columnId: string,
+    body: Partial<FormViewColumn>,
+    ncMeta = Noco.ncMeta
+  ) {
     // get existing cache
     const key = `${CacheScope.FORM_VIEW_COLUMN}:${columnId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
@@ -124,7 +128,7 @@ export default class FormViewColumn implements FormColumnType {
       await NocoCache.set(key, o);
     }
     // update meta
-    await Noco.ncMeta.metaUpdate(
+    await ncMeta.metaUpdate(
       null,
       null,
       MetaTable.FORM_VIEW_COLUMNS,
