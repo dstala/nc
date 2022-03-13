@@ -19,7 +19,7 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 // @ts-ignore
 export async function galleryViewGet(req: Request, res: Response<GalleryType>) {
-  res.json(await GalleryView.get(req.params.galleyViewId));
+  res.json(await GalleryView.get(req.params.galleryViewId));
 }
 
 // @ts-ignore
@@ -40,7 +40,7 @@ export async function galleryViewCreate(req: Request<any, any>, res) {
 
 // @ts-ignore
 export async function galleryViewUpdate(req, res) {
-  res.json(await GalleryView.update(req.params.galleyViewId, req.body));
+  res.json(await GalleryView.update(req.params.galleryViewId, req.body));
 }
 
 // @ts-ignore
@@ -49,8 +49,8 @@ export async function galleyViewDelete(req: Request, res: Response, next) {}
 const router = Router({ mergeParams: true });
 // router.get('/', galleyViewList);
 router.post('/tables/:tableId/galleries', ncMetaAclMw(galleryViewCreate));
-// router.get('/:galleyViewId', galleyViewGet);
-router.put('/galleries/:galleyViewId', ncMetaAclMw(galleryViewUpdate));
-router.get('/galleries/:galleyViewId', ncMetaAclMw(galleryViewGet));
-// router.delete('/:galleyViewId', galleyViewDelete);
+// router.get('/:galleryViewId', galleyViewGet);
+router.put('/galleries/:galleryViewId', ncMetaAclMw(galleryViewUpdate));
+router.get('/galleries/:galleryViewId', ncMetaAclMw(galleryViewGet));
+// router.delete('/:galleryViewId', galleyViewDelete);
 export default router;
