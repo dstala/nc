@@ -159,6 +159,7 @@ export interface QueryParamsv1 {
   columnsWidth: ColumnsWidthv1;
   extraViewParams: ExtraViewParamsv1;
   showSystemFields: boolean;
+  coverImageField: string;
 }
 
 interface Rollupv1 {
@@ -697,8 +698,10 @@ async function migrateProjectModelViews(
       insertObj.type = ViewTypes.GRID;
     } else if (viewData.show_as === 'gallery') {
       insertObj.type = ViewTypes.GALLERY;
-
-      // todo: add fk_cover_image_col_id
+      insertObj.fk_cover_image_col_id =
+        objModelColumnAliasRef[project.id][viewData.parent_model_title][
+          queryParams.coverImageField
+        ]?.id;
     } else if (viewData.show_as === 'form') {
       insertObj.type = ViewTypes.FORM;
       insertObj.heading = queryParams.extraViewParams?.formParams?.name;
