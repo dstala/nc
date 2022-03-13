@@ -114,8 +114,28 @@ export interface ViewStatusv1 {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ColumnsWidthv1 {}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ExtraViewParamsv1 {}
+export interface ExtraViewParamsv1 {
+  formParams?: {
+    name: string;
+    description: string;
+    submit: {
+      submitRedirectUrl?: string;
+      message: string;
+      showBlankForm: boolean;
+      showAnotherSubmit: boolean;
+    };
+    emailMe: {
+      [email: string]: boolean;
+    };
+    fields: {
+      [columnAlias: string]: {
+        required: boolean;
+        label?: string;
+        description?: string;
+      };
+    };
+  };
+}
 
 export interface QueryParamsv1 {
   filters: Array<{
@@ -655,8 +675,11 @@ async function migrateProjectModelViews(
       viewData.title
     ] = queryParams;
 
-    const insertObj: Partial<View> &
-      Partial<GridView | KanbanView | FormView | GalleryView> = {
+    const insertObj: Partial<View &
+      GridView &
+      KanbanView &
+      FormView &
+      GalleryView> = {
       title: viewData.title,
       show: true,
       order: viewData.view_order,
@@ -673,6 +696,21 @@ async function migrateProjectModelViews(
       // todo: add fk_cover_image_col_id
     } else if (viewData.show_as === 'form') {
       insertObj.type = ViewTypes.FORM;
+      insertObj.title = queryParams.extraViewParams?.formParams?.name;
+      insertObj.heading = queryParams.extraViewParams?.formParams?.name;
+      insertObj.subheading =
+        queryParams.extraViewParams?.formParams?.description;
+      insertObj.success_msg =
+        queryParams.extraViewParams?.formParams?.submit?.message;
+      insertObj.redirect_url =
+        queryParams.extraViewParams?.formParams?.submit?.submitRedirectUrl;
+      insertObj.email = JSON.stringify(
+        queryParams.extraViewParams?.formParams?.emailMe
+      );
+      insertObj.submit_another_form =
+        queryParams.extraViewParams?.formParams?.submit.showAnotherSubmit;
+      insertObj.show_blank_form =
+        queryParams.extraViewParams?.formParams?.submit?.showBlankForm;
     } else throw new Error('not implemented');
 
     const view = await View.insert(insertObj, ncMeta);
