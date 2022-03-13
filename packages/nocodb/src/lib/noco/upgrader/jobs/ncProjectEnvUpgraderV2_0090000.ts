@@ -23,6 +23,7 @@ import { MetaTable } from '../../../utils/globals';
 import Hook from '../../../noco-models/Hook';
 import FormViewColumn from '../../../noco-models/FormViewColumn';
 import GridViewColumn from '../../../noco-models/GridViewColumn';
+import { getUniqueColumnAliasName } from '../../meta/api/helpers/getUniqueName';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -369,9 +370,17 @@ async function migrateProjectModels(
 
       // migrate table columns
       for (const columnMeta of meta.columns) {
+        let system = false;
+
+        if (meta.belongsTo?.find(bt => bt.cn === columnMeta.cn)) {
+          system = true;
+          columnMeta.uidt = UITypes.ForeignKey;
+        }
+
         const column = await Column.insert(
           {
             ...columnMeta,
+            system,
             fk_model_id: model.id
           },
           ncMeta
@@ -428,8 +437,6 @@ async function migrateProjectModels(
                 fk_mm_child_column_id,
                 fk_mm_parent_column_id,
                 fk_related_model_id: columnMeta.hm ? tnId : rtnId
-                // todo: mapping system field
-                // system: columnMeta.system
               },
               ncMeta
             );
@@ -570,6 +577,54 @@ async function migrateProjectModels(
             }
           });
         }
+      }
+
+      // extract system hasmany relation
+      const hmColumns = meta.hasMany?.filter(
+        hm =>
+          !meta.v.find(
+            v =>
+              v.hm &&
+              v.hm.rtn === hm.rtn &&
+              v.hm.rcn === hm.rcn &&
+              v.hm.tn === hm.tn &&
+              v.hm.cn === hm.cn
+          )
+      );
+
+      for (const rel of hmColumns) {
+        virtualRelationColumnInsert.push(async () => {
+          const rel_column_id = projectModelColumnRefs?.[rel.tn]?.[rel.cn]?.id;
+
+          const tnId = projectModelRefs?.[rel.tn]?.id;
+
+          const ref_rel_column_id =
+            projectModelColumnRefs?.[rel.rtn]?.[rel.rcn]?.id;
+
+          // const rtnId = projectModelRefs?.[rel.rtn]?.id;
+
+          const column = await Column.insert<LinkToAnotherRecordColumn>(
+            {
+              project_id: project.id,
+              db_alias: baseId,
+              fk_model_id: model.id,
+              // todo: populate unique name
+              _cn: getUniqueColumnAliasName([], `${rel.tn}List`),
+              uidt: UITypes.LinkToAnotherRecord,
+              type: 'hm',
+              fk_child_column_id: rel_column_id,
+              fk_parent_column_id: ref_rel_column_id,
+              fk_index_name: rel.fkn,
+              ur: rel.ur,
+              dr: rel.dr,
+              fk_related_model_id: tnId,
+              system: true
+            },
+            ncMeta
+          );
+
+          projectModelColumnAliasRefs[model.tn][column._cn] = column;
+        });
       }
 
       defaultViewsUpdate.push(async () => {
