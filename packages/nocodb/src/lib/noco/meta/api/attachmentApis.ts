@@ -5,12 +5,11 @@ import { nanoid } from 'nanoid';
 import path from 'path';
 import slash from 'slash';
 import mimetypes, { mimeIcons } from '../../../utils/mimeTypes';
-import Local from '../../plugins/adapters/storage/Local';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import catchError from './helpers/catchError';
+import NcPluginMgrv2 from './helpers/NcPluginMgrv2';
 
-// todo:  use plugin manager
-const storageAdapter = new Local();
+// const storageAdapter = new Local();
 export async function upload(req: Request, res: Response) {
   const destPath = path.join(
     'nc',
@@ -19,6 +18,7 @@ export async function upload(req: Request, res: Response) {
     req.params.viewId
   );
 
+  const storageAdapter = await NcPluginMgrv2.storageAdapter();
   const attachments = await Promise.all(
     (req as any).files?.map(async file => {
       const fileName = `${nanoid(6)}${path.extname(file.originalname)}`;
@@ -43,6 +43,7 @@ export async function upload(req: Request, res: Response) {
 }
 export async function fileRead(req, res) {
   try {
+    const storageAdapter = await NcPluginMgrv2.storageAdapter();
     // const type = mimetypes[path.extname(req.params.fileName).slice(1)] || 'text/plain';
     const type =
       mimetypes[
@@ -81,4 +82,36 @@ router.post(
   ncMetaAclMw(upload)
 );
 router.get('/download/:projectId/:viewId/:fileName', catchError(fileRead));
+
+router.get(/^\/dl\/([^/]+)\/([^/]+)\/(.+)$/, async (req, res) => {
+  try {
+    // const type = mimetypes[path.extname(req.params.fileName).slice(1)] || 'text/plain';
+    const type =
+      mimetypes[
+        path
+          .extname(req.params[2])
+          .split('/')
+          .pop()
+          .slice(1)
+      ] || 'text/plain';
+
+    const storageAdapter = await NcPluginMgrv2.storageAdapter();
+    // const img = await this.storageAdapter.fileRead(slash(path.join('nc', req.params.projectId, req.params.dbAlias, 'uploads', req.params.fileName)));
+    const img = await storageAdapter.fileRead(
+      slash(
+        path.join(
+          'nc',
+          req.params[0],
+          req.params[1],
+          'uploads',
+          ...req.params[2].split('/')
+        )
+      )
+    );
+    res.writeHead(200, { 'Content-Type': type });
+    res.end(img, 'binary');
+  } catch (e) {
+    res.status(404).send('Not found');
+  }
+});
 export default router;
