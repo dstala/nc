@@ -22,6 +22,7 @@ import ModelRoleVisibility from '../../../noco-models/ModelRoleVisibility';
 import { MetaTable } from '../../../utils/globals';
 import Hook from '../../../noco-models/Hook';
 import FormViewColumn from '../../../noco-models/FormViewColumn';
+import GridViewColumn from '../../../noco-models/GridViewColumn';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -113,7 +114,9 @@ export interface ShowFieldsv1 {
 export interface ViewStatusv1 {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ColumnsWidthv1 {}
+export interface ColumnsWidthv1 {
+  [columnAlias: string]: string;
+}
 
 export interface ExtraViewParamsv1 {
   formParams?: {
@@ -587,12 +590,12 @@ async function migrateProjectModels(
         for (const [_cn, column] of Object.entries(
           projectModelColumnAliasRefs[model.tn]
         )) {
-          await View.updateColumn(
-            defaultView.id,
+          await GridViewColumn.update(
             viewColumns.find(c => column.id === c.fk_column_id),
             {
               order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
-              show: queryParams?.showFields?.[_cn]
+              show: queryParams?.showFields?.[_cn],
+              width: queryParams?.columnsWidth?.[_cn]
             },
             ncMeta
           );
@@ -737,6 +740,16 @@ async function migrateProjectModelViews(
             description: columnParams?.description,
             order,
             show
+          },
+          ncMeta
+        );
+      } else if (viewData.show_as === 'grid') {
+        await GridViewColumn.update(
+          viewColumns.find(c => column.id === c.fk_column_id),
+          {
+            order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
+            show: queryParams?.showFields?.[_cn],
+            width: queryParams?.columnsWidth?.[_cn]
           },
           ncMeta
         );
