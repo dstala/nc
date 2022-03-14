@@ -102,7 +102,7 @@ export default class Model implements TableType {
   public static async insert(
     projectId,
     baseId,
-    model: TableReqType & { mm?: boolean },
+    model: TableReqType & { mm?: boolean; created_at?: any; updated_at?: any },
     ncMeta = Noco.ncMeta
   ) {
     const { id } = await ncMeta.metaInsert2(
@@ -119,7 +119,9 @@ export default class Model implements TableType {
             project_id: projectId,
             base_id: baseId
           })),
-        type: model.type || ModelTypes.TABLE
+        type: model.type || ModelTypes.TABLE,
+        created_at: model.created_at,
+        updated_at: model.updated_at
       }
     );
 
@@ -134,7 +136,9 @@ export default class Model implements TableType {
         fk_model_id: id,
         title: model._tn || model.tn,
         is_default: true,
-        type: ViewTypes.GRID
+        type: ViewTypes.GRID,
+        created_at: model.created_at,
+        updated_at: model.updated_at
       },
       ncMeta
     );

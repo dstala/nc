@@ -151,6 +151,8 @@ export default class View implements ViewType {
     view: Partial<View> &
       Partial<FormView | GridView | GalleryView | KanbanView> & {
         copy_from_id?: string;
+        created_at?;
+        updated_at?;
       },
     ncMeta = Noco.ncMeta
   ) {
@@ -174,7 +176,9 @@ export default class View implements ViewType {
       type: view.type,
       fk_model_id: view.fk_model_id,
       project_id: view.project_id,
-      base_id: view.base_id
+      base_id: view.base_id,
+      created_at: view.created_at,
+      updated_at: view.updated_at
     };
     if (!(view.project_id && view.base_id)) {
       const model = await Model.getByIdOrName({ id: view.fk_model_id }, ncMeta);

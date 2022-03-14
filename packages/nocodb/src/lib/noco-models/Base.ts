@@ -26,7 +26,7 @@ export default class Base implements BaseType {
   }
 
   public static async createBase(
-    base: BaseType & { projectId: string },
+    base: BaseType & { projectId: string; created_at?; updated_at? },
     ncMeta = Noco.ncMeta
   ) {
     const { id } = await ncMeta.metaInsert2(
@@ -48,7 +48,9 @@ export default class Base implements BaseType {
           Noco.getConfig()?.auth?.jwt?.secret
         ).toString(),
         type: base.type,
-        is_meta: base.is_meta
+        is_meta: base.is_meta,
+        created_at: base.created_at,
+        updated_at: base.updated_at
       }
     );
     await NocoCache.appendToList(

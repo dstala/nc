@@ -17,7 +17,7 @@ export default class ProjectUser {
   }
 
   public static async insert(
-    projectUser: Partial<ProjectUser>,
+    projectUser: Partial<ProjectUser & { created_at?: any; updated_at?: any }>,
     ncMeta = Noco.ncMeta
   ) {
     const { project_id, fk_user_id } = await ncMeta.metaInsert2(
@@ -27,7 +27,9 @@ export default class ProjectUser {
       {
         fk_user_id: projectUser.fk_user_id,
         project_id: projectUser.project_id,
-        roles: projectUser.roles
+        roles: projectUser.roles,
+        created_at: projectUser.created_at,
+        updated_at: projectUser.updated_at
       },
       true
     );

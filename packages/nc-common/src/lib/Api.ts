@@ -57,6 +57,8 @@ export interface ProjectType {
   bases?: BaseType[];
   is_meta?: boolean;
   prefix?: string;
+  created_at?: any;
+  updated_at?: any;
 }
 
 export interface ProjectListType {
@@ -70,6 +72,8 @@ export interface BaseType {
   type?: string;
   is_meta?: boolean;
   config?: any;
+  created_at?: any;
+  updated_at?: any;
 }
 
 export interface BaseReqType {

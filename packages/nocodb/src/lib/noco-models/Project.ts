@@ -23,6 +23,9 @@ export default class Project implements ProjectType {
   public is_meta = false;
   public bases?: Base[];
 
+  created_at: any;
+  updated_at: any;
+
   // shared base props
   uuid?: string;
   password?: string;
@@ -33,7 +36,10 @@ export default class Project implements ProjectType {
   }
 
   public static async createProject(
-    projectBody: ProjectType,
+    projectBody: ProjectType & {
+      created_at?;
+      updated_at?;
+    },
     ncMeta = Noco.ncMeta
   ): Promise<Project> {
     const { id: projectId } = await ncMeta.metaInsert2(
@@ -45,7 +51,9 @@ export default class Project implements ProjectType {
         title: projectBody.title,
         prefix: projectBody.prefix,
         description: projectBody.description,
-        is_meta: projectBody.is_meta
+        is_meta: projectBody.is_meta,
+        created_at: projectBody.created_at,
+        updated_at: projectBody.updated_at
       }
     );
 

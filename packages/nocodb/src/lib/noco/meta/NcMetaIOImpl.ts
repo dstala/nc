@@ -262,9 +262,9 @@ export default class NcMetaIOImpl extends NcMetaIO {
     if (base_id !== null) insertObj.base_id = base_id;
     if (project_id !== null) insertObj.project_id = project_id;
     await this.knexConnection(target).insert({
-      created_at: this.knexConnection?.fn?.now(),
-      updated_at: this.knexConnection?.fn?.now(),
-      ...insertObj
+      ...insertObj,
+      created_at: insertObj?.created_at || this.knexConnection?.fn?.now(),
+      updated_at: insertObj?.updted_at || this.knexConnection?.fn?.now()
     });
     return insertObj;
   }

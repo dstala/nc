@@ -80,8 +80,12 @@ async function migrateProjects(ncMeta = Noco.ncMeta) {
       bases: projectConfig?.envs?._noco?.db?.map(d => ({
         is_meta: !!projectConfig.prefix,
         type: d.client,
-        config: d
-      }))
+        config: d,
+        created_at: project.created_at,
+        updated_at: project.updated_at
+      })),
+      created_at: project.created_at,
+      updated_at: project.updated_at
     };
 
     projectList.push(await Project.createProject(projectBody, ncMeta));
@@ -96,7 +100,9 @@ async function migrateProjectUsers(ncMeta = Noco.ncMeta) {
       {
         project_id: projectUser.project_id,
         fk_user_id: projectUser.user_id,
-        roles: projectUser.roles
+        roles: projectUser.roles,
+        created_at: projectUser.created_at,
+        updated_at: projectUser.updated_at
       },
       ncMeta
     );
@@ -235,6 +241,8 @@ interface ModelMetav1 {
   m_to_m_meta: string;
   order: number;
   view_order: number;
+  created_at;
+  updated_at;
 }
 
 type ObjModelColumnRefv1 = {
@@ -336,7 +344,9 @@ async function migrateProjectModels(
           order: modelData.order,
           tn: modelData.title,
           _tn: modelData.alias,
-          type: modelData.type === 'table' ? ModelTypes.TABLE : ModelTypes.VIEW
+          type: modelData.type === 'table' ? ModelTypes.TABLE : ModelTypes.VIEW,
+          created_at: modelData.created_at,
+          updated_at: modelData.updated_at
         },
         ncMeta
       );
@@ -735,13 +745,18 @@ async function migrateProjectModelViews(
       GridView &
       KanbanView &
       FormView &
-      GalleryView> = {
+      GalleryView & {
+        created_at;
+        updated_at;
+      }> = {
       title: viewData.title,
       show: true,
       order: viewData.view_order,
       fk_model_id: objModelRef[project.id][viewData.parent_model_title].id,
       project_id: project.id,
-      base_id: baseId
+      base_id: baseId,
+      created_at: viewData.created_at,
+      updated_at: viewData.updated_at
     };
 
     if (viewData.show_as === 'grid') {
@@ -881,6 +896,8 @@ async function migrateUIAcl(ctx: MigrateCtxV1, ncMeta: any) {
     tn: string;
     parent_model_title: string;
     project_id: string;
+    created_at?;
+    updated_at?;
   }> = await ncMeta.metaList(null, null, 'nc_disabled_models_for_role');
 
   for (const acl of uiAclList) {
@@ -899,7 +916,9 @@ async function migrateUIAcl(ctx: MigrateCtxV1, ncMeta: any) {
       {
         role: acl.role,
         fk_view_id,
-        disabled: acl.disabled
+        disabled: acl.disabled,
+        created_at: acl.created_at,
+        updated_at: acl.updated_at
       },
       ncMeta
     );
@@ -985,7 +1004,9 @@ async function migratePlugins(ncMeta: any) {
       input_schema: plugin.input_schema,
       creator: plugin.creator,
       creator_website: plugin.creator_website,
-      price: plugin.price
+      price: plugin.price,
+      created_at: plugin.created_at,
+      updated_at: plugin.updated_at
     });
   }
 }
@@ -1011,6 +1032,8 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
     retry_interval: number;
     timeout: number;
     active: boolean;
+    created_at?;
+    updated_at?;
   }> = await ncMeta.metaList(null, null, 'nc_hooks');
 
   for (const hook of hooks) {
@@ -1036,7 +1059,9 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
         retries: hook.retries,
         retry_interval: hook.retry_interval,
         timeout: hook.timeout,
-        active: hook.active
+        active: hook.active,
+        created_at: hook.created_at,
+        updated_at: hook.updated_at
       },
       ncMeta
     );

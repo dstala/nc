@@ -4464,7 +4464,9 @@
           },
           "prefix": {
             "type": "string"
-          }
+          },
+          "created_at": {},
+          "updated_at": {}
         }
       },
       "ProjectList": {
@@ -4545,7 +4547,9 @@
             "type": "boolean",
             "readOnly": true
           },
-          "config": {}
+          "config": {},
+          "created_at": {},
+          "updated_at": {}
         }
       },
       "BaseReq": {
