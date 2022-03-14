@@ -97,8 +97,7 @@ export const genTest = (apiType, dbType) => {
                 .should("exist");
         }
 
-        // exclude@ncv2: to be investigated & fixed
-        it.skip(`View (Gallery/ Grid/ Form) re-order`, () => {
+        it(`View (Gallery/ Grid/ Form) re-order`, () => {
             cy.openTableTab("Actor", 25);
 
             // create 3 views, use default names
@@ -117,7 +116,7 @@ export const genTest = (apiType, dbType) => {
             cy.get(".nc-child-draggable-icon-Actor3").drag(
                 `.nc-child-draggable-icon-${
                     isXcdb() ? `nc_${getProjectString()}__` : ``
-                }Actor`
+                }actor`
             );
 
             // validate new position order, Actor3 on top

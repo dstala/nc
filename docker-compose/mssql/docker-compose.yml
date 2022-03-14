@@ -24,7 +24,10 @@ services:
     ports:
       - "8080:8080"
     restart: always
+    volumes:
+      - nc_data:/usr/app/data
     environment:
       NC_DB: "mssql://root_db:1433?u=sa&p=Password123.&d=root_db"
 volumes:
   db_data: {}
+  nc_data: {}

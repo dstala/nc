@@ -17,13 +17,13 @@ export const genTest = (apiType, dbType) => {
             cy.openTableTab("Country", 25);
         });
 
-        // beforeEach(() => {
-        //     cy.restoreLocalStorage();
-        // });
+        beforeEach(() => {
+            cy.restoreLocalStorage();
+        });
 
-        // afterEach(() => {
-        //     cy.saveLocalStorage();
-        // });
+        afterEach(() => {
+            cy.saveLocalStorage();
+        });
 
         after(() => {
             cy.closeTableTab("Country");
@@ -60,8 +60,8 @@ export const genTest = (apiType, dbType) => {
                     .should("exist");
 
                 // move Country field down (drag, drop)
-                cy.get("#data-table-form-LastUpdate").drag(
-                    "#data-table-form-Country"
+                cy.get("#data-table-form-Country").drag(
+                    "#data-table-form-LastUpdate"
                 );
 
                 // Verify if order is: LastUpdate, Country, Country => City
@@ -103,7 +103,7 @@ export const genTest = (apiType, dbType) => {
             it(`Validate ${viewType} view: Inverted order field member addition from menu`, () => {
                 cy.get(".col-md-4")
                     .find(".pointer.caption")
-                    .contains("remove all")
+                    .contains("Remove all")
                     .click();
 
                 // click fields in inverted order: LastUpdate, Country => City
@@ -118,7 +118,7 @@ export const genTest = (apiType, dbType) => {
                     .should("exist");
                 cy.get(".nc-field-wrapper")
                     .eq(1)
-                    .contains("CityList")
+                    .contains("Country => City")
                     .should("exist");
                 cy.get(".nc-field-wrapper")
                     .eq(2)
@@ -154,24 +154,24 @@ export const genTest = (apiType, dbType) => {
                     .should("exist");
             });
 
-            it(`Validate ${viewType}: add all, remove all validation`, () => {
+            it(`Validate ${viewType}: Add all, Remove all validation`, () => {
                 // .col-md-4 : left hand menu
                 // .nc-form : form view (right hand side)
 
                 // ensure buttons exist on left hand menu
                 cy.get(".col-md-4")
                     .find(".pointer.caption")
-                    .contains("add all")
+                    .contains("Add all")
                     .should("not.exist");
                 cy.get(".col-md-4")
                     .find(".pointer.caption")
-                    .contains("remove all")
+                    .contains("Remove all")
                     .should("exist");
 
                 // click: remove-all
                 cy.get(".col-md-4")
                     .find(".pointer.caption")
-                    .contains("remove all")
+                    .contains("Remove all")
                     .click();
                 // form should not contain any "field remove icons" -- except for mandatory field (Country)
                 cy.get(".nc-form")
@@ -188,11 +188,11 @@ export const genTest = (apiType, dbType) => {
                 // cy.get('.col-md-4').find('.pointer.caption').contains('Remove all').should('not.exist')
                 cy.get(".col-md-4")
                     .find(".pointer.caption")
-                    .contains("add all")
+                    .contains("Add all")
                     .click();
                 cy.get(".col-md-4")
                     .find(".pointer.caption")
-                    .contains("remove all")
+                    .contains("Remove all")
                     .should("exist");
                 // form should contain "field remove icons"
                 cy.get(".nc-form")
@@ -228,9 +228,7 @@ export const genTest = (apiType, dbType) => {
 
             it(`Validate ${viewType}: Submit default, with valid Show message entry`, () => {
                 // clicking again on view name shows blank still. work around- toggling between two views
-                cy.get(`.nc-view-item.nc-grid-view-item`)
-                    .contains("Country")
-                    .click();
+                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country').click()
                 cy.get(`.nc-view-item.nc-${viewType}-view-item`)
                     .contains("Country1")
                     .click();
@@ -256,9 +254,7 @@ export const genTest = (apiType, dbType) => {
 
             it(`Validate ${viewType}: Submit default, Enable checkbox "Submit another form`, () => {
                 // clicking again on view name shows blank still. work around- toggling between two views
-                cy.get(`.nc-view-item.nc-grid-view-item`)
-                    .contains("Country")
-                    .click();
+                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country').click()
                 cy.get(`.nc-view-item.nc-${viewType}-view-item`)
                     .contains("Country1")
                     .click();
@@ -299,12 +295,8 @@ export const genTest = (apiType, dbType) => {
             });
 
             it(`Validate ${viewType}: Submit default, Enable checkbox "blank form after 5 seconds"`, () => {
-                cy.get(`.nc-view-item.nc-grid-view-item`)
-                    .contains("Country")
-                    .click();
-                cy.get(`.nc-view-item.nc-${viewType}-view-item`)
-                    .contains("Country1")
-                    .click();
+                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country').click()
+                // cy.get(`.nc-view-item.nc-${viewType}-view-item`).contains('Country1').click()
 
                 cy.get("#data-table-form-Country").type("_abc");
                 cy.get("#data-table-form-LastUpdate").click();
@@ -397,8 +389,8 @@ export const genTest = (apiType, dbType) => {
 
                 cy.get("#data-table-form-LastUpdate").should("exist");
                 // remove "LastUpdate field"
-                cy.get(".nc-form").find(".nc-field-remove-icon").eq(2).click();
-                cy.get("#data-table-form-LastUpdate").should("not.exist");
+                cy.get(".nc-form").find(".nc-field-remove-icon").eq(1).click();
+                cy.get("#data-table-form-lastUpdate").should("not.exist");
                 cy.get(".col-md-4")
                     .find(".pointer.item")
                     .contains("LastUpdate")
@@ -417,14 +409,14 @@ export const genTest = (apiType, dbType) => {
                     .contains("Country1")
                     .click();
                 // verify URL & copy it for subsequent test
-                cy.url().should("contain", `&view=vw_`);
+                cy.url().should("contain", `&view=Country1`);
                 cy.url().then((url) => {
                     cy.log(url);
                     formViewURL = url;
                 });
             });
 
-            it.skip(`Validate ${viewType}: URL validation after re-access`, () => {
+            it(`Validate ${viewType}: URL validation after re-access`, () => {
                 // visit URL
                 cy.log(formViewURL);
                 cy.visit(formViewURL, {

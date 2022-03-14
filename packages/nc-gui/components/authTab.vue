@@ -5,7 +5,7 @@
         <v-tab>
           <span class="caption text-capitalize">
             <!-- Users Management -->
-            {{ $t('management.tabs.user') }}
+            {{ $t('title.userMgmt') }}
           </span>
         </v-tab>
         <v-tab-item class="h-100">
@@ -16,22 +16,22 @@
           <v-tab>
             <span class="caption text-capitalize">
               <!-- API Tokens Management -->
-              {{ $t('management.tabs.api') }}
+              {{ $t('title.apiTokenMgmt') }}
             </span>
           </v-tab>
           <v-tab-item>
             <api-tokens :nodes="nodes" />
           </v-tab-item>
         </template>
-        <!--        <v-tab>
+        <v-tab>
           <span class="caption text-capitalize">
-            &lt;!&ndash; Roles Management &ndash;&gt;
-            {{ $t('management.tabs.roles') }}
+            <!-- Roles Management -->
+            {{ $t('title.rolesMgmt') }}
           </span>
         </v-tab>
         <v-tab-item>
           <roles :nodes="nodes" />
-        </v-tab-item>-->
+        </v-tab-item>
         <!--              <v-tab><span class="caption text-capitalize">Auth Management</span></v-tab>
               <v-tab-item>
                 <auth-hooks :nodes="nodes"></auth-hooks>

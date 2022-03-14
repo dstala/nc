@@ -76,18 +76,18 @@ export const genTest = (apiType, dbType) => {
 
                 // check if add/ expand options available for 'has many' column type
                 mainPage
-                    .getCell("CityList", 1)
+                    .getCell("Country => City", 1)
                     .click()
                     .find("button.mdi-plus")
                     .should(`${vString}exist`);
                 mainPage
-                    .getCell("CityList", 1)
+                    .getCell("Country => City", 1)
                     .click()
                     .find("button.mdi-arrow-expand")
                     .should(`${vString}exist`);
 
                 // update row option (right click) - should not be available for Lock view
-                mainPage.getCell("CityList", 1).rightclick();
+                mainPage.getCell("Country => City", 1).rightclick();
                 cy.get(".menuable__content__active").should(
                     `${vString}be.visible`
                 );

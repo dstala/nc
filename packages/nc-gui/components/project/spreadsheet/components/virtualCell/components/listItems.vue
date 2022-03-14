@@ -63,7 +63,8 @@
           </template>
 
           <div v-else-if="data" class="text-center py-15 textLight--text">
-            No items found
+            <!--No items found-->
+            {{ $t('placeholder.noItemsFound') }}
           </div>
         </div>
       </v-card-text>
@@ -83,7 +84,6 @@
 
 <script>
 import Pagination from '@/components/project/spreadsheet/components/pagination'
-import password from '~/pages/user/settings/password'
 
 export default {
   name: 'ListItems',

@@ -41,7 +41,8 @@
           <v-icon small left>
             refresh
           </v-icon>
-          Reload
+          <!-- Reload -->
+          {{ $t('general.reload') }}
         </x-btn>
 
         <x-btn
@@ -62,7 +63,7 @@
         <x-btn
           v-ge="['mocks','save']"
           outlined
-          tooltip="Save Changes"
+          :tooltip="$t('tooltip.saveChanges')"
           color="success"
           class="success"
           small
@@ -75,7 +76,8 @@
           >
             save
           </v-icon>
-          Save
+          <!-- Save -->
+          {{ $t('general.save') }}
         </x-btn>
       </v-toolbar>
 

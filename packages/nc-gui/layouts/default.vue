@@ -22,7 +22,8 @@
               ><v-icon color="primary">alpha-c-circle </v-icon> -->
             </v-btn>
           </template>
-          Home
+          <!-- Home -->
+          {{ $t('general.home') }}
           <span
             class="caption ml-1 font-weight-light"
           >(v{{
@@ -46,7 +47,7 @@
       </v-toolbar-items>
       <!-- <template v-if="!isThisMobile ">
 
-                <a class="align-self-center" style="" target="_blank" href="https://calendly.com/nocodb">
+                <a class="align-self-center" style="" target="_blank" href="https://calendly.com/nocodb-meeting">
 
                   <x-icon size="20" tooltip="Book a free demo" color="white" icon.class="mr-3">mdi-calendar-month</x-icon>
 
@@ -67,7 +68,8 @@
               </template>
 
             </v-toolbar-items>-->
-      <span v-show="$nuxt.$loading.show" class="caption grey--text ml-3">Loading <v-icon small color="grey">mdi-spin mdi-loading</v-icon></span>
+            <!-- loading -->
+      <span v-show="$nuxt.$loading.show" class="caption grey--text ml-3">{{ $t('general.loading') }} <v-icon small color="grey">mdi-spin mdi-loading</v-icon></span>
 
       <span
         v-shortkey="[ 'ctrl','shift', 'd']"
@@ -121,7 +123,8 @@
               <v-icon small class="mr-1">
                 mdi-account-supervisor-outline
               </v-icon>
-              Share
+              <!-- Share -->
+              {{ $t('activity.share') }}
             </x-btn>
           </div>
 
@@ -236,7 +239,9 @@
               </v-icon>
             </template>
             <h3 class="pa-3">
-              {{ $vuetify.theme.dark ? 'It does come in Black (^⇧B)' : 'Does it come in Black ? (^⇧B)' }}
+              <!-- "dark": "It does come in Black (^⇧B)",
+              "light": "Does it come in Black ? (^⇧B)" -->
+              {{ $vuetify.theme.dark ? $t('tooltip.theme.dark') :  $t('tooltip.theme.light')  }}
               <i />
             </h3>
           </v-tooltip>
@@ -305,31 +310,56 @@
             </v-btn>
           </template>
           <v-list dense class="nc-user-menu">
-            <v-list-item v-ge="['Settings','']" dense to="/user/settings">
-              <v-list-item-title>
-                <v-icon small>
-                  mdi-at
-                </v-icon>&nbsp; <span class="font-weight-bold caption">{{ userEmail }}</span>
-              </v-list-item-title>
-            </v-list-item>
+            <template v-if="isDocker">
+              <!--              <v-list-item @click="xcMetaTabAdd" v-ge="['Meta add','']">-->
+              <!--                <v-list-item-title>-->
 
-            <v-divider />
+              <!--                  <v-icon small>mdi-file-table-box-multiple-outline</v-icon>&nbsp; Export/Import Metadata-->
+              <!--                </v-list-item-title>-->
+              <!--              </v-list-item>-->
+              <!--              <v-list-item @click="showChangeEnv = true" v-ge="['Change env','']">-->
+              <!--                <v-list-item-title>-->
 
-            <v-list-item
-              v-if="isDashboard"
-              v-clipboard="$store.state.users.token"
-              dense
-              @click.stop="$toast.success('Auth token copied to clipboard').goAway(3000)"
-            >
-              <v-list-item-title>
-                <v-icon key="terminal-dash" small>
-                  mdi-content-copy
-                </v-icon>&nbsp;
-                <span class="font-weight-regular caption">Copy Auth Token</span>
-              </v-list-item-title>
-            </v-list-item>
+              <!--                  <v-icon small>mdi-test-tube</v-icon>&nbsp; Change Environment-->
+              <!--                </v-list-item-title>-->
+              <!--              </v-list-item>-->
+              <!--              <v-list-item @click="terminalTabAdd()" v-ge="[isDocker ? 'Docker Console' : 'API Generator','']">
+                              <v-list-item-title>
 
-            <!--
+                                <v-icon small key="terminal-dash">
+                                  mdi-console
+                                </v-icon>&nbsp;
+                                {{ isDocker ? 'Docker Console' : 'API Generator' }}
+
+                              </v-list-item-title>
+                            </v-list-item>-->
+              <v-list-item v-ge="['Settings','']" dense to="/user/settings">
+                <v-list-item-title>
+                  <v-icon small>
+                    mdi-at
+                  </v-icon>&nbsp; <span class="font-weight-bold caption">{{ userEmail }}</span>
+                </v-list-item-title>
+              </v-list-item>
+
+              <v-divider />
+
+              <!-- Copy Auth Token -->
+              <!-- "Auth token copied to clipboard" -->
+              <v-list-item
+                v-if="isDashboard"
+                v-clipboard="$store.state.users.token"
+                dense
+                @click.stop="$toast.success($t('msg.toast.authToken')).goAway(3000)"
+              >
+                <v-list-item-title>
+                  <v-icon key="terminal-dash" small>
+                    mdi-content-copy
+                  </v-icon>&nbsp;
+                  <span class="font-weight-regular caption">{{ $t('activity.account.authToken') }}</span>
+                </v-list-item-title>
+              </v-list-item>
+
+              <!--
                             <v-list-item dense @click.stop="projectInfoTabAdd">
                               <v-list-item-title>
 
@@ -358,7 +388,7 @@
               <v-list-item-title>
                 <v-icon small>
                   mdi-content-copy
-                </v-icon>&nbsp; <span class="font-weight-regular caption">Copy Project info</span>
+                </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('activity.account.projInfo') }}</span>
               </v-list-item-title>
             </v-list-item>
             <v-divider />
@@ -383,19 +413,20 @@
                 <v-icon key="terminal-dash" small>
                   mdi-palette
                 </v-icon>&nbsp;
-                <span class="font-weight-regular caption">Themes</span>
+                <span class="font-weight-regular caption">{{ $t('activity.account.themes') }}</span>
               </v-list-item-title>
             </v-list-item>
 
-            <v-divider v-if="isDashboard" />
+              <v-divider v-if="isDashboard" />
 
-            <v-list-item v-ge="['Sign Out','']" dense @click="MtdSignOut">
-              <v-list-item-title>
-                <v-icon small>
-                  mdi-logout
-                </v-icon>&nbsp; <span class="font-weight-regular caption">Sign Out</span>
-              </v-list-item-title>
-            </v-list-item>
+              <v-list-item v-ge="['Sign Out','']" dense @click="MtdSignOut">
+                <v-list-item-title>
+                  <v-icon small>
+                    mdi-logout
+                  </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('general.signOut') }}</span>
+                </v-list-item-title>
+              </v-list-item>
+            </template>
           </v-list>
         </v-menu>
         <v-menu v-else offset-y open-on-hover>
@@ -413,14 +444,14 @@
                   mdi-account-plus-outline
                 </v-icon> &nbsp; <span
                   class="font-weight-regular caption"
-                >Sign Up</span>
+                >{{ $t('general.signUp') }}</span>
               </v-list-item-title>
             </v-list-item>
             <v-list-item v-if="!user && !isThisMobile" dense to="/user/authentication/signin">
               <v-list-item-title>
                 <v-icon small>
                   mdi-login
-                </v-icon> &nbsp; <span class="font-weight-regular caption">Login</span>
+                </v-icon> &nbsp; <span class="font-weight-regular caption">{{ $t('general.signIn') }}</span>
               </v-list-item-title>
             </v-list-item>
             <!--            <v-list-item @click="openPricingPage">-->
@@ -537,7 +568,8 @@
         Update & Restart
       </v-btn>
       <v-btn @click.native="releaseDownloadedSnackbar = false">
-        Close
+        <!-- Close -->
+        {{ $t('general.close') }}
       </v-btn>
     </v-snackbar>
 
@@ -547,7 +579,8 @@
         Upgrade
       </v-btn>
       <v-btn @click.native="downloadAvailSnackbar = false">
-        Close
+        <!-- Close -->
+        {{ $t('general.close') }}
       </v-btn>
     </v-snackbar>
     <change-env v-model="showChangeEnv" />
@@ -562,8 +595,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
 import ReleaseInfo from '@/components/releaseInfo'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import 'splitpanes/dist/splitpanes.css'
 import ChangeEnv from '../components/changeEnv'
 import XBtn from '../components/global/xBtn'
@@ -575,14 +608,14 @@ import { copyTextToClipboard } from '@/helpers/xutils'
 import Snackbar from '~/components/snackbar'
 import Language from '~/components/utils/language'
 import Loader from '~/components/loader'
-// import TemplatesModal from '~/components/templates/templatesModal'
-// import BetterUX from '~/components/utils/betterUX'
+import TemplatesModal from '~/components/templates/templatesModal'
+import BetterUX from '~/components/utils/betterUX'
 import FileSaver from 'file-saver'
 
 export default {
   components: {
-    // BetterUX,
-    // TemplatesModal,
+    BetterUX,
+    TemplatesModal,
     Loader,
     ReleaseInfo,
     Language,

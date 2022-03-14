@@ -1,6 +1,6 @@
 ---
 title: 'REST APIs'
-position: 200
+position: 1010
 category: 'Developer Resources'
 menuTitle: 'REST APIs'
 ---
@@ -115,7 +115,7 @@ menuTitle: 'REST APIs'
 
 ```
 eq      -   '='         -  (colName,eq,colValue)
-not     -   '!='        -  (colName,ne,colValue)
+not     -   '!='        -  (colName,not,colValue)
 gt      -   '>'         -  (colName,gt,colValue)
 ge      -   '>='        -  (colName,ge,colValue)
 lt      -   '<'         -  (colName,lt,colValue)

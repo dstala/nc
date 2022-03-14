@@ -14,7 +14,7 @@ export default function formulaQueryBuilder(
   aliasToColumn = {}
 ) {
   const fn = (pt, a?, prevBinaryOp?) => {
-    const colAlias = a ? ` as ${a}` : '';
+    const colAlias = a ? ` as "${a}"` : '';
     if (pt.type === 'CallExpression') {
       switch (pt.callee.name) {
         case 'ADD':
@@ -62,6 +62,41 @@ export default function formulaQueryBuilder(
             } else {
               return fn(pt.arguments[0], a, prevBinaryOp);
             }
+          }
+          break;
+        case 'URL':
+          return fn(
+            {
+              type: 'CallExpression',
+              arguments: [
+                {
+                  type: 'Literal',
+                  value: 'URI::(',
+                  raw: '"URI::("'
+                },
+                pt.arguments[0],
+                {
+                  type: 'Literal',
+                  value: ')',
+                  raw: '")"'
+                }
+              ],
+              callee: {
+                type: 'Identifier',
+                name: 'CONCAT'
+              }
+            },
+            a,
+            prevBinaryOp
+          );
+          break;
+        case 'DATEADD':
+          if(pt.arguments[1].value) {
+            pt.callee.name = "DATE_ADD";
+            return fn(pt, a, prevBinaryOp);
+          } else if(pt.arguments[1].operator == '-') {
+            pt.callee.name = "DATE_SUB";
+            return fn(pt, a, prevBinaryOp);
           }
           break;
         default:

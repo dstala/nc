@@ -5,7 +5,10 @@
         <v-icon icon x-small class="mr-2">
           mdi-file-table-box-multiple-outline
         </v-icon>
-        <span class="caption text-capitalize nc-exp-imp-metadata"> Export/Import Metadata</span>
+        <span class="caption text-capitalize nc-exp-imp-metadata">
+          <!-- Export/Import Metadata -->
+          {{ $t('title.exportImportMeta') }}
+        </span>
       </v-tab>
       <v-tab-item value="xc-project-meta">
         <div class="d-flex justify-center d-100">
@@ -16,7 +19,8 @@
       <template v-for="(db,i) in bases">
         <v-tab :key="db.id + i" :href="'#' + db.id + 'meta'" class="text-capitalize caption nc-meta-mgmt-metadata-tab">
           <!--          {{ db.connection.database | extractDbName }} {{ db.id }} -->
-          Metadata
+          <!-- Metadata -->
+          {{ $t('title.metadata') }}
         </v-tab>
         <v-tab-item :key="db.id + 't' + i" :value="db.id + 'meta'">
           <metaDiffSync
@@ -68,12 +72,14 @@
         <template v-if="uiacl">
           <v-tab :key="db.id + 'acl'" :href="'#' + db.id + 'acl'" class="text-capitalize caption nc-ui-acl-tab">
             <!--          {{ db.connection.database | extractDbName }}-->
-            UI Access Control
+            <!--UI Access Control-->
+            {{ $t('title.uiACL') }}
           </v-tab>
           <v-tab-item :key="db.id + 'aclt'" :value=" db.id + 'acl'">
             <v-tabs color="x-active" height="28">
               <v-tab class="text-capitalize caption">
-                Tables
+                <!-- Tables -->
+                {{ $t('objects.tables') }}
               </v-tab>
               <v-tab-item>
                 <toggle-table-ui-acl

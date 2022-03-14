@@ -9,7 +9,7 @@ export const genTest = (apiType, dbType) => {
         before(() => {
             //loginPage.signIn(roles.owner.credentials)
             mainPage.toolBarTopLeft(mainPage.HOME).click();
-            // cy.screenshot("Debug 6d-1", { overwrite: true });
+            cy.screenshot("Debug 6d-1", { overwrite: true });
         });
 
         const langVerification = (idx, lang) => {
@@ -24,7 +24,7 @@ export const genTest = (apiType, dbType) => {
 
                 cy.getActiveMenu().find(".v-list-item").eq(idx).click();
 
-                // cy.screenshot("Debug 6d-2", { overwrite: true });
+                cy.screenshot("Debug 6d-2", { overwrite: true });
 
                 // basic validations
                 // 1. Page title: "My Projects"
@@ -32,14 +32,14 @@ export const genTest = (apiType, dbType) => {
                 // 3. Search box palceholder text: "Search Projects"
                 // cy.get("b").contains(json.title.myProject).should("exist");
                 cy.get(".nc-project-page-title")
-                    .contains(json.projects.my_projects)
+                    .contains(json.title.myProject)
                     .should("exist");
                 cy.get(".nc-new-project-menu")
-                    .contains(json.projects.create_new_project_button.text)
+                    .contains(json.title.newProj)
                     .should("exist");
-                cy.get(
-                    `[placeholder="${json.projects.search_project}"]`
-                ).should("exist");
+                cy.get(`[placeholder="${json.activity.searchProject}"]`).should(
+                    "exist"
+                );
             });
         };
 

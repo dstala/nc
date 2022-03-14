@@ -6,7 +6,7 @@
 
 </h1>
 <p align="center">
-Verwandelt jeden MySQL, PostgreSQL, SQL Server, SQLite & Mariadb in eine Smart-Tabelle. 
+Verwandelt jeden MySQL, PostgreSQL, SQL Server, SQLite & MariaDB in eine Smart-Tabelle. 
 </p>
 <div align="center">
  
@@ -17,22 +17,24 @@ Verwandelt jeden MySQL, PostgreSQL, SQL Server, SQLite & Mariadb in eine Smart-T
 </div>
 
 <p align="center">
-    <a href="http://www.nocodb.com"><b>Website</b></a> •
+    <a href="http://www.nocodb.com"><b>Webseite</b></a> •
     <a href="https://discord.gg/5RgZmkW"><b>Discord</b></a> •
     <a href="https://twitter.com/nocodb"><b>Twitter</b></a> •
     <a href="https://www.reddit.com/r/NocoDB/"><b>Reddit</b></a> •
-    <a href="https://docs.nocodb.com/"><b>Documentation</b></a>
+    <a href="https://docs.nocodb.com/"><b>Dokumentation</b></a>
 </p>
 
 ![OpenSourceAirtableAlternative](https://user-images.githubusercontent.com/5435402/133762127-e94da292-a1c3-4458-b09a-02cd5b57be53.png)
 
 <img src="https://static.scarf.sh/a.png?x-pxid=c12a77cc-855e-4602-8a0f-614b2d0da56a" />
 
-<a href="https://www.producthunt.com/posts/nocodb?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-nocodb" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=297536&theme=dark" alt="NocoDB - The Open Source Airtable alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+<p align="center">
+  <a href="https://www.producthunt.com/posts/nocodb?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-nocodb" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=297536&theme=dark" alt="NocoDB - The Open Source Airtable alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+</p>
 
-# Schneller Try.
+# Schneller Versuch
 
-### 1-Click Deploy
+### 1-Klick-Bereitstellung
 
 #### Heroku
 
@@ -45,21 +47,28 @@ Verwandelt jeden MySQL, PostgreSQL, SQL Server, SQLite & Mariadb in eine Smart-T
 </a>
 <br>
 
-### Verwenden von Docker.
+### Verwenden von Docker
 
 ```bash
 docker run -d --name nocodb -p 8080:8080 nocodb/nocodb:latest
 ```
 
-> To persist data you can mount volume at `/usr/app/data/`.
+- NocoDB benötigt eine Datenbank zur Eingabe: Siehe [Production Setup](https://github.com/nocodb/nocodb/blob/master/README.md#production-setup).
+- Fehlt diese Eingabe, wird aus SQLite zurückgegriffen. Um SQLite dauerhaft zu machen, kann `/usr/app/data/` gemountet werden. 
 
-### Verwenden von NPM.
+  Beispiel:
+
+  ```
+  docker run -d -p 8080:8080 --name nocodb -v /local/path:/usr/app/data/ nocodb/nocodb:latest
+  ```
+
+### Verwenden von NPM
 
 ```
-npx create-nocodb-app
+npm create-nocodb-app
 ```
 
-### Mit git.
+### Verwenden von Git
 
 ```
 git clone https://github.com/nocodb/nocodb-seed
@@ -82,69 +91,69 @@ Zugriff auf Dashboard mit. : [http://localhost:8080/dashboard](http://localhost:
 
 # Screenshots
 
-![1](https://user-images.githubusercontent.com/86527202/136068605-191df0d6-ba40-4500-aa82-84f369dff184.png)
+![1](https://user-images.githubusercontent.com/86527202/155515238-b10c900d-5b1d-454b-a4d4-d03f742af8e8.png)
 <br>
 
-![2](https://user-images.githubusercontent.com/86527202/136068612-6dcc8fb6-eff0-42d7-8196-db0b280bd49d.png)
+![2](https://user-images.githubusercontent.com/86527202/155515258-3eea7e44-9616-4e63-b9da-c701c11b7a05.png)
 <br>
 
-![5](https://user-images.githubusercontent.com/86527202/136068615-0d8aa363-e197-4b9d-b81a-0f7a6030635c.png)
+![5](https://user-images.githubusercontent.com/86527202/155515271-04914510-8b76-4b7d-9f57-c43cc3dfb7a7.png)
 <br>
 
-![6](https://user-images.githubusercontent.com/86527202/136068618-f6443b58-0458-4e87-a358-f1bffcc44936.png)
+![6](https://user-images.githubusercontent.com/86527202/155515273-4f36b28f-8d36-4fe0-94e2-acd3e5020d91.png)
 <br>
 
-![7](https://user-images.githubusercontent.com/86527202/136068620-1f6f7aec-79e5-43a7-9ad5-65e1fc48d297.png)
+![7](https://user-images.githubusercontent.com/86527202/155515277-fe434e7a-78bd-4f73-a78a-5a45c090e05a.png)
 <br>
 
-![8](https://user-images.githubusercontent.com/86527202/136068624-7d37104a-87ce-442c-a038-e23fb40966e3.png)
+![8](https://user-images.githubusercontent.com/86527202/155515280-3906823d-96b3-4e40-a2ec-c5aaec190891.png)
 <br>
 
-![9](https://user-images.githubusercontent.com/86527202/136068627-938f9bc9-194e-44e4-a040-bd33649aca35.png)
+![9](https://user-images.githubusercontent.com/86527202/155515287-63b898f4-b171-49fd-a33b-bb385df9dfb6.png)
 <br>
 
-![9a](https://user-images.githubusercontent.com/86527202/136068629-7d341076-a73a-4964-bec8-68e4dd91828e.png)
+![3](https://user-images.githubusercontent.com/86527202/155515262-e26e10f9-e825-4741-adbb-e60bec35c3a4.png)
 <br>
 
-![9b](https://user-images.githubusercontent.com/86527202/136068630-60f799a5-d43f-4aaa-8f7c-9f077ee13fa8.png)
+![4](https://user-images.githubusercontent.com/86527202/155515265-3a9228db-cc49-46d7-8fc9-3091571deb86.png)
 <br>
 
-![10](https://user-images.githubusercontent.com/86527202/136068633-e7e2c8ab-610e-4fab-9bc1-737c45182125.png)
+![10](https://user-images.githubusercontent.com/86527202/155515288-02cac9bd-1047-4725-b390-640f7ccab746.png)
 <br>
 
-![11](https://user-images.githubusercontent.com/86527202/136068635-d9ac5165-7800-402d-b4e3-2e21d3d36027.png)
+![11](https://user-images.githubusercontent.com/86527202/155515290-046a7cb9-e4d6-4ab6-a3f3-a27b256b3159.png)
 <br>
 
 # Merkmale
 
 ### Rich-Tabellenschnittstelle
 
-- ⚡ Suchen, sortieren, filtern, Spalten mit Uber-Leichtigkeit ausblenden
-- ⚡ Ansichten erstellen: Gitter, Galerie, Kanban, Gantt, Form
-- ⚡ Teilen von Ansichten: Öffentliche und Passwort geschützt
+- ⚡ Einfaches Suchen, Sortieren, Filtern und Ausblenden von Spalten
+- ⚡ Ansichten erstellen: Gitter, Galerie, Kanban, Formular
+- ⚡ Teilen von Ansichten: Öffentlich und passwortgeschützt
 - ⚡ Persönliche und gesperrte Ansichten
-- ⚡ Laden Sie Bilder in Zellen hoch (funktioniert mit S3, Minio, GCP, Azure, Digitalocean, Linode, OVH, Backraze) !!
-- ⚡ Rollen: Besitzer, Ersteller, Herausgeber, Kommentator, Viewer, Kommentator, benutzerdefinierte Rollen.
-- ⚡ Zugriffskontrolle: Granulare Zugangskontrolle auch bei Datenbank-, Tabellen- und Spaltenebene.
+- ⚡ Bilder in Zellen hochladen (funktioniert mit S3, Minio, GCP, Azure, Digitalocean, Linode, OVH, Backraze) !!
+- ⚡ Rollen: Eigentümer, Ersteller, Bearbeiter, Betrachter, Kommentator, Benutzerdefinierte Rollen.
+- ⚡ Zugriffskontrolle: Feingliedrige Zugangskontrolle auch bei Datenbank-, Tabellen- und Spaltenebene.
 
-### App Store für Workflow-Automationen:
+### App-Store für Workflow-Automationen
 
-- ⚡ Chat: Microsoft-Teams, Slack, Discord, Materie
+- ⚡ Chat: Microsoft Teams, Slack, Discord, Mattermost
 - ⚡ E-Mail: SMTP, SES, MailChimp
-- ⚡ SMS: TWILIO
-- ⚡ WhatsApp.
+- ⚡ SMS: Twilio
+- ⚡ WhatsApp
 - ⚡ Jede 3rd-Party-APIs
 
-### Programmatischer API-Zugriff über:
+### Programmatischer API-Zugriff über
 
 - ⚡ Rest APIs (Swagger)
-- ⚡ Graphql-APIs.
-- ⚡ Enthält die JWT-Authentifizierung & Social Auth
-- ⚡ API-Token, um mit Zapier, Integromat zu integrieren.
+- ⚡ Graphql-APIs
+- ⚡ Enthält JWT-Authentifizierung & Social Auth
+- ⚡ API-Tokens für die Integration mit Zapier, Integromat.
 
-# Produktionseinrichtung
+# Produktivaufbau
 
-NOCODB erfordert eine Datenbank zum Speichern von Metadaten, Tabellenkalkulationen und externen Datenbanken. Verbindungsparameter für diese Datenbank können in der Umgebungsvariablen der NC_DB angegeben werden.
+NocoDB erfordert eine Datenbank, um Metadaten von Tabellenansichten und externen Datenbanken zu speichern. Verbindungsparameter für diese Datenbank können in der Umgebungsvariablen `NC_DB` spezifiziert werden.
 
 ## Docker
 
@@ -182,78 +191,76 @@ git clone https://github.com/nocodb/nocodb
 cd nocodb
 cd docker-compose
 cd mysql or pg or mssql
-docker-compose up
+docker-compose up -d
 ```
 
 ## Umgebungsvariablen
 
-| Variable                           | Mandatory | Comments                                                                                                 | If absent                                     |
-| ---------------------------------- | --------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| NC_DB                              | Yes       | See our database URLs                                                                                    | A local SQLite will be created in root folder |
-| DATABASE_URL                       | No        | JDBC URL Format. Kann statt NC_DB genutzt werden. Wird im 1-Click Heroku deployment genutzt.             |                                               |
-| DATABASE_URL_FILE                  | No        | path to file containing JDBC URL Format. Can be used instead of NC_DB. Used in 1-Click Heroku deployment |                                               |
-| NC_PUBLIC_URL                      | Yes       | Wird für Einladungen per Mail genutzt                                                                    | Best guess from http request params           |
-| NC_AUTH_JWT_SECRET                 | Yes       | JWT secret used for auth and storing other secrets                                                       | A Random secret will be generated             |
-| NC_SENTRY_DSN                      | No        | For Sentry monitoring                                                                                    |                                               |
-| NC_CONNECT_TO_EXTERNAL_DB_DISABLED | No        | Disable Project creation with external database                                                          |                                               |
-| NC_DISABLE_TELE                    | No        | Disable telemetry                                                                                        |                                               |
-| NC_BACKEND_URL                     | No        | Custom Backend URL                                                                                       | `http://localhost:8080` will be used          |
+Siehe [Environment variables](https://docs.nocodb.com/getting-started/installation#environment-variables)
 
 # Entwicklungsaufbau
 
-```
+## Projekt kopieren
+
+```shell
 git clone https://github.com/nocodb/nocodb
 cd nocodb
+```
 
-# run backend
+## Backend lokal ausführen
+
+```shell
 cd packages/nocodb
 npm install
 npm run watch:run
+# localhost:8080/dashboard im Browser aufrufen
+```
 
-# open localhost:8080/dashboard in browser
+## Frontend lokal ausführen
 
-# run frontend
+```shell
 cd packages/nc-gui
 npm install
 npm run dev
-
-# open localhost:3000/dashboard in browser
+# localhost:3000/dashboard iM Browser aufrufen
 ```
 
-Changes made to code automatically restart.
+Änderungen am Code starten automatisch neu.
+
+> nocodb/packages/nocodb enthält nc-lib-gui, die entwickelte Version von nc-gui, die in der npm-Registry gehostet wird. Sie können localhost:8000/dashboard im Browser aufrufen, nachdem Sie das Backend lokal gestartet haben, wenn Sie nur das Backend ändern möchten.
+
 
 ## Cypress-Tests lokal ausführen
 
 ```shell
-# install dependencies(cypress)
+# install dependencies (cypress)
 npm install
 
-# run mysql database with required database using docker compose
+# MySQL-Datenbank mit der benötigten Datenbank mit Docker Compose ausführen
 docker-compose -f ./scripts/docker-compose-cypress.yml up
 
-# Run backend api using following command
+# Backend API mit folgendem Befehl ausführen
 npm run start:api
 
-# Run frontend web UI using following command
+# Frontend Web-UI mit folgendem Befehl ausführen
 npm run start:web
 
-# wait until both 3000 and 8080 ports are available
-# and run cypress test using following command
+# Warten, bis die beiden Ports 3000 und 8000 verfügbar sind,
+# dann Cypress Test mit diesem Befehl ausführen
 npm run cypress:run
 
-# or run following command to run it with GUI
+# Oder diesen Befehl ausführen, um die GUI auszuführen
 npm run cypress:open
 ```
 
-# Beitragen
+# Beiträge
 
-- Bitte schau mal rein ./scripts/contribute/HowToApplyLicense.md
-- Ignorieren Sie das Hinzufügen von Überschriften für .json oder .md oder .yml
+Siehe [Contribution Guide](https://github.com/nocodb/nocodb/blob/master/.github/CONTRIBUTING.md).
 
-# 🎯 Warum bauen wir das auf?
+# Warum bauen wir das auf?
 
-Die meisten Internet-Unternehmen rüsten sich mit einer Tabelle oder einer Datenbank aus, um ihre Geschäftsanforderungen zu lösen. Die Tabellenkalkulationen werden von einer Milliarde + Menschen mit einem jeden Tag kollaborativ verwendet. Wir arbeiten jedoch mit ähnlichen Geschwindigkeiten in Datenbanken, die in Bezug auf das Berechnen viel stärkere Werkzeuge sind. Versuche, dies mit SaaS-Angeboten zu lösen, bedeutete schreckliche Zugangskontrollen, Anbieter-Lockin, Daten-Lockin, abrupte Preisänderungen und vor allem eine Glaskugel, was in Zukunft möglich ist.
+Die meisten Internet-Unternehmen verwenden entweder eine Tabellenkalkulation oder eine Datenbank, um ihre Geschäftsanforderungen zu erfüllen. Tabellenkalkulationen werden jeden Tag von mehr als einer Milliarde Menschen für die Zusammenarbeit genutzt. Wir sind jedoch weit davon entfernt, mit einer ähnlichen Geschwindigkeit an Datenbanken zu arbeiten, die weitaus leistungsfähigere Werkzeuge für die Datenverarbeitung sind. Versuche, dieses Problem mit SaaS-Angeboten zu lösen, bedeutete schreckliche Zugangskontrollen, Anbieterbindungen, Datenbindungen, plötzliche Preisänderungen und vor allem einen Blick in die Glaskugel, was in Zukunft möglich sein wird.
 
-# ❤ Unsere Aufgabe :
+# Unsere Aufgabe
 
-Unsere Mission ist es, die leistungsstärkste No-Code-Schnittstelle für Datenbanken bereitzustellen, die für jedes einzelne Internetgeschäft der Welt nutzbar ist. Dies würde nicht nur den Zugang zu einem leistungsstarken Computing-Tool demokratisieren, sondern auch eine Milliarde + Menschen hervorbringen, die im Internet radikale Bastel- und Baufähigkeiten haben werden.
+Unser Ziel ist es, die leistungsstärkste No-Code-Schnittstelle für Datenbanken, welche Open Source ist, für jedes einzelne Internet-Unternehmen in der Welt bereitzustellen. Dies würde nicht nur den Zugang zu einem leistungsstarken Computerwerkzeug demokratisieren, sondern auch mehr als eine Milliarde Menschen hervorbringen, die über radikale Bastel- und Konstruktionsfähigkeiten im Internet verfügen werden.

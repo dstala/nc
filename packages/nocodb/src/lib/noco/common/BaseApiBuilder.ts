@@ -32,12 +32,7 @@ import ncModelsOrderUpgrader from './jobs/ncModelsOrderUpgrader';
 import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
 import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
 import xcMetaDiffSync from './handlers/xcMetaDiffSync';
-// import ncModelsOrderUpgrader from './jobs/ncModelsOrderUpgrader';
-// import ncParentModelTitleUpgrader from './jobs/ncParentModelTitleUpgrader';
-// import ncRemoveDuplicatedRelationRows from './jobs/ncRemoveDuplicatedRelationRows';
-import Model from '../../noco-models/Model';
 import UITypes from '../../sqlUi/UITypes';
-// import { BaseModelSqlv2 } from '../../dataMapper/lib/sql/BaseModelSqlv2';
 
 const log = debug('nc:api:base');
 
@@ -71,13 +66,6 @@ const IGNORE_TABLES = [
 export default abstract class BaseApiBuilder<T extends Noco>
   implements XcDynamicChanges {
   public abstract readonly type: string;
-  protected models2: {
-    [key: string]: Model;
-  };
-  //
-  // protected baseModels2: {
-  //   [key: string]: BaseModelSqlv2;
-  // };
 
   public get knex(): XKnex {
     return this.sqlClient?.knex || this.dbDriver;
@@ -175,8 +163,6 @@ export default abstract class BaseApiBuilder<T extends Noco>
     connectionConfig: DbConfig
   ) {
     this.models = {};
-    this.models2 = {};
-    // this.baseModels2 = {};
     this.app = app;
     this.config = config;
     this.connectionConfig = connectionConfig;
@@ -201,7 +187,12 @@ export default abstract class BaseApiBuilder<T extends Noco>
   }
 
   public getSqlClient(): any {
-    return this.sqlClient;
+    return NcConnectionMgr.getSqlClient({
+      dbAlias: this.dbAlias,
+      env: this.config.env,
+      config: this.config,
+      projectId: this.projectId
+    });
   }
 
   public abstract onViewCreate(viewName: string): Promise<void>;
@@ -387,7 +378,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
         /* update fieldsOrder */
         const index = fieldsOrder.indexOf(alias);
         if (index > -1) {
-          fieldsOrder.splice(index, 0);
+          fieldsOrder.splice(index, 1);
         }
 
         /* update formView params */
@@ -736,6 +727,9 @@ export default abstract class BaseApiBuilder<T extends Noco>
     this.baseLog(`onTableUpdate : Getting old model meta for '%s'`, tn);
     XcCache.del([this.projectId, this.dbAlias, 'table', tn].join('::'));
 
+    // get columns list from db
+    const columnsFromDb = await this.getColumnList(tn);
+
     const relationTableMetas: Set<any> = new Set();
 
     const oldModelRow = await this.xcMeta.metaGet(
@@ -762,8 +756,12 @@ export default abstract class BaseApiBuilder<T extends Noco>
     const columns =
       changeObj.columns
         .filter(c => c.altered !== 4)
-        .map(({ altered: _al, ...rest }) => rest) ||
-      (await this.getColumnList(tn));
+        .map(({ altered: _al, ...rest }) =>
+          this.mergeUiColAndDbColMetas(
+            rest,
+            columnsFromDb?.find(c => c.cn === rest.cn)
+          )
+        ) || (await this.getColumnList(tn));
 
     /* Get all relations */
     const relations = await this.relationsSyncAndGet();
@@ -1062,7 +1060,7 @@ export default abstract class BaseApiBuilder<T extends Noco>
           /* update fieldsOrder */
           const index = fieldsOrder.indexOf(column.cno);
           if (index > -1) {
-            fieldsOrder.splice(index, 0);
+            fieldsOrder.splice(index, 1);
           }
 
           /* update formView params */
@@ -1203,6 +1201,22 @@ export default abstract class BaseApiBuilder<T extends Noco>
     );
 
     await NcHelp.executeOperations(aclOper, this.connectionConfig.client);
+  }
+
+  protected mergeUiColAndDbColMetas(uiCol, dbCol) {
+    return {
+      ...(uiCol || {}),
+      ...(dbCol || {}),
+      // persist x props for single/multi select
+      ...(uiCol?.uidt === UITypes.SingleSelect ||
+      uiCol?.uidt === UITypes.MultiSelect
+        ? {
+            dtx: uiCol.dtx,
+            dtxp: uiCol.dtxp,
+            dtxs: uiCol.dtxs
+          }
+        : {})
+    };
   }
 
   public async onViewUpdate(
@@ -2415,15 +2429,14 @@ export default abstract class BaseApiBuilder<T extends Noco>
           .map(mm => {
             if (
               queryParams?.showFields &&
-              !(`${mm._rtn}MMList` in queryParams.showFields)
+              !(`${mm._tn} <=> ${mm._rtn}` in queryParams.showFields)
             ) {
-              queryParams.showFields[`${mm._rtn}MMList`] = true;
+              queryParams.showFields[`${mm._tn} <=> ${mm._rtn}`] = true;
             }
 
             return {
               mm,
-              uidt: UITypes.LinkToAnotherRecord,
-              _cn: `${mm._rtn}MMList`
+              _cn: `${mm._tn} <=> ${mm._rtn}`
             };
           })
       ];

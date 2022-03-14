@@ -58,6 +58,9 @@ export default {
     },
     isAttachment() {
       return this.uiDatatype === 'Attachment'
+    },
+    isCurrency() {
+      return this.column.uidt == 'Currency'
     }
 
   }

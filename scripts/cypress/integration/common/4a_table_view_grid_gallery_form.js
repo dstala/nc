@@ -31,7 +31,7 @@ export const genTest = (apiType, dbType) => {
                 cy.toastWait("View created successfully");
 
                 // validate if view was creted && contains default name 'Country1'
-                cy.get(`.nc-${viewType}-view-item`)
+                cy.get(`.nc-view-item.nc-${viewType}-view-item`)
                     .contains("Country1")
                     .should("exist");
 
@@ -40,7 +40,7 @@ export const genTest = (apiType, dbType) => {
 
             it(`Edit ${viewType} view name`, () => {
                 // click on edit-icon (becomes visible on hovering mouse)
-                cy.get(".nc-view-edit-icon").last().click({
+                cy.get(".nc-view-edit-icon").click({
                     force: true,
                     timeout: 1000,
                 });
@@ -52,7 +52,7 @@ export const genTest = (apiType, dbType) => {
                 cy.toastWait("View renamed successfully");
 
                 // validate
-                cy.get(`.nc-${viewType}-view-item`)
+                cy.get(`.nc-view-item.nc-${viewType}-view-item`)
                     .contains(`${viewType}View-1`)
                     .should("exist");
             });

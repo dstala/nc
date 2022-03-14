@@ -937,16 +937,14 @@ export class MssqlUi {
 
   static getAbstractType(col): any {
     switch ((col.dt || col.dt).toLowerCase()) {
-      case 'bigint':
       case 'smallint':
       case 'bit':
       case 'tinyint':
       case 'int':
         return 'integer';
 
+      case 'bigint':
       case 'binary':
-        return 'string';
-
       case 'char':
         return 'string';
 
@@ -1090,7 +1088,7 @@ export class MssqlUi {
         colProp.validate = {
           func: ['isMobilePhone'],
           args: [''],
-          msg: ['Validation failed : isMobilePhone']
+          msg: ['Validation failed : Invalid Mobile Format']
         };
         break;
       case 'Email':
@@ -1098,7 +1096,7 @@ export class MssqlUi {
         colProp.validate = {
           func: ['isEmail'],
           args: [''],
-          msg: ['Validation failed : isEmail']
+          msg: ['Validation failed : Invalid Email Format']
         };
         break;
       case 'URL':
@@ -1106,7 +1104,7 @@ export class MssqlUi {
         colProp.validate = {
           func: ['isURL'],
           args: [''],
-          msg: ['Validation failed : isURL']
+          msg: ['Validation failed : Invalid URL Format']
         };
         break;
       case 'Number':
@@ -1120,7 +1118,7 @@ export class MssqlUi {
         colProp.validate = {
           func: ['isCurrency'],
           args: [''],
-          msg: ['Validation failed : isCurrency']
+          msg: ['Validation failed : Invalid Currency Format']
         };
         break;
       case 'Percent':

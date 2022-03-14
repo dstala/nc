@@ -92,12 +92,12 @@ export class _mainPage {
 
         cy.snip("NewUser");
 
-        cy.get('label:contains("Email")')
+        cy.get('label:contains("E-mail")')
             .next("input")
             .type(userCred.username)
             .trigger("input");
 
-        cy.get('label:contains("Select User roles")').click();
+        cy.get('label:contains("Select User Role")').click();
 
         // opt-in requested role & submit
         cy.snipActiveMenu("Menu_RoleType");
@@ -128,7 +128,7 @@ export class _mainPage {
             .find(".mdi-pencil-outline", { timeout: 2000 })
             .click();
 
-        cy.get("label:contains(Select User roles)").click();
+        cy.get("label:contains(Select User Role)").click();
 
         // opt-in requested role & submit
         //
@@ -316,7 +316,10 @@ export class _mainPage {
         cy.get(".nc-filter-field-select").last().click();
         cy.snipActiveMenu("Menu_FilterField-fieldSelect");
 
-        cy.getActiveMenu().find(`.nc-filter-fld-${field}`).click();
+        cy.getActiveMenu()
+            .find(`.v-list-item:contains(${field})`)
+            .first()
+            .click();
         cy.get(".nc-filter-operation-select").last().click();
         cy.snipActiveMenu("Menu_FilterField-operationSelect");
 

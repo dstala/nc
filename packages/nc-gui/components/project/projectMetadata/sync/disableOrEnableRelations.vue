@@ -14,14 +14,15 @@
       <v-spacer />
       <x-btn
         outlined
-        tooltip="Reload list"
+        :tooltip="$t('tooltip.reloadList')"
         small
         color="primary"
         icon="refresh"
         btn.class="text-capitalize"
         @click="loadRelations"
       >
-        Reload
+        <!-- Reload -->
+        {{ $t('general.reload') }}
       </x-btn>
       <!--      <x-btn
         outlined
@@ -36,7 +37,7 @@
       </x-btn>-->
       <x-btn
         outlined
-        tooltip="Save Changes"
+        :tooltip="$t('tooltip.saveChanges')"
         small
         :disabled="!edited"
         :loading="updating"
@@ -45,7 +46,8 @@
         icon="save"
         @click="save"
       >
-        Save
+        <!-- Save -->
+        {{ $t('general.save') }}
       </x-btn>
     </v-toolbar>
     <div class="d-flex justify-center">

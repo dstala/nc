@@ -61,7 +61,10 @@
           <x-icon small class="mr-1 nc-column-edit" color="primary">
             mdi-pencil
           </x-icon>
-          <span class="caption">Edit</span>
+          <span class="caption">
+            <!--Edit-->
+            {{ $t('general.edit') }}
+          </span>
         </v-list-item>
         <!--  <v-list-item dense @click="setAsPrimaryValue">
             <x-icon small class="mr-1" color="primary">mdi-key-star</x-icon>
@@ -76,7 +79,10 @@
           <x-icon small class="mr-1 nc-column-delete" color="error">
             mdi-delete-outline
           </x-icon>
-          <span class="caption">Delete</span>
+          <span class="caption">
+            <!--Delete-->
+            {{ $t('general.delete') }}
+          </span>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -100,7 +106,8 @@
         <v-card-actions class="d-flex pa-4">
           <v-spacer />
           <v-btn small @click="columnDeleteDialog = false">
-            Cancel
+            <!-- Cancel -->
+            {{ $t('general.cancel') }}
           </v-btn>
           <v-btn small color="error" @click="deleteColumn">
             Confirm

@@ -20,18 +20,17 @@ export const genTest = (apiType, dbType) => {
             const verifyCsv = (retrievedRecords) => {
                 // expected output, statically configured
                 let storedRecords = [
-                    `Country,CityList`,
+                    `Country,Country => City`,
                     `Afghanistan,Kabul`,
                     `Algeria,"Batna,Bchar,Skikda"`,
                     `American Samoa,Tafuna`,
                     `Angola,"Benguela,Namibe"`,
                 ];
 
-                // @nocov1, fix me
-                // for (let i = 0; i < storedRecords.length - 1; i++) {
-                //     cy.log(retrievedRecords[i]);
-                //     expect(retrievedRecords[i]).to.be.equal(storedRecords[i]);
-                // }
+                for (let i = 0; i < storedRecords.length - 1; i++) {
+                    cy.log(retrievedRecords[i]);
+                    expect(retrievedRecords[i]).to.be.equal(storedRecords[i]);
+                }
             };
 
             // download & verify

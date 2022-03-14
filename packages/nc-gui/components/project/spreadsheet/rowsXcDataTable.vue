@@ -50,7 +50,7 @@
           dense
           solo
           hide-details
-          :placeholder="searchField ? `Search '${searchField}' column` : 'Search all columns'"
+          :placeholder="searchField ? $t('placeholder.searchColumn', {searchField}) : 'Search all columns'"
           class="elevation-0 pa-0 flex-grow-1 caption search-field"
           @keyup.enter="searchQuery = searchQueryVal"
           @blur="searchQuery = searchQueryVal"
@@ -121,6 +121,7 @@
           :is-view="isView"
           @showAdditionalFeatOverlay="showAdditionalFeatOverlay($event)"
           @webhook="showAdditionalFeatOverlay('webhooks')"
+          @reload="reload"
         />
       </div>
       <v-spacer class="h-100" @dblclick="debug=true" />
@@ -149,8 +150,9 @@
         <v-icon small class="mx-n1" color="grey lighten-1">
           mdi-circle-small
         </v-icon>
+        <!-- tooltip="Reload view data" -->
         <x-icon
-          tooltip="Reload view data"
+          :tooltip="$t('general.reload')"
           icon.class="nc-table-reload-btn mx-1"
           small
           @click="reload"
@@ -176,10 +178,12 @@
         <!--          btn.class="nc-add-new-row-btn"-->
         <!--          @click="insertNewRow(true,true)"-->
         <!--        >-->
+
+        <!--          tooltip="Add new row"-->
         <x-icon
           v-if="!isView &&isEditable && relationType !== 'bt'"
           icon.class="nc-add-new-row-btn mx-1"
-          tooltip="Add new row"
+          :tooltip="$t('activity.addRow')"
           :disabled="isLocked"
           small
           :color="['success','']"
@@ -230,7 +234,7 @@
           :disabled="isLocked"
           small
           :color="['red',''] "
-          tooltip="Delete table"
+          :tooltip="$t('activity.deleteTable')"
           @click="checkAndDeleteTable"
         >
           mdi-delete-outline
@@ -271,8 +275,9 @@
               </v-list>
             </v-menu>-->
 
+      <!--tooltip="Toggle navigation drawer"-->
       <x-btn
-        tooltip="Toggle navigation drawer"
+        :tooltip="$t('tooltip.toggleNavDraw')"
         outlined
         small
         text
@@ -547,13 +552,22 @@
             v-if="relationType !== 'bt'"
             @click="insertNewRow(false)"
           >
-            <span class="caption">Insert New Row</span>
+            <span class="caption">
+              <!-- Insert New Row -->
+              {{ $t('activity.insertRow') }}
+            </span>
           </v-list-item>
           <v-list-item @click="deleteRow">
-            <span class="caption">Delete Row</span>
+            <span class="caption">
+              <!-- Delete Row -->
+              {{ $t('activity.deleteRow') }}
+            </span>
           </v-list-item>
           <v-list-item @click="deleteSelectedRows">
-            <span class="caption">Delete Selected Rows</span>
+            <span class="caption">
+              <!-- Delete Selected Rows -->
+              {{ $t('activity.deleteSelectedRow') }}
+            </span>
           </v-list-item>
         </template>
         <template v-if="rowContextMenu.col && !rowContextMenu.col.rqd && !rowContextMenu.col.virtual">

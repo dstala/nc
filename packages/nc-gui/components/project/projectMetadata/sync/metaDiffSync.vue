@@ -14,7 +14,7 @@
                 dense
                 hide-details
                 class="my-2 mx-auto caption"
-                :placeholder="`Search models`"
+                :placeholder="$t('placeholder.searchModels')"
                 prepend-inner-icon="search"
                 style="max-width:500px"
                 outlined
@@ -24,29 +24,30 @@
               <x-btn
                 btn.class="nc-btn-metasync-reload"
                 outlined
-                tooltip="Reload list"
+                :tooltip="$t('tooltip.reloadList')"
                 small
                 color="primary"
                 icon="refresh"
                 @click="loadXcDiff()"
               >
-                Reload
+                <!-- Reload -->
+                {{ $t('general.reload') }}
               </x-btn>
               <!--              <x-btn
                 outlined
-                tooltip="Reload list"
+                :tooltip="$t('tooltip.reloadList')"
                 small
                 color="primary"
                 icon="refresh"
                 @click="loadModels();loadTableList()"
               >
-                Reload
+                {{ $t('general.reload') }}
               </x-btn>-->
               <!--x-btn
                 outlined
                 :loading="updating"
                 :disabled="updating || !edited"
-                tooltip="Save Changes"
+                :tooltip="$t('tooltip.saveChanges')"
                 small
                 color="primary"
                 icon="save"
@@ -61,11 +62,13 @@
                 <thead>
                   <tr>
                     <th class="grey--text">
-                      Models
+                      <!--Models-->
+                      {{ $t('labels.models') }}
                     </th>
                     <!--                    <th>APIs</th>-->
                     <th class="grey--text">
-                      Sync state
+                      <!--Sync state-->
+                      {{ $t('labels.syncState') }}
                     </th>
                     <th />
                   </tr>
@@ -117,7 +120,8 @@
                         v-else
                         class="caption grey--text"
                       >
-                        {{ 'No change identified' }}
+                        <!--{{ 'No change identified' }}-->
+                        {{ $t('msg.info.metaNoChange') }}
                       </span>
                     <!--                  <span v-else class="caption grey&#45;&#45;text">Recreate metadata.</span>-->
                     </td>
@@ -200,8 +204,8 @@
           <div class="d-flex">
             <v-spacer />
 
-            <v-tooltip bottom>
-              <!-- template #activator="{on}">
+            <!--            <v-tooltip bottom>-->
+            <!-- template #activator="{on}">
                 <v-alert
                   v-if="isNewOrDeletedModelFound"
                   dense
@@ -232,35 +236,32 @@
                 Metadata for API creation & management isn't sync with
                 '{{ dbAliasList[dbsTab].connection.database }}' Database.
               </template-->
-            </v-tooltip>
+            <!--            </v-tooltip>-->
             <v-spacer />
           </div>
           <!--          <div-->
           <!--            v-if="isNewOrDeletedModelFound" -->
           <div class="d-flex justify-center">
-            <!--            <x-btn
+            <v-btn
+              v-if="isChanged"
               x-large
-              btn.class="mx-auto primary nc-btn-sync-meta-data"
-              tooltip="Sync metadata"
-              @click="syncMetadata"
-            >
-              <v-icon color="white" class="mr-2 mt-n1">
-                mdi-database-sync
-              </v-icon>
-              Sync Now
-            </x-btn>-->
-
-            <x-btn
-              x-large
-              btn.class="mx-auto primary nc-btn-metasync-sync-now"
-              tooltip="Sync metadata"
+              class="mx-auto primary nc-btn-metasync-sync-now"
               @click="syncMetaDiff"
             >
               <v-icon color="white" class="mr-2 mt-n1">
                 mdi-database-sync
               </v-icon>
               Sync Now
-            </x-btn>
+            </v-btn>
+
+            <v-alert
+              v-else
+              dense
+              outlined
+              type="success"
+            >
+              Tables metadata is in sync
+            </v-alert>
           </div>
         </v-col>
       </v-row>
@@ -421,6 +422,9 @@ export default {
     ...mapGetters({
       dbAliasList: 'project/GtrDbAliasList'
     }),
+    isChanged() {
+      return this.diff && this.diff.some(d => d && d.detectedChanges && d.detectedChanges.length)
+    },
     prefix() {
       return this.$store.getters['project/GtrProjectPrefix'] || ''
     }

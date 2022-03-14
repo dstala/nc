@@ -32,7 +32,7 @@
           <v-text-field
             v-else
             v-model="search"
-            placeholder="Search tables"
+            :placeholder="$t('placeholder.searchProjectTree')"
             dense
             hide-details
             class="elevation-0 mr-2  pl-3 pr-1 caption nc-table-list-filter"
@@ -162,7 +162,7 @@
                       <v-tooltip v-if="!isNonAdminAccessAllowed(item)" top>
                         <template #activator="{ on }">
                           <span v-if="item.type === 'tableDir'" class="body-2 font-weight-medium" v-on="on">
-                            Tables<template v-if="item.children && item.children.length"> ({{
+                            {{ $t('objects.tables') }}<template v-if="item.children && item.children.length"> ({{
                               item.children.filter(child => !search || child.name.toLowerCase().includes(search.toLowerCase())).length
                             }})</template></span>
                           <span v-else class="body-2 font-weight-medium" v-on="on">
@@ -174,7 +174,7 @@
                         v-else
                       >
                         <span v-if="item.type === 'tableDir'" class="body-2 font-weight-medium">
-                          Tables<template v-if="item.children && item.children.length"> ({{
+                          {{ $t('objects.tables') }}<template v-if="item.children && item.children.length"> ({{
                             item.children.filter(child => !search || child.name.toLowerCase().includes(search.toLowerCase())).length
                           }})</template></span>
                         <span v-else class="caption font-weight-regular">
@@ -301,7 +301,10 @@
                                       </v-icon>
                                     </v-list-item-icon>
                                     <v-list-item-title>
-                                      <span classs="caption">Rename</span>
+                                      <span classs="caption">
+                                        <!--Rename-->
+                                        {{ $t('general.rename') }}
+                                      </span>
                                     </v-list-item-title>
                                   </v-list-item>
                                   <v-list-item v-if="_isUIAllowed('ui-acl')" dense @click="openUIACL(child)">
@@ -311,7 +314,10 @@
                                       </v-icon>
                                     </v-list-item-icon>
                                     <v-list-item-title>
-                                      <span classs="caption">UI ACL</span>
+                                      <span classs="caption">
+                                        <!--UI ACL-->
+                                        {{ $t('labels.uiAcl') }}
+                                      </span>
                                     </v-list-item-title>
                                   </v-list-item>
                                 </v-list>
@@ -397,7 +403,7 @@
             <v-list-item>
               <v-list-item-title>
                 <!-- Settings -->
-                <span class="body-2 font-weight-medium">{{ $t('treeview.settings.title') }}</span>
+                <span class="body-2 font-weight-medium">{{ $t('activity.settings') }}</span>
                 <v-tooltip top>
                   <template #activator="{ on }">
                     <x-icon
@@ -413,7 +419,7 @@
                     </x-icon>
                   </template>
                   <!-- Only visible to Creator -->
-                  <span class="caption">{{ $t('treeview.settings.tooltip') }}</span>
+                  <span class="caption">{{ $t('msg.info.onlyCreator') }}</span>
                 </v-tooltip>
               </v-list-item-title>
             </v-list-item>
@@ -430,13 +436,13 @@
                     <!-- App Store -->
                     <v-list-item-title>
                       <span class="font-weight-regular caption">{{
-                        $t('treeview.app_store')
+                        $t('title.appStore')
                       }}</span>
                     </v-list-item-title>
                   </v-list-item>
                 </template>
                 <!-- App Store -->
-                {{ $t('treeview.app_store') }}
+                {{ $t('title.appStore') }}
               </v-tooltip>
 
               <v-tooltip bottom>
@@ -450,13 +456,13 @@
                     <!-- Team & Auth -->
                     <v-list-item-title>
                       <span class="font-weight-regular caption">{{
-                        $t('treeview.team_n_auth.title')
+                        $t('title.team&auth')
                       }}</span>
                     </v-list-item-title>
                   </v-list-item>
                 </template>
                 <!-- Roles & Users Management -->
-                {{ $t('treeview.team_n_auth.tooltip') }}
+                {{ $t('title.rolesUserMgmt') }}
               </v-tooltip>
               <v-tooltip bottom>
                 <template #activator="{ on }">
@@ -469,13 +475,13 @@
                     <!-- Project Metadata -->
                     <v-list-item-title>
                       <span class="font-weight-regular caption">{{
-                        $t('treeview.project_metadata.title')
+                        $t('title.projMeta')
                       }}</span>
                     </v-list-item-title>
                   </v-list-item>
                 </template>
                 <!-- Meta Management -->
-                {{ $t('treeview.project_metadata.tooltip') }}
+                {{ $t('title.metaMgmt') }}
               </v-tooltip>
 
               <v-tooltip bottom>
@@ -489,13 +495,13 @@
                     <!-- Project Metadata -->
                     <v-list-item-title>
                       <span class="font-weight-regular caption">{{
-                        $t('treeview.audit.title')
+                        $t('title.audit')
                       }}</span>
                     </v-list-item-title>
                   </v-list-item>
                 </template>
                 <!-- Meta Management -->
-                {{ $t('treeview.audit.tooltip') }}
+                {{ $t('title.auditLogs') }}
               </v-tooltip>
             </template>
           </v-list>
@@ -554,7 +560,7 @@
           <v-list v-if="_isUIAllowed('previewAs') || previewAs" dense>
             <v-list-item>
               <!-- Preview as -->
-              <span class="body-2 font-weight-medium">{{ $t('treeview.preview_as') }}</span>
+              <span class="body-2 font-weight-medium">{{ $t('activity.previewAs') }}</span>
               <v-icon small class="ml-1">
                 mdi-drama-masks
               </v-icon>
@@ -597,7 +603,7 @@
                     mdi-close
                   </v-icon>
                   <!-- Reset Preview -->
-                  <span class="caption nc-preview-reset">{{ $t('treeview.reset_review') }}</span>
+                  <span class="caption nc-preview-reset">{{ $t('activity.resetReview') }}</span>
                 </v-list-item>
               </template>
             </v-list>
@@ -715,20 +721,20 @@
 <script>
 /* eslint-disable */
 
-import { mapMutations, mapGetters, mapActions } from 'vuex'
+import {mapMutations, mapGetters, mapActions} from 'vuex';
 
-import rightClickOptions from '../helpers/rightClickOptions'
-import rightClickOptionsSub from '../helpers/rightClickOptionsSub'
-import icons from '../helpers/treeViewIcons'
+import rightClickOptions from '../helpers/rightClickOptions';
+import rightClickOptionsSub from '../helpers/rightClickOptionsSub';
+import icons from '../helpers/treeViewIcons';
 
-import textDlgSubmitCancel from './utils/dlgTextSubmitCancel'
-import dlgLabelSubmitCancel from './utils/dlgLabelSubmitCancel'
-import { copyTextToClipboard } from '../helpers/xutils'
-import DlgTableCreate from '@/components/utils/dlgTableCreate'
-import DlgViewCreate from '@/components/utils/dlgViewCreate'
-import SponsorMini from '@/components/sponsorMini'
-import { validateTableName } from '~/helpers'
-import ExcelImport from '~/components/import/excelImport'
+import textDlgSubmitCancel from './utils/dlgTextSubmitCancel';
+import dlgLabelSubmitCancel from './utils/dlgLabelSubmitCancel';
+import {copyTextToClipboard} from '../helpers/xutils';
+import DlgTableCreate from '@/components/utils/dlgTableCreate';
+import DlgViewCreate from '@/components/utils/dlgViewCreate';
+import SponsorMini from '@/components/sponsorMini';
+import {validateTableName} from "~/helpers";
+import ExcelImport from "~/components/import/excelImport";
 
 import draggable from 'vuedraggable'
 
@@ -747,9 +753,9 @@ export default {
     drag: false,
     dragOptions: {
       animation: 200,
-      group: 'description',
+      group: "description",
       disabled: false,
-      ghostClass: 'ghost'
+      ghostClass: "ghost"
     },
     validateTableName,
     roleIcon: {
@@ -786,7 +792,7 @@ export default {
     x: 0,
     y: 0,
     menuItem: null,
-    menu: [{ title: 'Execute' }],
+    menu: [{title: 'Execute'}],
     icons,
     tree: [],
     active: [],
@@ -833,17 +839,17 @@ export default {
   computed: {
     previewAs: {
       get() {
-        return this.$store.state.users.previewAs
+        return this.$store.state.users.previewAs;
       },
       set(previewAs) {
-        this.$store.commit('users/MutPreviewAs', previewAs)
+        this.$store.commit('users/MutPreviewAs', previewAs);
       },
     },
     selectedItem() {
-      return [this.$route.query.type, this.$route.query.dbalias, this.$route.query.name].join('||')
+      return [this.$route.query.type, this.$route.query.dbalias, this.$route.query.name].join('||');
     },
     direction() {
-      return this.navigation.shown === false ? 'Open' : 'Closed'
+      return this.navigation.shown === false ? 'Open' : 'Closed';
     },
     ...mapGetters({
       projects: 'project/list',
@@ -852,7 +858,7 @@ export default {
       currentProjectFolder: 'project/currentProjectFolder',
     }),
     filter() {
-      return (item, search, textKey) => item[textKey].indexOf(search) > -1
+      return (item, search, textKey) => item[textKey].indexOf(search) > -1;
     },
     hideNode() {
       return {
@@ -860,7 +866,7 @@ export default {
         migrationsDir: !this._isUIAllowed('migrationsDir'),
         functionDir: !this._isUIAllowed('functionDir'),
         procedureDir: !this._isUIAllowed('procedureDir'),
-      }
+      };
     },
     isTreeView() {
       return (
@@ -872,7 +878,7 @@ export default {
               (this.projects[0].children[0] &&
                 this.projects[0].children[0].children &&
                 this.projects[0].children[0].children.length > 1))))
-      )
+      );
     },
     listViewArr() {
       return (
@@ -884,11 +890,12 @@ export default {
           this.projects[0].children[0].children[0] &&
           this.projects[0].children[0].children[0].children) ||
         []
-      )
+      );
     },
   },
   methods: {
     async onMove(event, children) {
+
 
       if (children.length - 1 === event.moved.newIndex) {
         this.$set(children[event.moved.newIndex], 'order', children[event.moved.newIndex - 1].order + 1)
@@ -922,10 +929,10 @@ export default {
     },
     setPreviewUSer(previewAs) {
       if (!process.env.EE) {
-        this.$toast.info('Available in Enterprise edition').goAway(3000)
+        this.$toast.info('Available in Enterprise edition').goAway(3000);
       } else {
-        this.previewAs = previewAs
-        window.location.reload()
+        this.previewAs = previewAs;
+        window.location.reload();
       }
     },
     async loadRoles() {
@@ -947,28 +954,25 @@ export default {
       // }
     },
     appsTabAdd() {
-      const tabIndex = this.tabs.findIndex(el => el.key === `appStore`)
+      const tabIndex = this.tabs.findIndex(el => el.key === `appStore`);
       if (tabIndex !== -1) {
-        this.changeActiveTab(tabIndex)
+        this.changeActiveTab(tabIndex);
       } else {
-        console.log('add app store tab')
-        let item = {
-          name: 'App Store',
-          key: `appStore`
-        }
-        item._nodes = { env: '_noco' }
-        item._nodes.type = 'appStore'
-        this.$store.dispatch('tabs/ActAddTab', item)
+        console.log('add app store tab');
+        let item = {name: 'App Store', key: `appStore`};
+        item._nodes = {env: '_noco'};
+        item._nodes.type = 'appStore';
+        this.$store.dispatch('tabs/ActAddTab', item);
       }
     },
     isNonAdminAccessAllowed(item) {
-      return ['tableDir', 'viewDir'].includes(item.type)
+      return ['tableDir', 'viewDir'].includes(item.type);
     },
     changeTheme() {
-      this.$store.dispatch('windows/ActToggleDarkMode', !this.$store.state.windows.darkTheme)
+      this.$store.dispatch('windows/ActToggleDarkMode', !this.$store.state.windows.darkTheme);
     },
     openLink(link) {
-      window.open(link, '_blank')
+      window.open(link, '_blank');
     },
 
     /*    settingsTabAdd() {
@@ -986,33 +990,27 @@ export default {
         },*/
 
     rolesTabAdd() {
-      const tabIndex = this.tabs.findIndex(el => el.key === `roles`)
+      const tabIndex = this.tabs.findIndex(el => el.key === `roles`);
       if (tabIndex !== -1) {
-        this.changeActiveTab(tabIndex)
+        this.changeActiveTab(tabIndex);
       } else {
-        console.log('add roles tab')
-        let item = {
-          name: 'Team & Auth ',
-          key: `roles`
-        }
-        item._nodes = { env: '_noco' }
-        item._nodes.type = 'roles'
-        this.$store.dispatch('tabs/ActAddTab', item)
+        console.log('add roles tab');
+        let item = {name: `${this.$t('title.team&auth')} `, key: `roles`};
+        item._nodes = {env: '_noco'};
+        item._nodes.type = 'roles';
+        this.$store.dispatch('tabs/ActAddTab', item);
       }
     },
     disableOrEnableModelTabAdd() {
-      const tabIndex = this.tabs.findIndex(el => el.key === `disableOrEnableModel`)
+      const tabIndex = this.tabs.findIndex(el => el.key === `disableOrEnableModel`);
       if (tabIndex !== -1) {
-        this.changeActiveTab(tabIndex)
+        this.changeActiveTab(tabIndex);
       } else {
-        console.log('add acl tab')
-        let item = {
-          name: 'Meta Management',
-          key: `disableOrEnableModel`
-        }
-        item._nodes = { env: '_noco' }
-        item._nodes.type = 'disableOrEnableModel'
-        this.$store.dispatch('tabs/ActAddTab', item)
+        console.log('add acl tab');
+        let item = {name: `${this.$t('title.metaMgmt')}`, key: `disableOrEnableModel`};
+        item._nodes = {env: '_noco'};
+        item._nodes.type = 'disableOrEnableModel';
+        this.$store.dispatch('tabs/ActAddTab', item);
       }
     },
     openAuditTab() {
@@ -1020,11 +1018,8 @@ export default {
       if (tabIndex !== -1) {
         this.changeActiveTab(tabIndex)
       } else {
-        console.log('add audit tab')
-        let item = {
-          name: 'Audit',
-          key: `migrationsDir`
-        }
+        console.log('add audit tab');
+        let item = {name: `${this.$t('title.audit')}`, key: `migrationsDir`};
         item._nodes = {
           env: '_noco',
           dbAlias: 'db'
@@ -1038,27 +1033,27 @@ export default {
       this.$store.commit('panelSize/MutSize', {
         type: 'treeView',
         size: this.$store.state.panelSize.treeView.size === 18 ? 5 : 18,
-      })
+      });
       // this.onMiniHoverEnter();
       // this.mini = !this.mini;
     },
     onMiniHoverEnter() {
       if (this.mini && this.$refs.drawer) {
-        const el = this.$refs.drawer.$el
-        this.$refs.drawer.width = el.style.width = '320px'
-        this.miniExpanded = true
+        const el = this.$refs.drawer.$el;
+        this.$refs.drawer.width = el.style.width = '320px';
+        this.miniExpanded = true;
       }
     },
     onMiniHoverLeave() {
       if (this.mini && this.$refs.drawer) {
-        const el = this.$refs.drawer.$el
-        this.navigation.width = this.$refs.drawer.width = el.style.width = '50px'
-        this.miniExpanded = false
+        const el = this.$refs.drawer.$el;
+        this.navigation.width = this.$refs.drawer.width = el.style.width = '50px';
+        this.miniExpanded = false;
       }
     },
     onExcelImport() {
       if (!this.menuItem || this.menuItem.type !== 'tableDir') {
-        this.menuItem = this.listViewArr.find(n => n.type === 'tableDir')
+        this.menuItem = this.listViewArr.find(n => n.type === 'tableDir');
       }
       this.loadTables(this.menuItem)
     },
@@ -1089,37 +1084,37 @@ export default {
       try {
         if (item._nodes.type === 'tableDir' && !open) {
           //load tables
-          await this.loadTables(item)
-          const currentlyOpened = JSON.parse(JSON.stringify(this.open))
-          currentlyOpened.push(item._nodes.key)
-          this.activeListItem = item._nodes.key
-          this.open = currentlyOpened
+          await this.loadTables(item);
+          const currentlyOpened = JSON.parse(JSON.stringify(this.open));
+          currentlyOpened.push(item._nodes.key);
+          this.activeListItem = item._nodes.key;
+          this.open = currentlyOpened;
         } else if (item._nodes.type === 'viewDir' && !open) {
-          await this.loadViews(item)
-          const currentlyOpened = JSON.parse(JSON.stringify(this.open))
-          currentlyOpened.push(item._nodes.key)
-          this.activeListItem = item._nodes.key
-          this.open = currentlyOpened
+          await this.loadViews(item);
+          const currentlyOpened = JSON.parse(JSON.stringify(this.open));
+          currentlyOpened.push(item._nodes.key);
+          this.activeListItem = item._nodes.key;
+          this.open = currentlyOpened;
         } else if (item._nodes.type === 'functionDir' && !open) {
-          await this.loadFunctions(item)
-          const currentlyOpened = JSON.parse(JSON.stringify(this.open))
-          currentlyOpened.push(item._nodes.key)
-          this.activeListItem = item._nodes.key
-          this.open = currentlyOpened
+          await this.loadFunctions(item);
+          const currentlyOpened = JSON.parse(JSON.stringify(this.open));
+          currentlyOpened.push(item._nodes.key);
+          this.activeListItem = item._nodes.key;
+          this.open = currentlyOpened;
         } else if (item._nodes.type === 'procedureDir' && !open) {
-          await this.loadProcedures(item)
-          const currentlyOpened = JSON.parse(JSON.stringify(this.open))
-          currentlyOpened.push(item._nodes.key)
-          this.activeListItem = item._nodes.key
-          this.open = currentlyOpened
+          await this.loadProcedures(item);
+          const currentlyOpened = JSON.parse(JSON.stringify(this.open));
+          currentlyOpened.push(item._nodes.key);
+          this.activeListItem = item._nodes.key;
+          this.open = currentlyOpened;
         } else if (item._nodes.type === 'sequenceDir' && !open) {
-          await this.loadSequences(item)
-          const currentlyOpened = JSON.parse(JSON.stringify(this.open))
-          currentlyOpened.push(item._nodes.key)
-          this.activeListItem = item._nodes.key
-          this.open = currentlyOpened
+          await this.loadSequences(item);
+          const currentlyOpened = JSON.parse(JSON.stringify(this.open));
+          currentlyOpened.push(item._nodes.key);
+          this.activeListItem = item._nodes.key;
+          this.open = currentlyOpened;
         } else if (item._nodes.type === 'env') {
-          return
+          return;
         } else {
           // const tabIndex = this.tabs.findIndex(el => el.key === item.key);
           const tabIndex = this.tabs.findIndex(el => {
@@ -1130,10 +1125,10 @@ export default {
                   el._nodes.type === item._nodes.type &&
                   el._nodes.dbAlias === item._nodes.dbAlias)) &&
               item.name === el.name
-            )
-          })
+            );
+          });
           if (tabIndex !== -1) {
-            this.changeActiveTab(tabIndex)
+            this.changeActiveTab(tabIndex);
           } else {
             if (
               item._nodes.type === 'tableDir' ||
@@ -1144,19 +1139,17 @@ export default {
               item._nodes.type === 'db' ||
               item._nodes.type === 'functionDir'
             ) {
-              return
+              return;
             }
             if (item._nodes.type === 'table') {
-              let tableIndex = +item._nodes.key.split('.').pop()
-              if (!(await this.$store.dispatch('windows/ActCheckMaxTable', { tableIndex }))) {
-                return
-              }
+              let tableIndex = +item._nodes.key.split('.').pop();
+              if (!(await this.$store.dispatch('windows/ActCheckMaxTable', {tableIndex}))) return;
             }
-            this.$store.dispatch('tabs/ActAddTab', item)
+            this.$store.dispatch('tabs/ActAddTab', item);
           }
         }
       } catch (e) {
-        console.log(e)
+        console.log(e);
       } finally {
         //this.$store.commit('notification/MutToggleProgressBar', false);
       }
@@ -1171,26 +1164,24 @@ export default {
           ['functionDir', 'procedureDir'].includes(item.type)
         ) &&
         (['tableDir', 'viewDir'].includes(item.type) || this._isUIAllowed('advanced'))
-      )
+      );
     },
     showCTXMenu(e, item, open, leaf) {
-      if (!item) {
-        return
-      }
-      e.preventDefault()
-      this.x = e.clientX
-      this.y = e.clientY
-      this.menuItem = item
+      if (!item) return;
+      e.preventDefault();
+      this.x = e.clientX;
+      this.y = e.clientY;
+      this.menuItem = item;
 
       this.$nextTick(() => {
-        this.menuVisible = true
-      })
+        this.menuVisible = true;
+      });
     },
     async loadProjectsData(id = null) {
       try {
-        this.$store.commit('tabs/clear')
-        this.loadingProjects = true
-        await this.loadProjects(id)
+        this.$store.commit('tabs/clear');
+        this.loadingProjects = true;
+        await this.loadProjects(id);
 
         if ('toast' in this.$route.query) {
           this.$toast
@@ -1202,7 +1193,7 @@ export default {
                 position: 'top-center',
               }
             )
-            .goAway(5000)
+            .goAway(5000);
         }
 
         try {
@@ -1210,32 +1201,30 @@ export default {
             this.projects[0].key,
             this.projects[0].children[0].key,
             this.projects[0].children[0].children[0].key,
-          ]
+          ];
         } catch (error) {
-          console.log('this.open set array error', error)
+          console.log('this.open set array error', error);
         }
-        this.loadingProjects = false
+        this.loadingProjects = false;
         if (!this.isTreeView) {
           if (this.$route.query.type) {
-            const node = this.listViewArr.find(n => n.type === `${this.$route.query.type}Dir`)
-            await this.addTab({ ...(node || this.listViewArr[0]) }, false, true)
+            const node = this.listViewArr.find(n => n.type === `${this.$route.query.type}Dir`);
+            await this.addTab({...(node || this.listViewArr[0])}, false, true);
           } else {
-            await this.addTab({ ...this.listViewArr[0] }, false, true)
+            await this.addTab({...this.listViewArr[0]}, false, true);
           }
         }
       } catch (error) {
-        console.error('loadProjectsData', error)
+        console.error('loadProjectsData', error);
       }
     },
     ctxMenuOptions() {
-      if (!this.menuItem || !this.menuItem._nodes.type) {
-        return
-      }
-      let options = rightClickOptions[this.menuItem._nodes.type]
+      if (!this.menuItem || !this.menuItem._nodes.type) return;
+      let options = rightClickOptions[this.menuItem._nodes.type];
       if (!this.$store.getters['users/GtrIsAdmin']) {
-        options = rightClickOptionsSub[this.menuItem._nodes.type]
+        options = rightClickOptionsSub[this.menuItem._nodes.type];
       }
-      return options
+      return options;
       // if (options) {
       //   return Object.keys(options).map(k => typeof options[k] === 'object' ? Object.keys(options[k]) : k);
       // }
@@ -1245,26 +1234,26 @@ export default {
       return (
         (item.children && item.children.length) ||
         ['tableDir', 'viewDir', 'functionDir', 'procedureDir', 'sequenceDir'].includes(item.type)
-      )
+      );
     },
     async handleCreateBtnClick(type, item) {
-      this.menuItem = item
+      this.menuItem = item;
       switch (type) {
         case 'tableDir':
-          this.dialogGetTableName.dialogShow = true
-          break
+          this.dialogGetTableName.dialogShow = true;
+          break;
         case 'viewDir':
-          this.dialogGetViewName.dialogShow = true
-          break
+          this.dialogGetViewName.dialogShow = true;
+          break;
         case 'functionDir':
-          this.dialogGetFunctionName.dialogShow = true
-          break
+          this.dialogGetFunctionName.dialogShow = true;
+          break;
         case 'procedureDir':
-          this.dialogGetProcedureName.dialogShow = true
-          break
+          this.dialogGetProcedureName.dialogShow = true;
+          break;
         case 'sequenceDir':
-          this.dialogGetSequenceName.dialogShow = true
-          break
+          this.dialogGetSequenceName.dialogShow = true;
+          break;
       }
     },
 
@@ -1272,45 +1261,45 @@ export default {
       ///this.$store.commit('notification/MutToggleProgressBar', true);
 
       try {
-        const item = this.menuItem
+        const item = this.menuItem;
         // const options = rightClickOptions[this.menuItem._nodes.type];
-        const action = actionStr //options[actionStr];
+        const action = actionStr; //options[actionStr];
         if (action) {
-          console.log('action and context', item, action)
+          console.log('action and context', item, action);
           if (action === 'ENV_DB_TABLES_CREATE') {
-            this.dialogGetTableName.dialogShow = true
+            this.dialogGetTableName.dialogShow = true;
           } else if (action === 'ENV_DB_VIEWS_CREATE') {
-            this.dialogGetViewName.dialogShow = true
+            this.dialogGetViewName.dialogShow = true;
           } else if (action === 'ENV_DB_PROCEDURES_CREATE') {
-            this.dialogGetProcedureName.dialogShow = true
+            this.dialogGetProcedureName.dialogShow = true;
           } else if (action === 'ENV_DB_SEQUENCES_CREATE') {
-            this.dialogGetSequenceName.dialogShow = true
+            this.dialogGetSequenceName.dialogShow = true;
           } else if (action === 'ENV_DB_FUNCTIONS_CREATE') {
-            this.dialogGetFunctionName.dialogShow = true
+            this.dialogGetFunctionName.dialogShow = true;
           } else if (action === 'ENV_DB_FUNCTIONS_CREATE') {
-            this.dialogGetFunctionName.dialogShow = true
-          } else if (action === 'ENV_DB_TABLES_REFRESH') {
-            await this.loadTables(this.menuItem)
-            this.$toast.success('Tables refreshed').goAway(1000)
+            this.dialogGetFunctionName.dialogShow = true;
+          } else if (action === "ENV_DB_TABLES_REFRESH") {
+            await this.loadTables(this.menuItem);
+            this.$toast.success('Tables refreshed').goAway(1000);
           } else if (action === 'ENV_DB_VIEWS_REFRESH') {
-            await this.loadViews(this.menuItem)
-            this.$toast.success('Views refreshed').goAway(1000)
+            await this.loadViews(this.menuItem);
+            this.$toast.success('Views refreshed').goAway(1000);
           } else if (action === 'IMPORT_EXCEL') {
             this.excelImportDialog = true
           } else if (action === 'ENV_DB_FUNCTIONS_REFRESH') {
-            await this.loadFunctions(this.menuItem)
-            this.$toast.success('Functions refreshed').goAway(1000)
+            await this.loadFunctions(this.menuItem);
+            this.$toast.success('Functions refreshed').goAway(1000);
           } else if (action === 'ENV_DB_PROCEDURES_REFRESH') {
-            await this.loadProcedures(this.menuItem)
-            this.$toast.success('Procedures refreshed').goAway(1000)
+            await this.loadProcedures(this.menuItem);
+            this.$toast.success('Procedures refreshed').goAway(1000);
           } else if (action === 'ENV_DB_SEQUENCES_REFRESH') {
-            await this.loadSequences(this.menuItem)
-            this.$toast.success('Table refreshed').goAway(1000)
+            await this.loadSequences(this.menuItem);
+            this.$toast.success('Table refreshed').goAway(1000);
           } else if (action === 'ENV_DB_TABLES_RENAME') {
-            console.log(`${item._nodes.type} Rename`)
-            this.dialogRenameTable.cookie = item
-            this.dialogRenameTable.dialogShow = true
-            this.dialogRenameTable.defaultValue = item.name
+            console.log(`${item._nodes.type} Rename`);
+            this.dialogRenameTable.cookie = item;
+            this.dialogRenameTable.dialogShow = true;
+            this.dialogRenameTable.defaultValue = item.name;
           } else if (action === 'ENV_DB_MIGRATION_DOWN') {
             await this.sqlMgr.migrator().migrationsDown({
               env: item._nodes.env,
@@ -1318,12 +1307,12 @@ export default {
               migrationSteps: 99999999999,
               folder: this.currentProjectFolder,
               sqlContentMigrate: 1,
-            })
-            console.log('migrations down done')
+            });
+            console.log('migrations down done');
           } else if (action === 'SHOW_NODES') {
-            console.log('\n_nodes.type = ', item._nodes.type, '\n')
-            console.log('_nodes.key = ', item._nodes.key, '\n')
-            console.log('_nodes = ', item._nodes, '\n')
+            console.log('\n_nodes.type = ', item._nodes.type, '\n');
+            console.log('_nodes.key = ', item._nodes.key, '\n');
+            console.log('_nodes = ', item._nodes, '\n');
           } else if (
             action === 'ENV_DB_TABLES_DELETE' ||
             action === 'ENV_DB_VIEWS_DELETE' ||
@@ -1331,44 +1320,44 @@ export default {
             action === 'ENV_DB_PROCEDURES_DELETE' ||
             action === 'ENV_DB_SEQUENCES_DELETE'
           ) {
-            console.log(`${item._nodes.type} delete`)
-            this.deleteSelectedNode('showDialog', item)
+            console.log(`${item._nodes.type} delete`);
+            this.deleteSelectedNode('showDialog', item);
           } else if (action === 'ENV_DB_TABLES_CREATE_STATEMENT') {
             await this.handleSqlStatementGeneration(
               item,
               'tableCreateStatement',
               `${item.name} Create Statement copied`
-            )
+            );
           } else if (action === 'ENV_DB_TABLES_INSERT_STATEMENT') {
             await this.handleSqlStatementGeneration(
               item,
               'tableInsertStatement',
               `${item.name} Insert Statement copied`
-            )
+            );
           } else if (action === 'ENV_DB_TABLES_UPDATE_STATEMENT') {
             await this.handleSqlStatementGeneration(
               item,
               'tableUpdateStatement',
               `${item.name} Update Statement copied`
-            )
+            );
           } else if (action === 'ENV_DB_TABLES_DELETE_STATEMENT') {
             await this.handleSqlStatementGeneration(
               item,
               'tableSelectStatement',
               `${item.name} Delete Statement copied`
-            )
+            );
           } else if (action === 'ENV_DB_TABLES_SELECT_STATEMENT') {
             await this.handleSqlStatementGeneration(
               item,
               'tableDeleteStatement',
               `${item.name} Select Statement copied`
-            )
+            );
           } else {
-            console.log(`No Action Fn found for ${action}`)
+            console.log(`No Action Fn found for ${action}`);
           }
         }
       } catch (e) {
-        console.log(e)
+        console.log(e);
       } finally {
         //this.$store.commit('notification/MutToggleProgressBar', false);
       }
@@ -1382,41 +1371,41 @@ export default {
             dbAlias: item._nodes.dbAlias,
           },
           func,
-          { tn: item.name },
-        ])
+          {tn: item.name},
+        ]);
         if (result && result.data) {
-          copyTextToClipboard(result.data, 'selection')
+          copyTextToClipboard(result.data, 'selection');
         } else {
-          copyTextToClipboard('Example String', 'selection')
+          copyTextToClipboard('Example String', 'selection');
         }
 
-        let sqlClientNode = { ...item._nodes }
+        let sqlClientNode = {...item._nodes};
         let newItem = {
           _nodes: sqlClientNode,
-        }
+        };
 
-        sqlClientNode.type = 'sqlClientDir'
-        sqlClientNode.key = sqlClientNode.tableDirKey.split('.')
-        sqlClientNode.key.pop()
-        sqlClientNode.dbKey = sqlClientNode.key.join('.')
-        sqlClientNode.key.push('sqlClient')
-        sqlClientNode.key = sqlClientNode.key.join('.')
+        sqlClientNode.type = 'sqlClientDir';
+        sqlClientNode.key = sqlClientNode.tableDirKey.split('.');
+        sqlClientNode.key.pop();
+        sqlClientNode.dbKey = sqlClientNode.key.join('.');
+        sqlClientNode.key.push('sqlClient');
+        sqlClientNode.key = sqlClientNode.key.join('.');
 
-        newItem.key = sqlClientNode.dbKey + '.sqlClient'
-        newItem.name = 'SQL Client'
-        newItem.tooltip = 'SQL Client'
-        newItem.type = 'sqlClientDir'
+        newItem.key = sqlClientNode.dbKey + '.sqlClient';
+        newItem.name = 'SQL Client';
+        newItem.tooltip = 'SQL Client';
+        newItem.type = 'sqlClientDir';
 
-        console.log('Generated sql client node', sqlClientNode)
+        console.log('Generated sql client node', sqlClientNode);
 
-        this.$toast.success(msg).goAway(2000)
+        this.$toast.success(msg).goAway(2000);
 
-        this.addTab(newItem, false, false)
+        this.addTab(newItem, false, false);
 
-        this.$store.commit('queries/MutSetClipboardQuery', result.data)
+        this.$store.commit('queries/MutSetClipboardQuery', result.data);
       } catch (e) {
-        console.log(e)
-        this.$toast.error('Something went wrong').goAway(2000)
+        console.log(e);
+        this.$toast.error('Something went wrong').goAway(2000);
       }
     },
 
@@ -1458,24 +1447,24 @@ export default {
           key: this.menuItem._nodes.key,
         },
         name: _tn,
-      })
-      this.dialogRenameTable.dialogShow = false
-      this.dialogRenameTable.defaultValue = null
-      this.$toast.success('Table renamed successfully').goAway(3000)
-      console.log(_tn, cookie)
+      });
+      this.dialogRenameTable.dialogShow = false;
+      this.dialogRenameTable.defaultValue = null;
+      this.$toast.success('Table renamed successfully').goAway(3000);
+      console.log(_tn, cookie);
     },
     mtdDialogRenameTableCancel() {
-      console.log('mtdDialogGetTableNameCancel cancelled')
-      this.dialogRenameTable.dialogShow = false
-      this.dialogRenameTable.defaultValue = null
+      console.log('mtdDialogGetTableNameCancel cancelled');
+      this.dialogRenameTable.dialogShow = false;
+      this.dialogRenameTable.defaultValue = null;
     },
     mtdTableCreate(table) {
       if (!this.menuItem || this.menuItem.type !== 'tableDir') {
-        this.menuItem = this.listViewArr.find(n => n.type === 'tableDir')
+        this.menuItem = this.listViewArr.find(n => n.type === 'tableDir');
       }
       // const tables = table.name.split(',');
-      this.$store.commit('notification/MutToggleProgressBar', true)
-      this.dialogGetTableName.dialogShow = false
+      this.$store.commit('notification/MutToggleProgressBar', true);
+      this.dialogGetTableName.dialogShow = false;
       setTimeout(() => {
         // for (let i = 0; i < tables.length; ++i) {
         if (table.name) {
@@ -1492,17 +1481,17 @@ export default {
               newTable: table,
             },
             name: table.alias,
-          })
+          });
         }
-      })
-      setTimeout(() => this.$store.commit('notification/MutToggleProgressBar', false), 200)
+      });
+      setTimeout(() => this.$store.commit('notification/MutToggleProgressBar', false), 200);
 
-      this.$set(this.dialogGetTableName, 'dialogShow', false)
+      this.$set(this.dialogGetTableName, 'dialogShow', false);
     },
     mtdViewCreate(view) {
       // const tables = table.name.split(',');
-      this.$store.commit('notification/MutToggleProgressBar', true)
-      this.dialogGetViewName.dialogShow = false
+      this.$store.commit('notification/MutToggleProgressBar', true);
+      this.dialogGetViewName.dialogShow = false;
       setTimeout(() => {
         // for (let i = 0; i < tables.length; ++i) {
         if (view.name) {
@@ -1519,19 +1508,19 @@ export default {
               newView: true,
             },
             name: view.alias,
-          })
+          });
         }
-      })
-      setTimeout(() => this.$store.commit('notification/MutToggleProgressBar', false), 200)
+      });
+      setTimeout(() => this.$store.commit('notification/MutToggleProgressBar', false), 200);
 
-      this.$set(this.dialogGetTableName, 'dialogShow', false)
+      this.$set(this.dialogGetTableName, 'dialogShow', false);
     },
     mtdDialogGetTableNameSubmit(tn, cookie) {
-      console.log(tn)
+      console.log(tn);
 
-      let tables = tn.split(',')
-      this.$store.commit('notification/MutToggleProgressBar', true)
-      this.dialogGetTableName.dialogShow = false
+      let tables = tn.split(',');
+      this.$store.commit('notification/MutToggleProgressBar', true);
+      this.dialogGetTableName.dialogShow = false;
       setTimeout(() => {
         for (let i = 0; i < tables.length; ++i) {
           if (tables[i]) {
@@ -1549,18 +1538,18 @@ export default {
                 newTable: true,
               },
               name: tables[i],
-            })
+            });
           }
         }
-      })
-      setTimeout(() => this.$store.commit('notification/MutToggleProgressBar', false), 200)
+      });
+      setTimeout(() => this.$store.commit('notification/MutToggleProgressBar', false), 200);
     },
     mtdDialogGetTableNameCancel() {
-      console.log('mtdDialogGetTableNameCancel cancelled')
-      this.dialogGetTableName.dialogShow = false
+      console.log('mtdDialogGetTableNameCancel cancelled');
+      this.dialogGetTableName.dialogShow = false;
     },
     mtdDialogGetViewNameSubmit(view_name) {
-      console.log(view_name)
+      console.log(view_name);
       this.$store.dispatch('tabs/ActAddTab', {
         _nodes: {
           env: this.menuItem._nodes.env,
@@ -1575,15 +1564,15 @@ export default {
           newView: true,
         },
         name: view_name,
-      })
-      this.dialogGetViewName.dialogShow = false
+      });
+      this.dialogGetViewName.dialogShow = false;
     },
     mtdDialogGetViewNameCancel() {
-      console.log('mtdDialogGetTableNameCancel cancelled')
-      this.dialogGetViewName.dialogShow = false
+      console.log('mtdDialogGetTableNameCancel cancelled');
+      this.dialogGetViewName.dialogShow = false;
     },
     mtdDialogGetFunctionNameSubmit(function_name) {
-      console.log(function_name)
+      console.log(function_name);
       this.$store.dispatch('tabs/ActAddTab', {
         _nodes: {
           dbKey: this.menuItem._nodes.dbKey,
@@ -1596,15 +1585,15 @@ export default {
           dbConnection: this.menuItem._nodes.dbConnection,
         },
         name: function_name,
-      })
-      this.dialogGetFunctionName.dialogShow = false
+      });
+      this.dialogGetFunctionName.dialogShow = false;
     },
     mtdDialogGetFunctionNameCancel() {
-      console.log('mtdDialogGetFunctionNameCancel cancelled')
-      this.dialogGetFunctionName.dialogShow = false
+      console.log('mtdDialogGetFunctionNameCancel cancelled');
+      this.dialogGetFunctionName.dialogShow = false;
     },
     mtdDialogGetProcedureNameSubmit(procedure_name) {
-      console.log(procedure_name)
+      console.log(procedure_name);
       this.$store.dispatch('tabs/ActAddTab', {
         _nodes: {
           dbKey: this.menuItem._nodes.dbKey,
@@ -1616,11 +1605,11 @@ export default {
           key: this.menuItem._nodes.key,
         },
         name: procedure_name,
-      })
-      this.dialogGetProcedureName.dialogShow = false
+      });
+      this.dialogGetProcedureName.dialogShow = false;
     },
     mtdDialogGetSequenceNameSubmit(sequence_name) {
-      console.log(sequence_name)
+      console.log(sequence_name);
       this.$store.dispatch('tabs/ActAddTab', {
         _nodes: {
           dbKey: this.menuItem._nodes.dbKey,
@@ -1633,16 +1622,16 @@ export default {
           dbConnection: this.menuItem._nodes.dbConnection,
         },
         name: sequence_name,
-      })
-      this.dialogGetSequenceName.dialogShow = false
+      });
+      this.dialogGetSequenceName.dialogShow = false;
     },
     mtdDialogGetProcedureNameCancel() {
-      console.log('mtdDialogGetProcedureNameCancel cancelled')
-      this.dialogGetProcedureName.dialogShow = false
+      console.log('mtdDialogGetProcedureNameCancel cancelled');
+      this.dialogGetProcedureName.dialogShow = false;
     },
     mtdDialogGetSequenceNameCancel() {
-      console.log('mtdDialogGetSequenceNameCancel cancelled')
-      this.dialogGetSequenceName.dialogShow = false
+      console.log('mtdDialogGetSequenceNameCancel cancelled');
+      this.dialogGetSequenceName.dialogShow = false;
     },
     async renameSelectedNode(action = '', item) {
       if (action === 'showDialog') {
@@ -1650,13 +1639,13 @@ export default {
           dialog: true,
           item: item,
           heading: `Rename ${item._nodes.type}`,
-        }
+        };
       } else if (action === 'hideDialog') {
         this.selectedNodeForDelete = {
           dialog: false,
           item: null,
           heading: null,
-        }
+        };
       } else {
       }
     },
@@ -1666,15 +1655,15 @@ export default {
           dialog: true,
           item: item,
           heading: `Click Submit to Delete The ${item._nodes.type}`,
-        }
+        };
       } else if (action === 'hideDialog') {
         this.selectedNodeForDelete = {
           dialog: false,
           item: null,
           heading: null,
-        }
+        };
       } else {
-        item = this.selectedNodeForDelete.item
+        item = this.selectedNodeForDelete.item;
         if (item._nodes.type === 'table') {
           const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [
             {
@@ -1685,7 +1674,7 @@ export default {
             {
               tn: item._nodes.tn,
             },
-          ])
+          ]);
 
           await this.sqlMgr.sqlOpPlus(
             {
@@ -1693,17 +1682,14 @@ export default {
               dbAlias: item._nodes.dbAlias,
             },
             'tableDelete',
-            {
-              tn: item._nodes.tn,
-              columns: columns.data.list
-            }
-          )
+            {tn: item._nodes.tn, columns: columns.data.list}
+          );
           await this.loadTablesFromParentTreeNode({
             _nodes: {
               ...item._nodes,
             },
-          })
-          this.$toast.success('Table deleted successfully').goAway(3000)
+          });
+          this.$toast.success('Table deleted successfully').goAway(3000);
         } else if (item._nodes.type === 'view') {
           const view = await this.$store.dispatch('sqlMgr/ActSqlOp', [
             {
@@ -1711,8 +1697,8 @@ export default {
               dbAlias: item._nodes.dbAlias,
             },
             'viewRead',
-            { view_name: item._nodes.view_name },
-          ])
+            {view_name: item._nodes.view_name},
+          ]);
 
           await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
             {
@@ -1724,13 +1710,13 @@ export default {
               view_name: item._nodes.view_name,
               oldViewDefination: view.view_definition,
             },
-          ])
+          ]);
           await this.loadViewsFromParentTreeNode({
             _nodes: {
               ...item._nodes,
             },
-          })
-          this.$toast.success('View deleted successfully').goAway(3000)
+          });
+          this.$toast.success('View deleted successfully').goAway(3000);
         } else if (item._nodes.type === 'function') {
           const _function = await this.$store.dispatch('sqlMgr/ActSqlOp', [
             {
@@ -1741,7 +1727,7 @@ export default {
             {
               function_name: item._nodes.function_name,
             },
-          ])
+          ]);
 
           await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
             {
@@ -1753,14 +1739,14 @@ export default {
               function_name: item._nodes.function_name,
               oldCreateFunction: _function.create_function,
             },
-          ])
+          ]);
 
           await this.loadFunctionsFromParentTreeNode({
             _nodes: {
               ...item._nodes,
             },
-          })
-          this.$toast.success('Function deleted successfully').goAway(3000)
+          });
+          this.$toast.success('Function deleted successfully').goAway(3000);
         } else if (item._nodes.type === 'procedure') {
           const procedure = await this.$store.dispatch('sqlMgr/ActSqlOp', [
             {
@@ -1771,7 +1757,7 @@ export default {
             {
               procedure_name: item._nodes.procedure_name,
             },
-          ])
+          ]);
 
           await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
             {
@@ -1783,30 +1769,33 @@ export default {
               procedure_name: item._nodes.procedure_name,
               create_procedure: procedure.create_procedure,
             },
-          ])
+          ]);
 
           await this.loadProceduresFromParentTreeNode({
             _nodes: {
               ...item._nodes,
             },
-          })
-          this.$toast.success('Procedure deleted successfully').goAway(3000)
+          });
+          this.$toast.success('Procedure deleted successfully').goAway(3000);
         }
 
-        await this.removeTabsByName(item)
+        await this.removeTabsByName(item);
 
         this.selectedNodeForDelete = {
           dialog: false,
           item: null,
           heading: null,
-        }
+        };
       }
+    },
+    validateTableName(v) {
+      return validateTableName(v, this.$store.getters['project/GtrProjectIsGraphql'])
     },
   },
   async created() {
     // this.loadDefaultTabs();
     // this.instantiateSqlMgr();
-    const _id = this.$route.params.project
+    const _id = this.$route.params.project;
 
     if (_id === 'external') {
     }
@@ -1821,9 +1810,9 @@ export default {
     // this.setEvents();
   },
   async destroyed() {
-    await this.clearProjects()
+    await this.clearProjects();
   },
-}
+};
 </script>
 <style scoped>
 /deep/ .project-tree .v-treeview-node__level {

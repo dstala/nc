@@ -35,8 +35,12 @@
       :primary-col="parentPrimaryCol"
       :primary-key="parentPrimaryKey"
       :api="parentApi"
-      :query-params="parentQueryParams"
+      :query-params="{
+        ...parentQueryParams,
+        where: isNew ? null :`${btWhereClause}`,
+      }"
       :is-public="isPublic"
+      :tn="bt && bt.rtn"
       :password="password"
       @add-new-record="insertAndMapNewParentRecord"
       @add="addChildToParent"
@@ -106,6 +110,7 @@
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'
 import ItemChip from '~/components/project/spreadsheet/components/virtualCell/components/itemChip'
+import { parseIfInteger } from '@/helpers'
 
 export default {
   name: 'BelongsToCell',
@@ -121,6 +126,7 @@ export default {
     isForm: Boolean,
     value: [Object, Array],
     meta: [Object],
+    bt: Object,
     nodes: [Object],
     row: [Object],
     api: [Object, Function],
@@ -172,6 +178,20 @@ export default {
     },
     parentPrimaryKey() {
       return this.parentMeta && (this.parentMeta.columns.find(c => c.pk) || {})._cn
+    },
+    parentReferenceKey() {
+      return this.parentMeta && (this.parentMeta.columns.find(c => c.cn === this.bt.rcn) || {})._cn
+    },
+    btWhereClause() {
+      // if parent reference key is pk, then filter out the selected value
+      // else, filter out the selected value + empty values (as we can't set an empty value)
+      const prk = this.parentReferenceKey
+      const isPk = !!(this.parentMeta && (this.parentMeta.columns.find(c => c.pk && c._cn === prk))) || false
+      let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.cn === this.bt.cn).map(c => this.row[c._cn] || '').join('___') : ''
+      if (this.parentMeta && (this.parentMeta.columns.find(c => c._cn === prk)).type !== 'string') {
+        selectedValue = selectedValue || 0
+      }
+      return `(${prk},not,${selectedValue})` + (!isPk ? `~and(${prk},not,)` : '')
     },
     parentQueryParams() {
       if (!this.parentMeta) {
@@ -321,9 +341,9 @@ export default {
       const _cn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
       let isNum = false
 
-      if (pkColumns.length === 1) {
-        isNum = ['float', 'integer'].includes(this.sqlUi.getAbstractType(pkColumns[0]))
-      }
+      // if (pkColumns.length === 1) {
+      //   isNum = ['float', 'integer'].includes(this.sqlUi.getAbstractType(pkColumns[0]))
+      // }
 
       if (this.isNew) {
         this.localState = parent
@@ -332,14 +352,13 @@ export default {
         this.newRecordModal = false
         return
       }
-
       // await this.api.update(id, {
-      //   [_cn]: isNum ? +pid : pid
+      //   [_cn]: parseIfInteger(parent[this.parentReferenceKey])
       // }, {
       //   [_cn]: this.value && this.value[this.parentPrimaryKey]
       // })
 
-      await this.$api.data.update(this.meta.id, id, { [_cn]: isNum ? +pid : pid })
+      await this.$api.data.update(this.meta.id, id, { [_cn]: parseIfInteger(parent[this.parentReferenceKey]) })
 
       this.pid = pid
 
@@ -416,6 +435,7 @@ export default {
  * @author Naveen MR <oof1lab@gmail.com>
  * @author Pranav C Balan <pranavxc@gmail.com>
  * @author Md Ishtiaque Zafar <ishtiaque.zafar92@gmail.com>
+ * @author Wing-Kam Wong <wingkwong.code@gmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *

@@ -25,11 +25,12 @@
         <v-icon small left>
           refresh
         </v-icon>
-        Reload
+        <!-- Reload -->
+        {{ $t('general.reload') }}
       </x-btn>
       <x-btn
         outlined
-        tooltip="Save Changes"
+        :tooltip="$t('tooltip.saveChanges')"
         color="primary"
         small
         :disabled="!edited || loading"
@@ -38,7 +39,8 @@
         <v-icon small left>
           save
         </v-icon>
-        Save
+        <!-- Save -->
+        {{ $t('general.save') }}
       </x-btn>
     </v-toolbar>
     <template v-if="columns">
@@ -74,7 +76,7 @@
                   <template #input>
                     <v-text-field
                       v-model="item._cn"
-                      label="Edit"
+                      :label="$t('general.edit')"
                       single-line
                       @input="edited=true"
                     />
@@ -210,7 +212,8 @@
             <v-spacer />
 
             <v-btn outlined x-small @click="validatorEditDialog = false">
-              Cancel
+              <!-- Cancel -->
+              {{ $t('general.cancel') }}
             </v-btn>
             <x-btn
               outlined
@@ -225,7 +228,8 @@
               Add Validation
             </x-btn>
             <v-btn outlined color="primary" x-small @click.prevent="saveValidationForColumn(clickedItem)">
-              Save
+              <!-- Save -->
+              {{ $t('general.save') }}
             </v-btn>
           </div>
           <v-simple-table v-if="clickedItem.validate.func && clickedItem.validate.func.length" dense>
@@ -265,7 +269,7 @@
                     <template #input>
                       <v-text-field
                         v-model="clickedItem.validate.msg[i]"
-                        label="Edit"
+                        :label="$t('general.edit')"
                         single-line
                         @input="edited=true"
                       />

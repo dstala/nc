@@ -261,9 +261,10 @@
         <!--      </v-tabs-items>-->
       </v-tabs-items>
 
+      <!-- tooltip: Add new table -->
       <x-icon
         v-if="_isUIAllowed('addTable')"
-        tooltip="Create new table"
+        :tooltip="$t('tooltip.addTable')"
         icon-class="add-btn"
         :color="[ 'white','grey lighten-2']"
         @click="dialogCreateTableShow = true"
@@ -293,7 +294,7 @@
       @create="$emit('tableCreate',$event); dialogCreateTableShow =false;"
     />
 
-    <screensaver v-if="showScreensaver && !($store.state.project.projectInfo && $store.state.project.projectInfo.ncMin)" class="screensaver" />
+    <!--    <screensaver v-if="showScreensaver && !($store.state.project.projectInfo && $store.state.project.projectInfo.ncMin)" class="screensaver" />-->
   </v-container>
 </template>
 
@@ -321,7 +322,7 @@ import ApiClientSwaggerTab from './project/apiClientSwagger'
 import XcMeta from './project/settings/xcMeta'
 import XcInfo from './project/xcInfo'
 import SwaggerClient from '@/components/project/swaggerClient'
-import Screensaver from '@/components/screensaver'
+// import Screensaver from '@/components/screensaver'
 import DlgTableCreate from '@/components/utils/dlgTableCreate'
 import AppStore from '@/components/project/appStore'
 import AuthTab from '@/components/authTab'
@@ -335,7 +336,7 @@ import AuditTab from '~/components/project/auditTab'
 export default {
   components: {
     SwaggerClient,
-    Screensaver,
+    // Screensaver,
     DlgTableCreate,
     AuditTab,
     AppStore,
@@ -519,7 +520,7 @@ export default {
     //   // }
     // );
 
-    this.checkInactiveState()
+    // this.checkInactiveState()
   },
   mounted() {
   },

@@ -40,7 +40,8 @@
           <v-icon small left>
             refresh
           </v-icon>
-          Reload
+          <!-- Reload -->
+          {{ $t('general.reload') }}
         </x-btn>
         <x-btn
           v-ge="['acl','open-folder']"
@@ -57,7 +58,7 @@
         <x-btn
           v-ge="['acl','save']"
           outlined
-          tooltip="Save Changes"
+          :tooltip="$t('tooltip.saveChanges')"
           color="primary"
           class="primary"
           small
@@ -67,7 +68,8 @@
           <v-icon small left>
             save
           </v-icon>
-          Save
+          <!-- Save -->
+          {{ $t('general.save') }}
         </x-btn>
       </v-toolbar>
 

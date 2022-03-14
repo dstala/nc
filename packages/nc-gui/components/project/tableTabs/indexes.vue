@@ -47,7 +47,8 @@
         <v-icon small left>
           refresh
         </v-icon>
-        Reload
+        <!-- Reload -->
+        {{ $t('general.reload') }}
       </x-btn>
       <x-btn
         v-if="indexCreationAllowed"
@@ -65,7 +66,7 @@
       <x-btn
         v-ge="['indexes','delete-table']"
         outlined
-        tooltip="Delete Table"
+        :tooltip="$t('activity.deleteTable')"
         small
         color="error "
         class="error text-right"
@@ -129,7 +130,7 @@
                           :disabled="props.index !== selected"
                           class="body-2"
                           :rules="[max25chars]"
-                          label="Edit"
+                          :label="$t('general.edit')"
                           single-line
                           counter
                         />

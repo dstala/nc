@@ -46,13 +46,14 @@
                       <div style="position: absolute; right:5px;bottom:0">
                         <x-btn
                           outlined
-                          tooltip="Reload list"
+                          :tooltip="$t('tooltip.reloadList')"
                           small
                           color="primary"
                           icon="refresh"
                           @click="loadCrons()"
                         >
-                          Reload
+                          <!-- Reload -->
+                          {{ $t('general.reload') }}
                         </x-btn>
                         <x-btn
                           outlined
@@ -148,13 +149,14 @@
                             outlined
                             :loading="updating"
                             :disabled="updating || !selectedItem"
-                            tooltip="Save Changes"
+                            :tooltip="$t('tooltip.saveChanges')"
                             small
                             color="primary"
                             icon="save"
                             @click="saveCron()"
                           >
-                            Save
+                            <!-- Save -->
+                            {{ $t('general.save') }}
                           </x-btn>
                         </div>
                         <v-switch

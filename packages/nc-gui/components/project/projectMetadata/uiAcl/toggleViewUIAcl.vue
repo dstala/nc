@@ -23,25 +23,27 @@
           <v-spacer />
           <x-btn
             outlined
-            tooltip="Reload list"
+            :tooltip="$t('tooltip.reloadList')"
             small
             color="primary"
             icon="refresh"
             @click="loadViewList()"
           >
-            Reload
+            <!-- Reload -->
+            {{ $t('general.reload') }}
           </x-btn>
           <x-btn
             outlined
             :loading="updating"
             :disabled="updating || !edited"
-            tooltip="Save Changes"
+            :tooltip="$t('tooltip.saveChanges')"
             small
             color="primary"
             icon="save"
             @click="save()"
           >
-            Save
+            <!-- Save -->
+            {{ $t('general.save') }}
           </x-btn>
         </v-toolbar>
 

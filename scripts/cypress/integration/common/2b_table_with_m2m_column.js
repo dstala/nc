@@ -21,10 +21,10 @@ export const genTest = (apiType, dbType) => {
 
         it("Expand m2m column", () => {
             // expand first row
-            cy.get('td[data-col="FilmMMList"] div', { timeout: 12000 })
+            cy.get('td[data-col="Actor <=> Film"] div', { timeout: 12000 })
                 .first()
                 .click({ force: true });
-            cy.get('td[data-col="FilmMMList"] div .mdi-arrow-expand')
+            cy.get('td[data-col="Actor <=> Film"] div .mdi-arrow-expand')
                 .first()
                 .click({ force: true });
 
@@ -60,7 +60,7 @@ export const genTest = (apiType, dbType) => {
                     cy.getActiveModal()
                         .find(".child-card")
                         .eq(0)
-                        .contains("ACADEMY DINOSAUR")
+                        .contains("ACE GOLDFINGER")
                         .should("exist");
                     cy.get("body").type("{esc}");
                 });
@@ -79,7 +79,7 @@ export const genTest = (apiType, dbType) => {
                         .contains("ACADEMY DINOSAUR")
                         .should("exist");
                     cy.getActiveModal()
-                        .find('button:contains("Save Row")')
+                        .find('button:contains("Save row")')
                         .should("exist");
                     cy.getActiveModal()
                         .find('button:contains("Cancel")')

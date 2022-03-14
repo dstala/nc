@@ -16,7 +16,8 @@
         <v-icon small left>
           refresh
         </v-icon>
-        Reload
+        <!-- Reload -->
+        {{ $t('general.reload') }}
       </x-btn>
       <x-btn
         v-ge="['roles','add new']"
@@ -36,7 +37,7 @@
       <x-btn
         v-ge="['rows','save']"
         outlined
-        tooltip="Save Changes"
+        :tooltip="$t('tooltip.saveChanges')"
         color="primary"
         small
         :disabled="!edited || loading"
@@ -47,7 +48,8 @@
         <v-icon small left>
           save
         </v-icon>
-        Save
+        <!-- Save -->
+        {{ $t('general.save') }}
       </x-btn>
     </v-toolbar>
     <div class="d-flex justify-center pa-2">

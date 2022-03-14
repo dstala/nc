@@ -54,7 +54,16 @@
       :column="column"
       :query-params="{
         ...childQueryParams,
-        where: isNew ? null :`~not(${childForeignKey},eq,${parentId})~or(${childForeignKey},is,null)`,
+        // check if it needs to bypass to
+        // avoid foreign key constraint violation in real relation
+        isByPass,
+        where:
+          // show all for new record
+          isNew ? null :
+          // filter out those selected items
+          `~not(${childForeignKey},eq,${parentId})` +
+          // allow the child with empty key
+          '~or(' + childForeignKey + ',is,null)'
       }"
       :is-public="isPublic"
       :password="password"
@@ -219,6 +228,23 @@ export default {
     childForeignKey() {
       return this.childMeta && (this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id) || {})._cn
     },
+    childForeignKeyVal() {
+      return this.meta && this.meta.columns ? this.meta.columns.filter(c => c._cn === this.childForeignKey).map(c => this.row[c._cn] || '').join('___') : ''
+    },
+    isVirtualRelation() {
+      return (this.childMeta && (!!this.childMeta.columns.find(c => c.cn === this.hm.cn && this.hm.type === 'virtual'))) || false
+    },
+    isByPass() {
+      if (this.isVirtualRelation) {
+        return false
+      }
+      // if child fk references a column in parent which is not pk,
+      // then this column has to be filled
+      if (((this.meta && this.meta.columns.find(c => !c.pk && c.cn === this.hm.rcn)) || false)) {
+        return this.childForeignKeyVal === ''
+      }
+      return false
+    },
     disabledChildColumns() {
       return { [this.childForeignKey]: true }
     },
@@ -249,7 +275,9 @@ export default {
       }
     },
     parentId() {
-      return this.meta && this.meta.columns ? this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___') : ''
+      return (this.meta && this.meta.columns &&
+        (this.meta.columns.filter(c => c._cn === this.childForeignKey).map(c => this.row[c._cn] || '').join('___') ||
+        this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___'))) || ''
     }
   },
   watch: {
@@ -372,7 +400,7 @@ export default {
 
       this.$emit('loadTableData')
       if ((this.childListModal || this.isForm) && this.$refs.childList) {
-        this.$refs.childList.loadData()
+        await this.$refs.childList.loadData()
       }
     },
     async editChild(child) {
@@ -501,6 +529,7 @@ export default {
  *
  * @author Naveen MR <oof1lab@gmail.com>
  * @author Pranav C Balan <pranavxc@gmail.com>
+ * @author Wing-Kam Wong <wingkwong.code@gmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *

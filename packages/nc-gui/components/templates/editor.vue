@@ -112,7 +112,7 @@
                 </div>
 
                 <p v-if="project.tables" class="caption grey--text mt-4">
-                  {{ project.tables.length }} sheet{{ project.tables.length > 1 ? 's' :'' }} are available for import
+                  {{ project.tables.length }} sheet{{ project.tables.length > 1 ? 's' :'' }} available for import
                 </p>
 
                 <v-expansion-panels
@@ -168,10 +168,12 @@
                           <thead>
                             <tr>
                               <th class="caption text-left pa-1">
-                                Column Name
+                                <!--Column Name-->
+                                {{ $t('labels.columnName') }}
                               </th>
                               <th class="caption text-left pa-1" colspan="4">
-                                Column Type
+                                <!--Column Type-->
+                                {{ $t('labels.columnType') }}
                               </th>
                               <th />
                             <!--                    <th class='text-center'>Related Table</th>-->
@@ -193,7 +195,7 @@
                                   outlined
                                   dense
                                   class="caption"
-                                  placeholder="Column name"
+                                  :placeholder="$t('labels.columnName')"
                                   hide-details="auto"
                                   :rules="[
                                     v => !!v || 'Column name required',
@@ -512,7 +514,10 @@
 
     <v-dialog v-model="createTablesDialog" max-width="500">
       <v-card>
-        <v-card-title>Enter table name</v-card-title>
+        <v-card-title>
+          <!--Enter table name-->
+          {{ $t('msg.info.enterTableName') }}
+        </v-card-title>
         <v-card-text>
           <v-text-field
             v-model="tableNamesInput"
@@ -527,10 +532,12 @@
         <v-card-actions>
           <v-spacer />
           <v-btn outlined small @click="createTablesDialog=false">
-            Cancel
+            <!-- Cancel -->
+            {{ $t('general.cancel') }}
           </v-btn>
           <v-btn outlined color="primary" small @click="addTables">
-            Save
+            <!-- Save -->
+            {{ $t('general.save') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -552,10 +559,12 @@
         <v-card-actions>
           <v-spacer />
           <v-btn outlined small @click="createTableColumnsDialog=false">
-            Cancel
+            <!-- Cancel -->
+            {{ $t('general.cancel') }}
           </v-btn>
           <v-btn outlined color="primary" small @click="addColumns">
-            Save
+            <!-- Save -->
+            {{ $t('general.save') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -578,7 +587,10 @@
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </template>
-      <span class="caption">Add new table</span>
+      <span class="caption">
+        <!--Add new table-->
+        {{ $t('tooltip.addTable') }}
+      </span>
     </v-tooltip>
   </div>
 </template>

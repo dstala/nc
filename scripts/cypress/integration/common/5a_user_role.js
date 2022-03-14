@@ -196,7 +196,7 @@ export const genTest = (apiType, dbType) => {
                 const verifyCsv = (retrievedRecords) => {
                     // expected output, statically configured
                     let storedRecords = [
-                        `City,AddressList,CountryRead`,
+                        `City,City => Address,Country <= City`,
                         `A Corua (La Corua),939 Probolinggo Loop,Spain`,
                         `Abha,733 Mandaluyong Place,Saudi Arabia`,
                         `Abu Dhabi,535 Ahmadnagar Manor,United Arab Emirates`,

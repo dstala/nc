@@ -40,13 +40,14 @@
           <v-icon small left>
             refresh
           </v-icon>
-          Reload
+          <!-- Reload -->
+          {{ $t('general.reload') }}
         </x-btn>
         <x-btn
           v-if="!isView"
           v-ge="['rows','save']"
           outlined
-          tooltip="Save Changes"
+          :tooltip="$t('tooltip.saveChanges')"
           color="primary"
           class="primary"
           small
@@ -56,7 +57,8 @@
           <v-icon small left>
             save
           </v-icon>
-          Save
+          <!-- Save -->
+          {{ $t('general.save') }}
         </x-btn>
         <x-btn
           v-if="!isView"
@@ -112,7 +114,7 @@
                     <v-text-field
                       v-model="item.data[text]"
                       class="mt-0 caption"
-                      label="Edit"
+                      :label="$t('general.edit')"
                       :type="getType(type)"
                       single-line
                       hide-details
@@ -142,7 +144,7 @@
                   v-ge="['rows','save']"
                   dense
                   hide-details
-                  label="Edit"
+                  :label="$t('general.edit')"
                   :type="getType(type)"
                   :placeholder="text"
                   :disabled="ai"

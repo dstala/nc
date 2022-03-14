@@ -1,6 +1,6 @@
 ---
 title: 'GraphQL APIs'
-position: 300
+position: 1020
 category: 'Developer Resources'
 menuTitle: 'GraphQL APIs'
 ---
@@ -68,7 +68,7 @@ menuTitle: 'GraphQL APIs'
 
 ```
 eq      -   '='         -  (colName,eq,colValue)
-not     -   '!='        -  (colName,ne,colValue)
+not     -   '!='        -  (colName,not,colValue)
 gt      -   '>'         -  (colName,gt,colValue)
 ge      -   '>='        -  (colName,ge,colValue)
 lt      -   '<'         -  (colName,lt,colValue)

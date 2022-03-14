@@ -19,16 +19,16 @@
         v-if="meta"
         height="40"
         dense
-        class="elevation-0 xc-toolbar xc-border-bottom"
+        class="nc-table-toolbar elevation-0 xc-toolbar xc-border-bottom"
         style="z-index: 7;border-radius: 4px"
       >
         <!--
-      <div class="d-flex xc-border align-center search-box">
+      <div class="d-flex xc-border align-center search-box"  style="min-width:156px">
         <v-menu bottom offset-y>
           <template #activator="{on}">
-            <div v-on="on">
+            <div style="min-width: 56px" v-on="on">
               <v-icon
-                class="pa-1 pr-0 ml-2"
+                class="ml-2"
                 small
                 color="grey"
               >
@@ -62,7 +62,7 @@
         <v-text-field
           v-model="searchQuery"
           autocomplete="off"
-          style="min-width: 300px"
+          style="min-width: 100px ; width: 150px"
           flat
           dense
           solo
@@ -82,7 +82,7 @@
       }}) -> {{ relationType === 'hm' ? ' Has Many ' : ' Belongs To ' }} -> {{ table }}</span>
 -->
 
-        <v-spacer />
+      <div class="d-inline-flex">
 
         <!--        <v-btn outlined small text @click="reload">
           <v-icon small class="mr-1" color="grey  darken-3">
@@ -122,7 +122,8 @@
           :meta="meta"
           :req-payload="{filters, sorts, password}"
         />
-
+      </div>
+        <v-spacer class="h-100" @dblclick="debug=true" />
         <!--      <v-menu>
           <template #activator="{ on, attrs }">
             <v-icon
@@ -329,7 +330,7 @@ export default {
     concatenatedXWhere() {
       let where = ''
       if (this.searchField && this.searchQuery.trim()) {
-        if (['text', 'string'].includes(this.sqlUi.getAbstractType(this.meta.columns.find(({ cn }) => cn === this.searchField)))) {
+        if (['text', 'string'].includes(this.sqlUi.getAbstractType(this.meta.columns.find(({ _cn }) => _cn === this.searchField)))) {
           where = `(${this.searchField},like,%${this.searchQuery.trim()}%)`
         } else {
           where = `(${this.searchField},eq,${this.searchQuery.trim()})`

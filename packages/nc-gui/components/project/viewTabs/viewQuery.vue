@@ -36,18 +36,20 @@
         icon="refresh"
         @click="loadEnv()"
       >
-        Reload
+        <!-- Reload -->
+        {{ $t('general.reload') }}
       </x-btn>
       <x-btn
         outlined
-        tooltip="Save Changes"
+        :tooltip="$t('tooltip.saveChanges')"
         :disabled="nodes.dbConnection.client === 'sqlite3' && !newView "
         small
         color="primary"
         icon="save"
         @click="applyChanges()"
       >
-        Save
+        <!-- Save -->
+        {{ $t('general.save') }}
       </x-btn>
       <x-btn
         outlined

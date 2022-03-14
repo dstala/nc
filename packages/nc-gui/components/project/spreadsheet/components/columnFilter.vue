@@ -62,7 +62,7 @@
             v-if="!i"
             :key="i + '_2'"
             class="caption d-flex align-center"
-          >where</span>
+          >{{ $t('labels.where') }}</span>
 
           <v-select
             v-else
@@ -105,7 +105,7 @@
             v-model="filter.fk_column_id"
             class="caption nc-filter-field-select"
             :items="meta.columns"
-            placeholder="Field"
+            :placeholder="$t('objects.field')"
             solo
             flat
             dense
@@ -129,7 +129,7 @@
             v-model="filter.comparison_op"
             class="flex-shrink-1 flex-grow-0 caption  nc-filter-operation-select"
             :items="comparisonOp"
-            placeholder="Operation"
+            :placeholder="$t('labels.operation')"
             solo
             flat
             style="max-width:120px"
@@ -181,7 +181,8 @@
       <v-icon small color="grey">
         mdi-plus
       </v-icon>
-      Add Filter
+      <!-- Add Filter -->
+      {{ $t('activity.addFilter') }}
     </v-btn>
     <!--    <v-btn small class="elevation-0 grey&#45;&#45;text my-3" @click.stop="addFilterGroup">-->
     <!--      <v-icon small color="grey">-->

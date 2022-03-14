@@ -8,14 +8,15 @@
       <v-icon left>
         refresh
       </v-icon>
-      Reload
+      <!-- Reload -->
+      {{ $t('general.reload') }}
     </v-btn>
     <v-btn
       small
       class=" text-right"
       @click="deleteTable('showDialog')"
     >
-      Delete Table
+      {{ $t('activity.deleteTable') }}
     </v-btn>
     <v-btn @click="throwError()">
       error

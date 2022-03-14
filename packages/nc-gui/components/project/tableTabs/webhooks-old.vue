@@ -32,7 +32,7 @@
       <x-btn
         v-ge="['rows','save']"
         outlined
-        tooltip="Save Changes"
+        :tooltip="$t('tooltip.saveChanges')"
         color="primary"
         small
 
@@ -42,7 +42,8 @@
         <v-icon small left>
           save
         </v-icon>
-        Save
+        <!-- Save -->
+        {{ $t('general.save') }}
       </x-btn>
     </v-toolbar>
 
