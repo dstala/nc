@@ -97,8 +97,11 @@ export default class User implements UserType {
     return user;
   }
 
-  static async isFirst() {
-    return !(await NocoCache.getAll(`${CacheScope.USER}:*`))?.length;
+  static async isFirst(ncMeta = Noco.ncMeta) {
+    const isFirst = !(await NocoCache.getAll(`${CacheScope.USER}:*`))?.length;
+    if (isFirst)
+      return !(await ncMeta.metaGet2(null, null, MetaTable.USERS, {}));
+    return false;
   }
 
   static async count(ncMeta = Noco.ncMeta) {
