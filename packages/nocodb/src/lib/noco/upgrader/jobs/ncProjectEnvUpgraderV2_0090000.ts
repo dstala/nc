@@ -645,7 +645,7 @@ async function migrateProjectModels(
             viewColumns.find(c => column.id === c.fk_column_id),
             {
               order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
-              show: queryParams?.showFields?.[_cn],
+              show: queryParams?.showFields?.[_cn] || false,
               width: queryParams?.columnsWidth?.[_cn]
             },
             ncMeta
@@ -780,7 +780,7 @@ async function migrateProjectModelViews(
     )) {
       const viewColumn = viewColumns.find(c => column.id === c.fk_column_id);
       const order = queryParams?.fieldsOrder?.indexOf(_cn) + 1;
-      const show = queryParams?.showFields?.[_cn];
+      const show = queryParams?.showFields?.[_cn] || false;
       if (viewData.show_as === 'form') {
         const columnParams =
           queryParams?.extraViewParams?.formParams?.fields?.[_cn];
@@ -800,8 +800,8 @@ async function migrateProjectModelViews(
         await GridViewColumn.update(
           viewColumns.find(c => column.id === c.fk_column_id),
           {
-            order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
-            show: queryParams?.showFields?.[_cn],
+            order,
+            show,
             width: queryParams?.columnsWidth?.[_cn]
           },
           ncMeta
