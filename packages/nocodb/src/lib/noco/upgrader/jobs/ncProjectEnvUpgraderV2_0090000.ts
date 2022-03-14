@@ -649,13 +649,20 @@ async function migrateProjectModels(
 
         const viewColumns = await View.getColumns(defaultView.id, ncMeta);
 
-        for (const [_cn, column] of Object.entries(
+        const aliasColArr = Object.entries(
           projectModelColumnAliasRefs[model.tn]
-        )) {
+        ).sort(([a], [b]) => {
+          return (
+            ((queryParams?.fieldsOrder || [])?.indexOf(a) + 1 || Infinity) -
+            ((queryParams?.fieldsOrder || [])?.indexOf(b) + 1 || Infinity)
+          );
+        });
+        let orderCount = 1;
+        for (const [_cn, column] of aliasColArr) {
           await GridViewColumn.update(
             viewColumns.find(c => column.id === c.fk_column_id),
             {
-              order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
+              order: orderCount++,
               show: queryParams?.showFields
                 ? queryParams?.showFields?.[_cn] || false
                 : true,
@@ -793,11 +800,20 @@ async function migrateProjectModelViews(
 
     const viewColumns = await View.getColumns(view.id, ncMeta);
 
-    for (const [_cn, column] of Object.entries(
+    const aliasColArr = Object.entries(
       objModelColumnAliasRef[project.id][viewData.parent_model_title]
-    )) {
+    ).sort(([a], [b]) => {
+      return (
+        ((queryParams?.fieldsOrder || [])?.indexOf(a) + 1 || Infinity) -
+        ((queryParams?.fieldsOrder || [])?.indexOf(b) + 1 || Infinity)
+      );
+    });
+
+    let orderCount = 1;
+
+    for (const [_cn, column] of aliasColArr) {
       const viewColumn = viewColumns.find(c => column.id === c.fk_column_id);
-      const order = queryParams?.fieldsOrder?.indexOf(_cn) + 1;
+      const order = orderCount++;
       const show = queryParams?.fieldsOrder
         ? queryParams?.fieldsOrder?.[_cn] || false
         : true;
