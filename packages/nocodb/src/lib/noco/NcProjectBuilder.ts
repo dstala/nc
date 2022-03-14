@@ -48,7 +48,7 @@ export default class NcProjectBuilder {
 
       this.startTime = Date.now();
       const allRoutesInfo: any[] = [];
-      await this.app.ncMeta.projectStatusUpdate(this.id, 'starting');
+      // await this.app.ncMeta.projectStatusUpdate(this.id, 'starting');
       await this.syncMigration();
       await this._createApiBuilder();
       // this.initApiInfoRoute();
@@ -72,10 +72,11 @@ export default class NcProjectBuilder {
       }
 
       // this.app.projectRouter.use(`/nc/${this.id}`, this.router);
-      await this.app.ncMeta.projectStatusUpdate(this.id, 'started');
+      // await this.app.ncMeta.projectStatusUpdate(this.id, 'started');
     } catch (e) {
       console.log(e);
-      await this.app.ncMeta.projectStatusUpdate(this.id, 'stopped');
+      throw e;
+      // await this.app.ncMeta.projectStatusUpdate(this.id, 'stopped');
     }
   }
 

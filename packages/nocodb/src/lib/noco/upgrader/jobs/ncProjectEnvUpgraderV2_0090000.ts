@@ -35,8 +35,8 @@ export default async function(ctx: NcUpgraderCtx) {
     // const projectConfig = JSON.parse(project.config);
 
     const projectBuilder = new NcProjectBuilderEE(
-      { ...this, ncMeta: ctx.ncMeta },
-      this.config,
+      { ncMeta: ctx.ncMeta } as any,
+      { workingEnv: '_noco' } as any,
       project
     );
 
@@ -655,7 +655,9 @@ async function migrateProjectModels(
             viewColumns.find(c => column.id === c.fk_column_id),
             {
               order: queryParams?.fieldsOrder?.indexOf(_cn) + 1,
-              show: queryParams?.showFields?.[_cn] || false,
+              show: queryParams?.showFields
+                ? queryParams?.showFields?.[_cn] || false
+                : true,
               width: queryParams?.columnsWidth?.[_cn]
             },
             ncMeta
@@ -795,7 +797,9 @@ async function migrateProjectModelViews(
     )) {
       const viewColumn = viewColumns.find(c => column.id === c.fk_column_id);
       const order = queryParams?.fieldsOrder?.indexOf(_cn) + 1;
-      const show = queryParams?.showFields?.[_cn] || false;
+      const show = queryParams?.fieldsOrder
+        ? queryParams?.fieldsOrder?.[_cn] || false
+        : true;
       if (viewData.show_as === 'form') {
         const columnParams =
           queryParams?.extraViewParams?.formParams?.fields?.[_cn];
