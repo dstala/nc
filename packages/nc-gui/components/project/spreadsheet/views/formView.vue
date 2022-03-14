@@ -40,7 +40,7 @@
                 v-if="columns.length"
                 class="pointer caption"
                 style="border-bottom: 2px solid rgb(218,218,218)"
-                @click="columns=[]"
+                @click="removeAllColumns"
               >
                 <!--Remove all-->
                 {{ $t('general.removeAll') }}
