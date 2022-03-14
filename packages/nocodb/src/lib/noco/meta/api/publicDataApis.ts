@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
-import { nocoExecute } from '../../noco-resolver/NocoExecute';
+import { nocoExecute } from 'nc-help';
 import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { PagedResponseImpl } from './helpers/PagedResponse';

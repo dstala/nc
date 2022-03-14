@@ -3,7 +3,7 @@ import View from '../../../noco-models/View';
 import Model from '../../../noco-models/Model';
 import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
-import { nocoExecute } from '../../noco-resolver/NocoExecute';
+import { nocoExecute } from 'nc-help';
 import papaparse from 'papaparse';
 import { isSystemColumn, UITypes } from 'nc-common';
 import Column from '../../../noco-models/Column';

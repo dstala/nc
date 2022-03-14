@@ -12,6 +12,7 @@ export default class Audit implements AuditType {
   user?: string;
   ip?: string;
   base_id?: string;
+  db_alias?: string;
   project_id?: string;
   fk_model_id?: string;
   row_id?: string;
@@ -44,7 +45,7 @@ export default class Audit implements AuditType {
     const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.AUDIT, {
       user: audit.user,
       ip: audit.ip,
-      base_id: audit.base_id,
+      db_alias: audit.base_id,
       project_id: audit.project_id,
       row_id: audit.row_id,
       fk_model_id: audit.fk_model_id,
