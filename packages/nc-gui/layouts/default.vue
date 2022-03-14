@@ -11,15 +11,11 @@
       height="48"
       @contextmenu="showAirtabLikeLink++"
     >
-      <!--      {{ $store.state.plugins.brand }}-->
-      <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
       <v-toolbar-title>
         <v-tooltip bottom>
           <template #activator="{ on }">
             <v-btn to="/projects" icon class="pa-1 brand-icon nc-noco-brand-icon" v-on="on">
               <v-img :src="logo" max-height="30px" max-width="30px" />
-              <!-- <v-icon color="primary">alpha-x-circle</v-icon
-              ><v-icon color="primary">alpha-c-circle </v-icon> -->
             </v-btn>
           </template>
           <!-- Home -->
@@ -36,38 +32,7 @@
       </v-toolbar-title>
 
       <v-toolbar-items class="ml-0">
-        <!--        <a
-          class="align-self-center caption font-weight-bold ml-1 mr-2 white&#45;&#45;text"
-          href="https://docs.nocodb.com"
-          target="_blank"
-        >Docs</a>-->
-        <!--        <templates-modal v-if="isDashboard && _isUIAllowed('template-import')" v-model="templateModal" class="align-self-center" />-->
-
-        <!--        <better-u-x v-if="clickCount" />-->
       </v-toolbar-items>
-      <!-- <template v-if="!isThisMobile ">
-
-                <a class="align-self-center" style="" target="_blank" href="https://calendly.com/nocodb-meeting">
-
-                  <x-icon size="20" tooltip="Book a free demo" color="white" icon.class="mr-3">mdi-calendar-month</x-icon>
-
-                </a>
-
-                <a href="https://twitter.com/NocoDB" target="_blank" class="align-self-center" style="">
-                  <v-icon size="20" color="white" class="mr-3">mdi-twitter</v-icon>
-                </a>
-                &lt;!&ndash;            <v-menu offset-y>&ndash;&gt;
-                &lt;!&ndash;              <template v-slot:activator="{on}">&ndash;&gt;
-                &lt;!&ndash;                href="https://discord.gg/5RgZmkW"&ndash;&gt;
-                <a target="_blank" class="align-self-center" style="" href="https://discord.gg/5RgZmkW">
-                  <v-icon size="20" color="white" class="mr-3">mdi-discord</v-icon>
-                </a>
-                &lt;!&ndash;              </template>&ndash;&gt;
-                &lt;!&ndash;              <discord></discord>&ndash;&gt;
-                &lt;!&ndash;            </v-menu>&ndash;&gt;
-              </template>
-
-            </v-toolbar-items>-->
             <!-- loading -->
       <span v-show="$nuxt.$loading.show" class="caption grey--text ml-3">{{ $t('general.loading') }} <v-icon small color="grey">mdi-spin mdi-loading</v-icon></span>
 
@@ -77,25 +42,6 @@
       />
 
       <v-spacer />
-      <!--      <div style="position: absolute; top:0;left:0;width:100%; pointer-events: none" class="d-flex align-center">
-        <h5
-          v-if="isDashboard && $store.getters['project/GtrProjectName'] !== '__project__'"
-          class="text-center mx-auto mb-0 mt-1 title font-weight-bold text-capitalize"
-        >
-          <v-icon small class="mr-2\1" color="grey lighten-2">
-            mdi-folder-outline
-          </v-icon>
-          {{ $store.getters['project/GtrProjectName'] }}
-          <v-tooltip bottom>
-            <template #activator="{on}">
-              <v-icon style="pointer-events:all" x-small color="grey lighten-2" v-on="on">
-                mdi-information-outline
-              </v-icon>
-            </template>
-            Project name
-          </v-tooltip>
-        </h5>
-      </div>-->
 
       <v-spacer />
 
@@ -127,43 +73,6 @@
               {{ $t('activity.share') }}
             </x-btn>
           </div>
-
-          <!--          <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-icon
-                v-ripple="{class : 'nc-ripple'}"
-                class="mt-1 ml-3 nc-menu-theme"
-                size="22"
-                v-on="on"
-                @click="$store.commit('windows/MutToggleTheme')"
-              >
-                mdi-format-color-fill
-              </v-icon>
-            </template>
-            Change theme (^⇧M)
-          </v-tooltip>
-
-          <span
-            v-shortkey="[ 'ctrl','shift', 'b']"
-            @shortkey="changeTheme"
-          />
-          <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-icon
-                v-ripple="{class : 'nc-ripple'}"
-                size="20"
-                class="ml-3 nc-menu-dark-theme"
-                @click="changeTheme"
-                v-on="on"
-              >
-                {{ $vuetify.theme.dark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}
-              </v-icon>
-            </template>
-            <span class="caption">
-              {{ $vuetify.theme.dark ? 'Click for light theme' : 'Click for dark theme' }}
-              <i />
-            </span>
-          </v-tooltip>-->
 
           <span
             v-shortkey="[ 'ctrl','shift', 'd']"
@@ -198,22 +107,8 @@
             @shortkey="toggleLogWindow"
           />
 
-          <!--          <v-icon v-if="_isDev" @click="dialogDebugShow">mdi-view-headline</v-icon>-->
         </template>
         <template v-else>
-          <!--          <x-icon iconClass="mr-4" @click="apiClientSwaggerOpen()" v-if="!$store.state.windows.isComp"-->
-          <!--                  tooltip="API Client (^⇧A)">mdi-code-json-->
-          <!--          </x-icon>-->
-
-          <!--          <x-icon iconClass="mr-4" tooltip="Feed (^⇧F)" @click="feedDialog = true">mdi-glasses</x-icon>-->
-          <!--          <span v-shortkey="['ctrl','shift','f']" @shortkey="feedDialog = true"></span>-->
-
-          <!--          <x-icon iconClass="mr-4" @click="settingsTabAdd" size="20" tooltip="Tool Settings (^⇧C)">mdi-cog-->
-          <!--          </x-icon>-->
-          <!--          <x-icon iconClass="mr-4" @click="settingsDialog = true" tooltip="Tool Settings (^⇧C)">mdi-cog-->
-          <!--          </x-icon>-->
-          <!--          <span v-shortkey="[ 'ctrl','shift', 'c']"-->
-          <!--                @shortkey="settingsDialog = true"></span>   -->
           <span
             v-shortkey="[ 'ctrl','shift', 'c']"
             @shortkey="settingsTabAdd"
@@ -224,13 +119,6 @@
             @shortkey="changeTheme"
           />
 
-          <!--          <span v-shortkey="[ 'ctrl','shift', 'd']"-->
-          <!--                @shortkey="openDiscord"></span>-->
-
-          <!--          <x-icon key="discord" iconClass="mr-4" @click="openDiscord" tooltip="Discord Chat (^⇧D)">mdi-discord-->
-          <!--          </x-icon>-->
-          <!--          <x-icon key="github" iconClass="mr-4" @click="openGithub" tooltip="Github">mdi-github-circle-->
-          <!--          </x-icon>-->
 
           <v-tooltip bottom>
             <template #activator="{ on }">
@@ -246,48 +134,7 @@
             </h3>
           </v-tooltip>
           <!--          <notification></notification>-->
-
-          <!--          <v-icon v-if="_isDev" @click="dialogDebugShow">mdi-view-headline</v-icon>-->
         </template>
-
-        <!--        <v-btn text active-class to="/how-it-works" v-if="!user && !isThisMobile">-->
-        <!--          <b>How it works</b>-->
-        <!--        </v-btn>-->
-
-        <!--        <v-btn text class="ml-1" to="/pricing" v-if="!isThisMobile">-->
-        <!--          <b>Pricing</b>-->
-        <!--        </v-btn>-->
-
-        <!--        <v-btn text class="ml-1" to="/user/authentication/signin" v-if="!user && !isThisMobile">-->
-        <!--          <b>Log in</b>-->
-        <!--        </v-btn>-->
-        <!--        <v-btn text class="ml-3  elevation-0 "-->
-        <!--               to="/user/authentication/signup" v-if="!user && !isThisMobile">-->
-        <!--          <b>SIGN UP</b>-->
-        <!--        </v-btn>-->
-
-        <!--        <v-btn text class=""-->
-        <!--               to="/referral" v-if="user && !isThisMobile">-->
-        <!--          <b>Refer</b>-->
-        <!--        </v-btn>-->
-
-        <!--        <v-btn text class=""-->
-        <!--               to="/visits" v-if="user && !isThisMobile">-->
-        <!--          <b>Your Rewards</b>-->
-        <!--        </v-btn>-->
-        <!-- span
-          v-shortkey="['ctrl', 'shift', 't']"
-          tooltip="Terminal"
-          @shortkey="terminalTabAdd()"
-        /-->
-
-        <!--        <x-icon key="settings-dash" iconClass="mr-1 ml-4" @click="settingsDialog = true" tooltip="Tool Settings (^⇧C)">-->
-        <!--          mdi-cog-->
-        <!--        </x-icon>-->
-        <!--        <x-icon key="settings-dash" iconClass="mr-1 ml-4"  size="20" @click="settingsTabAdd" tooltip="Tool Settings (^⇧C)">-->
-        <!--          mdi-cog-->
-        <!--        </x-icon>-->
-
         <notification class="mx-2" />
 
         <language class="ml-3" />
@@ -296,6 +143,7 @@
           offset-y
           open-on-hover
         >
+          {{isDocker}}
           <template #activator="{ on }">
             <v-btn v-ge="['Profile','']" text class="font-weight-bold nc-menu-account" v-on="on">
               <v-icon v-if="role && roleIcon[role]" size="20">
@@ -310,29 +158,8 @@
             </v-btn>
           </template>
           <v-list dense class="nc-user-menu">
-            <template v-if="isDocker">
-              <!--              <v-list-item @click="xcMetaTabAdd" v-ge="['Meta add','']">-->
-              <!--                <v-list-item-title>-->
+            <template>
 
-              <!--                  <v-icon small>mdi-file-table-box-multiple-outline</v-icon>&nbsp; Export/Import Metadata-->
-              <!--                </v-list-item-title>-->
-              <!--              </v-list-item>-->
-              <!--              <v-list-item @click="showChangeEnv = true" v-ge="['Change env','']">-->
-              <!--                <v-list-item-title>-->
-
-              <!--                  <v-icon small>mdi-test-tube</v-icon>&nbsp; Change Environment-->
-              <!--                </v-list-item-title>-->
-              <!--              </v-list-item>-->
-              <!--              <v-list-item @click="terminalTabAdd()" v-ge="[isDocker ? 'Docker Console' : 'API Generator','']">
-                              <v-list-item-title>
-
-                                <v-icon small key="terminal-dash">
-                                  mdi-console
-                                </v-icon>&nbsp;
-                                {{ isDocker ? 'Docker Console' : 'API Generator' }}
-
-                              </v-list-item-title>
-                            </v-list-item>-->
               <v-list-item v-ge="['Settings','']" dense to="/user/settings">
                 <v-list-item-title>
                   <v-icon small>
@@ -358,18 +185,6 @@
                   <span class="font-weight-regular caption">{{ $t('activity.account.authToken') }}</span>
                 </v-list-item-title>
               </v-list-item>
-
-              <!--
-                            <v-list-item dense @click.stop="projectInfoTabAdd">
-                              <v-list-item-title>
-
-                                <v-icon small key="terminal-dash">
-                                  mdi-information-outline
-                                </v-icon>&nbsp;
-                                <span class="font-weight-regular">Project Info</span>
-
-                              </v-list-item-title>
-                            </v-list-item>-->
             <v-list-item
               v-if="swaggerOrGraphiqlUrl"
               dense
@@ -392,22 +207,22 @@
               </v-list-item-title>
             </v-list-item>
             <v-divider />
-            <v-list-item dense @click="exportCache">
+            <v-list-item v-if="isDashboard" dense @click="exportCache">
               <v-list-item-title>
                 <v-icon small>
                   mdi-export
                 </v-icon>&nbsp; <span class="font-weight-regular caption">Export Cache</span>
               </v-list-item-title>
             </v-list-item>
-            <v-divider />
-            <v-list-item dense @click="deleteCache">
+            <v-divider v-if="isDashboard" />
+            <v-list-item dense v-if="isDashboard" @click="deleteCache">
               <v-list-item-title>
                 <v-icon small>
                   mdi-delete
                 </v-icon>&nbsp; <span class="font-weight-regular caption">Delete Cache</span>
               </v-list-item-title>
             </v-list-item>
-            <v-divider />
+            <v-divider v-if="isDashboard" />
             <v-list-item v-if="isDashboard" dense @click.stop="settingsTabAdd">
               <v-list-item-title>
                 <v-icon key="terminal-dash" small>
@@ -454,72 +269,12 @@
                 </v-icon> &nbsp; <span class="font-weight-regular caption">{{ $t('general.signIn') }}</span>
               </v-list-item-title>
             </v-list-item>
-            <!--            <v-list-item @click="openPricingPage">-->
-            <!--              <v-list-item-title>-->
-
-            <!--                <v-icon small>mdi-currency-usd</v-icon>&nbsp; Pricing-->
-            <!--              </v-list-item-title>-->
-            <!--            </v-list-item>-->
-            <!--            <v-list-item @click="openHowItWorks">-->
-            <!--              <v-list-item-title>-->
-            <!--                <v-icon small>mdi-help-circle</v-icon> &nbsp; How it works-->
-            <!--              </v-list-item-title>-->
-            <!--            </v-list-item>-->
           </v-list>
         </v-menu>
       </v-toolbar-items>
     </v-app-bar>
 
     <v-main class="pb-0 mb-0">
-      <!--      <v-navigation-drawer-->
-      <!--        mini-variant-->
-      <!--        app-->
-      <!--        clipped-->
-
-      <!--        expand-on-hover-->
-      <!--      >-->
-      <!--&lt;!&ndash;        <v-list-item class="px-2">&ndash;&gt;-->
-      <!--&lt;!&ndash;          <v-list-item-avatar>&ndash;&gt;-->
-      <!--&lt;!&ndash;            <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>&ndash;&gt;-->
-      <!--&lt;!&ndash;          </v-list-item-avatar>&ndash;&gt;-->
-
-      <!--&lt;!&ndash;          <v-list-item-title>John Leider</v-list-item-title>&ndash;&gt;-->
-
-      <!--&lt;!&ndash;          <v-btn&ndash;&gt;-->
-      <!--&lt;!&ndash;            icon&ndash;&gt;-->
-      <!--&lt;!&ndash;          >&ndash;&gt;-->
-      <!--&lt;!&ndash;            <v-icon>mdi-chevron-left</v-icon>&ndash;&gt;-->
-      <!--&lt;!&ndash;          </v-btn>&ndash;&gt;-->
-      <!--&lt;!&ndash;        </v-list-item>&ndash;&gt;-->
-
-      <!--&lt;!&ndash;        <v-divider></v-divider>&ndash;&gt;-->
-
-      <!--        <v-list dense>-->
-      <!--          <v-list-item-->
-      <!--            link-->
-      <!--            to="/"-->
-      <!--          >-->
-      <!--            <v-list-item-icon>-->
-      <!--            </v-list-item-icon>-->
-
-      <!--            <v-list-item-content>-->
-      <!--              <v-list-item-title>Dashboard</v-list-item-title>-->
-      <!--            </v-list-item-content>-->
-      <!--          </v-list-item>-->
-      <!--          <v-list-item-->
-      <!--            link-->
-      <!--            to="/client"-->
-      <!--          >-->
-      <!--            <v-list-item-icon>-->
-      <!--              <v-icon>mdi-code-json</v-icon>-->
-      <!--            </v-list-item-icon>-->
-
-      <!--            <v-list-item-content>-->
-      <!--              <v-list-item-title>API Client</v-list-item-title>-->
-      <!--            </v-list-item-content>-->
-      <!--          </v-list-item>-->
-      <!--        </v-list>-->
-      <!--      </v-navigation-drawer>-->
 
       <v-container class="ma-0 pa-0" fluid style="">
         <v-progress-linear
@@ -555,13 +310,6 @@
     >
       <x-term v-if="terminalDialog" is-modal style="min-height:400px" />
     </v-dialog>
-    <!--    <v-dialog-->
-    <!--      width="70%"-->
-    <!--      v-model="feedDialog"-->
-    <!--    >-->
-    <!--      <feed v-if="feedDialog" style="min-height1:400px"></feed>-->
-    <!--    </v-dialog>-->
-
     <v-snackbar v-model="releaseDownloadedSnackbar" :top="true" color="info">
       New update successfully downloaded. Restart to update.
       <v-btn @click.native="updateAndRestart()">
