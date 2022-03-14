@@ -23,15 +23,15 @@
             <api-tokens :nodes="nodes" />
           </v-tab-item>
         </template>
-        <v-tab>
-          <span class="caption text-capitalize">
-            <!-- Roles Management -->
-            {{ $t('title.rolesMgmt') }}
-          </span>
-        </v-tab>
-        <v-tab-item>
-          <roles :nodes="nodes" />
-        </v-tab-item>
+<!--        <v-tab>-->
+<!--          <span class="caption text-capitalize">-->
+<!--            &lt;!&ndash; Roles Management &ndash;&gt;-->
+<!--            {{ $t('title.rolesMgmt') }}-->
+<!--          </span>-->
+<!--        </v-tab>-->
+<!--        <v-tab-item>-->
+<!--          <roles :nodes="nodes" />-->
+<!--        </v-tab-item>-->
         <!--              <v-tab><span class="caption text-capitalize">Auth Management</span></v-tab>
               <v-tab-item>
                 <auth-hooks :nodes="nodes"></auth-hooks>
