@@ -58,24 +58,12 @@
 
     <v-card style="height:calc(100% - 38px)">
       <v-container style="height: 100%" fluid>
-        <!--          <div class="d-flex d-100 justify-center">-->
 
         <v-row style="height:100%">
           <v-col cols="12" class="h-100">
             <v-card class="h-100 elevation-0">
               <v-row style="height:100%">
                 <v-col offset="2" :cols="8" class="h-100" style="overflow-y: auto">
-                  <!--                  <v-card class="h-100 px-4 py-2">-->
-
-                  <!--                <v-row>
-                                    <v-col>
-
-                                    </v-col>
-                                    <v-col class="flex-shrink-1 flex-grow-0"><h4 class="text-center text-capitalize mt-2 d-100"
-                                                                                 style="min-width:100px">User List</h4></v-col>
-                                    <v-col></v-col>
-
-                                  </v-row>-->
                   <v-data-table
                     v-if="users"
                     dense
@@ -116,12 +104,6 @@
 
                     <template #item="{item}">
                       <tr @click="selectedUser = item">
-                        <!--          <td>
-                                    <v-radio-group dense hide-details v-model="selectedUserIndex" class="mt-n2">
-                                      <v-radio :value="index"
-                                      ></v-radio>
-                                    </v-radio-group>
-                                  </td>-->
                         <td>{{ item.email }}</td>
                         <td>
                           <!--                          {{ item.roles }}-->
@@ -134,22 +116,6 @@
                             {{ getRole(item.roles) }}
                           </v-chip>
 
-                          <!--                    <v-edit-dialog-->
-                          <!--                    >-->
-                          <!--                      <div-->
-                          <!--                        :title="item.roles"-->
-                          <!--                        style="width:180px;overflow:hidden;white-space: nowrap;text-overflow:ellipsis"> {{-->
-                          <!--                          item.roles-->
-                          <!--                        }}-->
-                          <!--                      </div>-->
-                          <!--                      <template v-slot:input>-->
-                          <!--                        <v-text-field-->
-                          <!--                          v-model="item.roles"-->
-                          <!--                          label="Edit"-->
-                          <!--                          single-line-->
-                          <!--                        ></v-text-field>-->
-                          <!--                      </template>-->
-                          <!--                    </v-edit-dialog>-->
                         </td>
                         <td>
                           <!-- tooltip="Edit User" -->
@@ -168,21 +134,11 @@
                               tooltip="Add user to project"
                               color="primary"
                               small
-                              @click="inviteUser(item.email)"
+                              @click="inviteUser(item)"
                             >
                               mdi-plus
                             </x-icon>
-                            <!-- <x-icon
-                              tooltip="Remove user from NocoDB"
-                              class="ml-2"
-                              color="error"
-                              small
-                              @click.prevent.stop="deleteId = item.id; deleteItem = item.id;showConfirmDlg = true;deleteUserType='DELETE_FROM_NOCODB'"
-                            >
-                              mdi-delete-forever-outline
-                            </x-icon> -->
                           </span>
-                          <!-- tooltip="Remove user from project" -->
                           <x-icon
                             v-else
                             :tooltip="$t('activity.deleteUser')"
@@ -327,18 +283,6 @@
       <v-card v-if="selectedUser" style="min-height: 100%">
         <v-card-title>
           {{ $t('activity.share') }} : {{ $store.getters['project/GtrProjectName'] }}
-          <!--
-          <h4 class="text-center text-capitalize mt-2 d-100 display-1">
-            <template v-if="invite_token">
-              Copy Invite Token
-            </template>
-            <template v-else-if="selectedUser.id">
-              Edit User
-            </template>
-            <template v-else>
-              Invite
-            </template>
-          </h4>-->
 
           <div class="nc-header-border" />
         </v-card-title>
@@ -462,10 +406,6 @@
                   </v-col>
                 </v-row>
               </v-form>
-              <!--        </v-card-text>
-        <v-card-actions class="justify-center">-->
-
-              <!-- tooltip="Save Changes" -->
               <div class="text-center mt-0">
                 <x-btn
                   v-ge="['rows','save']"
@@ -723,16 +663,6 @@ export default {
     },
     async deleteUser(id, type) {
       try {
-        // await this.$axios.delete('/admin/' + id, {
-        //   params: {
-        //     project_id: this.$route.params.project_id,
-        //     email: this.deleteItem.email,
-        //     type
-        //   },
-        //   headers: {
-        //     'xc-auth': this.$store.state.users.token
-        //   }
-        // })
         await this.$api.auth.projectUserRemove(this.$route.params.project_id, id)
         this.$toast.success(`Successfully removed the user from ${type === 'DELETE_FROM_PROJECT' ? 'project' : 'NocoDB'}`).goAway(3000)
         await this.loadUsers()
@@ -757,15 +687,6 @@ export default {
     },
     async inviteUser(item) {
       try {
-        // await this.$axios.post('/admin', {
-        //   email,
-        //   project_id: this.$route.params.project_id,
-        //   projectName: this.$store.getters['project/GtrProjectName']
-        // }, {
-        //   headers: {
-        //     'xc-auth': this.$store.state.users.token
-        //   }
-        // })
         await this.$api.auth.projectUserAdd(this.$route.params.project_id, item)
         this.$toast.success('Successfully added user to project').goAway(3000)
         await this.loadUsers()
@@ -787,16 +708,6 @@ export default {
       try {
         let data
         if (this.selectedUser.id) {
-          // await this.$axios.put('/admin/' + this.selectedUser.id, {
-          //   roles: this.selectedUser.roles,
-          //   email: this.selectedUser.email,
-          //   project_id: this.$route.params.project_id,
-          //   projectName: this.$store.getters['project/GtrProjectName']
-          // }, {
-          //   headers: {
-          //     'xc-auth': this.$store.state.users.token
-          //   }
-          // })
 
           await this.$api.auth.projectUserUpdate(this.$route.params.project_id, this.selectedUser.id, {
             roles: this.selectedUser.roles,
@@ -805,15 +716,6 @@ export default {
             projectName: this.$store.getters['project/GtrProjectName']
           })
         } else {
-          // data = await this.$axios.post('/admin', {
-          //   ...this.selectedUser,
-          //   project_id: this.$route.params.project_id,
-          //   projectName: this.$store.getters['project/GtrProjectName']
-          // }, {
-          //   headers: {
-          //     'xc-auth': this.$store.state.users.token
-          //   }
-          // })
           data = (await this.$api.auth.projectUserAdd(this.$route.params.project_id, {
             ...this.selectedUser,
             project_id: this.$route.params.project_id,
