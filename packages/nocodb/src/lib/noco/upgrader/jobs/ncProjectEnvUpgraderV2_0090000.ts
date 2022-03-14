@@ -25,6 +25,7 @@ import FormViewColumn from '../../../noco-models/FormViewColumn';
 import GridViewColumn from '../../../noco-models/GridViewColumn';
 import { getUniqueColumnAliasName } from '../../meta/api/helpers/getUniqueName';
 import NcProjectBuilderEE from '../../NcProjectBuilderEE';
+import Audit from '../../../noco-models/Audit';
 
 export default async function(ctx: NcUpgraderCtx) {
   const ncMeta = ctx.ncMeta;
@@ -53,6 +54,7 @@ export default async function(ctx: NcUpgraderCtx) {
   await migrateSharedBase(ncMeta);
   await migratePlugins(ncMeta);
   await migrateWebhooks(migrationCtx, ncMeta);
+  await migrateAutitLog(migrationCtx, ncMeta);
 }
 
 async function migrateUsers(ncMeta = Noco.ncMeta) {
@@ -283,6 +285,7 @@ type ObjViewQPRefv1 = {
 interface MigrateCtxV1 {
   views: ModelMetav1[];
   objModelRef: ObjModelRefv1;
+  objModelAliasRef: ObjModelRefv1;
   objModelColumnRef: ObjModelColumnRefv1;
   objModelColumnAliasRef: ObjModelColumnAliasRefv1;
   objViewRef: ObjViewRefv1;
@@ -313,6 +316,7 @@ async function migrateProjectModels(
 
   // variable for keeping all
   const objModelRef: ObjModelRefv1 = {};
+  const objModelAliasRef: ObjModelRefv1 = {};
   const objModelColumnRef: ObjModelColumnRefv1 = {};
   const objModelColumnAliasRef: ObjModelColumnAliasRefv1 = {};
   const objViewRef: ObjViewRefv1 = {};
@@ -356,6 +360,9 @@ async function migrateProjectModels(
       const projectModelRefs = (objModelRef[project.id] =
         objModelRef[project.id] || {});
       objModelRef[project.id][model.tn] = model;
+
+      objModelAliasRef[project.id] = objModelAliasRef[project.id] || {};
+      objModelAliasRef[project.id][model._tn] = model;
 
       const projectModelColumnRefs = (objModelColumnRef[project.id] =
         objModelColumnRef[project.id] || {});
@@ -698,7 +705,8 @@ async function migrateProjectModels(
       objModelColumnAliasRef,
       objModelColumnRef,
       objViewRef,
-      objViewQPRef
+      objViewQPRef,
+      objModelAliasRef
     },
     ncMeta
   );
@@ -710,7 +718,8 @@ async function migrateProjectModels(
       objModelColumnAliasRef,
       objModelColumnRef,
       objViewRef,
-      objViewQPRef
+      objViewQPRef,
+      objModelAliasRef
     },
     ncMeta
   );
@@ -721,7 +730,8 @@ async function migrateProjectModels(
     objModelColumnAliasRef,
     objModelColumnRef,
     objViewRef,
-    objViewQPRef
+    objViewQPRef,
+    objModelAliasRef
   };
 }
 
@@ -1086,5 +1096,48 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
       },
       ncMeta
     );
+  }
+}
+
+async function migrateAutitLog(ctx: MigrateCtxV1, ncMeta: any) {
+  const audits: Array<{
+    user: string;
+    ip: string;
+    project_id: string;
+    db_alias: string;
+    model_name: string;
+    model_id: string;
+    op_type: string;
+    op_sub_type: string;
+    status: string;
+    description: string;
+    details: string;
+    created_at: any;
+    updated_at: any;
+  }> = await ncMeta.metaList(null, null, 'nc_audit');
+
+  for (const audit of audits) {
+    const insertObj: any = {
+      user: audit.user,
+      ip: audit.ip,
+      project_id: audit.project_id,
+      row_id: audit.model_id,
+      op_type: audit.op_type,
+      op_sub_type: audit.op_sub_type,
+      status: audit.status,
+      description: audit.description,
+      details: audit.details,
+      created_at: audit.created_at,
+      updated_at: audit.updated_at
+    };
+
+    if (audit.model_name) {
+      insertObj.fk_model_id = (
+        ctx.objModelAliasRef?.[audit.project_id]?.[audit.model_name] ||
+        ctx.objModelRef?.[audit.project_id]?.[audit.model_name]
+      ).id;
+    }
+
+    await Audit.insert(insertObj, ncMeta);
   }
 }

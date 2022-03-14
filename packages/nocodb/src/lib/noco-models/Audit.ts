@@ -12,7 +12,6 @@ export default class Audit implements AuditType {
   user?: string;
   ip?: string;
   base_id?: string;
-  db_alias?: string;
   project_id?: string;
   fk_model_id?: string;
   row_id?: string;
@@ -36,16 +35,24 @@ export default class Audit implements AuditType {
     return audit && new Audit(audit);
   }
 
-  public static async insert(audit: Partial<Audit>) {
+  public static async insert(
+    audit: Partial<
+      Audit & {
+        created_at?;
+        updated_at?;
+      }
+    >,
+    ncMeta = Noco.ncMeta
+  ) {
     if (!audit.project_id && audit.fk_model_id) {
       audit.project_id = (
-        await Model.getByIdOrName({ id: audit.fk_model_id })
+        await Model.getByIdOrName({ id: audit.fk_model_id }, ncMeta)
       ).project_id;
     }
-    const { id } = await Noco.ncMeta.metaInsert2(null, null, MetaTable.AUDIT, {
+    const auditRec = await ncMeta.metaInsert2(null, null, MetaTable.AUDIT, {
       user: audit.user,
       ip: audit.ip,
-      db_alias: audit.base_id,
+      base_id: audit.base_id,
       project_id: audit.project_id,
       row_id: audit.row_id,
       fk_model_id: audit.fk_model_id,
@@ -53,10 +60,12 @@ export default class Audit implements AuditType {
       op_sub_type: audit.op_sub_type,
       status: audit.status,
       description: audit.description,
-      details: audit.details
+      details: audit.details,
+      created_at: audit.created_at,
+      updated_at: audit.updated_at
     });
 
-    return this.get(id);
+    return auditRec;
   }
 
   public static async commentsCount(args: {
