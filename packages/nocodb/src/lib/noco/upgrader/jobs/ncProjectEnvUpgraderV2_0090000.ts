@@ -346,7 +346,8 @@ async function migrateProjectModels(
           _tn: modelData.alias,
           type: modelData.type === 'table' ? ModelTypes.TABLE : ModelTypes.VIEW,
           created_at: modelData.created_at,
-          updated_at: modelData.updated_at
+          updated_at: modelData.updated_at,
+          mm: !!modelData.mm
         },
         ncMeta
       );
