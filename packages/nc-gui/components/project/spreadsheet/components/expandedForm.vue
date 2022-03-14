@@ -22,14 +22,14 @@
           </v-icon>
         </v-btn>
 
-<!--        <x-icon-->
-<!--          :tooltip="`${showSystemFields ? 'Hide' : 'Show'} system fields`"-->
-<!--          icon.class="mr-3 mt-n1"-->
-<!--          small-->
-<!--          @click="showSystemFields = !showSystemFields"-->
-<!--        >-->
-<!--          mdi-table-headers-eye-->
-<!--        </x-icon>-->
+        <!--        <x-icon-->
+        <!--          :tooltip="`${showSystemFields ? 'Hide' : 'Show'} system fields`"-->
+        <!--          icon.class="mr-3 mt-n1"-->
+        <!--          small-->
+        <!--          @click="showSystemFields = !showSystemFields"-->
+        <!--        >-->
+        <!--          mdi-table-headers-eye-->
+        <!--        </x-icon>-->
 
         <x-icon
           v-if="!isNew && _isUIAllowed('rowComments')"
@@ -269,7 +269,6 @@ import EditableCell from '@/components/project/spreadsheet/components/editableCe
 import colors from '@/mixins/colors'
 import VirtualCell from '@/components/project/spreadsheet/components/virtualCell'
 import VirtualHeaderCell from '@/components/project/spreadsheet/components/virtualHeaderCell'
-import { UITypes } from '@/components/project/spreadsheet/helpers/uiTypes'
 
 const relativeTime = require('dayjs/plugin/relativeTime')
 const utc = require('dayjs/plugin/utc')

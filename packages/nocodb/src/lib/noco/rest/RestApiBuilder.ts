@@ -32,7 +32,6 @@ import { RestCtrlBelongsTo } from './RestCtrlBelongsTo';
 import { RestCtrlCustom } from './RestCtrlCustom';
 import { RestCtrlHasMany } from './RestCtrlHasMany';
 import { RestCtrlProcedure } from './RestCtrlProcedure';
-import Model from '../../noco-models/Model';
 import Column from '../../noco-models/Column';
 // import NocoTypeGenerator from '../noco-resolver/NocoTypeGenerator';
 // import NocoResolverGenerator from '../noco-resolver/NocoResolverGenerator';
@@ -600,88 +599,88 @@ export class RestApiBuilder extends BaseApiBuilder<Noco> {
               ...column
             });
           }
-          this.models2[table.tn] = await Model.getByIdOrName({
-            tn: table.tn,
-            project_id: this.projectId,
-            base_id: this.getDbAlias()
-          });
-          virtualColumnsInsert.push(async () => {
-            for (const column of meta.v) {
-              const rel = column.hm || column.bt || column.mm;
-
-              const rel_column_id = (
-                await this.models2?.[rel.tn]?.getColumns()
-              )?.find(c => c.cn === rel.cn)?.id;
-              const ref_rel_column_id = (
-                await this.models2?.[rel.rtn]?.getColumns()
-              )?.find(c => c.cn === rel.rcn)?.id;
-
-              let fk_mm_model_id;
-              let fk_mm_child_column_id;
-              let fk_mm_parent_column_id;
-
-              if (column.mm) {
-                fk_mm_model_id = this.models2?.[rel.vtn]?.id;
-                fk_mm_child_column_id = (
-                  await this.models2?.[rel.vtn]?.getColumns()
-                )?.find(c => c.cn === rel.vcn)?.id;
-                fk_mm_parent_column_id = (
-                  await this.models2?.[rel.vtn]?.getColumns()
-                )?.find(c => c.cn === rel.vrcn)?.id;
-              }
-              try {
-                await Column.insert({
-                  project_id: this.projectId,
-                  db_alias: this.dbAlias,
-                  fk_model_id: modelId,
-                  cn: column.cn,
-                  _cn: column._cn,
-                  uidt: column.uidt,
-                  type: column.hm ? 'hm' : column.mm ? 'mm' : 'bt',
-                  // column_id,
-                  fk_child_column_id: rel_column_id,
-                  fk_parent_column_id: ref_rel_column_id,
-                  fk_index_name: rel.fkn,
-                  ur: rel.ur,
-                  dr: rel.dr,
-                  fk_mm_model_id,
-                  fk_mm_child_column_id,
-                  fk_mm_parent_column_id
-                });
-              } catch (e) {
-                console.log(e);
-              }
-              // todo: insert virtual columns
-              // insert in nc_columns_v2 & nc_col_relations
-              // const { id: column_id } =
-              // await this.xcMeta.metaInsert2(
-              //   this.projectId,
-              //   this.dbAlias,
-              //   'nc_columns_v2',
-              //   {
-              //     model_id: modelId,
-              //     cn: column.cn,
-              //     _cn: column._cn,
-              //     uidt: column.uidt
-              //   }
-              // );
-
-              // await this.xcMeta.metaInsert2(
-              //   this.projectId,
-              //   this.dbAlias,
-              //   'nc_col_relations',
-              //   {
-              //     type: column.hm ? 'hm' : 'bt',
-              //     column_id,
-              //     rel_column_id,
-              //     ref_rel_column_id,
-              //     fkn: rel.fkn,
-              //     ur: rel.ur,
-              //     dr: rel.dr
-              //   }
-              // );
-            }
-          });
+          // this.models2[table.tn] = await Model.getByIdOrName({
+          //   tn: table.tn,
+          //   project_id: this.projectId,
+          //   base_id: this.getDbAlias()
+          // });
+          // virtualColumnsInsert.push(async () => {
+          //   for (const column of meta.v) {
+          //     const rel = column.hm || column.bt || column.mm;
+          //
+          //     const rel_column_id = (
+          //       await this.models2?.[rel.tn]?.getColumns()
+          //     )?.find(c => c.cn === rel.cn)?.id;
+          //     const ref_rel_column_id = (
+          //       await this.models2?.[rel.rtn]?.getColumns()
+          //     )?.find(c => c.cn === rel.rcn)?.id;
+          //
+          //     let fk_mm_model_id;
+          //     let fk_mm_child_column_id;
+          //     let fk_mm_parent_column_id;
+          //
+          //     if (column.mm) {
+          //       fk_mm_model_id = this.models2?.[rel.vtn]?.id;
+          //       fk_mm_child_column_id = (
+          //         await this.models2?.[rel.vtn]?.getColumns()
+          //       )?.find(c => c.cn === rel.vcn)?.id;
+          //       fk_mm_parent_column_id = (
+          //         await this.models2?.[rel.vtn]?.getColumns()
+          //       )?.find(c => c.cn === rel.vrcn)?.id;
+          //     }
+          //     try {
+          //       await Column.insert({
+          //         project_id: this.projectId,
+          //         db_alias: this.dbAlias,
+          //         fk_model_id: modelId,
+          //         cn: column.cn,
+          //         _cn: column._cn,
+          //         uidt: column.uidt,
+          //         type: column.hm ? 'hm' : column.mm ? 'mm' : 'bt',
+          //         // column_id,
+          //         fk_child_column_id: rel_column_id,
+          //         fk_parent_column_id: ref_rel_column_id,
+          //         fk_index_name: rel.fkn,
+          //         ur: rel.ur,
+          //         dr: rel.dr,
+          //         fk_mm_model_id,
+          //         fk_mm_child_column_id,
+          //         fk_mm_parent_column_id
+          //       });
+          //     } catch (e) {
+          //       console.log(e);
+          //     }
+          //     // todo: insert virtual columns
+          //     // insert in nc_columns_v2 & nc_col_relations
+          //     // const { id: column_id } =
+          //     // await this.xcMeta.metaInsert2(
+          //     //   this.projectId,
+          //     //   this.dbAlias,
+          //     //   'nc_columns_v2',
+          //     //   {
+          //     //     model_id: modelId,
+          //     //     cn: column.cn,
+          //     //     _cn: column._cn,
+          //     //     uidt: column.uidt
+          //     //   }
+          //     // );
+          //
+          //     // await this.xcMeta.metaInsert2(
+          //     //   this.projectId,
+          //     //   this.dbAlias,
+          //     //   'nc_col_relations',
+          //     //   {
+          //     //     type: column.hm ? 'hm' : 'bt',
+          //     //     column_id,
+          //     //     rel_column_id,
+          //     //     ref_rel_column_id,
+          //     //     fkn: rel.fkn,
+          //     //     ur: rel.ur,
+          //     //     dr: rel.dr
+          //     //   }
+          //     // );
+          //   }
+          // });
         } else if (args?.oldMetas?.[table.tn]?.id) {
           this.log(
             "xcTablesPopulate : Updating model metadata for '%s' - %s",
