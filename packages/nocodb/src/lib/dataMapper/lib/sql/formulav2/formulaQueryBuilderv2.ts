@@ -399,6 +399,7 @@ export default async function formulaQueryBuilderv2(
         break;
       case UITypes.LinkToAnotherRecord:
         {
+          const alias = `__nc_formula_ll`;
           const relation = await col.getColOptions<LinkToAnotherRecordColumn>();
           // if (relation.type !== 'bt') continue;
 
@@ -460,9 +461,11 @@ export default async function formulaQueryBuilderv2(
             //
             // // getAggregateFn();
 
+            //   todo: provide unique alias
+
             const mmModel = await relation.getMMModel();
             const mmParentColumn = await relation.getMMParentColumn();
-            // const mmChildColumn = await relation.getMMChildColumn();
+            const mmChildColumn = await relation.getMMChildColumn();
 
             const qb = knex(`${parentModel.tn} as ${alias}`)
               .join(
@@ -471,7 +474,7 @@ export default async function formulaQueryBuilderv2(
                 `${alias}.${parentColumn.cn}`
               )
               .where(
-                `${alias}.${parentColumn.cn}`,
+                `${mmModel.tn}.${mmChildColumn.cn}`,
                 knex.raw(`??`, [`${childModel.tn}.${childColumn.cn}`])
               );
             selectQb = fn =>
