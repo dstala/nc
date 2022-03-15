@@ -1596,6 +1596,10 @@ export default {
           this.selectedView.show_system_fields = v
           this.$api.meta.viewUpdate(this.selectedViewId, {
             show_system_fields: v
+          }).then(() => {
+            if (v) {
+              this.loadTableData()
+            }
           })
         }
       }
