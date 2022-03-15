@@ -51,7 +51,17 @@ export default class FormView implements FormType {
     const insertObj = {
       fk_view_id: view.fk_view_id,
       project_id: view.project_id,
-      base_id: view.base_id
+      base_id: view.base_id,
+      heading: view.heading,
+      subheading: view.subheading,
+      success_msg: view.success_msg,
+      redirect_url: view.redirect_url,
+      redirect_after_secs: view.redirect_after_secs,
+      email: view.email,
+      banner_image_url: view.banner_image_url,
+      logo_url: view.logo_url,
+      submit_another_form: view.submit_another_form,
+      show_blank_form: view.show_blank_form
     };
     if (!(view.project_id && view.base_id)) {
       const viewRef = await View.get(view.fk_view_id);
@@ -72,7 +82,6 @@ export default class FormView implements FormType {
     const key = `${CacheScope.FORM_VIEW}:${formId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
-      o.title = body.title;
       o.heading = body.heading;
       o.subheading = body.subheading;
       o.success_msg = body.success_msg;
@@ -92,7 +101,6 @@ export default class FormView implements FormType {
       null,
       MetaTable.FORM_VIEW,
       {
-        title: body.title,
         heading: body.heading,
         subheading: body.subheading,
         success_msg: body.success_msg,

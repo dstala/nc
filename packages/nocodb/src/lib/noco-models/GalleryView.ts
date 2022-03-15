@@ -7,7 +7,6 @@ import NocoCache from '../noco-cache/NocoCache';
 
 export default class GalleryView implements GalleryType {
   fk_view_id?: string;
-  title?: string;
   deleted?: boolean;
   order?: number;
   next_enabled?: boolean;
@@ -20,12 +19,12 @@ export default class GalleryView implements GalleryType {
   public?: boolean;
   password?: string;
   show_all_fields?: boolean;
-  columns?: GalleryColumnType[];
-  fk_model_id?: string;
   fk_cover_image_col_id?: string;
 
   project_id?: string;
   base_id?: string;
+
+  columns?: GalleryColumnType[];
 
   constructor(data: GalleryView) {
     Object.assign(this, data);
@@ -58,7 +57,14 @@ export default class GalleryView implements GalleryType {
       base_id: view.base_id,
       fk_view_id: view.fk_view_id,
       fk_cover_image_col_id: columns?.find(c => c.uidt === UITypes.Attachment)
-        ?.id
+        ?.id,
+      next_enabled: view.next_enabled,
+      prev_enabled: view.prev_enabled,
+      cover_image_idx: view.cover_image_idx,
+      cover_image: view.cover_image,
+      restrict_types: view.restrict_types,
+      restrict_size: view.restrict_size,
+      restrict_number: view.restrict_number
     };
     if (!(view.project_id && view.base_id)) {
       const viewRef = await View.get(view.fk_view_id);
@@ -86,7 +92,6 @@ export default class GalleryView implements GalleryType {
     const key = `${CacheScope.GALLERY_VIEW}:${galleryId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
-      o.title = body.title;
       o.next_enabled = body.next_enabled;
       o.prev_enabled = body.prev_enabled;
       o.cover_image_idx = body.cover_image_idx;
@@ -94,8 +99,6 @@ export default class GalleryView implements GalleryType {
       o.restrict_types = body.restrict_types;
       o.restrict_size = body.restrict_size;
       o.restrict_number = body.restrict_number;
-      o.columns = body.columns;
-      o.fk_model_id = body.fk_model_id;
       o.fk_cover_image_col_id = body.fk_cover_image_col_id;
       // set cache
       await NocoCache.set(key, o);
@@ -106,7 +109,6 @@ export default class GalleryView implements GalleryType {
       null,
       MetaTable.GALLERY_VIEW,
       {
-        title: body.title,
         next_enabled: body.next_enabled,
         prev_enabled: body.prev_enabled,
         cover_image_idx: body.cover_image_idx,
@@ -114,8 +116,6 @@ export default class GalleryView implements GalleryType {
         restrict_types: body.restrict_types,
         restrict_size: body.restrict_size,
         restrict_number: body.restrict_number,
-        columns: body.columns,
-        fk_model_id: body.fk_model_id,
         fk_cover_image_col_id: body.fk_cover_image_col_id
       },
       {
