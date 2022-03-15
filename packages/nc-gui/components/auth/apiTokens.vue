@@ -138,6 +138,8 @@
 </template>
 
 <script>
+import { copyTextToClipboard } from '~/helpers/xutils'
+
 export default {
   name: 'ApiTokens',
   data: () => ({
@@ -151,7 +153,7 @@ export default {
   },
   methods: {
     copyToken(token) {
-      this.$clipboard(token)
+      copyTextToClipboard(token)
       this.$toast.info('Copied to clipboard').goAway(1000)
     },
     async loadApiTokens() {

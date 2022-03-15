@@ -119,6 +119,7 @@
 <script>
 import { ViewTypes } from 'nc-common'
 import viewIcons from '~/helpers/viewIcons'
+import { copyTextToClipboard } from '~/helpers/xutils'
 
 export default {
   name: 'SharedViewsList',
@@ -139,7 +140,7 @@ export default {
   },
   methods: {
     copyLink(view) {
-      this.$clipboard(`${this.dashboardUrl}#${this.sharedViewUrl(view)}`)
+      copyTextToClipboard(`${this.dashboardUrl}#${this.sharedViewUrl(view)}`)
       this.$toast.info('Copied to clipboard').goAway(1000)
     },
     async loadSharedViewsList() {

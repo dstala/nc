@@ -524,6 +524,7 @@ import { ViewTypes } from 'nc-common'
 import CreateViewDialog from '@/components/project/spreadsheet/dialog/createViewDialog'
 import Extras from '~/components/project/spreadsheet/components/extras'
 import viewIcons from '~/helpers/viewIcons'
+import { copyTextToClipboard } from '~/helpers/xutils'
 
 export default {
   name: 'SpreadsheetNavDrawer',
@@ -803,7 +804,7 @@ export default {
     //   this.$emit('loadTableData');
     // },
     copyapiUrlToClipboard() {
-      this.$clipboard(this.currentApiUrl)
+      copyTextToClipboard(this.currentApiUrl)
       this.clipboardSuccessHandler()
     },
     async updateViewName(view, index) {
