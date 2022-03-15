@@ -86,11 +86,9 @@
                     </v-tooltip>
                   </td>
                   <td>
-                    <!--
-                                     todo:enable
-                                     <v-icon small :color="viewIcons[(table.type === 'vtable' ? table.show_as : table.type) || 'table'].color" v-on="on">
-                    {{ viewIcons[(table.type === 'vtable' ? table.show_as : table.type) || 'table'].icon }}
-                  </v-icon>-->
+                    <v-icon small :color="viewIcons[table.type].color" v-on="on">
+                      {{ viewIcons[table.type].icon }}
+                    </v-icon>
                     <span v-if="table.ptn" class="caption">{{ table._tn }}</span>
                     <span v-else class="caption">{{ $t('general.default') }}</span>
                     <!--                    {{ table.show_as || table.type }}-->
