@@ -232,7 +232,7 @@ export default {
       return this.meta && this.meta.columns ? this.meta.columns.filter(c => c._cn === this.childForeignKey).map(c => this.row[c._cn] || '').join('___') : ''
     },
     isVirtualRelation() {
-      return (this.childMeta && (!!this.childMeta.columns.find(c => c.cn === this.hm.cn && this.hm.type === 'virtual'))) || false
+      return this.column && this.column.colOptions.virtual// (this.childMeta && (!!this.childMeta.columns.find(c => c.cn === this.hm.cn && this.hm.type === 'virtual'))) || false
     },
     isByPass() {
       if (this.isVirtualRelation) {
@@ -240,7 +240,10 @@ export default {
       }
       // if child fk references a column in parent which is not pk,
       // then this column has to be filled
-      if (((this.meta && this.meta.columns.find(c => !c.pk && c.cn === this.hm.rcn)) || false)) {
+      // if (((this.meta && this.meta.columns.find(c => !c.pk && c.id === this.hm.rcn)) || false)) {
+      //   return this.childForeignKeyVal === ''
+      // }
+      if (((this.meta && this.meta.columns.find(c => !c.pk && c.id === this.column.fk_parent_column_id)) || false)) {
         return this.childForeignKeyVal === ''
       }
       return false
