@@ -555,10 +555,10 @@ export default {
     currentApiUrl: String,
     fieldsOrder: Array,
     viewStatus: Object,
-    columnsWidth: Object,
-    coverImageField: String,
+    // columnsWidth: Object,
+    // coverImageField: String,
     groupingField: String,
-    showSystemFields: Boolean,
+    // showSystemFields: Boolean,
     views: Array
   },
   data: () => ({

@@ -127,8 +127,11 @@
               </template>
             </v-checkbox>
             <v-spacer />
-            <v-icon small color="grey" 
-              :class="`align-self-center drag-icon nc-child-draggable-icon-${field}`">
+            <v-icon
+              small
+              color="grey"
+              :class="`align-self-center drag-icon nc-child-draggable-icon-${field}`"
+            >
               mdi-drag
             </v-icon>
           </v-list-item>
@@ -150,7 +153,7 @@
             <span class="caption">
               <!-- Show System Fields -->
               {{ $t('activity.showSystemFields') }}
-              </span>
+            </span>
           </template>
         </v-checkbox>
       </v-list-item>
@@ -188,7 +191,7 @@ export default {
     value: [Object, Array],
     fieldList: [Array, Object],
     showSystemFields: {
-      type: Boolean,
+      type: [Boolean, Number],
       default: false
     },
     isLocked: Boolean,
@@ -243,7 +246,9 @@ export default {
     },
 
     isAnyFieldHidden() {
-      return Object.values(this.showFields).some(v => !v)
+      return this.fields.some(f => !(!this.showSystemFieldsLoc && this.systemColumnsIds.includes(f.fk_column_id)) &&
+        !f.show
+      )// Object.values(this.showFields).some(v => !v)
     },
     showSystemFieldsLoc: {
       get() {
