@@ -1785,6 +1785,9 @@ class BaseModelSqlv2 {
 
   // todo: handle composite primary key
   protected _extractPksValues(data: any) {
+    // data can be still inserted without PK
+    // TODO: return a meaningful value
+    if (!this.model.primaryKey) return 'N/A';
     return data[this.model.primaryKey._cn];
   }
   // @ts-ignore
