@@ -43,7 +43,8 @@
     />-->
 
     <template v-if="lookupColumnMeta">
-      <virtual-cell
+      <div
+        :is="virtualCell"
         v-if="isVirtualCol(lookupColumnMeta)"
         :is-public="true"
         :metas="metas"
@@ -81,18 +82,12 @@
 </template>
 
 <script>
-// import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
 import { isVirtualCol } from 'nc-common'
 import TableCell from '../cell'
 import ItemChip from '@/components/project/spreadsheet/components/virtualCell/components/itemChip'
-// import ListChildItemsModal
-// from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
-import VirtualCell from '~/components/project/spreadsheet/components/virtualCell'
-
 export default {
   name: 'LookupCell',
   components: {
-    VirtualCell,
     TableCell,
     // ListChildItemsModal,
     ItemChip
@@ -117,6 +112,9 @@ export default {
     isVirtualCol
   }),
   computed: {
+    virtualCell() {
+      return this.lookupColumnMeta && isVirtualCol(this.lookupColumnMeta) ? () => import('@/components/project/spreadsheet/components/virtualCell') : 'div'
+    },
     // todo : optimize
     lookupApi() {
       // return this.column && this.$ncApis.get({
