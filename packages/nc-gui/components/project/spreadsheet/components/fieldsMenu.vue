@@ -256,6 +256,8 @@ export default {
       },
       set(v) {
         this.$emit('update:showSystemFields', v)
+        this.showFields = { ...this.showFields }
+        this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
       }
     }
     // viewId() {
