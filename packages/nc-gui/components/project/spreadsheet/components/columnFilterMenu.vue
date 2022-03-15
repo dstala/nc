@@ -1,5 +1,5 @@
 <template>
-  <v-menu offset-y>
+  <v-menu offset-y eager>
     <template #activator="{ on, }">
       <v-badge
         :value="filters.length"
@@ -28,6 +28,7 @@
       </v-badge>
     </template>
     <column-filter
+
       v-model="filters"
       :shared="shared"
       :view-id="viewId"
@@ -49,7 +50,7 @@
             <span class="grey--text caption">
               {{ $t('msg.info.filterAutoApply') }}
               <!-- Auto apply -->
-              </span>
+            </span>
           </template>
         </v-checkbox>
 
