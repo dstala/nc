@@ -824,8 +824,8 @@ async function migrateProjectModelViews(
     for (const [_cn, column] of aliasColArr) {
       const viewColumn = viewColumns.find(c => column.id === c.fk_column_id);
       const order = orderCount++;
-      const show = queryParams?.fieldsOrder
-        ? queryParams?.fieldsOrder?.[_cn] || false
+      const show = queryParams?.showFields
+        ? queryParams?.showFields?.[_cn] || false
         : true;
       if (viewData.show_as === 'form') {
         const columnParams =
