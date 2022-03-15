@@ -281,7 +281,9 @@ export default {
         return
       }
       const id = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
-      await this.api.update(id, { [_cn]: null }, this.row)
+      // await this.api.update(id, { [_cn]: null }, this.row)
+      // todo: audit
+      await this.$api.data.update(this.meta.id, id, { [_cn]: null })
       this.$emit('loadTableData')
       if (this.isForm && this.$refs.childList) {
         this.$refs.childList.loadData()
