@@ -256,7 +256,7 @@ export default {
       },
       set(v) {
         this.$emit('update:showSystemFields', v)
-        this.showFields = { ...this.showFields }
+        this.showFields = this.fields.reduce((o, c) => ({ [c._cn]: c.show, ...o }), {})
         this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
       }
     }
