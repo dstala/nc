@@ -143,7 +143,6 @@
           offset-y
           open-on-hover
         >
-          {{isDocker}}
           <template #activator="{ on }">
             <v-btn v-ge="['Profile','']" text class="font-weight-bold nc-menu-account" v-on="on">
               <v-icon v-if="role && roleIcon[role]" size="20">
