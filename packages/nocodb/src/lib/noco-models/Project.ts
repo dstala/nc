@@ -171,10 +171,10 @@ export default class Project implements ProjectType {
     // get existing cache
     const key = `${CacheScope.PROJECT}:${projectId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
-    if (o.uuid) {
+    if (o?.uuid) {
       await NocoCache.del(`${CacheScope.PROJECT}:${o.uuid}`);
     }
-    await NocoCache.del(`${CacheScope.PROJECT}:${projectId}`);
+    if (o) await NocoCache.del(`${CacheScope.PROJECT}:${projectId}`);
 
     // remove item in cache list
     await NocoCache.deepDel(
