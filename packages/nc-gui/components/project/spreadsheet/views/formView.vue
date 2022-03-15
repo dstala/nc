@@ -124,6 +124,8 @@
           class="h-100 px-sm-1 px-md-10 "
           style="overflow-y: auto"
         >
+          <pre class="caption">{{ fields }}</pre>
+
           <!--        <div class="my-14 d-flex align-center justify-center">-->
           <!--          <v-chip>Add cover image</v-chip>-->
           <!--        </div>-->

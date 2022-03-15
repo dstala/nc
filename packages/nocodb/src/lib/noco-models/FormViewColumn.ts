@@ -3,6 +3,7 @@ import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import { FormColumnType } from 'nc-common';
 import View from './View';
 import NocoCache from '../noco-cache/NocoCache';
+import extractProps from '../noco/meta/api/helpers/extractProps';
 
 export default class FormViewColumn implements FormColumnType {
   id?: string;
@@ -116,14 +117,19 @@ export default class FormViewColumn implements FormColumnType {
     body: Partial<FormViewColumn>,
     ncMeta = Noco.ncMeta
   ) {
+    const insertObj = extractProps(body, [
+      'label',
+      'help',
+      'description',
+      'required',
+      'show',
+      'order'
+    ]);
     // get existing cache
     const key = `${CacheScope.FORM_VIEW_COLUMN}:${columnId}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
-      o.label = body.label;
-      o.help = body.help;
-      o.description = body.description;
-      o.required = body.required;
+      Object.assign(o, insertObj);
       // set cache
       await NocoCache.set(key, o);
     }
@@ -132,12 +138,7 @@ export default class FormViewColumn implements FormColumnType {
       null,
       null,
       MetaTable.FORM_VIEW_COLUMNS,
-      {
-        label: body.label,
-        help: body.help,
-        description: body.description,
-        required: body.required
-      },
+      insertObj,
       columnId
     );
   }
