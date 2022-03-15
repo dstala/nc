@@ -180,31 +180,33 @@
                   'darken-4':$vuetify.theme.dark
                 }"
               >
-                <v-list-item v-for="log in logs" :key="log.id" class="d-flex">
-                  <v-list-item-icon class="ma-0 mr-2">
-                    <v-icon :color="isYou(log.user) ? 'pink lighten-2' : 'blue lighten-2'">
-                      mdi-account-circle
-                    </v-icon>
-                  </v-list-item-icon>
-                  <div class="flex-grow-1" style="min-width: 0">
-                    <p class="mb-1 caption edited-text">
-                      {{ isYou(log.user) ? 'You' : log.user==null?'Shared base':log.user }} {{
-                        log.op_type === 'COMMENT' ? 'commented' : (
-                          log.op_sub_type === 'INSERT' ? 'created' : 'edited'
-                        )
-                      }}
-                    </p>
-                    <p v-if="log.op_type === 'COMMENT'" class="caption mb-0 nc-chip" :style="{background :colors[2]}">
-                      {{ log.description }}
-                    </p>
+                <div>
+                  <v-list-item v-for="log in logs" :key="log.id" class="d-flex">
+                    <v-list-item-icon class="ma-0 mr-2">
+                      <v-icon :color="isYou(log.user) ? 'pink lighten-2' : 'blue lighten-2'">
+                        mdi-account-circle
+                      </v-icon>
+                    </v-list-item-icon>
+                    <div class="flex-grow-1" style="min-width: 0">
+                      <p class="mb-1 caption edited-text">
+                        {{ isYou(log.user) ? 'You' : log.user == null ? 'Shared base' : log.user }} {{
+                          log.op_type === 'COMMENT' ? 'commented' : (
+                            log.op_sub_type === 'INSERT' ? 'created' : 'edited'
+                          )
+                        }}
+                      </p>
+                      <p v-if="log.op_type === 'COMMENT'" class="caption mb-0 nc-chip" :style="{background :colors[2]}">
+                        {{ log.description }}
+                      </p>
 
-                    <p v-else class="caption mb-0" style="word-break: break-all;" v-html="log.details" />
+                      <p v-else class="caption mb-0" style="word-break: break-all;" v-html="log.details" />
 
-                    <p class="time text-right mb-0">
-                      {{ calculateDiff(log.created_at) }}
-                    </p>
-                  </div>
-                </v-list-item>
+                      <p class="time text-right mb-0">
+                        {{ calculateDiff(log.created_at) }}
+                      </p>
+                    </div>
+                  </v-list-item>
+                </div>
               </v-list>
 
               <v-spacer />
@@ -276,7 +278,12 @@ dayjs.extend(utc)
 dayjs.extend(relativeTime)
 export default {
   name: 'ExpandedForm',
-  components: { VirtualHeaderCell, VirtualCell, EditableCell, HeaderCell },
+  components: {
+    VirtualHeaderCell,
+    VirtualCell,
+    EditableCell,
+    HeaderCell
+  },
   mixins: [colors, form],
   props: {
     showNextPrev: {
@@ -400,8 +407,14 @@ export default {
         comments_only: this.commentsOnly
       })).data
 
-      this.logs = data
+      this.logs = data.reverse()
       this.loadingLogs = false
+
+      this.$nextTick(() => {
+        if (this.$refs.commentsList && this.$refs.commentsList.$el && this.$refs.commentsList.$el.firstElementChild) {
+          this.$refs.commentsList.$el.scrollTop = this.$refs.commentsList.$el.firstElementChild.offsetHeight
+        }
+      })
     },
     async save() {
       try {
@@ -447,7 +460,8 @@ export default {
               row_id: id,
               value: updatedObj[key],
               prev_value: this.oldRow[key]
-            }).then(() => {})
+            }).then(() => {
+            })
           }
         } else {
           return this.$toast.info('No columns to update').goAway(3000)
@@ -508,7 +522,9 @@ export default {
       if (this.localState) {
         const value = this.localState[this.primaryValueColumn]
         const col = this.meta.columns.find(c => c._cn == this.primaryValueColumn)
-        if (!col) { return }
+        if (!col) {
+          return
+        }
         const uidt = col.uidt
         if (uidt == UITypes.Date) {
           return (/^\d+$/.test(value) ? dayjs(+value) : dayjs(value)).format('YYYY-MM-DD')
@@ -516,9 +532,15 @@ export default {
           return (/^\d+$/.test(this.value) ? dayjs(+this.value) : dayjs(this.value)).format('YYYY-MM-DD HH:mm')
         } else if (uidt == UITypes.Time) {
           let dateTime = dayjs(value)
-          if (!dateTime.isValid()) { dateTime = dayjs(value, 'HH:mm:ss') }
-          if (!dateTime.isValid()) { dateTime = dayjs(`1999-01-01 ${value}`) }
-          if (!dateTime.isValid()) { return value }
+          if (!dateTime.isValid()) {
+            dateTime = dayjs(value, 'HH:mm:ss')
+          }
+          if (!dateTime.isValid()) {
+            dateTime = dayjs(`1999-01-01 ${value}`)
+          }
+          if (!dateTime.isValid()) {
+            return value
+          }
           return dateTime.format('HH:mm:ss')
         }
         return value
@@ -659,8 +681,8 @@ h5 {
   background: var(--v-backgroundColorDefault-base);
 }
 
-.nc-chip{
-  padding:8px;
+.nc-chip {
+  padding: 8px;
   border-radius: 8px;
 }
 </style>
