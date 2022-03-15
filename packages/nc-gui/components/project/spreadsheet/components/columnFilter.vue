@@ -104,7 +104,7 @@
             :key="i + '_6'"
             v-model="filter.fk_column_id"
             class="caption nc-filter-field-select"
-            :items="meta.columns"
+            :items="columns"
             :placeholder="$t('objects.field')"
             solo
             flat
@@ -234,6 +234,9 @@ export default {
     ]
   }),
   computed: {
+    columns() {
+      return (this.meta && this.meta.columns.filter(c => c && (!c.colOptions || !c.system)))
+    },
     types() {
       if (!this.meta || !this.meta.columns || !this.meta.columns.length) {
         return {}
