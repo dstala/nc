@@ -1134,7 +1134,7 @@ export default {
       } = this.data[row]
       if (rowMeta.new) {
         // return if there is no change
-        if (oldRow[column._cn] === rowObj[column._cn] || saving) {
+        if ((column && oldRow[column._cn] === rowObj[column._cn]) || saving) {
           return
         }
         await this.save()

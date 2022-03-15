@@ -180,14 +180,16 @@ export default {
       return this.parentMeta && (this.parentMeta.columns.find(c => c.pk) || {})._cn
     },
     parentReferenceKey() {
-      return this.parentMeta && (this.parentMeta.columns.find(c => c.cn === this.bt.rcn) || {})._cn
+      // return this.parentMeta && (this.parentMeta.columns.find(c => c.cn === this.bt.rcn) || {})._cn
+      return this.parentMeta && (this.parentMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id) || {})._cn
     },
     btWhereClause() {
       // if parent reference key is pk, then filter out the selected value
       // else, filter out the selected value + empty values (as we can't set an empty value)
       const prk = this.parentReferenceKey
       const isPk = !!(this.parentMeta && (this.parentMeta.columns.find(c => c.pk && c._cn === prk))) || false
-      let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.cn === this.bt.cn).map(c => this.row[c._cn] || '').join('___') : ''
+      // let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.cn === this.bt.cn).map(c => this.row[c._cn] || '').join('___') : ''
+      let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.id === this.column.colOptions.fk_child_column_id).map(c => this.row[c._cn] || '').join('___') : ''
       if (this.parentMeta && (this.parentMeta.columns.find(c => c._cn === prk)).type !== 'string') {
         selectedValue = selectedValue || 0
       }
@@ -199,9 +201,9 @@ export default {
       }
       // todo: use reduce
       return {
-        hm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.hm).map(({ hm }) => hm.tn).join()) || '',
-        bt: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.bt).map(({ bt }) => bt.rtn).join()) || '',
-        mm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.mm).map(({ mm }) => mm.rtn).join()) || ''
+        // hm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.hm).map(({ hm }) => hm.tn).join()) || '',
+        // bt: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.bt).map(({ bt }) => bt.rtn).join()) || '',
+        // mm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.mm).map(({ mm }) => mm.rtn).join()) || ''
       }
     },
     parentAvailableColumns() {
@@ -266,7 +268,7 @@ export default {
     },
 
     async unlink() {
-      const column = this.meta.columns.find(c => c.cn === this.bt.cn)
+      const column = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)
       const _cn = column._cn
       if (this.isNew) {
         this.$emit('updateCol', this.row, _cn, null)
@@ -339,7 +341,7 @@ export default {
       const pid = pkColumns.map(c => parent[c._cn]).join('___')
       const id = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
       const _cn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
-      let isNum = false
+      const isNum = false
 
       // if (pkColumns.length === 1) {
       //   isNum = ['float', 'integer'].includes(this.sqlUi.getAbstractType(pkColumns[0]))
