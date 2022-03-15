@@ -1,6 +1,6 @@
 <template>
   <div class="chips-wrapper">
-    <div class="chips d-flex align-center  lookup-items">
+    <!--    <div class="chips d-flex align-center  lookup-items">
       <template v-if="localValue">
         <item-chip
           v-for="(value,i) in localValue"
@@ -20,7 +20,7 @@
       </template>
       <span
         v-if="localValue && localValue.length === 10"
-        class="caption pointer ml-1 grey--text"
+        class="caption pointer ml-1 grey&#45;&#45;text"
         @click="showLookupListModal"
       >more...
       </span>
@@ -40,20 +40,63 @@
       :read-only="true"
       :query-params="queryParams"
       :metas="metas"
-    />
+    />-->
+
+    <template v-if="lookupColumnMeta">
+      <virtual-cell
+        v-if="isVirtualCol(lookupColumnMeta)"
+        :is-public="true"
+        :metas="metas"
+        :is-locked="true"
+        :column="lookupColumnMeta"
+        :row="{[lookupColumnMeta._cn]:value}"
+        :nodes="nodes"
+        :meta="lookupTableMeta"
+        :sql-ui="sqlUi"
+      />
+      <template v-else>
+        <template v-if="localValue">
+          <item-chip
+            v-for="(value,i) in localValue"
+            :key="i"
+            style="margin: 1.5px"
+            :active="active"
+            :value="value"
+            :readonly="true"
+          >
+            <table-cell
+
+              :is-locked="true"
+              :column="lookupColumnMeta"
+              :meta="lookupTableMeta"
+              :db-alias="nodes.dbAlias"
+              :value="value"
+              :sql-ui="sqlUi"
+            />
+          </item-chip>
+        </template>
+      </template>
+    </template>
   </div>
 </template>
 
 <script>
 // import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
+import { isVirtualCol } from 'nc-common'
 import TableCell from '../cell'
 import ItemChip from '@/components/project/spreadsheet/components/virtualCell/components/itemChip'
-import ListChildItemsModal
-from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
+// import ListChildItemsModal
+// from '@/components/project/spreadsheet/components/virtualCell/components/listChildItemsModal'
+import VirtualCell from '~/components/project/spreadsheet/components/virtualCell'
 
 export default {
   name: 'LookupCell',
-  components: { TableCell, ListChildItemsModal, ItemChip },
+  components: {
+    VirtualCell,
+    TableCell,
+    // ListChildItemsModal,
+    ItemChip
+  },
   props: {
     meta: [Object],
     metas: [Object],
@@ -68,7 +111,10 @@ export default {
     value: [Object, Array, String, Number]
   },
   data: () => ({
-    lookupListModal: false
+    lookupListModal: false,
+    lookupTableMeta: null,
+    lookupColumnMeta: null,
+    isVirtualCol
   }),
   computed: {
     // todo : optimize
@@ -149,8 +195,16 @@ export default {
   },
   created() {
     this.loadLookupMeta()
+    this.loadLookupColumnMeta()
   },
   methods: {
+
+    async loadLookupColumnMeta() {
+      const relationColumn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_relation_column_id)
+      this.lookupTableMeta = await this.$store.dispatch('meta/ActLoadMeta', { id: relationColumn.colOptions.fk_related_model_id })
+      this.lookupColumnMeta = this.lookupTableMeta.columns.find(c => c.id === this.column.colOptions.fk_lookup_column_id)
+    },
+
     async loadLookupMeta() {
       // if (!this.metas && !this.lookUpMeta) {
       //   await this.$store.dispatch('meta/ActLoadMeta', {
