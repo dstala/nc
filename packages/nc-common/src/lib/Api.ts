@@ -516,9 +516,9 @@ export interface PasswordForgotPayloadType {
 }
 
 export interface PasswordChangePayloadType {
-  old_password?: string;
-  new_password?: string;
-  new_password_repeat?: string;
+  currentPassword?: string;
+  newPassword?: string;
+  verifyPassword?: string;
 }
 
 export interface PasswordResetPayloadType {

@@ -3,6 +3,7 @@ export default {
   creator: '*',
   guest: {},
   editor: {
+    passwordChange: true,
     // new permissions
     // project
     projectGet: true,
@@ -113,6 +114,7 @@ export default {
     xcExportAsCsv: true
   },
   commenter: {
+    passwordChange: true,
     // project
     projectGet: true,
     exportCsv: true,
@@ -156,6 +158,7 @@ export default {
     xcExportAsCsv: true
   },
   viewer: {
+    passwordChange: true,
     // project
     projectGet: true,
     //table
@@ -194,9 +197,11 @@ export default {
     xcExportAsCsv: true
   },
   user_new: {
+    passwordChange: true,
     projectList: true
   },
   user: {
+    passwordChange: true,
     pluginList: true,
     pluginRead: true,
     pluginTest: true,

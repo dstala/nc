@@ -167,13 +167,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "old_password": {
+                  "currentPassword": {
                     "type": "string"
                   },
-                  "new_password": {
+                  "newPassword": {
                     "type": "string"
                   },
-                  "new_password_repeat": {
+                  "verifyPassword": {
                     "type": "string"
                   }
                 }

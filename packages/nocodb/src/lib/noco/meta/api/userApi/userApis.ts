@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { TableType } from 'nc-common';
+import { PasswordChangePayloadType, TableType } from 'nc-common';
 import catchError, { NcError } from '../helpers/catchError';
 const { isEmail } = require('validator');
 import * as ejs from 'ejs';
@@ -21,6 +21,7 @@ const jwtConfig = {};
 
 import passport from 'passport';
 import extractProjectIdAndAuthenticate from '../helpers/extractProjectIdAndAuthenticate';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 
 export async function signup(req: Request, res: Response<TableType>) {
   const {
@@ -221,6 +222,45 @@ async function me(req, res): Promise<any> {
   res.json(req?.session?.passport?.user ?? {});
 }
 
+async function passwordChange(
+  req: Request<any, any, PasswordChangePayloadType>,
+  res
+): Promise<any> {
+  if (!(req as any).isAuthenticated()) {
+    NcError.forbidden('Not allowed');
+  }
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return NcError.badRequest('Missing new/old password');
+  }
+  const user = await User.getByEmail((req as any).user.email);
+  const hashedPassword = await promisify(bcrypt.hash)(
+    currentPassword,
+    user.salt
+  );
+  if (hashedPassword !== user.password) {
+    return NcError.badRequest('Current password is wrong');
+  }
+
+  const salt = await promisify(bcrypt.genSalt)(10);
+  const password = await promisify(bcrypt.hash)(newPassword, salt);
+
+  await User.update(user.id, {
+    salt,
+    password
+  });
+
+  Audit.insert({
+    op_type: 'AUTHENTICATION',
+    op_sub_type: 'PASSWORD_CHANGE',
+    user: user.email,
+    description: `changed password `,
+    ip: (req as any).clientIp
+  });
+
+  res.json({ msg: 'Password updated successfully' });
+}
+
 const mapRoutes = router => {
   // todo: old api - /auth/signup?tool=1
   router.post('/auth/user/signup', catchError(signup));
@@ -228,5 +268,6 @@ const mapRoutes = router => {
   router.post('/auth/user/signin', catchError(signin));
 
   router.get('/auth/user/me', extractProjectIdAndAuthenticate, catchError(me));
+  router.post('/user/password/change', ncMetaAclMw(passwordChange));
 };
 export { mapRoutes as userApis };
