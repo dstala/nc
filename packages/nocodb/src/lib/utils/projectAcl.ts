@@ -6,7 +6,6 @@ export default {
     // new permissions
     // project
     projectGet: true,
-    projectDelete: true,
     projectList: true,
     //table
     tableList: true,
