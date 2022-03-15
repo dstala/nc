@@ -349,7 +349,7 @@
                     <td style="width:150px;min-width:150px;max-width:150px">
                       <x-icon
                         :tooltip="
-                          $t('projects.delete_project')
+                          $t('activity.deleteProject')
                         "
                         class="pointer mr-2"
                         color="red grey"

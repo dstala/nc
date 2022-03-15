@@ -34,7 +34,8 @@
               </div>
               <v-form v-if=" type === 'jwt'" ref="formType" v-model="formUtil.valid" elevation-20 @submit="MtdOnSignup">
                 <p v-if="firstUser" class="success--text">
-                  You will be the 'Super Admin'
+                  <!-- You will be the 'Super Admin' -->
+                  {{ $t('msg.info.signUp.superAdmin') }}
                 </p>
 
                 <v-text-field
