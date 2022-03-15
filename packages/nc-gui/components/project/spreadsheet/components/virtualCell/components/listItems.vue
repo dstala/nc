@@ -141,7 +141,15 @@ export default {
     async loadData() {
       if (this.isPublic) {
         this.data = (await this.$api.public.dataRelationList(
-          { uuid: this.$route.params.id, relationColumnId: this.column.id }, { password: this.password })).data.data
+          { uuid: this.$route.params.id, relationColumnId: this.column.id },
+          { password: this.password }, {
+            query: {
+              limit: this.size,
+              offset: this.size * (this.page - 1),
+              ...this.queryParams
+              // where
+            }
+          })).data.data
         // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedDataGet', {
         //   password: this.password,
         //   limit: this.size,
@@ -155,10 +163,10 @@ export default {
         //   return
         // }
 
-        // const where = this.queryParams.where || ''
-        // if (this.query) {
-        //   where += (where ? '~and' : '') + `(${this.primaryCol},like,%${this.query}%)`
-        // }
+        let where = this.queryParams.where || ''
+        if (this.query) {
+          where = (where ? `(${where})~and` : '') + `(${this.primaryCol},like,%${this.query}%)`
+        }
 
         // if (this.mm) {
         //   this.data = await this.api.paginatedM2mNotChildrenList({
@@ -172,9 +180,9 @@ export default {
           this.meta.id, {
             query: {
               limit: this.size,
-              offset: this.size * (this.page - 1)
-              // ...this.queryParams,
-              // where
+              offset: this.size * (this.page - 1),
+              ...this.queryParams,
+              where
             }
           })).data.data
 
