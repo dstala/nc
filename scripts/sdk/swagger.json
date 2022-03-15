@@ -184,7 +184,57 @@
       },
       "parameters": []
     },
-    "/auth/password/reset": {
+    "/auth/token/validate/{token}": {
+      "post": {
+        "summary": "Password Reset",
+        "operationId": "password-reset-token-validate",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "token",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/auth/email/validate/{token}": {
+      "post": {
+        "summary": "Password Reset",
+        "operationId": "email-validate",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "tags": [
+          "AUTH"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "token",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/auth/password/reset/{token}": {
       "post": {
         "summary": "Password Reset",
         "operationId": "password-reset",
@@ -203,9 +253,6 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "reset_token": {
-                    "type": "string"
-                  },
                   "new_password": {
                     "type": "string"
                   }
@@ -215,7 +262,16 @@
           }
         }
       },
-      "parameters": []
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "token",
+          "in": "path",
+          "required": true
+        }
+      ]
     },
     "/auth/token/verify": {
       "post": {

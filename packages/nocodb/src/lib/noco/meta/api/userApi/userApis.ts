@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { PasswordChangePayloadType, TableType } from 'nc-common';
+import {
+  PasswordChangePayloadType,
+  PasswordForgotPayloadType,
+  TableType
+} from 'nc-common';
 import catchError, { NcError } from '../helpers/catchError';
 const { isEmail } = require('validator');
 import * as ejs from 'ejs';
@@ -22,6 +26,8 @@ const jwtConfig = {};
 import passport from 'passport';
 import extractProjectIdAndAuthenticate from '../helpers/extractProjectIdAndAuthenticate';
 import ncMetaAclMw from '../helpers/ncMetaAclMw';
+import { MetaTable } from '../../../../utils/globals';
+import Noco from '../../../Noco';
 
 export async function signup(req: Request, res: Response<TableType>) {
   const {
@@ -261,13 +267,151 @@ async function passwordChange(
   res.json({ msg: 'Password updated successfully' });
 }
 
+async function passwordForgot(
+  req: Request<any, any, PasswordForgotPayloadType>,
+  res
+): Promise<any> {
+  const _email = req.body.email;
+  if (!_email) {
+    NcError.badRequest('Please enter your email address.');
+  }
+
+  const email = _email.toLowerCase();
+
+  const user = await User.getByEmail(email);
+  if (user) {
+    const token = uuidv4();
+    await User.update(user.id, {
+      reset_password_token: token,
+      reset_password_expires: new Date(Date.now() + 60 * 60 * 1000)
+    });
+    try {
+      const template = (await import('./ui/emailTemplates/forgotPassword'))
+        .default;
+      await NcPluginMgrv2.emailAdapter().then(adapter =>
+        adapter.mailSend({
+          to: user.email,
+          subject: 'Password Reset Link',
+          text: `Visit following link to update your password : ${
+            (req as any).ncSiteUrl
+          }/password/reset/${token}.`,
+          html: ejs.render(template, {
+            resetLink: (req as any).ncSiteUrl + `/password/reset/${token}`
+          })
+        })
+      );
+    } catch (e) {
+      console.log(
+        'Warning : `mailSend` failed, Please configure emailClient configuration.'
+      );
+    }
+    console.log(`Password reset token : ${token}`);
+
+    Audit.insert({
+      op_type: 'AUTHENTICATION',
+      op_sub_type: 'PASSWORD_FORGOT',
+      user: user.email,
+      description: `requested for password reset `,
+      ip: (req as any).clientIp
+    });
+  }
+  res.json({ msg: 'Check your email if you are registered with us.' });
+}
+
+async function tokenValidate(req, res): Promise<any> {
+  const token = req.params.token;
+
+  // todo: redis ??
+  const user = await Noco.ncMeta.metaGet(null, null, MetaTable.USERS, {
+    reset_password_token: token
+  });
+
+  if (!user || !user.email) {
+    NcError.badRequest('Invalid reset url');
+  }
+  if (user.reset_password_expires < new Date()) {
+    NcError.badRequest('Password reset url expired');
+  }
+  res.json(true);
+}
+
+async function passwordReset(req, res): Promise<any> {
+  const token = req.params.token;
+
+  // todo: redis ??
+  const user = await Noco.ncMeta.metaGet(null, null, MetaTable.USERS, {
+    reset_password_token: token
+  });
+
+  if (!user) {
+    NcError.badRequest('Invalid reset url');
+  }
+  if (user.reset_password_expires < new Date()) {
+    NcError.badRequest('Password reset url expired');
+  }
+  if (user.provider && user.provider !== 'local') {
+    NcError.badRequest('Email registered via social account');
+  }
+
+  const salt = await promisify(bcrypt.genSalt)(10);
+  const password = await promisify(bcrypt.hash)(req.body.password, salt);
+
+  await User.update(user.id, {
+    salt,
+    password,
+    reset_password_expires: null,
+    reset_password_token: ''
+  });
+
+  Audit.insert({
+    op_type: 'AUTHENTICATION',
+    op_sub_type: 'PASSWORD_RESET',
+    user: user.email,
+    description: `did reset password `,
+    ip: req.clientIp
+  });
+
+  res.json({ msg: 'Password reset successful' });
+}
+
+async function emailVerification(req, res): Promise<any> {
+  const token = req.params.token;
+
+  // todo: redis ??
+  const user = await Noco.ncMeta.metaGet(null, null, MetaTable.USERS, {
+    email_verification_token: token
+  });
+
+  if (!user) {
+    NcError.badRequest('Invalid verification url');
+  }
+
+  await User.update(user.id, {
+    email_verification_token: '',
+    email_verified: true
+  });
+
+  Audit.insert({
+    op_type: 'AUTHENTICATION',
+    op_sub_type: 'EMAIL_VERIFICATION',
+    user: user.email,
+    description: `verified email `,
+    ip: req.clientIp
+  });
+
+  res.json({ msg: 'Email verified successfully' });
+}
+
 const mapRoutes = router => {
   // todo: old api - /auth/signup?tool=1
   router.post('/auth/user/signup', catchError(signup));
-
   router.post('/auth/user/signin', catchError(signin));
-
   router.get('/auth/user/me', extractProjectIdAndAuthenticate, catchError(me));
+  router.post('/auth/password/forgot', catchError(passwordForgot));
+  router.post('/auth/token/validate/:tokenId', catchError(tokenValidate));
+  router.post('/auth/password/reset/:tokenId', catchError(passwordReset));
+  router.post('/auth/email/validate/:tokenId', catchError(emailVerification));
+
   router.post('/user/password/change', ncMetaAclMw(passwordChange));
 };
 export { mapRoutes as userApis };

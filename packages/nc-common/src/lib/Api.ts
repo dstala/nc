@@ -522,7 +522,6 @@ export interface PasswordChangePayloadType {
 }
 
 export interface PasswordResetPayloadType {
-  reset_token?: string;
   new_password?: string;
 }
 
@@ -971,17 +970,50 @@ export class Api<
      * No description
      *
      * @tags AUTH
+     * @name PasswordResetTokenValidate
+     * @summary Password Reset
+     * @request POST:/auth/token/validate/{token}
+     * @response `200` `void` OK
+     */
+    passwordResetTokenValidate: (token: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/token/validate/${token}`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags AUTH
+     * @name EmailValidate
+     * @summary Password Reset
+     * @request POST:/auth/email/validate/{token}
+     * @response `200` `void` OK
+     */
+    emailValidate: (token: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/email/validate/${token}`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags AUTH
      * @name PasswordReset
      * @summary Password Reset
-     * @request POST:/auth/password/reset
+     * @request POST:/auth/password/reset/{token}
      * @response `200` `void` OK
      */
     passwordReset: (
+      token: string,
       data: PasswordResetPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/auth/password/reset`,
+        path: `/auth/password/reset/${token}`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
