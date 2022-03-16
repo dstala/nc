@@ -1,6 +1,6 @@
 import Base from '../noco-models/Base';
 import Noco from '../noco/Noco';
-import { ProjectType } from 'nc-common';
+import { ProjectListParamsType, ProjectType } from 'nc-common';
 import {
   CacheDelDirection,
   CacheGetType,
@@ -76,8 +76,12 @@ export default class Project implements ProjectType {
     return this.getWithInfo(projectId, ncMeta);
   }
 
-  // @ts-ignore
-  static async list(param, ncMeta = Noco.ncMeta): Promise<Project[]> {
+  static async list(
+    // @ts-ignore
+    param: ProjectListParamsType,
+    ncMeta = Noco.ncMeta
+  ): Promise<Project[]> {
+    // todo: pagination
     let projectList = await NocoCache.getList(CacheScope.PROJECT, []);
     if (!projectList.length) {
       projectList = await ncMeta.metaList2(null, null, MetaTable.PROJECT, {

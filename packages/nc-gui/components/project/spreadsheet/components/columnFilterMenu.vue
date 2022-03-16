@@ -28,7 +28,7 @@
       </v-badge>
     </template>
     <column-filter
-
+      ref="filter"
       v-model="filters"
       :shared="shared"
       :view-id="viewId"
@@ -55,7 +55,7 @@
         </v-checkbox>
 
         <v-spacer />
-        <v-btn v-show="!autosave" color="primary" small class="caption ml-2" @click="$emit('input', filters)">
+        <v-btn v-show="!autosave" color="primary" small class="caption ml-2" @click="applyChanges">
           Apply
           changes
         </v-btn>
@@ -105,7 +105,12 @@ export default {
   created() {
     this.filters = this.autosave ? this.value || [] : JSON.parse(JSON.stringify(this.value || []))
   },
-  methods: {}
+  methods: {
+    applyChanges() {
+      this.$emit('input', this.filters)
+      if (this.$refs.filter) { this.$refs.filter.applyChanges() }
+    }
+  }
 }
 </script>
 

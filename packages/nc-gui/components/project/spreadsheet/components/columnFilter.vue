@@ -5,8 +5,50 @@
   >
     <div class="grid" @click.stop>
       <template v-for="(filter,i) in filters" dense>
-        <div v-if="filter.is_group" :key="i" style="grid-column: span 4; padding:6px" class="elevation-4 ">
-          <div class="d-flex" style="gap:6px; padding: 0 6px">
+        <template v-if="filter.status !== 'delete'">
+          <div v-if="filter.is_group" :key="i" style="grid-column: span 4; padding:6px" class="elevation-4 ">
+            <div class="d-flex" style="gap:6px; padding: 0 6px">
+              <v-icon
+                v-if="!filter.readOnly"
+                :key="i + '_3'"
+                small
+                class="nc-filter-item-remove-btn"
+                @click.stop="deleteFilter(filter,i)"
+              >
+                mdi-close-box
+              </v-icon>
+              <span v-else :key="i + '_1'" />
+              <v-select
+                v-model="filter.logical_op"
+                class="flex-shrink-1 flex-grow-0 elevation-0 caption "
+                :items="['and' ,'or']"
+                solo
+                flat
+                dense
+                hide-details
+                placeholder="Group op"
+                @click.stop
+                @change="saveOrUpdate(filter, i)"
+              >
+                <template #item="{item}">
+                  <span class="caption font-weight-regular">{{ item }}</span>
+                </template>
+              </v-select>
+            </div>
+            <column-filter
+              v-if="filter.id || shared"
+              ref="nestedFilter"
+              v-model="filter.children"
+              :parent-id="filter.id"
+              :view-id="viewId"
+              nested
+              :meta="meta"
+              :shared="shared"
+              @updated="$emit('updated')"
+              @input="$emit('input', filters)"
+            />
+          </div>
+          <template v-else>
             <v-icon
               v-if="!filter.readOnly"
               :key="i + '_3'"
@@ -17,48 +59,8 @@
               mdi-close-box
             </v-icon>
             <span v-else :key="i + '_1'" />
-            <v-select
-              v-model="filter.logical_op"
-              class="flex-shrink-1 flex-grow-0 elevation-0 caption "
-              :items="['and' ,'or']"
-              solo
-              flat
-              dense
-              hide-details
-              placeholder="Group op"
-              @click.stop
-              @change="saveOrUpdate(filter, i)"
-            >
-              <template #item="{item}">
-                <span class="caption font-weight-regular">{{ item }}</span>
-              </template>
-            </v-select>
-          </div>
-          <column-filter
-            v-if="filter.id || shared"
-            v-model="filter.children"
-            :parent-id="filter.id"
-            :view-id="viewId"
-            nested
-            :meta="meta"
-            :shared="shared"
-            @updated="$emit('updated')"
-            @input="$emit('input', filters)"
-          />
-        </div>
-        <template v-else>
-          <v-icon
-            v-if="!filter.readOnly"
-            :key="i + '_3'"
-            small
-            class="nc-filter-item-remove-btn"
-            @click.stop="deleteFilter(filter,i)"
-          >
-            mdi-close-box
-          </v-icon>
-          <span v-else :key="i + '_1'" />
 
-          <!--        <span
+            <!--        <span
             v-if="!i"
             :key="i + '_2'"
             class="caption d-flex align-center"
@@ -81,91 +83,92 @@
               <span class="caption font-weight-regular">{{ item }}</span>
             </template>
           </v-select>-->
-          <!--        <v-text-field-->
-          <!--          v-if="filter.readOnly"-->
-          <!--          :key="i + '_5'"-->
-          <!--          v-model="filter.field"-->
-          <!--          class="caption "-->
-          <!--          placeholder="Field"-->
-          <!--          solo-->
-          <!--          flat-->
-          <!--          dense-->
-          <!--          disabled-->
-          <!--          hide-details-->
-          <!--          @click.stop-->
-          <!--        >-->
-          <!--          <template #item="{item}">-->
-          <!--            <span class="caption font-weight-regular">{{ item }}</span>-->
-          <!--          </template>-->
-          <!--        </v-text-field>-->
-          <!--        v-else-->
+            <!--        <v-text-field-->
+            <!--          v-if="filter.readOnly"-->
+            <!--          :key="i + '_5'"-->
+            <!--          v-model="filter.field"-->
+            <!--          class="caption "-->
+            <!--          placeholder="Field"-->
+            <!--          solo-->
+            <!--          flat-->
+            <!--          dense-->
+            <!--          disabled-->
+            <!--          hide-details-->
+            <!--          @click.stop-->
+            <!--        >-->
+            <!--          <template #item="{item}">-->
+            <!--            <span class="caption font-weight-regular">{{ item }}</span>-->
+            <!--          </template>-->
+            <!--        </v-text-field>-->
+            <!--        v-else-->
 
-          <v-select
-            :key="i + '_6'"
-            v-model="filter.fk_column_id"
-            class="caption nc-filter-field-select"
-            :items="columns"
-            :placeholder="$t('objects.field')"
-            solo
-            flat
-            dense
-            :disabled="filter.readOnly"
-            hide-details
-            item-value="id"
-            item-text="_cn"
-            @click.stop
-            @change="saveOrUpdate(filter, i)"
-          >
-            <template #item="{item}">
-              <span
-                :class="`caption font-weight-regular nc-filter-fld-${item._cn}`"
-              >
-                {{ item._cn }}
-              </span>
-            </template>
-          </v-select>
-          <v-select
-            :key="'k' + i"
-            v-model="filter.comparison_op"
-            class="flex-shrink-1 flex-grow-0 caption  nc-filter-operation-select"
-            :items="comparisonOp"
-            :placeholder="$t('labels.operation')"
-            solo
-            flat
-            style="max-width:120px"
-            dense
-            :disabled="filter.readOnly"
-            hide-details
-            item-value="value"
-            @click.stop
-            @change="saveOrUpdate(filter, i)"
-          >
-            <template #item="{item}">
-              <span class="caption font-weight-regular">{{ item.text }}</span>
-            </template>
-          </v-select>
-          <span v-if="['null', 'notnull', 'empty', 'notempty'].includes(filter.comparison_op)" :key="'span' + i" />
-          <v-checkbox
-            v-else-if="types[filter.field] === 'boolean'"
-            :key="i + '_7'"
-            v-model="filter.value"
-            dense
-            :disabled="filter.readOnly"
-            @change="saveOrUpdate(filter, i)"
-          />
-          <v-text-field
-            v-else
-            :key="i + '_7'"
-            v-model="filter.value"
-            solo
-            flat
-            hide-details
-            dense
-            class="caption nc-filter-value-select"
-            :disabled="filter.readOnly"
-            @click.stop
-            @input="saveOrUpdate(filter, i)"
-          />
+            <v-select
+              :key="i + '_6'"
+              v-model="filter.fk_column_id"
+              class="caption nc-filter-field-select"
+              :items="columns"
+              :placeholder="$t('objects.field')"
+              solo
+              flat
+              dense
+              :disabled="filter.readOnly"
+              hide-details
+              item-value="id"
+              item-text="_cn"
+              @click.stop
+              @change="saveOrUpdate(filter, i)"
+            >
+              <template #item="{item}">
+                <span
+                  :class="`caption font-weight-regular nc-filter-fld-${item._cn}`"
+                >
+                  {{ item._cn }}
+                </span>
+              </template>
+            </v-select>
+            <v-select
+              :key="'k' + i"
+              v-model="filter.comparison_op"
+              class="flex-shrink-1 flex-grow-0 caption  nc-filter-operation-select"
+              :items="comparisonOp"
+              :placeholder="$t('labels.operation')"
+              solo
+              flat
+              style="max-width:120px"
+              dense
+              :disabled="filter.readOnly"
+              hide-details
+              item-value="value"
+              @click.stop
+              @change="saveOrUpdate(filter, i)"
+            >
+              <template #item="{item}">
+                <span class="caption font-weight-regular">{{ item.text }}</span>
+              </template>
+            </v-select>
+            <span v-if="['null', 'notnull', 'empty', 'notempty'].includes(filter.comparison_op)" :key="'span' + i" />
+            <v-checkbox
+              v-else-if="types[filter.field] === 'boolean'"
+              :key="i + '_7'"
+              v-model="filter.value"
+              dense
+              :disabled="filter.readOnly"
+              @change="saveOrUpdate(filter, i)"
+            />
+            <v-text-field
+              v-else
+              :key="i + '_7'"
+              v-model="filter.value"
+              solo
+              flat
+              hide-details
+              dense
+              class="caption nc-filter-value-select"
+              :disabled="filter.readOnly"
+              @click.stop
+              @input="saveOrUpdate(filter, i)"
+            />
+          </template>
         </template>
       </template>
     </div>
@@ -219,21 +222,64 @@ export default {
       '<='
     ],
     comparisonOp: [
-      { text: 'is equal', value: 'eq' },
-      { text: 'is not equal', value: 'neq' },
-      { text: 'is like', value: 'like' },
-      { text: 'is not like', value: 'nlike' },
-      { text: 'is empty', value: 'empty', ignoreVal: true },
-      { text: 'is not empty', value: 'notempty', ignoreVal: true },
-      { text: 'is null', value: 'null', ignoreVal: true },
-      { text: 'is not null', value: 'notnull', ignoreVal: true },
-      { text: '>', value: 'gt' },
-      { text: '<', value: 'lt' },
-      { text: '>=', value: 'gte' },
-      { text: '<=', value: 'lte' }
+      {
+        text: 'is equal',
+        value: 'eq'
+      },
+      {
+        text: 'is not equal',
+        value: 'neq'
+      },
+      {
+        text: 'is like',
+        value: 'like'
+      },
+      {
+        text: 'is not like',
+        value: 'nlike'
+      },
+      {
+        text: 'is empty',
+        value: 'empty',
+        ignoreVal: true
+      },
+      {
+        text: 'is not empty',
+        value: 'notempty',
+        ignoreVal: true
+      },
+      {
+        text: 'is null',
+        value: 'null',
+        ignoreVal: true
+      },
+      {
+        text: 'is not null',
+        value: 'notnull',
+        ignoreVal: true
+      },
+      {
+        text: '>',
+        value: 'gt'
+      },
+      {
+        text: '<',
+        value: 'lt'
+      },
+      {
+        text: '>=',
+        value: 'gte'
+      },
+      {
+        text: '<=',
+        value: 'lte'
+      }
     ]
   }),
   computed: {
+    autoApply() {
+      return this.$store.state.windows.autoApplyFilter
+    },
     columns() {
       return (this.meta && this.meta.columns.filter(c => c && (!c.colOptions || !c.system)))
     },
@@ -275,6 +321,32 @@ export default {
     this.loadFilter()
   },
   methods: {
+    async applyChanges(nested = false) {
+      for (const [i, filter] of Object.entries(this.filters)) {
+        if (filter.status === 'delete') {
+          await this.$api.meta.filterDelete(this.viewId, filter.id)
+        } else if (filter.status === 'update') {
+          if (filter.id) {
+            await this.$api.meta.filterUpdate(this.viewId, filter.id, {
+              ...filter,
+              fk_parent_id: this.parentId
+            })
+          } else {
+            this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
+              ...filter,
+              fk_parent_id: this.parentId
+            })).data)
+          }
+        }
+      }
+      if (this.$refs.nestedFilter) {
+        for (const nestedFilter of this.$refs.nestedFilter) {
+          await nestedFilter.applyChanges(true)
+        }
+      }
+      this.loadFilter()
+      if (!nested) { this.$emit('updated') }
+    },
     async loadFilter() {
       let filters = []
 
@@ -313,31 +385,43 @@ export default {
     async saveOrUpdate(filter, i) {
       if (this.shared || !this._isUIAllowed('filterSync')) {
         // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
+        this.$emit('updated')
+      } else if (!this.autoApply) {
+        filter.status = 'update'
       } else if (filter.id) {
         await this.$api.meta.filterUpdate(this.viewId, filter.id, {
           ...filter,
           fk_parent_id: this.parentId
         })
+
+        this.$emit('updated')
       } else {
         this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
           ...filter,
           fk_parent_id: this.parentId
         })).data)
+
+        this.$emit('updated')
       }
-      this.$emit('updated')
     },
     async deleteFilter(filter, i) {
       if (this.shared || !this._isUIAllowed('filterSync')) {
         this.filters.splice(i, 1)
         // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
+        this.$emit('updated')
       } else if (filter.id) {
-        await this.$api.meta.filterDelete(this.viewId, filter.id)
-        await this.loadFilter()
+        if (!this.autoApply) {
+          this.$set(filter, 'status', 'delete')
+        } else {
+          await this.$api.meta.filterDelete(this.viewId, filter.id)
+          await this.loadFilter()
+          this.$emit('updated')
+        }
       } else {
         this.filters.splice(i, 1)
+        this.$emit('updated')
       }
       // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
-      this.$emit('updated')
     }
   }
 }

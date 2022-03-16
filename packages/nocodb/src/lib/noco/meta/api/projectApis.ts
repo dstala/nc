@@ -52,13 +52,13 @@ export async function projectList(
 ) {
   try {
     console.log(req.query.page);
-    const projects = await Project.list({});
+    const projects = await Project.list(req.query);
 
     res // todo: pagination
       .json({
         projects: new PagedResponseImpl(projects, {
           totalRows: projects.length,
-          pageSize: 20,
+          pageSize: projects.length,
           page: 1
         })
       });
