@@ -529,7 +529,7 @@ export default {
         if (uidt == UITypes.Date) {
           return (/^\d+$/.test(value) ? dayjs(+value) : dayjs(value)).format('YYYY-MM-DD')
         } else if (uidt == UITypes.DateTime) {
-          return (/^\d+$/.test(this.value) ? dayjs(+this.value) : dayjs(this.value)).format('YYYY-MM-DD HH:mm')
+          return (/^\d+$/.test(value) ? dayjs(+value) : dayjs(value)).format('YYYY-MM-DD HH:mm')
         } else if (uidt == UITypes.Time) {
           let dateTime = dayjs(value)
           if (!dateTime.isValid()) {
