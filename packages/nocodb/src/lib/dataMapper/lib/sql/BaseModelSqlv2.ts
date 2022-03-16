@@ -789,6 +789,7 @@ class BaseModelSqlv2 {
           {
             this._columns[column._cn] = column;
             const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
+            const parentColumn = await colOptions.getParentColumn();
 
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
@@ -806,7 +807,9 @@ class BaseModelSqlv2 {
               const self: BaseModelSqlv2 = this;
 
               proto[column._cn] = async function(): Promise<any> {
-                return listLoader.load(this[self?.model?.primaryKey?._cn]);
+                return listLoader.load(
+                  this[parentColumn?._cn || self?.model?.primaryKey?._cn]
+                );
               };
 
               // defining HasMany count method within GQL Type class
@@ -832,9 +835,11 @@ class BaseModelSqlv2 {
               });
 
               const self: BaseModelSqlv2 = this;
-
+              const childColumn = await colOptions.getChildColumn();
               proto[column._cn] = async function(): Promise<any> {
-                return await listLoader.load(this[self.model.primaryKey._cn]);
+                return await listLoader.load(
+                  this[childColumn?._cn || self.model.primaryKey._cn]
+                );
               };
             } else if (colOptions.type === 'bt') {
               // @ts-ignore
