@@ -20,9 +20,9 @@ export const genTest = (apiType, dbType) => {
         before(() => {
             if (isXcdb()) {
                 cy.log(getProjectString());
-                projPrefix = `nc_${getProjectString()}__`;
+                projPrefix = `${getProjectString()}`;
                 dbCmd = `sqliteExec`;
-                tblDisplayPrefix = `nc_${getProjectString()}__`;
+                tblDisplayPrefix = `${getProjectString()}`;
             }
             mainPage.openMetaTab();
         });

@@ -7,6 +7,7 @@ import { mainPage } from "../../support/page_objects/mainPage";
 import {
     isPostgres,
     isTestSuiteActive,
+    isXcdb,
 } from "../../support/page_objects/projectConstants";
 import {
     _advSettings,
@@ -57,6 +58,8 @@ export const genTest = (apiType, dbType, roleType) => {
             // validate if it has 19 entries representing tables & views
             if (isPostgres())
                 cy.get(".nc-acl-table-row").should("have.length", 24);
+            else if (isXcdb())
+                cy.get(".nc-acl-table-row").should("have.length", 19);
             else cy.get(".nc-acl-table-row").should("have.length", 19);
 
             // restore access

@@ -113,7 +113,7 @@ export const genTest = (apiType, dbType) => {
             // move Actor3 field on top (drag, drop)
             cy.get(".nc-child-draggable-icon-Actor3").drag(
                 `.nc-child-draggable-icon-${
-                    isXcdb() ? `nc_${getProjectString()}__` : ``
+                    isXcdb() ? `${getProjectString()}` : ``
                 }actor`
             );
 

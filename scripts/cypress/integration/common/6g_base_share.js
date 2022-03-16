@@ -24,6 +24,8 @@ export const genTest = (apiType, dbType) => {
             cy.visit(linkText, {
                 baseUrl: null,
             });
+            cy.wait(5000);
+            
             projectsPage.waitHomePageLoad();
 
             cy.closeTableTab("Actor");

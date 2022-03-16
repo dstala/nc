@@ -63,6 +63,7 @@ export const genTest = (apiType, dbType) => {
             cy.visit(linkText, {
                 baseUrl: null,
             });
+            cy.wait(5000);
 
             cy.getActiveModal().should("exist");
 
@@ -97,6 +98,7 @@ export const genTest = (apiType, dbType) => {
             cy.visit(storedURL, {
                 baseUrl: null,
             });
+            cy.wait(5000);
             mainPage.deleteCreatedViews();
         });
 
