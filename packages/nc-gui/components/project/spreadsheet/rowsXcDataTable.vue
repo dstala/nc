@@ -124,7 +124,7 @@
           @reload="reload"
         />
       </div>
-      <v-spacer class="h-100" @click="clickCount = clickCount + 1; debug=clickCount >= 5" />
+      <v-spacer class="h-100" @click="clickCount = clickCount + 1; debug=clickCount >= 2" />
 
       <template v-if="!isForm">
         <!-- Export Cache -->
