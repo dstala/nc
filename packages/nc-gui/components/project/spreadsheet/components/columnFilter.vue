@@ -130,7 +130,7 @@
               :key="'k' + i"
               v-model="filter.comparison_op"
               class="flex-shrink-1 flex-grow-0 caption  nc-filter-operation-select"
-              :items="comparisonOp"
+              :items="filterComparisonOp(filter)"
               :placeholder="$t('labels.operation')"
               solo
               flat
@@ -277,6 +277,9 @@ export default {
     ]
   }),
   computed: {
+    columnsById() {
+      return (this.columns || []).reduce((o, c) => ({ ...o, [c.id]: c }), {})
+    },
     autoApply() {
       return this.$store.state.windows.autoApplyFilter
     },
@@ -321,6 +324,22 @@ export default {
     this.loadFilter()
   },
   methods: {
+    filterComparisonOp(f) {
+      return this.comparisonOp.filter((op) => {
+        if (f && f.fk_column_id && this.columnsById[f.fk_column_id] &&
+          this.columnsById[f.fk_column_id].uidt === UITypes.LinkToAnotherRecord &&
+          this.columnsById[f.fk_column_id].uidt === UITypes.Lookup
+        ) {
+          return ![
+            'notempty',
+            'empty',
+            'notnull',
+            'null'
+          ].includes(op.value)
+        }
+        return true
+      })
+    },
     async applyChanges(nested = false) {
       for (const [i, filter] of Object.entries(this.filters)) {
         if (filter.status === 'delete') {
