@@ -4,15 +4,14 @@
 name: "CI/CD"
 on:
     push:
-        branches-ignore:
-            - master
+        branches: [master, develop, cypress]
         paths:
             - "packages/nc-gui/**"
             - "scripts/cypress/**"
             - "packages/nocodb/**"
             - ".github/workflows/ci-cd.yml"
     pull_request:
-        branches: [develop]
+        branches: [master, develop]
         paths:
             - "packages/nc-gui/**"
             - "scripts/cypress/**"
@@ -50,6 +49,7 @@ jobs:
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
@@ -93,6 +93,7 @@ jobs:
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
@@ -136,6 +137,7 @@ jobs:
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
@@ -179,6 +181,7 @@ jobs:
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
@@ -222,6 +225,7 @@ jobs:
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
@@ -229,12 +233,6 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: restTableOps-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     cypress-restViews-run:
         runs-on: ubuntu-20.04
         steps:
@@ -259,13 +257,13 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
@@ -273,12 +271,6 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: restViews-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     cypress-restRoles-run:
         runs-on: ubuntu-20.04
         steps:
@@ -303,13 +295,13 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
@@ -317,12 +309,6 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: restRoles-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     cypress-restMisc-run:
         runs-on: ubuntu-20.04
         steps:
@@ -347,13 +333,13 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:api
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
@@ -361,12 +347,6 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: restMisc-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     cypress-xcdb-restTableOps-run:
         runs-on: ubuntu-20.04
         steps:
@@ -397,18 +377,14 @@ jobs:
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:xcdb-api
                       npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
                   spec: "./scripts/cypress/integration/test/xcdb-restTableOps.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-restTableOps-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     cypress-xcdb-restViews-run:
         runs-on: ubuntu-20.04
         steps:
@@ -433,25 +409,20 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:xcdb-api
                       npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
                   spec: "./scripts/cypress/integration/test/xcdb-restViews.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-restViews-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     cypress-xcdb-restRoles-run:
         runs-on: ubuntu-20.04
         steps:
@@ -476,25 +447,20 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:xcdb-api
                       npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
                   spec: "./scripts/cypress/integration/test/xcdb-restRoles.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-restRoles-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     cypress-xcdb-restMisc-run:
         runs-on: ubuntu-20.04
         steps:
@@ -519,26 +485,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
+                      npm run build:common
                       npm run start:xcdb-api
                       npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
                   spec: "./scripts/cypress/integration/test/xcdb-restMisc.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-restMisc-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-gqlTableOps-run:
+    cypress-restTableOps-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -562,27 +523,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:api
+                      npm run build:common          
+                      npm run start:api:cache
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
-                  spec: "./scripts/cypress/integration/test/gqlTableOps.js"
+                  spec: "./scripts/cypress/integration/test/restTableOps.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: gqlTableOps-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-gqlViews-run:
+    cypress-restViews-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -606,27 +561,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:api
+                      npm run build:common
+                      npm run start:api:cache
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
-                  spec: "./scripts/cypress/integration/test/gqlViews.js"
+                  spec: "./scripts/cypress/integration/test/restViews.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: gqlViews-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-gqlRoles-run:
+    cypress-restRoles-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -650,27 +599,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:api
+                      npm run build:common
+                      npm run start:api:cache
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
-                  spec: "./scripts/cypress/integration/test/gqlRoles.js"
+                  spec: "./scripts/cypress/integration/test/restRoles.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: gqlRoles-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-gqlMisc-run:
+    cypress-restMisc-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -694,27 +637,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:api
+                      npm run build:common
+                      npm run start:api:cache
                       npm run start:web
                       docker-compose -f ./scripts/docker-compose-cypress.yml up -d
-                  spec: "./scripts/cypress/integration/test/gqlMisc.js"
+                  spec: "./scripts/cypress/integration/test/restMisc.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: gqlMisc-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-xcdb-gqlTableOps-run:
+    cypress-xcdb-restTableOps-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -738,26 +675,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:xcdb-api
+                      npm run build:common
+                      npm run start:xcdb-api:cache
                       npm run start:web
-                  spec: "./scripts/cypress/integration/test/xcdb-gqlTableOps.js"
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restTableOps.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-gqlTableOps-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-xcdb-gqlViews-run:
+    cypress-xcdb-restViews-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -781,26 +713,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:xcdb-api
+                      npm run build:common
+                      npm run start:xcdb-api:cache
                       npm run start:web
-                  spec: "./scripts/cypress/integration/test/xcdb-gqlViews.js"
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restViews.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-gqlViews-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-xcdb-gqlRoles-run:
+    cypress-xcdb-restRoles-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -824,26 +751,21 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:xcdb-api
+                      npm run build:common
+                      npm run start:xcdb-api:cache
                       npm run start:web
-                  spec: "./scripts/cypress/integration/test/xcdb-gqlRoles.js"
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restRoles.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-gqlRoles-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
-    cypress-xcdb-gqlMisc-run:
+    cypress-xcdb-restMisc-run-cache:
         runs-on: ubuntu-20.04
         steps:
             - name: Setup Node
@@ -867,25 +789,20 @@ jobs:
                       ${{ runner.os }}-build-${{ env.cache-name }}-
                       ${{ runner.os }}-build-
                       ${{ runner.os }}-
-
             - name: Set env
               run: echo "NODE_ENV=test" >> $GITHUB_ENV
             - name: Cypress run
               uses: cypress-io/github-action@v2
               with:
                   start: |
-                      npm run start:xcdb-api
+                      npm run build:common
+                      npm run start:xcdb-api:cache
                       npm run start:web
-                  spec: "./scripts/cypress/integration/test/xcdb-gqlMisc.js"
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restMisc.js"
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
-            - name: Upload screenshots
-              uses: actions/upload-artifact@v2
-              with:
-                  name: xcdb-gqlMisc-snapshots
-                  path: scripts/cypress/screenshots
-                  retention-days: 2
     docker:
         runs-on: ubuntu-latest
         steps:
@@ -895,7 +812,6 @@ jobs:
             - name: Check for update
               run: |
                   echo "CHANGED=$([[ $(lerna ls --since ${{github.event.before}} | grep nocodb) = nocodb ]] && echo 'OK')" >> $GITHUB_ENV
-
             - name: Test Mysql REST APIs
               if: ${{ env.CHANGED == 'OK' }}
               run: cd ./packages/nocodb/  && docker-compose run xc-test-mysql
