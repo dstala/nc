@@ -558,7 +558,7 @@ async function migrateProjectModels(
               if (!colBody.fk_relation_column_id) {
                 throw new Error('relation not found');
               }
-              await Column.insert(
+              const column = await Column.insert(
                 {
                   uidt: UITypes.Rollup,
                   ...colBody,
@@ -566,6 +566,7 @@ async function migrateProjectModels(
                 },
                 ncMeta
               );
+              projectModelColumnAliasRefs[model.tn][column._cn] = column;
             } else if (_columnMeta.formula) {
               const columnMeta: Formulav1 = _columnMeta;
               //  migrate formula column
