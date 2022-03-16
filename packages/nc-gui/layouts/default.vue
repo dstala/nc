@@ -205,22 +205,6 @@
                 </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('activity.account.projInfo') }}</span>
               </v-list-item-title>
             </v-list-item>
-            <v-divider />
-            <v-list-item v-if="isDashboard" dense @click="exportCache">
-              <v-list-item-title>
-                <v-icon small>
-                  mdi-export
-                </v-icon>&nbsp; <span class="font-weight-regular caption">Export Cache</span>
-              </v-list-item-title>
-            </v-list-item>
-            <v-divider v-if="isDashboard" />
-            <v-list-item dense v-if="isDashboard" @click="deleteCache">
-              <v-list-item-title>
-                <v-icon small>
-                  mdi-delete
-                </v-icon>&nbsp; <span class="font-weight-regular caption">Delete Cache</span>
-              </v-list-item-title>
-            </v-list-item>
             <v-divider v-if="isDashboard" />
             <v-list-item v-if="isDashboard" dense @click.stop="settingsTabAdd">
               <v-list-item-title>
@@ -357,7 +341,6 @@ import Language from '~/components/utils/language'
 import Loader from '~/components/loader'
 import TemplatesModal from '~/components/templates/templatesModal'
 import BetterUX from '~/components/utils/betterUX'
-import FileSaver from 'file-saver'
 
 export default {
   components: {
@@ -830,28 +813,6 @@ export default {
         this.$toast.error(e.message).goAway(3000)
       }
     },
-    async exportCache() {
-      try {
-        const data = (await this.$api.meta.cacheGet()).data
-        const blob = new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' })
-        FileSaver.saveAs(blob, 'cache_exported.json')
-        this.$toast.info('Copied Cache to clipboard').goAway(3000)
-        console.log(data)
-      } catch (e) {
-        console.log(e)
-        this.$toast.error(e.message).goAway(3000)
-      }
-    },
-    async deleteCache() {
-      try {
-        const data = (await this.$api.meta.cacheDelete()).data
-        this.$toast.info('Deleted Cache').goAway(3000)
-        console.log(data)
-      } catch (e) {
-        console.log(e)
-        this.$toast.error(e.message).goAway(3000)
-      }
-    }
   }
 
 }

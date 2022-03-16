@@ -124,9 +124,29 @@
           @reload="reload"
         />
       </div>
-      <v-spacer class="h-100" @dblclick="debug=true" />
+      <v-spacer class="h-100" @click="clickCount = clickCount + 1; debug=clickCount >= 5" />
 
       <template v-if="!isForm">
+        <!-- Export Cache -->
+        <v-tooltip bottom v-if="debug">
+          <template #activator="{on}">
+            <v-icon class="mr-3" small v-on="on" @click="exportCache">
+              mdi-export
+            </v-icon>
+          </template>
+          <span class="caption"> Export Cache
+          </span>
+        </v-tooltip>
+        <!-- Delete Cache -->
+        <v-tooltip bottom v-if="debug">
+          <template #activator="{on}">
+            <v-icon class="mr-3" small v-on="on" @click="deleteCache">
+              mdi-delete
+            </v-icon>
+          </template>
+          <span class="caption"> Delete Cache
+          </span>
+        </v-tooltip>
         <debug-metas v-if="debug" class="mr-3" />
         <v-tooltip bottom>
           <template #activator="{on}">
@@ -698,6 +718,7 @@ import Pagination from '@/components/project/spreadsheet/components/pagination'
 import ColumnFilter from '~/components/project/spreadsheet/components/columnFilterMenu'
 import MoreActions from '~/components/project/spreadsheet/components/moreActions'
 import ShareViewMenu from '~/components/project/spreadsheet/components/shareViewMenu'
+import FileSaver from 'file-saver'
 
 export default {
   name: 'RowsXcDataTable',
@@ -827,7 +848,8 @@ export default {
       selectedExpandRow: null,
       selectedExpandOldRow: null,
       selectedExpandRowMeta: null
-    }
+    },
+    clickCount: 0
   }),
   watch: {
     isActive(n, o) {
@@ -1570,6 +1592,30 @@ export default {
       this.kanban.selectedExpandRow = data.row
       this.kanban.selectedExpandOldRow = data.oldRow
       this.kanban.selectedExpandRowMeta = data.rowMeta
+    },
+    async exportCache() {
+      try {
+        const data = (await this.$api.meta.cacheGet()).data
+        if (!data.length) {
+          this.$toast.info('Cache is empty').goAway(3000)
+          return
+        }
+        const blob = new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' })
+        FileSaver.saveAs(blob, 'cache_exported.json')
+        this.$toast.info('Copied Cache to clipboard').goAway(3000)
+      } catch (e) {
+        console.log(e)
+        this.$toast.error(e.message).goAway(3000)
+      }
+    },
+    async deleteCache() {
+      try {
+        await this.$api.meta.cacheDelete()
+        this.$toast.info('Deleted Cache').goAway(3000)
+      } catch (e) {
+        console.log(e)
+        this.$toast.error(e.message).goAway(3000)
+      }
     }
   },
   computed: {
