@@ -187,13 +187,13 @@ export default {
       // if parent reference key is pk, then filter out the selected value
       // else, filter out the selected value + empty values (as we can't set an empty value)
       const prk = this.parentReferenceKey
-      const isPk = !!(this.parentMeta && (this.parentMeta.columns.find(c => c.pk && c._cn === prk))) || false
+      // const isPk = !!(this.parentMeta && (this.parentMeta.columns.find(c => c.pk && c._cn === prk))) || false
       // let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.cn === this.bt.cn).map(c => this.row[c._cn] || '').join('___') : ''
-      let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.id === this.column.colOptions.fk_child_column_id).map(c => this.row[c._cn] || '').join('___') : ''
-      if (this.parentMeta && (this.parentMeta.columns.find(c => c._cn === prk)).type !== 'string') {
-        selectedValue = selectedValue || 0
-      }
-      return `(${prk},not,${selectedValue})` + (!isPk ? `~and(${prk},not,)` : '')
+      const selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.id === this.column.colOptions.fk_child_column_id).map(c => this.row[c._cn] || '').join('___') : ''
+      // if (this.parentMeta && (this.parentMeta.columns.find(c => c._cn === prk)).type !== 'string') {
+      //   selectedValue = selectedValue || 0
+      // }
+      return `(${prk},not,${selectedValue})~or(${prk},is,null)`
     },
     parentQueryParams() {
       if (!this.parentMeta) {

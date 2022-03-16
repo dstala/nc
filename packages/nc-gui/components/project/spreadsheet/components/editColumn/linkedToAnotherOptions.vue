@@ -247,7 +247,7 @@ export default {
         type: this.type
       })
 
-      console.log(col.data)
+      await this.$store.dispatch('meta/ActLoadMeta', { id: this.relation.childId, force: true })
 
       // if (this.type === 'mm') {
       //   await this.saveManyToMany()
