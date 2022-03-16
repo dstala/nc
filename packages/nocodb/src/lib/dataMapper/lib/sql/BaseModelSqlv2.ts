@@ -106,6 +106,7 @@ class BaseModelSqlv2 {
     /*    await qb.conditionv2(
           await Filter.getFilterObject({ modelId: this.model.id })
         );*/
+    await this.model.getColumns();
 
     // todo: replace with view id
     if (!ignoreFilterSort) {
@@ -119,13 +120,21 @@ class BaseModelSqlv2 {
           this.dbDriver
         );
 
-        await sortV2(
-          args.sortArr?.length
-            ? args.sortArr
-            : await Sort.list({ viewId: this.viewId }),
-          qb,
-          this.dbDriver
-        );
+        const sorts = args.sortArr?.length
+          ? args.sortArr
+          : await Sort.list({ viewId: this.viewId });
+
+        await sortV2(sorts, qb, this.dbDriver);
+
+        // sort by primary key by default
+        if (!sorts?.length && this.model.primaryKey) {
+          qb.orderBy(this.model.primaryKey.cn);
+        }
+      } else {
+        // sort by primary key by default
+        if (this.model.primaryKey) {
+          qb.orderBy(this.model.primaryKey.cn);
+        }
       }
       this._paginateAndSort(qb, rest);
     }
@@ -138,266 +147,6 @@ class BaseModelSqlv2 {
       d.__proto__ = proto;
       return d;
     });
-
-    /* const pk = columnsObj.actor.find(c => c.pk);
-    const ids = data.map(r => r[pk.alias]);
-
-    for (const col of columnsObj.actor) {
-      switch (col.uidt) {
-        case 'LinkToAnotherRecord':
-          if (col.type === 'hm') {
-            const children = await knex.union(
-              ids.map(id => {
-                const query = knex(col.rel_tn)
-                  .where(col.rel_cn, id)
-                  .limit(10);
-                return query;
-              }),
-              true
-            );
-
-            const gb = children.reduce((gb, r) => {
-              gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || [];
-              gb[r[col.rel_cn]].push(r);
-              return gb;
-            }, {});
-
-            for (const d of data) {
-              d[col.alias] = gb[d[pk.alias]];
-            }
-          }
-          if (col.type === 'bt') {
-            const parentIds = data
-              .map(r => r[col._rel_cn])
-              .filter(id => id !== null && id !== undefined);
-
-            const parents = await knex(col.rel_tn).whereIn(
-              col.rel_cn,
-              parentIds
-            );
-            // .limit(10)
-
-            const gb = parents.reduce((gb, r) => {
-              gb[r[col.ref_rel_cn]] = r;
-              return gb;
-            }, {});
-
-            for (const d of data) {
-              d[col.alias] = gb[d[col._rel_cn]];
-            }
-          }
-
-          if (col.type === 'mm') {
-            const key = `${col.title}_${col.v_rel_cn}`;
-
-            const childs = await knex.union(
-              ids.map(id => {
-                const query = knex(col.ref_rel_tn)
-                  .join(
-                    col.v_rel_tn,
-                    `${col.v_rel_tn}.${col.v_ref_rel_cn}`,
-                    `${col.ref_rel_tn}.${col.ref_rel_cn}`
-                  )
-                  .where(`${col.v_rel_tn}.${col.v_rel_cn}`, id) // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].cn])
-                  // .xwhere(where, this.dbModels[child].selectQuery(''))
-                  .select({
-                    [key]: `${col.v_rel_tn}.${col.v_rel_cn}`
-                  })
-                  .select(`${col.ref_rel_tn}.*`);
-
-                // return this.isSqlite() ? driver.select().from(query) :
-                return query;
-              }),
-              true
-            );
-
-            const gs = _.groupBy(childs, key);
-
-            for (const d of data) {
-              d[col.alias] = gs[d[pk.alias]];
-            }
-          }
-          break;
-
-        // todo: combine with LinkToAnotherRecord
-        case 'Lookup':
-          {
-            let lkPk,
-              prev,
-              isArr = col.type !== 'bt';
-            let field, lkQb;
-            prev = col;
-            if (col.type === 'hm') {
-              // todo: decide based on type
-              field = columnsObj[col.rel_tn].find(
-                c => c.id === col.lookup_column_id
-              );
-
-              lkQb = knex(col.ref_rel_tn).join(
-                col.rel_tn,
-                `${col.rel_tn}.${col.rel_cn}`,
-                `${col.ref_rel_tn}.${col.ref_rel_cn}`
-              );
-
-              lkPk = columnsObj[col.rel_tn]?.find(c => c.pk) || lkPk;
-            } else if (col.type === 'bt') {
-              // todo: decide based on type
-              field = columnsObj[col.ref_rel_tn].find(
-                c => c.id === col.lookup_column_id
-              );
-
-              lkQb = knex(col.rel_tn).join(
-                col.ref_rel_tn,
-                `${col.ref_rel_tn}.${col.ref_rel_cn}`,
-                `${col.rel_tn}.${col.rel_cn}`
-              );
-
-              lkPk = columnsObj[col.ref_rel_tn]?.find(c => c.pk) || lkPk;
-            } else if (col.type === 'mm') {
-              // throw new Error('"m2m" lookup not implemented')
-
-              // todo: decide based on type
-              field = columnsObj[col.ref_rel_tn].find(
-                c => c.id === col.lookup_column_id
-              );
-
-              lkQb = knex(col.rel_tn)
-                .join(
-                  col.v_rel_tn,
-                  `${col.v_rel_tn}.${col.v_rel_cn}`,
-                  `${col.rel_tn}.${col.rel_cn}`
-                )
-                .join(
-                  col.ref_rel_tn,
-                  `${col.v_rel_tn}.${col.v_ref_rel_cn}`,
-                  `${col.ref_rel_tn}.${col.ref_rel_cn}`
-                );
-
-              lkPk = columnsObj[col.ref_rel_tn]?.find(c => c.pk) || lkPk;
-            }
-
-            while (field?.uidt === 'Lookup') {
-              isArr = isArr || col.type !== 'bt';
-              prev = field;
-
-              if (field.type === 'hm') {
-                lkQb.join(
-                  field.rel_tn,
-                  `${field.rel_tn}.${field.rel_cn}`,
-                  `${field.ref_rel_tn}.${field.ref_rel_cn}`
-                );
-                lkPk = columnsObj[field.rel_tn]?.find(c => c.pk) || lkPk;
-                field = columnsObj[field.rel_tn].find(
-                  c => c.id === field.lookup_column_id
-                );
-              } else if (field.type === 'bt') {
-                lkQb.join(
-                  field.ref_rel_tn,
-                  `${field.ref_rel_tn}.${field.ref_rel_cn}`,
-                  `${field.rel_tn}.${field.rel_cn}`
-                );
-                lkPk = columnsObj[field.ref_rel_tn]?.find(c => c.pk) || lkPk;
-                field = columnsObj[field.ref_rel_tn].find(
-                  c => c.id === field.lookup_column_id
-                );
-              } else if (field.type === 'mm') {
-                throw new Error('nested "m2m" lookup not implemented');
-              }
-            }
-
-            // console.log(lkQb.toQuery())
-
-            // check the look up column type
-            //    if it's lookup
-            //        construct query recursively
-            //     else construct query
-
-            const children = await knex.union(
-              ids.map(id => {
-                // lkQb.select(`${field.title}.${field.cn} as ${field.alias}`)
-
-                let query;
-                if (prev.type === 'hm') {
-                  query = knex(`${field.title} as a`)
-                    .select(
-                      `a.${field.cn} as ${field.alias}`,
-                      knex.raw('? as ??', [id, pk.cn])
-                    )
-                    .whereIn(
-                      lkPk.cn,
-                      lkQb
-                        .clone()
-                        .select(`${lkPk.title}.${lkPk.cn}`)
-                        .where(`${col.ref_rel_tn}.${pk.cn}`, id)
-                    )
-                    .limit(10);
-                } else if (prev.type === 'bt') {
-                  query = knex(`${field.title} as a`)
-                    .select(
-                      `a.${field.cn} as ${field.alias}`,
-                      knex.raw('? as ??', [id, pk.cn])
-                    )
-                    .whereIn(
-                      prev.ref_rel_cn,
-                      lkQb
-                        .clone()
-                        .select(`${prev.rel_tn}.${prev.rel_cn}`)
-                        .where(`${pk.title}.${pk.cn}`, id)
-                    )
-                    .limit(10);
-                } else if (prev.type === 'mm') {
-                  // throw new Error('"m2m" lookup not implemented')
-
-                  query = knex(`${field.title} as a`)
-                    .select(
-                      `a.${field.cn} as ${field.alias}`,
-                      knex.raw('? as ??', [id, pk.cn])
-                    )
-                    .whereIn(
-                      prev.ref_rel_cn,
-                      lkQb
-                        .clone()
-                        .select(`${prev.v_rel_tn}.${prev.v_ref_rel_cn}`)
-                        .where(`${col.rel_tn}.${pk.cn}`, id)
-                    )
-                    .limit(10);
-                }
-
-                console.log(query.toQuery());
-
-                return query;
-              }),
-              true
-            );
-
-            const gb = children.reduce((gb, r) => {
-              if (prev.type === 'hm') {
-                gb[r[col.rel_cn]] = gb[r[col.rel_cn]] || [];
-                gb[r[col.rel_cn]].push(r[field.alias]);
-              } else if (prev.type === 'bt') {
-                gb[r[pk.cn]] = gb[r[pk.cn]] || [];
-                gb[r[pk.cn]].push(r[field.alias]);
-              } else if (prev.type === 'mm') {
-                // throw new Error('"m2m" lookup not implemented')
-                gb[r[pk.cn]] = gb[r[pk.cn]] || [];
-                gb[r[pk.cn]].push(r[field.alias]);
-              }
-              return gb;
-            }, {});
-
-            for (const d of data) {
-              d[col.alias] = isArr
-                ? gb[d[pk.alias]]
-                : gb[d[pk.alias]] && gb[d[pk.alias]][0];
-            }
-          }
-          break;
-        case UITypes.Formula:
-          break;
-        default:
-          break;
-      }
-    }*/
   }
 
   public async count(
@@ -1785,6 +1534,7 @@ class BaseModelSqlv2 {
 
   // @ts-ignore
   protected async errorInsert(e, data, trx, cookie) {}
+
   // @ts-ignore
   protected async errorUpdate(e, data, trx, cookie) {}
 
@@ -1795,6 +1545,7 @@ class BaseModelSqlv2 {
     if (!this.model.primaryKey) return 'N/A';
     return data[this.model.primaryKey._cn];
   }
+
   // @ts-ignore
   protected async errorDelete(e, id, trx, cookie) {}
 
