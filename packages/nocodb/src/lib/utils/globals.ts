@@ -11,6 +11,7 @@ export enum MetaTable {
   COL_ROLLUP = 'nc_col_rollup_v2',
   COL_FORMULA = 'nc_col_formula_v2',
   FILTER_EXP = 'nc_filter_exp_v2',
+  // HOOK_FILTER_EXP = 'nc_hook_filter_exp_v2',
   SORT = 'nc_sort_v2',
   SHARED_VIEWS = 'nc_shared_views_v2',
   ACL = 'nc_acl_v2',

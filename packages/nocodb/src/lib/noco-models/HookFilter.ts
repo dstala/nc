@@ -17,7 +17,6 @@ export default class Filter {
 
   fk_model_id?: string;
   fk_view_id?: string;
-  fk_hook_id?: string;
   fk_column_id?: string;
   fk_parent_id?: string;
 
@@ -53,7 +52,6 @@ export default class Filter {
     const insertObj = {
       id: filter.id,
       fk_view_id: filter.fk_view_id,
-      fk_hook_id: filter.fk_hook_id,
       fk_column_id: filter.fk_column_id,
       comparison_op: filter.comparison_op,
       value: filter.value,
@@ -92,8 +90,7 @@ export default class Filter {
     filter: Partial<FilterType>,
     ncMeta = Noco.ncMeta
   ) {
-    // todo: set redis cache based on filter.fk_hook_id
-    if (!(id && (filter.fk_view_id || filter.fk_hook_id))) {
+    if (!(id && filter.fk_view_id)) {
       throw new Error(
         `Mandatory fields missing in FITLER_EXP cache population : id(${id}), fk_view_id(${filter.fk_view_id}), fk_parent_id(${filter.fk_view_id})`
       );
@@ -188,24 +185,24 @@ export default class Filter {
     });
   }
 
-  public async getGroup(ncMeta = Noco.ncMeta): Promise<Filter> {
-    if (!this.fk_parent_id) return null;
-    let filterObj = await NocoCache.get(
-      `${CacheScope.FILTER_EXP}:${this.fk_parent_id}`,
-      2
-    );
-    if (!filterObj) {
-      filterObj = await ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
-        id: this.fk_parent_id
-      });
-      await NocoCache.set(
-        `${CacheScope.FILTER_EXP}:${this.fk_parent_id}`,
-        filterObj
-      );
-    }
-    return filterObj && new Filter(filterObj);
-  }
-
+  // public async getGroup(ncMeta = Noco.ncMeta): Promise<Filter> {
+  //   if (!this.fk_parent_id) return null;
+  //   let filterObj = await NocoCache.get(
+  //     `${CacheScope.FILTER_EXP}:${this.fk_parent_id}`,
+  //     2
+  //   );
+  //   if (!filterObj) {
+  //     filterObj = await ncMeta.metaGet2(null, null, MetaTable.FILTER_EXP, {
+  //       id: this.fk_parent_id
+  //     });
+  //     await NocoCache.set(
+  //       `${CacheScope.FILTER_EXP}:${this.fk_parent_id}`,
+  //       filterObj
+  //     );
+  //   }
+  //   return filterObj && new Filter(filterObj);
+  // }
+  //
   public async getChildren(ncMeta = Noco.ncMeta): Promise<Filter[]> {
     if (this.children) return this.children;
     if (!this.is_group) return null;
@@ -241,27 +238,19 @@ export default class Filter {
 
   public static async getFilterObject(
     {
-      viewId,
-      hookId
+      viewId
     }: {
-      viewId?: string;
-      hookId?: string;
+      viewId: string;
     },
     ncMeta = Noco.ncMeta
   ): Promise<FilterType> {
-    let filters = await NocoCache.getList(CacheScope.FILTER_EXP, [
-      viewId || hookId
-    ]);
+    let filters = await NocoCache.getList(CacheScope.FILTER_EXP, [viewId]);
     if (!filters.length) {
       filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: viewId ? { fk_view_id: viewId } : { fk_hook_id: hookId }
+        condition: { fk_view_id: viewId }
       });
 
-      await NocoCache.setList(
-        CacheScope.FILTER_EXP,
-        [viewId || hookId],
-        filters
-      );
+      await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filters);
     }
 
     const result: FilterType = {
@@ -301,41 +290,24 @@ export default class Filter {
     return result;
   }
 
-  static async deleteAll(viewId: string, ncMeta = Noco.ncMeta) {
-    const filter = await this.getFilterObject({ viewId }, ncMeta);
-
-    const deleteRecursively = async filter => {
-      if (!filter) return;
-      for (const f of filter?.children || []) await deleteRecursively(f);
-      if (filter.id) {
-        await ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
-        await NocoCache.deepDel(
-          CacheScope.FILTER_EXP,
-          `${CacheScope.FILTER_EXP}:${filter.id}`,
-          CacheDelDirection.CHILD_TO_PARENT
-        );
-      }
-    };
-    await deleteRecursively(filter);
-  }
-  static async deleteAllByHook(hookId: string, ncMeta = Noco.ncMeta) {
-    const filter = await this.getFilterObject({ hookId }, ncMeta);
-
-    const deleteRecursively = async filter => {
-      if (!filter) return;
-      for (const f of filter?.children || []) await deleteRecursively(f);
-      if (filter.id) {
-        await ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
-        await NocoCache.deepDel(
-          CacheScope.FILTER_EXP,
-          `${CacheScope.FILTER_EXP}:${filter.id}`,
-          CacheDelDirection.CHILD_TO_PARENT
-        );
-      }
-    };
-    await deleteRecursively(filter);
-  }
-
+  // static async deleteAll(viewId: string, ncMeta = Noco.ncMeta) {
+  //   const filter = await this.getFilterObject({ viewId }, ncMeta);
+  //
+  //   const deleteRecursively = async filter => {
+  //     if (!filter) return;
+  //     for (const f of filter?.children || []) await deleteRecursively(f);
+  //     if (filter.id) {
+  //       await ncMeta.metaDelete(null, null, MetaTable.FILTER_EXP, filter.id);
+  //       await NocoCache.deepDel(
+  //         CacheScope.FILTER_EXP,
+  //         `${CacheScope.FILTER_EXP}:${filter.id}`,
+  //         CacheDelDirection.CHILD_TO_PARENT
+  //       );
+  //     }
+  //   };
+  //   await deleteRecursively(filter);
+  // }
+  //
   private static async get(id: string, ncMeta = Noco.ncMeta) {
     let filterObj =
       id &&
@@ -351,7 +323,7 @@ export default class Filter {
     }
     return filterObj && new Filter(filterObj);
   }
-
+  //
   static async rootFilterList(
     { viewId }: { viewId: any },
     ncMeta = Noco.ncMeta
@@ -365,77 +337,34 @@ export default class Filter {
     }
     return filterObjs?.map(f => new Filter(f));
   }
-
-  static async rootFilterListByHook(
-    { hookId }: { hookId: any },
-    ncMeta = Noco.ncMeta
-  ) {
-    let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [hookId]);
-    if (!filterObjs.length) {
-      filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: { fk_hook_id: hookId }
-      });
-      await NocoCache.setList(CacheScope.FILTER_EXP, [hookId], filterObjs);
-    }
-    return filterObjs?.map(f => new Filter(f));
-  }
-
-  static async parentFilterList(
-    {
-      viewId,
-      parentId
-    }: {
-      viewId: any;
-      parentId: any;
-    },
-    ncMeta = Noco.ncMeta
-  ) {
-    let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [
-      viewId,
-      parentId
-    ]);
-    if (!filterObjs.length) {
-      filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: {
-          fk_parent_id: parentId,
-          fk_view_id: viewId
-        }
-      });
-      await NocoCache.setList(
-        CacheScope.FILTER_EXP,
-        [viewId, parentId],
-        filterObjs
-      );
-    }
-    return filterObjs?.map(f => new Filter(f));
-  }
-  static async parentFilterListByHook(
-    {
-      hookId,
-      parentId
-    }: {
-      hookId: any;
-      parentId: any;
-    },
-    ncMeta = Noco.ncMeta
-  ) {
-    let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [
-      hookId,
-      parentId
-    ]);
-    if (!filterObjs.length) {
-      filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: {
-          fk_parent_id: parentId,
-          fk_hook_id: hookId
-        }
-      });
-      await NocoCache.setList(
-        CacheScope.FILTER_EXP,
-        [hookId, parentId],
-        filterObjs
-      );
-    }
-    return filterObjs?.map(f => new Filter(f));
-  }
+  //
+  // static async parentFilterList(
+  //   {
+  //     viewId,
+  //     parentId
+  //   }: {
+  //     viewId: any;
+  //     parentId: any;
+  //   },
+  //   ncMeta = Noco.ncMeta
+  // ) {
+  //   let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [
+  //     viewId,
+  //     parentId
+  //   ]);
+  //   if (!filterObjs.length) {
+  //     filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
+  //       condition: {
+  //         fk_parent_id: parentId,
+  //         fk_view_id: viewId
+  //       }
+  //     });
+  //     await NocoCache.setList(
+  //       CacheScope.FILTER_EXP,
+  //       [viewId, parentId],
+  //       filterObjs
+  //     );
+  //   }
+  //   return filterObjs?.map(f => new Filter(f));
+  // }
 }

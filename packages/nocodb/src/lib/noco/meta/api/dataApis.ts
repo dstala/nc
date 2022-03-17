@@ -232,4 +232,8 @@ router.get('/data/:viewId/:rowId', ncMetaAclMw(dataRead));
 router.put('/data/:viewId/:rowId', ncMetaAclMw(dataUpdate));
 router.delete('/data/:viewId/:rowId', ncMetaAclMw(dataDelete));
 router.get('/data/:viewId/:rowId/mm/:colId', ncMetaAclMw(mmList));
+// todo: implement these apis
+// router.get('/data/:viewId/:rowId/mm/:colId/exclude', ncMetaAclMw(mmList));
+// router.get('/data/:viewId/:rowId/hm/:colId', ncMetaAclMw(mmList));
+// router.get('/data/:viewId/:rowId/hm/:colId/exclude', ncMetaAclMw(mmList));
 export default router;

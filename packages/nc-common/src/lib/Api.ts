@@ -172,6 +172,7 @@ export interface FilterType {
   base_id?: string;
   fk_parent_id?: string;
   fk_view_id?: string;
+  fk_hook_id?: string;
 }
 
 export interface FilterListType {

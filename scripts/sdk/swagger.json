@@ -5231,6 +5231,9 @@
           },
           "fk_view_id": {
             "type": "string"
+          },
+          "fk_hook_id": {
+            "type": "string"
           }
         },
         "readOnly": true
@@ -6755,7 +6758,44 @@
             "examples": {
               "example-1": {
                 "value": {
-                  "projects": "string"
+                  "projects": {
+                    "list": [
+                      {
+                        "id": "string",
+                        "title": "string",
+                        "status": "string",
+                        "description": "string",
+                        "meta": "string",
+                        "color": "string",
+                        "deleted": "string",
+                        "order": 0,
+                        "bases": [
+                          {
+                            "id": "string",
+                            "project_id": "string",
+                            "alias": "string",
+                            "type": "string",
+                            "is_meta": true,
+                            "config": null,
+                            "created_at": null,
+                            "updated_at": null
+                          }
+                        ],
+                        "is_meta": true,
+                        "prefix": "string",
+                        "created_at": null,
+                        "updated_at": null
+                      }
+                    ],
+                    "pageInfo": {
+                      "pageSize": 0,
+                      "totalRows": 0,
+                      "sort": "string",
+                      "isFirstPage": true,
+                      "isLastPage": true,
+                      "page": 0
+                    }
+                  }
                 }
               }
             }

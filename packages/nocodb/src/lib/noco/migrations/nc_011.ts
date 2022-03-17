@@ -342,6 +342,8 @@ const up = async knex => {
 
     table.string('fk_view_id', 20);
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
+    table.string('fk_hook_id', 20);
+    table.foreign('fk_hook_id').references(`${MetaTable.HOOKS}.id`);
     table.string('fk_column_id', 20);
     table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
 
@@ -356,6 +358,34 @@ const up = async knex => {
     table.float('order');
     table.timestamps(true, true);
   });
+
+  // await knex.schema.createTable(MetaTable.HOOK_FILTER_EXP, table => {
+  //   table
+  //     .string('id', 20)
+  //     .primary()
+  //     .notNullable();
+  //
+  //   table.string('base_id', 20);
+  //   // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+  //   table.string('project_id', 128);
+  //   // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+  //
+  //   table.string('fk_hook_id', 20);
+  //   table.foreign('fk_hook_id').references(`${MetaTable.HOOKS}.id`);
+  //   table.string('fk_column_id', 20);
+  //   table.foreign('fk_column_id').references(`${MetaTable.COLUMNS}.id`);
+  //
+  //   table.string('fk_parent_id', 20);
+  //   table.foreign('fk_parent_id').references(`${MetaTable.HOOK_FILTER_EXP}.id`);
+  //
+  //   table.string('logical_op');
+  //   table.string('comparison_op');
+  //   table.string('value');
+  //   table.boolean('is_group');
+  //
+  //   table.float('order');
+  //   table.timestamps(true, true);
+  // });
 
   await knex.schema.createTable(MetaTable.SORT, table => {
     table
