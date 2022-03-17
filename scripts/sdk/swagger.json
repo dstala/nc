@@ -1580,51 +1580,6 @@
         ]
       }
     },
-    "/views/{viewId}/filters": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "viewId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "get": {
-        "summary": "",
-        "operationId": "filter-read",
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/FilterList"
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "post": {
-        "summary": "",
-        "operationId": "filter-create",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Filter"
-              }
-            }
-          }
-        }
-      }
-    },
     "/views/{viewId}/columns": {
       "parameters": [
         {
@@ -1790,68 +1745,6 @@
         }
       }
     },
-    "/views/{viewId}/sorts": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "viewId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "get": {
-        "summary": "",
-        "operationId": "sort-list",
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/SortList"
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "uuid": {
-                      "type": "string"
-                    },
-                    "url": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Meta"
-        ]
-      },
-      "post": {
-        "summary": "",
-        "operationId": "sort-create",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Meta"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sort"
-              }
-            }
-          }
-        }
-      }
-    },
     "/views/{viewId}/share": {
       "parameters": [
         {
@@ -1968,6 +1861,68 @@
         ]
       }
     },
+    "/views/{viewId}/sorts": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "sort-list",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SortList"
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "sort-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sort"
+              }
+            }
+          }
+        }
+      }
+    },
     "/views/{viewId}/sorts/{sortId}": {
       "parameters": [
         {
@@ -2038,6 +1993,51 @@
         "tags": [
           "Meta"
         ]
+      }
+    },
+    "/views/{viewId}/filters": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "filter-read",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FilterList"
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "filter-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Filter"
+              }
+            }
+          }
+        }
       }
     },
     "/views/{viewId}/filters/{filterId}": {
@@ -2134,6 +2134,162 @@
       "get": {
         "summary": "",
         "operationId": "filter-children-read",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Filter"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/hooks/{hookId}/filters": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "hookId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "hook-filter-read",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FilterList"
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "hook-filter-create",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Filter"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hooks/{viewId}/filters/{filterId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "filterId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "hook-filter-get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Filter"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "hook-filter-update",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Filter"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "hook-filter-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
+    "/hooks/{viewId}/filters/{filterParentId}/children": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "filterParentId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "hook-filter-children-read",
         "responses": {
           "200": {
             "description": "OK",
@@ -2916,7 +3072,7 @@
         }
       }
     },
-    "public/data/{uuid}/list": {
+    "/public/data/{uuid}/list": {
       "parameters": [
         {
           "schema": {
@@ -3068,7 +3224,7 @@
         ]
       }
     },
-    "public/data/{uuid}/create": {
+    "/public/data/{uuid}/create": {
       "parameters": [
         {
           "schema": {
@@ -3196,7 +3352,7 @@
         }
       }
     },
-    "public/data/{uuid}/relationTable/{relationColumnId}": {
+    "/public/data/{uuid}/relationTable/{relationColumnId}": {
       "parameters": [
         {
           "schema": {
@@ -3264,7 +3420,7 @@
         "description": ""
       }
     },
-    "public/meta/{uuid}": {
+    "/public/meta/{uuid}": {
       "parameters": [
         {
           "schema": {

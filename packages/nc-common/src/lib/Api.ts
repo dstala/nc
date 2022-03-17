@@ -1697,42 +1697,6 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name FilterRead
-     * @request GET:/views/{viewId}/filters
-     * @response `200` `FilterListType`
-     */
-    filterRead: (viewId: string, params: RequestParams = {}) =>
-      this.request<FilterListType, any>({
-        path: `/views/${viewId}/filters`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FilterCreate
-     * @request POST:/views/{viewId}/filters
-     * @response `200` `void` OK
-     */
-    filterCreate: (
-      viewId: string,
-      data: FilterType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/filters`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
      * @name ViewColumnList
      * @request GET:/views/{viewId}/columns
      * @response `200` `void`
@@ -1849,39 +1813,6 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name SortList
-     * @request GET:/views/{viewId}/sorts
-     * @response `200` `SortListType`
-     * @response `0` `{ uuid?: string, url?: string }`
-     */
-    sortList: (viewId: string, params: RequestParams = {}) =>
-      this.request<SortListType, { uuid?: string; url?: string }>({
-        path: `/views/${viewId}/sorts`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortCreate
-     * @request POST:/views/{viewId}/sorts
-     * @response `200` `void` OK
-     */
-    sortCreate: (viewId: string, data: SortType, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
      * @name ShareViewCreate
      * @request POST:/views/{viewId}/share
      * @response `200` `{ uuid?: string }` OK
@@ -1951,6 +1882,39 @@ export class Api<
      * No description
      *
      * @tags Meta
+     * @name SortList
+     * @request GET:/views/{viewId}/sorts
+     * @response `200` `SortListType`
+     * @response `0` `{ uuid?: string, url?: string }`
+     */
+    sortList: (viewId: string, params: RequestParams = {}) =>
+      this.request<SortListType, { uuid?: string; url?: string }>({
+        path: `/views/${viewId}/sorts`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name SortCreate
+     * @request POST:/views/{viewId}/sorts
+     * @response `200` `void` OK
+     */
+    sortCreate: (viewId: string, data: SortType, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/sorts`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
      * @name SortGet
      * @request GET:/views/{viewId}/sorts/{sortId}
      * @response `200` `SortType` OK
@@ -1997,6 +1961,42 @@ export class Api<
       this.request<void, any>({
         path: `/views/${viewId}/sorts/${sortId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name FilterRead
+     * @request GET:/views/{viewId}/filters
+     * @response `200` `FilterListType`
+     */
+    filterRead: (viewId: string, params: RequestParams = {}) =>
+      this.request<FilterListType, any>({
+        path: `/views/${viewId}/filters`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name FilterCreate
+     * @request POST:/views/{viewId}/filters
+     * @response `200` `void` OK
+     */
+    filterCreate: (
+      viewId: string,
+      data: FilterType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/filters`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -2072,6 +2072,123 @@ export class Api<
     ) =>
       this.request<FilterType, any>({
         path: `/views/${viewId}/filters/${filterParentId}/children`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookFilterRead
+     * @request GET:/hooks/{hookId}/filters
+     * @response `200` `FilterListType`
+     */
+    hookFilterRead: (hookId: string, params: RequestParams = {}) =>
+      this.request<FilterListType, any>({
+        path: `/hooks/${hookId}/filters`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookFilterCreate
+     * @request POST:/hooks/{hookId}/filters
+     * @response `200` `void` OK
+     */
+    hookFilterCreate: (
+      hookId: string,
+      data: FilterType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/hooks/${hookId}/filters`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookFilterGet
+     * @request GET:/hooks/{viewId}/filters/{filterId}
+     * @response `200` `FilterType` OK
+     */
+    hookFilterGet: (
+      viewId: string,
+      filterId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<FilterType, any>({
+        path: `/hooks/${viewId}/filters/${filterId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookFilterUpdate
+     * @request PUT:/hooks/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
+     */
+    hookFilterUpdate: (
+      viewId: string,
+      filterId: string,
+      data: FilterType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/hooks/${viewId}/filters/${filterId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookFilterDelete
+     * @request DELETE:/hooks/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
+     */
+    hookFilterDelete: (
+      viewId: string,
+      filterId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/hooks/${viewId}/filters/${filterId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Meta
+     * @name HookFilterChildrenRead
+     * @request GET:/hooks/{viewId}/filters/{filterParentId}/children
+     * @response `200` `FilterType` OK
+     */
+    hookFilterChildrenRead: (
+      viewId: string,
+      filterParentId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<FilterType, any>({
+        path: `/hooks/${viewId}/filters/${filterParentId}/children`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -2979,7 +3096,7 @@ export class Api<
      *
      * @tags Public
      * @name DataList
-     * @request POST:public/data/{uuid}/list
+     * @request POST:/public/data/{uuid}/list
      * @response `200` `any` OK
      */
     dataList: (
@@ -2988,7 +3105,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `public/data/${uuid}/list`,
+        path: `/public/data/${uuid}/list`,
         method: 'POST',
         query: query,
         body: data,
@@ -3029,7 +3146,7 @@ export class Api<
      *
      * @tags Public
      * @name DataCreate
-     * @request POST:public/data/{uuid}/create
+     * @request POST:/public/data/{uuid}/create
      * @response `200` `any` OK
      */
     dataCreate: (
@@ -3038,7 +3155,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `public/data/${uuid}/create`,
+        path: `/public/data/${uuid}/create`,
         method: 'POST',
         body: data,
         type: ContentType.FormData,
@@ -3073,7 +3190,7 @@ export class Api<
      *
      * @tags Public
      * @name DataRelationList
-     * @request POST:public/data/{uuid}/relationTable/{relationColumnId}
+     * @request POST:/public/data/{uuid}/relationTable/{relationColumnId}
      * @response `200` `any` OK
      */
     dataRelationList: (
@@ -3082,7 +3199,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `public/data/${uuid}/relationTable/${relationColumnId}`,
+        path: `/public/data/${uuid}/relationTable/${relationColumnId}`,
         method: 'POST',
         query: query,
         body: data,
@@ -3096,7 +3213,7 @@ export class Api<
      *
      * @tags
      * @name SharedViewMetaGet
-     * @request POST:public/meta/{uuid}
+     * @request POST:/public/meta/{uuid}
      * @response `200` `object` OK
      */
     sharedViewMetaGet: (
@@ -3105,7 +3222,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<object, any>({
-        path: `public/meta/${uuid}`,
+        path: `/public/meta/${uuid}`,
         method: 'POST',
         body: data,
         type: ContentType.Json,

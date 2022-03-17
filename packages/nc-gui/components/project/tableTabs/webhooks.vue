@@ -209,7 +209,7 @@
                   :operation.sync="hook.operation"
                 />
 
-                <!--                <v-card class="mb-8">
+                <v-card class="mb-8">
                   <v-card-text>
                     <v-checkbox
                       v-model="enableCondition"
@@ -222,15 +222,19 @@
 
                     <column-filter
                       v-if="enableCondition && _isEE"
+                      :key="hook.id"
+                      ref="filter"
                       v-model="hook.condition"
                       :shared="true"
                       :meta="meta"
                       :field-list="fieldList"
                       dense
                       style="max-width: 100%"
+                      :hook-id="hook.id"
+                      web-hook
                     />
                   </v-card-text>
-                </v-card>-->
+                </v-card>
 
                 <v-select
                   v-model="hook.notification.type"
@@ -671,6 +675,9 @@ export default {
 
         if (!this.hook.id && res) {
           this.hook.id = res.data.id
+        }
+        if (this.$refs.filter) {
+          await this.$refs.filter.applyChanges()
         }
 
         this.$toast.success('Webhook details updated successfully').goAway(3000)

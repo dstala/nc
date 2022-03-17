@@ -21,7 +21,21 @@ export default class Filter {
   fk_column_id?: string;
   fk_parent_id?: string;
 
-  comparison_op?: string;
+  comparison_op?:
+    | 'eq'
+    | 'neq'
+    | 'like'
+    | 'nlike'
+    | 'empty'
+    | 'notempty'
+    | 'null'
+    | 'notnull'
+    | 'gt'
+    | 'lt'
+    | 'gte'
+    | 'lte'
+    | 'ge'
+    | 'le';
   value?: string;
 
   logical_op?: string;

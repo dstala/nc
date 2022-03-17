@@ -44,6 +44,8 @@
               nested
               :meta="meta"
               :shared="shared"
+              :web-hook="webHook"
+              :hook-id="hookId"
               @updated="$emit('updated')"
               @input="$emit('input', filters)"
             />
@@ -208,7 +210,9 @@ export default {
     nested: Boolean,
     parentId: String,
     viewId: String,
-    shared: Boolean
+    shared: Boolean,
+    webHook: Boolean,
+    hookId: String
   },
   data: () => ({
     filters: [],
@@ -281,7 +285,7 @@ export default {
       return (this.columns || []).reduce((o, c) => ({ ...o, [c.id]: c }), {})
     },
     autoApply() {
-      return this.$store.state.windows.autoApplyFilter
+      return this.$store.state.windows.autoApplyFilter && !this.webHook
     },
     columns() {
       return (this.meta && this.meta.columns.filter(c => c && (!c.colOptions || !c.system)))
@@ -343,13 +347,29 @@ export default {
     async applyChanges(nested = false) {
       for (const [i, filter] of Object.entries(this.filters)) {
         if (filter.status === 'delete') {
-          await this.$api.meta.filterDelete(this.viewId, filter.id)
+          if (this.hookId) {
+            await this.$api.meta.hookFilterDelete(this.hookId, filter.id)
+          } else {
+            await this.$api.meta.filterDelete(this.viewId, filter.id)
+          }
         } else if (filter.status === 'update') {
           if (filter.id) {
-            await this.$api.meta.filterUpdate(this.viewId, filter.id, {
+            if (this.hookId) {
+              await this.$api.meta.hookFilterUpdate(this.hookId, filter.id, {
+                ...filter,
+                fk_parent_id: this.parentId
+              })
+            } else {
+              await this.$api.meta.filterUpdate(this.viewId, filter.id, {
+                ...filter,
+                fk_parent_id: this.parentId
+              })
+            }
+          } else if (this.hookId) {
+            this.$set(this.filters, i, (await this.$api.meta.hookFilterCreate(this.hookId, {
               ...filter,
               fk_parent_id: this.parentId
-            })
+            })).data)
           } else {
             this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
               ...filter,
@@ -375,27 +395,29 @@ export default {
           : (await this.$api.meta.filterRead(this.viewId))
         filters = data.data
       }
+      if (this.hookId && this._isUIAllowed('filterSync')) {
+        const data = this.parentId
+          ? (await this.$api.meta.hookFilterChildrenRead(this.hookId, this.parentId))
+          : (await this.$api.meta.hookFilterRead(this.hookId))
+        filters = data.data
+      }
 
       this.filters = filters
     },
     addFilter() {
       this.filters.push({
-        // field: '',
-        // op: '',
-        // value: '',
-        // logicOp: 'and'
-
         fk_column_id: null,
         comparison_op: 'eq',
-        value: ''
-
+        value: '',
+        status: 'update'
       })
       this.filters = this.filters.slice()
     },
     addFilterGroup() {
       this.filters.push({
         parentId: this.parentId,
-        is_group: true
+        is_group: true,
+        status: 'update'
       })
       this.filters = this.filters.slice()
       const index = this.filters.length - 1

@@ -30,6 +30,7 @@ import publicDataExportApis from './publicDataExportApis';
 import metaDiffApis from './metaDiffApis';
 import cacheApis from './cacheApis';
 import apiTokenApis from './apiTokenApis';
+import hookFilterApis from './hookFilterApis';
 
 export default function(router: Router) {
   initStrategies(router);
@@ -62,6 +63,7 @@ export default function(router: Router) {
   router.use(metaDiffApis);
   router.use(cacheApis);
   router.use(apiTokenApis);
+  router.use(hookFilterApis);
 
   userApis(router);
 }

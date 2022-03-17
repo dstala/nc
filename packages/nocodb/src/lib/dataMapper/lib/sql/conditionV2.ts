@@ -194,7 +194,7 @@ const parseConditionV2 = async (
     } else {
       if (
         filter.comparison_op === 'empty' ||
-        filter.comparison_op === 'noempty'
+        filter.comparison_op === 'notempty'
       )
         filter.value = '';
       const field = customWhereClause
