@@ -55,7 +55,7 @@ export async function hookTest(
     hook,
     payload: { data, user }
   } = req.body;
-  await invokeWebhook(hook, model, data, user);
+  await invokeWebhook(new Hook(hook), model, data, user);
 
   res.json({ msg: 'Success' });
 }
