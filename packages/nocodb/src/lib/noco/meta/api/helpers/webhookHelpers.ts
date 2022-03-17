@@ -1,8 +1,9 @@
 import Handlebars from 'handlebars';
-import { HookType } from 'nc-common';
 import Model from '../../../../noco-models/Model';
 import NcPluginMgrv2 from './NcPluginMgrv2';
 import Column from '../../../../noco-models/Column';
+import Hook from '../../../../noco-models/Hook';
+import Filter from '../../../../noco-models/Filter';
 
 export function parseBody(
   template: string,
@@ -22,55 +23,57 @@ export function parseBody(
   });
 }
 
-export function validateCondition(condition: any, data: any, _req: any) {
-  if (!condition || !condition.length) {
+export async function validateCondition(filters: Filter[], data: any) {
+  if (!filters.length) {
     return true;
   }
 
-  const isValid = condition.reduce((valid, con) => {
+  let isValid = true;
+  for (const filter of filters) {
     let res;
-    const field = con.field;
+    const field = await filter.getColumn().then(c => c._cn);
     let val = data[field];
-    switch (typeof con.value) {
+    switch (typeof filter.value) {
       case 'boolean':
         val = !!data[field];
         break;
       case 'number':
-        val = !!data[field];
+        val = +data[field];
         break;
     }
-    switch (con.op as string) {
-      case 'is equal':
-        res = val === con.value;
+    switch (filter.comparison_op) {
+      case 'eq':
+        res = val === filter.value;
         break;
-      case 'is not equal':
-        res = val !== con.value;
+      case 'neq':
+        res = val !== filter.value;
         break;
-      case 'is like':
+      case 'like':
         res =
-          data[field]?.toLowerCase()?.indexOf(con.value?.toLowerCase()) > -1;
+          data[field]?.toLowerCase()?.indexOf(filter.value?.toLowerCase()) > -1;
         break;
-      case 'is not like':
+      case 'nlike':
         res =
-          data[field]?.toLowerCase()?.indexOf(con.value?.toLowerCase()) === -1;
+          data[field]?.toLowerCase()?.indexOf(filter.value?.toLowerCase()) ===
+          -1;
         break;
-      case 'is empty':
+      case 'empty':
         res =
           data[field] === '' ||
           data[field] === null ||
           data[field] === undefined;
         break;
-      case 'is not empty':
+      case 'notempty':
         res = !(
           data[field] === '' ||
           data[field] === null ||
           data[field] === undefined
         );
         break;
-      case 'is null':
+      case 'null':
         res = res = data[field] === null;
         break;
-      case 'is not null':
+      case 'notnull':
         res = data[field] !== null;
         break;
 
@@ -83,9 +86,10 @@ export function validateCondition(condition: any, data: any, _req: any) {
               case '>=':
                 return condition + `~not(${filt.field},ge,${filt.value})`;*/
     }
-
-    return con.logicOp === 'or' ? valid || res : valid && res;
-  }, true);
+    isValid = isValid && res;
+    // return con.logicOp === 'or' ? valid || res : valid && res;
+    // if (!isValid) return isValid;
+  }
 
   return isValid;
 }
@@ -161,7 +165,7 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
   return req;
 }
 
-export async function invokeWebhook(hook: HookType, model: Model, data, user) {
+export async function invokeWebhook(hook: Hook, model: Model, data, user) {
   // for (const hook of hooks) {
   const notification =
     typeof hook.notification === 'string'
@@ -171,10 +175,9 @@ export async function invokeWebhook(hook: HookType, model: Model, data, user) {
   console.log('Hook handler ::::' + model.tn + ':: Hook ::', hook);
   console.log('Hook handler ::::' + model.tn + ':: Data ::', data);
 
-  /* todo:
-      if (!validateCondition(hook.condition, data, req)) {
-        continue;
-      }*/
+  if (!(await validateCondition(await hook.getFilters(), data))) {
+    return;
+  }
 
   switch (notification?.type) {
     case 'Email':

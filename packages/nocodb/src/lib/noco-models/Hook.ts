@@ -8,6 +8,7 @@ import {
 import Noco from '../noco/Noco';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
+import Filter from './Filter';
 
 export default class Hook implements HookType {
   id?: string;
@@ -48,6 +49,10 @@ export default class Hook implements HookType {
       await NocoCache.set(`${CacheScope.HOOK}:${hookId}`, hook);
     }
     return hook && new Hook(hook);
+  }
+
+  public async getFilters(ncMeta = Noco.ncMeta) {
+    return await Filter.rootFilterListByHook({ hookId: this.id }, ncMeta);
   }
 
   // public static async insert(hook: Partial<Hook>) {

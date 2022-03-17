@@ -212,7 +212,7 @@
                 <v-card class="mb-8">
                   <v-card-text>
                     <v-checkbox
-                      v-model="enableCondition"
+                      v-model="hook.condition"
                       dense
                       hide-details
                       class="mt-1"
@@ -224,7 +224,6 @@
                       v-if="enableCondition && _isEE"
                       :key="hook.id"
                       ref="filter"
-                      v-model="hook.condition"
                       :shared="true"
                       :meta="meta"
                       :field-list="fieldList"
