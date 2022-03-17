@@ -1068,35 +1068,58 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
     updated_at?;
   }> = await ncMeta.metaList(null, null, 'nc_hooks');
 
-  for (const hook of hooks) {
-    if (!hook.project_id) {
+  for (const hookMeta of hooks) {
+    if (!hookMeta.project_id) {
       continue;
     }
-    await Hook.insert(
+    const hook = await Hook.insert(
       {
-        fk_model_id: ctx.objModelRef[hook.project_id][hook.tn].id,
-        project_id: hook.project_id,
-        title: hook.title,
-        description: hook.description,
-        env: hook.env,
-        type: hook.type,
-        event: hook.event,
-        operation: hook.operation,
-        async: hook.async,
-        payload: hook.payload,
-        url: hook.url,
-        headers: hook.headers,
-        condition: hook.condition,
-        notification: hook.notification,
-        retries: hook.retries,
-        retry_interval: hook.retry_interval,
-        timeout: hook.timeout,
-        active: hook.active,
-        created_at: hook.created_at,
-        updated_at: hook.updated_at
+        fk_model_id: ctx.objModelRef[hookMeta.project_id][hookMeta.tn].id,
+        project_id: hookMeta.project_id,
+        title: hookMeta.title,
+        description: hookMeta.description,
+        env: hookMeta.env,
+        type: hookMeta.type,
+        event: hookMeta.event,
+        operation: hookMeta.operation,
+        async: hookMeta.async,
+        payload: hookMeta.payload,
+        url: hookMeta.url,
+        headers: hookMeta.headers,
+        condition: hookMeta.condition,
+        notification: hookMeta.notification,
+        retries: hookMeta.retries,
+        retry_interval: hookMeta.retry_interval,
+        timeout: hookMeta.timeout,
+        active: hookMeta.active,
+        created_at: hookMeta.created_at,
+        updated_at: hookMeta.updated_at
       },
       ncMeta
     );
+    let filters = [];
+    try {
+      filters = JSON.parse(hookMeta.condition);
+    } catch {}
+    // migrate view filter list
+    for (const filter of filters || []) {
+      await Filter.insert(
+        {
+          fk_column_id: (
+            ctx.objModelColumnRef[hookMeta.project_id][hookMeta.tn][
+              filter.field
+            ] ||
+            ctx.objModelColumnAliasRef[hookMeta.project_id][hookMeta.tn][
+              filter.field
+            ]
+          ).id,
+          fk_hook_id: hook.id,
+          comparison_op: filterV1toV2CompOpMap[filter.op],
+          value: filter.value
+        },
+        ncMeta
+      );
+    }
   }
 }
 
