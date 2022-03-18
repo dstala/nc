@@ -1086,7 +1086,7 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
         payload: hookMeta.payload,
         url: hookMeta.url,
         headers: hookMeta.headers,
-        condition: hookMeta.condition,
+        condition: !!hookMeta.condition,
         notification: hookMeta.notification,
         retries: hookMeta.retries,
         retry_interval: hookMeta.retry_interval,

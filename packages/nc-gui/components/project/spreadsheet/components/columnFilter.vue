@@ -388,7 +388,6 @@ export default {
     },
     async loadFilter() {
       let filters = []
-
       if (this.viewId && this._isUIAllowed('filterSync')) {
         const data = this.parentId
           ? (await this.$api.meta.filterChildrenRead(this.viewId, this.parentId))

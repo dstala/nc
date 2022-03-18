@@ -23,7 +23,7 @@ export default class Hook implements HookType {
   payload?: string;
   url?: string;
   headers?: string;
-  condition?: string;
+  condition?: boolean;
   notification?: string;
   retries?: number;
   retry_interval?: number;
@@ -129,10 +129,7 @@ export default class Hook implements HookType {
       payload: !!hook.payload,
       url: hook.url,
       headers: hook.headers,
-      condition:
-        hook.condition && typeof hook.condition === 'object'
-          ? JSON.stringify(hook.condition)
-          : hook.condition,
+      condition: hook.condition,
       notification:
         hook.notification && typeof hook.notification === 'object'
           ? JSON.stringify(hook.notification)
@@ -185,10 +182,7 @@ export default class Hook implements HookType {
       payload: !!hook.payload,
       url: hook.url,
       headers: hook.headers,
-      condition:
-        hook.condition && typeof hook.condition === 'object'
-          ? JSON.stringify(hook.condition)
-          : hook.condition,
+      condition: !!hook.condition,
       notification:
         hook.notification && typeof hook.notification === 'object'
           ? JSON.stringify(hook.notification)

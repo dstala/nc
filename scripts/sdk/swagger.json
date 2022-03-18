@@ -3546,7 +3546,7 @@
         "description": ""
       }
     },
-    "/data/{tableId}/{rowId}/mm/{colId}": {
+    "/data/{tableId}/{rowId}/{relationType}/{colId}": {
       "parameters": [
         {
           "schema": {
@@ -3569,6 +3569,14 @@
             "type": "string"
           },
           "name": "colId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "relationType",
           "in": "path",
           "required": true
         }
@@ -6536,7 +6544,7 @@
             "type": "string"
           },
           "condition": {
-            "type": "string"
+            "type": "boolean"
           },
           "notification": {
             "type": "string"

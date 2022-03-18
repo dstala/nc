@@ -221,8 +221,8 @@
                     />
 
                     <column-filter
-                      v-if="enableCondition && _isEE"
-                      :key="hook.id"
+                      v-if="hook.condition"
+                      :key="hook.id + key"
                       ref="filter"
                       :shared="true"
                       :meta="meta"
@@ -407,6 +407,7 @@ export default {
   },
   props: ['nodes'],
   data: () => ({
+    key: 0,
     apps: {},
     slackChannels: null,
     teamsChannels: null,
@@ -553,11 +554,11 @@ export default {
       }
     },
     checkConditionAvail() {
-      if (!process.env.EE) {
-        this.enableCondition = false
-        this.$toast.info('For webhook condition : Upgrade to Enterprise Edition').goAway(3000)
-      }
-      this.hook.condition = []
+      // if (!process.env.EE) {
+      //   this.enableCondition = false
+      //   this.$toast.info('For webhook condition : Upgrade to Enterprise Edition').goAway(3000)
+      // }
+      // this.hook.condition = []
     },
     async onNotTypeChange() {
       this.notification = {}
@@ -608,7 +609,7 @@ export default {
           type
         }
       }
-      this.enableCondition = !!(this.hook && this.hook.condition && Object.keys(this.hook.condition).length)
+      // this.enableCondition = !!(this.hook && this.hook.condition && Object.keys(this.hook.condition).length)
       await this.onNotTypeChange()
       this.notification = payload
       if (this.hook.notification.type === 'Slack') {
@@ -699,6 +700,7 @@ export default {
       this.loadingMeta = false
     },
     async loadHooksList() {
+      this.key++
       this.loading = true
       // const hooks = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   env: this.nodes.env,
@@ -711,7 +713,7 @@ export default {
 
       this.hooks = hooks.data.hooks.list.map((h) => {
         h.notification = h.notification && JSON.parse(h.notification)
-        h.condition = h.condition && JSON.parse(h.condition)
+        h.condition = h.condition // && JSON.parse(h.condition)
 
         return h
       })

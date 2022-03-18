@@ -462,7 +462,7 @@ export interface HookType {
   payload?: string;
   url?: string;
   headers?: string;
-  condition?: string;
+  condition?: boolean;
   notification?: string;
   retries?: number;
   retry_interval?: number;
@@ -3366,7 +3366,7 @@ export class Api<
      *
      * @tags Data
      * @name MmList
-     * @request GET:/data/{tableId}/{rowId}/mm/{colId}
+     * @request GET:/data/{tableId}/{rowId}/{relationType}/{colId}
      * @response `201` `any` Created
      * @response `0` `any`
      */
@@ -3374,10 +3374,11 @@ export class Api<
       tableId: string,
       rowId: string,
       colId: string,
+      relationType: string,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/data/${tableId}/${rowId}/mm/${colId}`,
+        path: `/data/${tableId}/${rowId}/${relationType}/${colId}`,
         method: 'GET',
         format: 'json',
         ...params,

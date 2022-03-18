@@ -357,7 +357,7 @@ const up = async knex => {
     table.text('headers', 'text');
 
     // todo: normalise
-    table.text('condition', 'text');
+    table.boolean('condition').defaultTo(false);
 
     table.text('notification', 'text');
 

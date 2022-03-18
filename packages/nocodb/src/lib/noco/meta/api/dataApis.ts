@@ -124,6 +124,63 @@ export async function mmList(req: Request, res: Response, next) {
   });
 }
 
+export async function hmList(req: Request, res: Response, next) {
+  const view = await View.get(req.params.viewId);
+
+  const model = await Model.getByIdOrName({
+    id: view?.fk_model_id || req.params.viewId
+  });
+
+  if (!model) return next(new Error('Table not found'));
+
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = `${model._tn}List`;
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async _args => {
+          return (
+            await baseModel.hasManyListGQL({
+              colId: req.params.colId,
+              ids: [req.params.rowId]
+            })
+          )?.[0];
+        }
+      },
+      {},
+      req.query
+    )
+  )?.[key];
+
+  const count = (
+    await baseModel.hasManyListCount({
+      colId: req.params.colId,
+      ids: [req.params.rowId]
+    })
+  )?.[0]?.count;
+
+  res.json({
+    data: new PagedResponseImpl(data, {
+      // todo:
+      totalRows: count,
+      pageSize: 25,
+      page: 1
+    })
+  });
+}
+
 async function dataRead(req: Request, res: Response, next) {
   try {
     const model = await Model.getByIdOrName({
@@ -234,6 +291,6 @@ router.delete('/data/:viewId/:rowId', ncMetaAclMw(dataDelete));
 router.get('/data/:viewId/:rowId/mm/:colId', ncMetaAclMw(mmList));
 // todo: implement these apis
 // router.get('/data/:viewId/:rowId/mm/:colId/exclude', ncMetaAclMw(mmList));
-// router.get('/data/:viewId/:rowId/hm/:colId', ncMetaAclMw(mmList));
+router.get('/data/:viewId/:rowId/hm/:colId', ncMetaAclMw(hmList));
 // router.get('/data/:viewId/:rowId/hm/:colId/exclude', ncMetaAclMw(mmList));
 export default router;
