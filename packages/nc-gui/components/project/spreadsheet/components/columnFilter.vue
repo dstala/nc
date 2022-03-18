@@ -344,18 +344,18 @@ export default {
         return true
       })
     },
-    async applyChanges(nested = false) {
+    async applyChanges(nested = false, { hookId }) {
       for (const [i, filter] of Object.entries(this.filters)) {
         if (filter.status === 'delete') {
-          if (this.hookId) {
-            await this.$api.meta.hookFilterDelete(this.hookId, filter.id)
+          if (this.hookId || hookId) {
+            await this.$api.meta.hookFilterDelete(this.hookId || hookId, filter.id)
           } else {
             await this.$api.meta.filterDelete(this.viewId, filter.id)
           }
         } else if (filter.status === 'update') {
           if (filter.id) {
-            if (this.hookId) {
-              await this.$api.meta.hookFilterUpdate(this.hookId, filter.id, {
+            if (this.hookId || hookId) {
+              await this.$api.meta.hookFilterUpdate(this.hookId || hookId, filter.id, {
                 ...filter,
                 fk_parent_id: this.parentId
               })
@@ -365,8 +365,8 @@ export default {
                 fk_parent_id: this.parentId
               })
             }
-          } else if (this.hookId) {
-            this.$set(this.filters, i, (await this.$api.meta.hookFilterCreate(this.hookId, {
+          } else if (this.hookId || hookId) {
+            this.$set(this.filters, i, (await this.$api.meta.hookFilterCreate(this.hookId || hookId, {
               ...filter,
               fk_parent_id: this.parentId
             })).data)
@@ -423,6 +423,7 @@ export default {
       this.saveOrUpdate(this.filters[index], index)
     },
     async saveOrUpdate(filter, i) {
+      debugger
       if (this.shared || !this._isUIAllowed('filterSync')) {
         // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
         this.$emit('updated')

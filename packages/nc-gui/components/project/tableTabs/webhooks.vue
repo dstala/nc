@@ -222,9 +222,8 @@
 
                     <column-filter
                       v-if="hook.condition"
-                      :key="hook.id + key"
+                      :key="key"
                       ref="filter"
-                      :shared="true"
                       :meta="meta"
                       :field-list="fieldList"
                       dense
@@ -592,6 +591,7 @@ export default {
       }
     },
     async onEventChange() {
+      this.key++
       if (!this.hooks || !this.hooks.length) {
         return
       }
@@ -677,7 +677,9 @@ export default {
           this.hook.id = res.data.id
         }
         if (this.$refs.filter) {
-          await this.$refs.filter.applyChanges()
+          await this.$refs.filter.applyChanges(false, {
+            hookId: this.hook.id
+          })
         }
 
         this.$toast.success('Webhook details updated successfully').goAway(3000)
@@ -713,13 +715,14 @@ export default {
 
       this.hooks = hooks.data.hooks.list.map((h) => {
         h.notification = h.notification && JSON.parse(h.notification)
-        h.condition = h.condition // && JSON.parse(h.condition)
+        // h.condition = h.condition && JSON.parse(h.condition)
 
         return h
       })
       this.loading = false
     },
     addNewHook() {
+      this.key++
       this.selectedHook = this.hooks.length
       this.hooks.push({
         notification: {
