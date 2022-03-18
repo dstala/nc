@@ -76,15 +76,20 @@ export async function validateCondition(filters: Filter[], data: any) {
       case 'notnull':
         res = data[field] !== null;
         break;
-
-      /*   todo:     case '<':
-                return condition + `~not(${filt.field},lt,${filt.value})`;
-              case '<=':
-                return condition + `~not(${filt.field},le,${filt.value})`;
-              case '>':
-                return condition + `~not(${filt.field},gt,${filt.value})`;
-              case '>=':
-                return condition + `~not(${filt.field},ge,${filt.value})`;*/
+      case 'lt':
+        res = +data[field] < +filter.value;
+        break;
+      case 'lte':
+      case 'le':
+        res = +data[field] <= +filter.value;
+        break;
+      case 'gt':
+        res = +data[field] > +filter.value;
+        break;
+      case 'gte':
+      case 'ge':
+        res = +data[field] >= +filter.value;
+        break;
     }
     isValid = isValid && res;
     // return con.logicOp === 'or' ? valid || res : valid && res;
