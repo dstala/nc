@@ -173,7 +173,7 @@ export default {
     },
     async deleteToken(item) {
       try {
-        await this.$api.meta.apiTokenDelete(this.$store.state.project.projectId, item.id)
+        await this.$api.meta.apiTokenDelete(this.$store.state.project.projectId, item.token)
         // this.tokens = //await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenDelete', { id: item.id }])
         this.$toast.success('Token deleted successfully').goAway(3000)
         await this.loadApiTokens()

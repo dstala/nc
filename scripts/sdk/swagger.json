@@ -4476,7 +4476,7 @@
         }
       ]
     },
-    "/projects/{projectId}/apiTokens/{tokenId}": {
+    "/projects/{projectId}/apiTokens/{token}": {
       "delete": {
         "summary": "",
         "operationId": "api-token-delete",
@@ -4502,7 +4502,7 @@
           "schema": {
             "type": "string"
           },
-          "name": "tokenId",
+          "name": "token",
           "in": "path",
           "required": true
         }

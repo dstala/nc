@@ -9,7 +9,7 @@ export async function apiTokenCreate(req: Request, res: Response) {
   res.json(await ApiToken.insert(req.body));
 }
 export async function apiTokenDelete(req: Request, res: Response) {
-  res.json(await ApiToken.delete(req.params.tokenId));
+  res.json(await ApiToken.delete(req.params.token));
 }
 
 const router = Router({ mergeParams: true });
@@ -17,7 +17,7 @@ const router = Router({ mergeParams: true });
 router.get('/projects/:projectId/apiTokens', ncMetaAclMw(apiTokenList));
 router.post('/projects/:projectId/apiTokens', ncMetaAclMw(apiTokenCreate));
 router.delete(
-  '/projects/:projectId/apiTokens/:tokenId',
+  '/projects/:projectId/apiTokens/:token',
   ncMetaAclMw(apiTokenDelete)
 );
 

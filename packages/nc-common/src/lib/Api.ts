@@ -3031,16 +3031,16 @@ export class Api<
      *
      * @tags meta
      * @name ApiTokenDelete
-     * @request DELETE:/projects/{projectId}/apiTokens/{tokenId}
+     * @request DELETE:/projects/{projectId}/apiTokens/{token}
      * @response `200` `void` OK
      */
     apiTokenDelete: (
       projectId: string,
-      tokenId: string,
+      token: string,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
-        path: `/projects/${projectId}/apiTokens/${tokenId}`,
+        path: `/projects/${projectId}/apiTokens/${token}`,
         method: 'DELETE',
         ...params,
       }),
