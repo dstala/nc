@@ -1,5 +1,6 @@
 <template>
   <v-dialog
+    v-if="show"
     v-model="show"
     align="center"
     absolute
