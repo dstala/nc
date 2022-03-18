@@ -344,7 +344,7 @@ export default {
         return true
       })
     },
-    async applyChanges(nested = false, { hookId }) {
+    async applyChanges(nested = false, { hookId } = {}) {
       for (const [i, filter] of Object.entries(this.filters)) {
         if (filter.status === 'delete') {
           if (this.hookId || hookId) {
