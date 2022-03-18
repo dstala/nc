@@ -82,7 +82,7 @@
                 v-for="(col,i) in fields"
               >
                 <div
-                  v-if="!col.lk"
+                  v-if="!col.lk && (!showFields || showFields[col._cn])"
                   :key="i"
                   :class="{
                     'active-row' : active === col._cn,
@@ -286,6 +286,7 @@ export default {
   },
   mixins: [colors, form],
   props: {
+    showFields: Object,
     showNextPrev: {
       type: Boolean,
       default: false

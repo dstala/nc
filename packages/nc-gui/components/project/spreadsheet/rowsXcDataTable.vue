@@ -128,7 +128,7 @@
 
       <template v-if="!isForm">
         <!-- Export Cache -->
-        <v-tooltip bottom v-if="debug">
+        <v-tooltip v-if="debug" bottom>
           <template #activator="{on}">
             <v-icon class="mr-3" small v-on="on" @click="exportCache">
               mdi-export
@@ -138,7 +138,7 @@
           </span>
         </v-tooltip>
         <!-- Delete Cache -->
-        <v-tooltip bottom v-if="debug">
+        <v-tooltip v-if="debug" bottom>
           <template #activator="{on}">
             <v-icon class="mr-3" small v-on="on" @click="deleteCache">
               mdi-delete
@@ -645,6 +645,7 @@
         :primary-value-column="primaryValueColumn"
         :api="api"
         :available-columns="availableColumns"
+        :show-fields="showFields"
         :nodes="nodes"
         :query-params="queryParams"
         :show-next-prev="false"
@@ -662,6 +663,7 @@
         :db-alias="nodes.dbAlias"
         :has-many="hasMany"
         :belongs-to="belongsTo"
+        :show-fields="showFields"
         :table="table"
         :old-row.sync="data[selectedExpandRowIndex].oldRow"
         :is-new="data[selectedExpandRowIndex].rowMeta.new"
@@ -700,6 +702,7 @@
 import { mapActions } from 'vuex'
 import debounce from 'debounce'
 import { SqlUiFactory, ViewTypes } from 'nc-common'
+import FileSaver from 'file-saver'
 import FormView from './views/formView'
 import XcGridView from './views/xcGridView'
 import spreadsheet from './mixins/spreadsheet'
@@ -718,7 +721,6 @@ import Pagination from '@/components/project/spreadsheet/components/pagination'
 import ColumnFilter from '~/components/project/spreadsheet/components/columnFilterMenu'
 import MoreActions from '~/components/project/spreadsheet/components/moreActions'
 import ShareViewMenu from '~/components/project/spreadsheet/components/shareViewMenu'
-import FileSaver from 'file-saver'
 
 export default {
   name: 'RowsXcDataTable',
