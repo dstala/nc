@@ -171,63 +171,67 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
 }
 
 export async function invokeWebhook(hook: Hook, model: Model, data, user) {
-  // for (const hook of hooks) {
-  const notification =
-    typeof hook.notification === 'string'
-      ? JSON.parse(hook.notification)
-      : hook.notification;
+  try {
+    // for (const hook of hooks) {
+    const notification =
+      typeof hook.notification === 'string'
+        ? JSON.parse(hook.notification)
+        : hook.notification;
 
-  console.log('Hook handler ::::' + model.tn + ':: Hook ::', hook);
-  console.log('Hook handler ::::' + model.tn + ':: Data ::', data);
+    console.log('Hook handler ::::' + model.tn + ':: Hook ::', hook);
+    console.log('Hook handler ::::' + model.tn + ':: Data ::', data);
 
-  if (!(await validateCondition(await hook.getFilters(), data))) {
-    return;
-  }
+    if (!(await validateCondition(await hook.getFilters(), data))) {
+      return;
+    }
 
-  switch (notification?.type) {
-    case 'Email':
-      await (await NcPluginMgrv2.emailAdapter())?.mailSend({
-        to: parseBody(
-          notification?.payload?.to,
-          user,
-          data,
-          notification?.payload
-        ),
-        subject: parseBody(
-          notification?.payload?.subject,
-          user,
-          data,
-          notification?.payload
-        ),
-        html: parseBody(
-          notification?.payload?.body,
-          user,
-          data,
-          notification?.payload
-        )
-      });
-      break;
-    case 'URL':
-      await handleHttpWebHook(notification?.payload, user, data);
-      break;
-    default:
-      await (
-        await NcPluginMgrv2.webhookNotificationAdapters(notification.type)
-      ).sendMessage(
-        parseBody(
-          notification?.payload?.body,
-          user,
-          data,
-          notification?.payload
-        ),
-        JSON.parse(JSON.stringify(notification?.payload), (_key, value) => {
-          return typeof value === 'string'
-            ? parseBody(value, user, data, notification?.payload)
-            : value;
-        })
-      );
-      // }
-      break;
+    switch (notification?.type) {
+      case 'Email':
+        await (await NcPluginMgrv2.emailAdapter())?.mailSend({
+          to: parseBody(
+            notification?.payload?.to,
+            user,
+            data,
+            notification?.payload
+          ),
+          subject: parseBody(
+            notification?.payload?.subject,
+            user,
+            data,
+            notification?.payload
+          ),
+          html: parseBody(
+            notification?.payload?.body,
+            user,
+            data,
+            notification?.payload
+          )
+        });
+        break;
+      case 'URL':
+        await handleHttpWebHook(notification?.payload, user, data);
+        break;
+      default:
+        await (
+          await NcPluginMgrv2.webhookNotificationAdapters(notification.type)
+        ).sendMessage(
+          parseBody(
+            notification?.payload?.body,
+            user,
+            data,
+            notification?.payload
+          ),
+          JSON.parse(JSON.stringify(notification?.payload), (_key, value) => {
+            return typeof value === 'string'
+              ? parseBody(value, user, data, notification?.payload)
+              : value;
+          })
+        );
+        // }
+        break;
+    }
+  } catch (e) {
+    console.log(e);
   }
 }
 

@@ -144,7 +144,7 @@ class NcPluginMgrv2 {
     }
 
     await plugin.init(pluginData?.input);
-    return plugin as IEmailAdapter;
+    return plugin.getAdapter();
   }
 
   public static async webhookNotificationAdapters(
