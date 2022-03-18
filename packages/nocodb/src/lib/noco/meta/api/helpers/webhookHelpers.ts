@@ -43,10 +43,10 @@ export async function validateCondition(filters: Filter[], data: any) {
     }
     switch (filter.comparison_op) {
       case 'eq':
-        res = val === filter.value;
+        res = val == filter.value;
         break;
       case 'neq':
-        res = val !== filter.value;
+        res = val != filter.value;
         break;
       case 'like':
         res =
