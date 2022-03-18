@@ -329,6 +329,46 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
+  await knex.schema.createTable(MetaTable.HOOKS, table => {
+    table
+      .string('id', 20)
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
+    table.string('fk_model_id', 20);
+    table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
+
+    table.string('title');
+    table.string('description', 255);
+    table.string('env').defaultTo('all');
+    table.string('type');
+    table.string('event');
+
+    table.string('operation');
+    table.boolean('async').defaultTo(false);
+    table.boolean('payload').defaultTo(true);
+
+    table.text('url', 'text');
+    table.text('headers', 'text');
+
+    // todo: normalise
+    table.text('condition', 'text');
+
+    table.text('notification', 'text');
+
+    table.integer('retries').defaultTo(0);
+    table.integer('retry_interval').defaultTo(60000);
+    table.integer('timeout').defaultTo(60000);
+    table.boolean('active').defaultTo(true);
+
+    table.timestamps();
+  });
+
   await knex.schema.createTable(MetaTable.FILTER_EXP, table => {
     table
       .string('id', 20)
@@ -768,46 +808,6 @@ const up = async knex => {
     table.text('details');
 
     table.timestamps(true, true);
-  });
-
-  await knex.schema.createTable(MetaTable.HOOKS, table => {
-    table
-      .string('id', 20)
-      .primary()
-      .notNullable();
-
-    table.string('base_id', 20);
-    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
-    table.string('project_id', 128);
-    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
-
-    table.string('fk_model_id', 20);
-    table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
-
-    table.string('title');
-    table.string('description', 255);
-    table.string('env').defaultTo('all');
-    table.string('type');
-    table.string('event');
-
-    table.string('operation');
-    table.boolean('async').defaultTo(false);
-    table.boolean('payload').defaultTo(true);
-
-    table.text('url', 'text');
-    table.text('headers', 'text');
-
-    // todo: normalise
-    table.text('condition', 'text');
-
-    table.text('notification', 'text');
-
-    table.integer('retries').defaultTo(0);
-    table.integer('retry_interval').defaultTo(60000);
-    table.integer('timeout').defaultTo(60000);
-    table.boolean('active').defaultTo(true);
-
-    table.timestamps();
   });
 
   await knex.schema.createTable(MetaTable.PLUGIN, table => {
