@@ -215,11 +215,11 @@ export default class Hook implements HookType {
   }
 
   static async delete(hookId: any, ncMeta = Noco.ncMeta) {
-    return await ncMeta.metaDelete(null, null, MetaTable.HOOKS, hookId);
     await NocoCache.deepDel(
       CacheScope.HOOK,
       `${CacheScope.HOOK}:${hookId}`,
       CacheDelDirection.CHILD_TO_PARENT
     );
+    return await ncMeta.metaDelete(null, null, MetaTable.HOOKS, hookId);
   }
 }
