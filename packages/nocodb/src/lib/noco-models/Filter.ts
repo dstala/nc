@@ -106,10 +106,9 @@ export default class Filter {
     filter: Partial<FilterType>,
     ncMeta = Noco.ncMeta
   ) {
-    // todo: set redis cache based on filter.fk_hook_id
     if (!(id && (filter.fk_view_id || filter.fk_hook_id))) {
       throw new Error(
-        `Mandatory fields missing in FITLER_EXP cache population : id(${id}), fk_view_id(${filter.fk_view_id}), fk_parent_id(${filter.fk_view_id})`
+        `Mandatory fields missing in FITLER_EXP cache population : id(${id}), fk_view_id(${filter.fk_view_id}), fk_hook_id(${filter.fk_hook_id})`
       );
     }
     const key = `${CacheScope.FILTER_EXP}:${id}`;
@@ -122,17 +121,43 @@ export default class Filter {
       /* store in redis */
       p.push(NocoCache.set(key, value));
       /* append key to relevant lists */
-      p.push(
-        NocoCache.appendToList(CacheScope.FILTER_EXP, [filter.fk_view_id], key)
-      );
-      if (filter.fk_parent_id) {
+      if (filter.fk_view_id) {
         p.push(
           NocoCache.appendToList(
             CacheScope.FILTER_EXP,
-            [filter.fk_view_id, filter.fk_parent_id],
+            [filter.fk_view_id],
             key
           )
         );
+      }
+      if (filter.fk_hook_id) {
+        p.push(
+          NocoCache.appendToList(
+            CacheScope.FILTER_EXP,
+            [filter.fk_hook_id],
+            key
+          )
+        );
+      }
+      if (filter.fk_parent_id) {
+        if (filter.fk_view_id) {
+          p.push(
+            NocoCache.appendToList(
+              CacheScope.FILTER_EXP,
+              [filter.fk_view_id, filter.fk_parent_id],
+              key
+            )
+          );
+        }
+        if (filter.fk_hook_id) {
+          p.push(
+            NocoCache.appendToList(
+              CacheScope.FILTER_EXP,
+              [filter.fk_hook_id, filter.fk_parent_id],
+              key
+            )
+          );
+        }
         p.push(
           NocoCache.appendToList(
             CacheScope.FILTER_EXP,
