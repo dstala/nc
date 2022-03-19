@@ -80,7 +80,6 @@ export default class Base implements BaseType {
       await NocoCache.setList(CacheScope.BASE, [args.projectId], baseDataList);
     }
     return baseDataList?.map(baseData => {
-      delete baseData.config;
       return new Base(baseData);
     });
   }
