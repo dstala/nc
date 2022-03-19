@@ -292,7 +292,7 @@ export async function mmList(req: Request, res: Response): Promise<any> {
       {
         [key]: async _args => {
           return (
-            await baseModel._getGroupedManyToManyList({
+            await baseModel.mmList({
               colId: req.params.columnId,
               parentIds: [req.params.rowId]
             })
@@ -305,7 +305,7 @@ export async function mmList(req: Request, res: Response): Promise<any> {
   )?.[key];
 
   const count = (
-    await baseModel._getGroupedManyToManyCount({
+    await baseModel.mmListCount({
       colId: req.params.columnId,
       parentIds: [req.params.rowId]
     })
@@ -356,7 +356,7 @@ export async function hmList(req: Request, res: Response): Promise<any> {
       {
         [key]: async _args => {
           return (
-            await baseModel.hasManyListGQL({
+            await baseModel.hmList({
               colId: req.params.columnId,
               ids: [req.params.rowId]
             })
@@ -369,7 +369,7 @@ export async function hmList(req: Request, res: Response): Promise<any> {
   )?.[key];
 
   const count = (
-    await baseModel.hasManyListCount({
+    await baseModel.hmListCount({
       colId: req.params.columnId,
       ids: [req.params.rowId]
     })

@@ -244,7 +244,7 @@ class BaseModelSqlv2 {
     );
   }
 
-  async hasManyListGQL({ colId, ids }) {
+  async hmList({ colId, ids }) {
     try {
       /*      const {
         where,
@@ -316,7 +316,7 @@ class BaseModelSqlv2 {
     }
   }
 
-  async hasManyListCount({ colId, ids }) {
+  async hmListCount({ colId, ids }) {
     try {
       // const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
       const relColumn = (await this.model.getColumns()).find(
@@ -345,7 +345,7 @@ class BaseModelSqlv2 {
     }
   }
 
-  public async _getGroupedManyToManyList({ colId, parentIds, ...params }) {
+  public async mmList({ colId, parentIds, ...params }) {
     // const { where, limit, offset, sort, ...restArgs } = this._getChildListArgs(
     //   rest,
     //   index,
@@ -424,7 +424,7 @@ class BaseModelSqlv2 {
     return parentIds.map(id => gs[id] || []);
   }
 
-  public async _getGroupedManyToManyCount({ colId, parentIds }) {
+  public async mmListCount({ colId, parentIds }) {
     // const { where, limit, offset, sort, ...restArgs } = this._getChildListArgs(
     //   rest,
     //   index,
@@ -543,7 +543,7 @@ class BaseModelSqlv2 {
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.hasManyListGQL({
+                  const data = await this.hmList({
                     colId: column.id,
                     ids
                   });
@@ -571,7 +571,7 @@ class BaseModelSqlv2 {
             } else if (colOptions.type === 'mm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this._getGroupedManyToManyList({
+                  const data = await this.mmList({
                     parentIds: ids,
                     colId: column.id
                   });
@@ -1059,6 +1059,83 @@ class BaseModelSqlv2 {
       throw e;
     }
   }
+
+  /*
+  // todo: update
+  public m2mNotChildren({ pid = null, assoc = null, ...args }): Promise<any> {
+    if (pid === null || assoc === null) {
+      return null;
+    }
+    // @ts-ignore
+    const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
+    this.manyToManyRelations.find(({ vtn }) => assoc === vtn) || {};
+    const childModel = this.dbModels[rtn];
+
+    const {
+      fields,
+      where,
+      limit,
+      offset,
+      sort,
+      condition,
+      conditionGraph = null
+    } = childModel._getListArgs(args);
+
+    const query = childModel.$db
+      .select(childModel.selectQuery(fields))
+      .xwhere(where, childModel.selectQuery(''))
+      .condition(condition, childModel.selectQuery(''))
+      .conditionGraph(conditionGraph)
+      .whereNotIn(
+        rcn,
+        childModel
+          .dbDriver(this.dbModels[rtn].tnPath)
+          .select(`${rtn}.${rcn}`)
+          .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
+          .where(`${vtn}.${vcn}`, pid)
+      );
+    childModel._paginateAndSort(query, { limit, offset, sort });
+
+    return this._run(query);
+  }
+
+  // todo: update
+  public m2mNotChildrenCount({
+                               pid = null,
+                               assoc = null,
+                               ...args
+                             }): Promise<any> {
+    if (pid === null || assoc === null) {
+      return null;
+    }
+    // @ts-ignore
+    const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
+    this.manyToManyRelations.find(({ vtn }) => assoc === vtn) || {};
+    const childModel = this.dbModels[rtn];
+
+    const { where, condition, conditionGraph = null } = childModel._getListArgs(
+      args
+    );
+
+    const query = childModel.$db
+      .count(`${rcn} as count`)
+      .xwhere(where, childModel.selectQuery(''))
+      .condition(condition, childModel.selectQuery(''))
+      .conditionGraph(conditionGraph)
+      .whereNotIn(
+        rcn,
+        childModel
+          .dbDriver(this.dbModels[rtn].tnPath)
+          .select(`${rtn}.${rcn}`)
+          .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
+          .where(`${vtn}.${vcn}`, pid)
+      )
+      .first();
+
+    return this._run(query);
+  }
+
+*/
 
   /**
    *  Hooks
