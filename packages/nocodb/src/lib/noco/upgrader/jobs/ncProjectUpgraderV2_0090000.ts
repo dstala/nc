@@ -916,10 +916,12 @@ async function migrateViewsParams(
         for (const sort of queryParams.sortList || []) {
           await Sort.insert(
             {
-              fk_column_id: (
-                objModelColumnAliasRef[projectId][tn][sort.field] ||
-                objModelColumnRef[projectId][tn][sort.field]
-              ).id,
+              fk_column_id:
+                sort.field &&
+                (
+                  objModelColumnAliasRef[projectId][tn][sort.field] ||
+                  objModelColumnRef[projectId][tn][sort.field]
+                ).id,
               fk_view_id: view.id,
               direction: sort.order === '-' ? 'desc' : 'asc'
             },
@@ -932,6 +934,7 @@ async function migrateViewsParams(
           await Filter.insert(
             {
               fk_column_id:
+                filter.field &&
                 objModelColumnAliasRef[projectId][tn][filter.field].id,
               fk_view_id: view.id,
               comparison_op: filterV1toV2CompOpMap[filter.op],
@@ -1131,14 +1134,16 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
     for (const filter of filters || []) {
       await Filter.insert(
         {
-          fk_column_id: (
-            ctx.objModelColumnRef[hookMeta.project_id][hookMeta.tn][
-              filter.field
-            ] ||
-            ctx.objModelColumnAliasRef[hookMeta.project_id][hookMeta.tn][
-              filter.field
-            ]
-          ).id,
+          fk_column_id:
+            filter.field &&
+            (
+              ctx.objModelColumnRef[hookMeta.project_id][hookMeta.tn][
+                filter.field
+              ] ||
+              ctx.objModelColumnAliasRef[hookMeta.project_id][hookMeta.tn][
+                filter.field
+              ]
+            ).id,
           fk_hook_id: hook.id,
           comparison_op: filterV1toV2CompOpMap[filter.op],
           value: filter.value
