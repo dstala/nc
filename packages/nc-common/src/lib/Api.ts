@@ -74,19 +74,19 @@ export interface BaseType {
   config?: any;
   created_at?: any;
   updated_at?: any;
+  inflection_column?: string;
+  inflection_table?: string;
 }
 
 export interface BaseReqType {
+  id?: string;
+  project_id?: string;
   alias?: string;
-  host?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  database?: string;
-  url?: string;
-  params?: string;
   type?: string;
-  ssl?: string;
+  is_meta?: boolean;
+  config?: any;
+  inflection_column?: string;
+  inflection_table?: string;
 }
 
 export interface BaseListType {

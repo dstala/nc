@@ -10,16 +10,20 @@ import Model from './Model';
 import { BaseType } from 'nc-common';
 import NocoCache from '../noco-cache/NocoCache';
 import CryptoJS from 'crypto-js';
+import extractProps from '../noco/meta/api/helpers/extractProps';
 
 // todo: hide credentials
 export default class Base implements BaseType {
-  public alias?: string;
-  public config?: any;
-  public type?: string;
-  public is_meta?: boolean;
-
-  public project_id: string;
-  public id: string;
+  id?: string;
+  project_id?: string;
+  alias?: string;
+  type?: string;
+  is_meta?: boolean;
+  config?: any;
+  created_at?: any;
+  updated_at?: any;
+  inflection_column?: string;
+  inflection_table?: string;
 
   constructor(base: Partial<Base>) {
     Object.assign(this, base);
@@ -29,29 +33,27 @@ export default class Base implements BaseType {
     base: BaseType & { projectId: string; created_at?; updated_at? },
     ncMeta = Noco.ncMeta
   ) {
+    const insertObj = extractProps(base, [
+      'id',
+      'alias',
+      'config',
+      'type',
+      'is_meta',
+      'created_at',
+      'updated_at',
+      'inflection_column',
+      'inflection_table'
+    ]);
+    insertObj.config = CryptoJS.AES.encrypt(
+      JSON.stringify(base.config),
+      Noco.getConfig()?.auth?.jwt?.secret
+    ).toString();
+
     const { id } = await ncMeta.metaInsert2(
       base.projectId,
       null,
       MetaTable.BASES,
-      {
-        id: base?.id,
-        alias: base.alias,
-        // host: base.host,
-        // port: base.port,
-        // username: base.username,
-        // password: base.password,
-        // database: base.database,
-        // url: base.url,
-        // params: base.params,
-        config: CryptoJS.AES.encrypt(
-          JSON.stringify(base.config),
-          Noco.getConfig()?.auth?.jwt?.secret
-        ).toString(),
-        type: base.type,
-        is_meta: base.is_meta,
-        created_at: base.created_at,
-        updated_at: base.updated_at
-      }
+      insertObj
     );
     await NocoCache.appendToList(
       CacheScope.BASE,
@@ -77,7 +79,10 @@ export default class Base implements BaseType {
       );
       await NocoCache.setList(CacheScope.BASE, [args.projectId], baseDataList);
     }
-    return baseDataList?.map(baseData => new Base(baseData));
+    return baseDataList?.map(baseData => {
+      delete baseData.config;
+      return new Base(baseData);
+    });
   }
   static async get(id: string, ncMeta = Noco.ncMeta): Promise<Base> {
     let baseData =

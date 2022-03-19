@@ -79,13 +79,18 @@ async function migrateProjects(ncMeta = Noco.ncMeta) {
       prefix: projectConfig.prefix,
       is_meta: !!projectConfig.prefix,
       title: projectConfig?.title,
-      bases: projectConfig?.envs?._noco?.db?.map(d => ({
-        is_meta: !!projectConfig.prefix,
-        type: d.client,
-        config: d,
-        created_at: project.created_at,
-        updated_at: project.updated_at
-      })),
+      bases: projectConfig?.envs?._noco?.db?.map(d => {
+        const inflection = (d && d.meta && d.meta.inflection) || {};
+        return {
+          is_meta: !!projectConfig.prefix,
+          type: d.client,
+          config: d,
+          created_at: project.created_at,
+          updated_at: project.updated_at,
+          inflection_column: inflection.cn,
+          inflection_table: inflection.tn
+        };
+      }),
       created_at: project.created_at,
       updated_at: project.updated_at
     };

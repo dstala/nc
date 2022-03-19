@@ -525,7 +525,7 @@
                                           />
                                         </v-col>
                                         <!--  todo : ssl & inflection -->
-                                        <v-col v-if="false && db.client !== 'sqlite3'" class="">
+                                        <v-col v-if="db.client !== 'sqlite3'" class="">
                                           <v-expansion-panels>
                                             <v-expansion-panel style="border: 1px solid wheat">
                                               <v-expansion-panel-header>
@@ -943,8 +943,8 @@
       :type="dialog.type"
     />
 
-<!-- heading="Connection was successful" -->
-<!-- ok-label="Ok & Save Project" -->
+    <!-- heading="Connection was successful" -->
+    <!-- ok-label="Ok & Save Project" -->
     <dlg-ok-new
       v-model="testSuccess"
       :heading="$t('msg.info.dbConnected')"
@@ -992,6 +992,7 @@ import Vue from 'vue'
 
 import { v4 as uuidv4 } from 'uuid'
 
+import inflection from 'inflection'
 import XBtn from './global/xBtn'
 import dlgOk from './utils/dlgOk.vue'
 import textDlgSubmitCancel from './utils/dlgTextSubmitCancel'
@@ -1117,8 +1118,8 @@ export default {
                     graphqlDepthLimit: 10
                   },
                   inflection: {
-                    tn: ['camelize'],
-                    cn: ['camelize']
+                    tn: 'camelize',
+                    cn: 'camelize'
                   }
                 },
                 ui: {
@@ -1673,10 +1674,11 @@ export default {
       //
 
       const con = projectJson.envs._noco.db[0]
+      const inflection = (con.meta && con.meta.inflection) || {}
 
       const result = (await this.$api.meta.projectCreate({
         title: projectJson.title,
-        bases: [{ type: con.client, config: con }],
+        bases: [{ type: con.client, config: con, inflection_column: inflection.cn, inflection_table: inflection.tn }],
         external: true
       })).data
 

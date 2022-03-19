@@ -142,7 +142,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
     ?.filter(({ tn }) => !IGNORE_TABLES.includes(tn))
     ?.map(t => {
       t.order = ++order;
-      t._tn = getTableNameAlias(t.tn, project.prefix);
+      t._tn = getTableNameAlias(t.tn, project.prefix, base);
       return t;
     });
 
@@ -155,11 +155,11 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
   }
 
   relations.forEach(r => {
-    r._tn = getTableNameAlias(r.tn, project.prefix);
-    r._rtn = getTableNameAlias(r.rtn, project.prefix);
+    r._tn = getTableNameAlias(r.tn, project.prefix, base);
+    r._rtn = getTableNameAlias(r.rtn, project.prefix, base);
   });
   tables.forEach(t => {
-    t._tn = getTableNameAlias(t.tn, project.prefix);
+    t._tn = getTableNameAlias(t.tn, project.prefix, base);
   });
 
   // await this.syncRelations();
@@ -224,7 +224,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         await Column.insert({
           fk_model_id: models2[table.tn].id,
           ...column,
-          _cn: getColumnNameAlias(column.cn),
+          _cn: getColumnNameAlias(column.cn, base),
           order: colOrder++
         });
       }
@@ -313,7 +313,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
     ?.map(v => {
       v.order = ++order;
       v.tn = v.view_name;
-      v._tn = getTableNameAlias(v.tn, project.prefix);
+      v._tn = getTableNameAlias(v.tn, project.prefix, base);
       return v;
     });
 
@@ -369,7 +369,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         await Column.insert({
           fk_model_id: models2[table.tn].id,
           ...column,
-          _cn: getColumnNameAlias(column.cn),
+          _cn: getColumnNameAlias(column.cn, base),
           order: colOrder++
         });
       }

@@ -4769,41 +4769,40 @@
           },
           "config": {},
           "created_at": {},
-          "updated_at": {}
+          "updated_at": {},
+          "inflection_column": {
+            "type": "string"
+          },
+          "inflection_table": {
+            "type": "string"
+          }
         }
       },
       "BaseReq": {
         "title": "Base",
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
           "alias": {
-            "type": "string"
-          },
-          "host": {
-            "type": "string"
-          },
-          "port": {
-            "type": "number"
-          },
-          "username": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "database": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          },
-          "params": {
             "type": "string"
           },
           "type": {
             "type": "string"
           },
-          "ssl": {
+          "is_meta": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "config": {},
+          "inflection_column": {
+            "type": "string"
+          },
+          "inflection_table": {
             "type": "string"
           }
         }

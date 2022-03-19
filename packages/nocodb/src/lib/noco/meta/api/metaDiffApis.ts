@@ -546,10 +546,10 @@ export async function metaDiffSync(req, res) {
             const ctx = {
               dbType: base.type,
               tn,
-              _tn: getTableNameAlias(tn, project.prefix),
+              _tn: getTableNameAlias(tn, project.prefix, base),
               columns: columns.map(c => ({
                 ...c,
-                _cn: getColumnNameAlias(c.cn)
+                _cn: getColumnNameAlias(c.cn, base)
               })),
               relations,
               hasMany,
@@ -591,10 +591,10 @@ export async function metaDiffSync(req, res) {
             const ctx = {
               dbType: base.type,
               tn,
-              _tn: getTableNameAlias(tn, project.prefix),
+              _tn: getTableNameAlias(tn, project.prefix, base),
               columns: columns.map(c => ({
                 ...c,
-                _cn: getColumnNameAlias(c.cn)
+                _cn: getColumnNameAlias(c.cn, base)
               })),
               relations: [],
               hasMany: [],
@@ -634,7 +634,7 @@ export async function metaDiffSync(req, res) {
             );
             column.uidt = metaFact.getUIDataType(column);
             //todo: inflection
-            column._cn = getColumnNameAlias(column.cn);
+            column._cn = getColumnNameAlias(column.cn, base);
             await Column.insert({ fk_model_id: change.id, ...column });
           }
           // update old

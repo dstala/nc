@@ -40,6 +40,9 @@ const up = async knex => {
     table.boolean('is_meta');
     table.string('type');
 
+    table.string('inflection_column');
+    table.string('inflection_table');
+
     // todo: type
     // table.text('ssl');
 
@@ -366,7 +369,40 @@ const up = async knex => {
     table.integer('timeout').defaultTo(60000);
     table.boolean('active').defaultTo(true);
 
-    table.timestamps();
+    table.timestamps(true, true);
+  });
+
+  await knex.schema.createTable(MetaTable.HOOK_LOGS, table => {
+    table
+      .string('id', 20)
+      .primary()
+      .notNullable();
+
+    table.string('base_id', 20);
+    // table.foreign('base_id').references(`${MetaTable.BASES}.id`);
+    table.string('project_id', 128);
+    // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
+
+    table.string('fk_hook_id', 20);
+    // table.foreign('fk_hook_id').references(`${MetaTable.HOOKS}.id`);
+
+    table.string('type');
+    table.string('event');
+    table.string('operation');
+
+    table.boolean('test_call').defaultTo(true);
+
+    table.boolean('payload').defaultTo(true);
+    table.text('conditions');
+    table.text('notification', 'text');
+    table.string('error_code');
+    table.string('error_message');
+    table.text('error', 'text');
+    table.integer('execution_time');
+    table.string('response');
+    table.string('triggered_by');
+
+    table.timestamps(true, true);
   });
 
   await knex.schema.createTable(MetaTable.FILTER_EXP, table => {
@@ -747,7 +783,7 @@ const up = async knex => {
     table.foreign('fk_user_id').references(`${MetaTable.USERS}.id`);
     // todo
     table.text('roles');
-    table.timestamps();
+    table.timestamps(true, true);
   });
 
   await knex.schema.createTable(MetaTable.ORGS, table => {
@@ -833,7 +869,7 @@ const up = async knex => {
     table.string('creator');
     table.string('creator_website');
     table.string('price');
-    table.timestamps();
+    table.timestamps(true, true);
   });
 
   await knex.schema.createTable(MetaTable.MODEL_ROLE_VISIBILITY, table => {
@@ -855,7 +891,7 @@ const up = async knex => {
 
     table.string('role', 45);
     table.boolean('disabled').defaultTo(true);
-    table.timestamps();
+    table.timestamps(true, true);
   });
 
   // await knex('nc_plugins').insert([

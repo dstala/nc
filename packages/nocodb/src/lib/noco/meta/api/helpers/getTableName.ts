@@ -1,14 +1,25 @@
 import inflection from 'inflection';
+import Base from '../../../../noco-models/Base';
 
-export default function getTableNameAlias(tableName: string, prefix): string {
+export default function getTableNameAlias(
+  tableName: string,
+  prefix,
+  base: Base
+): string {
   let tn = tableName;
   if (prefix) {
     tn = tn.replace(prefix, '');
   }
 
-  return inflection.camelize(tn);
+  return (
+    (base?.inflection_table && inflection[base?.inflection_table]?.(tn)) || tn
+  );
 }
 
-export function getColumnNameAlias(columnName: string): string {
-  return inflection.camelize(columnName);
+export function getColumnNameAlias(columnName: string, base: Base): string {
+  return (
+    (base?.inflection_column &&
+      inflection[base?.inflection_column]?.(columnName)) ||
+    columnName
+  );
 }
