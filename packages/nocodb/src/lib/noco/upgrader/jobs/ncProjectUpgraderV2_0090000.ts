@@ -884,7 +884,12 @@ async function migrateProjectModelViews(
 
 // migrate sort & filter
 async function migrateViewsParams(
-  { objModelColumnAliasRef, objViewRef, objViewQPRef }: MigrateCtxV1,
+  {
+    objModelColumnAliasRef,
+    objViewRef,
+    objViewQPRef,
+    objModelColumnRef
+  }: MigrateCtxV1,
   ncMeta
 ) {
   for (const projectId of Object.keys(objViewRef)) {
@@ -911,8 +916,10 @@ async function migrateViewsParams(
         for (const sort of queryParams.sortList || []) {
           await Sort.insert(
             {
-              fk_column_id:
-                objModelColumnAliasRef[projectId][tn][sort.field].id,
+              fk_column_id: (
+                objModelColumnAliasRef[projectId][tn][sort.field] ||
+                objModelColumnRef[projectId][tn][sort.field]
+              ).id,
               fk_view_id: view.id,
               direction: sort.order === '-' ? 'desc' : 'asc'
             },
