@@ -52,15 +52,15 @@
           <v-simple-table v-if="tables" dense style="min-width: 400px">
             <thead>
               <tr>
-                <th class="caption" bgcolor="#F5F5F5" width="100px">
+                <th class="caption" width="100px">
                   <!--TableName-->
                   {{ $t('labels.tableName') }}
                 </th>
-                <th class="caption" bgcolor="#F5F5F5" width="150px">
+                <th class="caption" width="150px">
                   <!--ViewName-->
                   {{ $t('labels.viewName') }}
                 </th>
-                <th v-for="role in roles" :key="role" class="caption" bgcolor="#F5F5F5" width="100px">
+                <th v-for="role in roles" :key="role" class="caption" width="100px">
                   {{ role.charAt(0).toUpperCase() + role.slice(1) }}
                 </th>
               </tr>
