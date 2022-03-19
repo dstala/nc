@@ -27,6 +27,7 @@ export default class Plugin implements PluginType {
   }
 
   public static async get(pluginId: string, ncMeta = Noco.ncMeta) {
+    // todo: redis - cache
     const plugin = await ncMeta.metaGet2(
       null,
       null,
@@ -37,6 +38,7 @@ export default class Plugin implements PluginType {
   }
 
   static async list(ncMeta = Noco.ncMeta) {
+    // todo: redis - cache
     return await ncMeta.metaList2(null, null, MetaTable.PLUGIN);
   }
   static async count(ncMeta = Noco.ncMeta): Promise<number> {
@@ -45,6 +47,7 @@ export default class Plugin implements PluginType {
   }
 
   public static async update(pluginId: string, plugin: Partial<PluginType>) {
+    // todo: redis - cache
     await Noco.ncMeta.metaUpdate(
       null,
       null,
@@ -60,5 +63,14 @@ export default class Plugin implements PluginType {
     );
 
     return this.get(pluginId);
+  }
+
+  public static async isPluginActive(title: string) {
+    // todo: redis - cache
+    const plugin = await Noco.ncMeta.metaGet2(null, null, MetaTable.PLUGIN, {
+      title
+    });
+
+    return plugin?.active;
   }
 }

@@ -29,10 +29,14 @@ export async function pluginUpdate(
 ) {
   res.json(await Plugin.update(req.params.pluginId, req.body));
 }
+export async function isPluginnAvtive(req: Request, res: Response) {
+  res.json(await Plugin.isPluginActive(req.params.pluginTitle));
+}
 
 const router = Router({ mergeParams: true });
 router.get('/plugins', ncMetaAclMw(pluginList));
 router.post('/plugins/test', ncMetaAclMw(pluginTest));
 router.get('/plugins/:pluginId', ncMetaAclMw(pluginRead));
 router.put('/plugins/:pluginId', ncMetaAclMw(pluginUpdate));
+router.put('/plugins/:pluginTitle/status', ncMetaAclMw(isPluginnAvtive));
 export default router;
