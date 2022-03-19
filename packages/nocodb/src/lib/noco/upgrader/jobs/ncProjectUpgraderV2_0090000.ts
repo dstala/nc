@@ -120,8 +120,9 @@ export interface ShowFieldsv1 {
   [columnAlias: string]: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ViewStatusv1 {}
+export interface ViewStatusv1 {
+  type: string;
+}
 
 export interface ColumnsWidthv1 {
   [columnAlias: string]: string;
@@ -893,6 +894,19 @@ async function migrateViewsParams(
       )) {
         const queryParams = objViewQPRef[projectId][tn][viewTitle];
 
+        if (
+          queryParams?.viewStatus?.type &&
+          queryParams?.viewStatus?.type !== view.lock_type
+        ) {
+          await View.update(
+            view.id,
+            {
+              lock_type: queryParams?.viewStatus?.type
+            },
+            ncMeta
+          );
+          view.lock_type = queryParams?.viewStatus?.type;
+        }
         // migrate view sort list
         for (const sort of queryParams.sortList || []) {
           await Sort.insert(
