@@ -507,6 +507,28 @@ export interface ApiTokenType {
   description?: string;
 }
 
+export interface HookLogType {
+  id?: string;
+  base_id?: string;
+  project_id?: string;
+  fk_hook_id?: string;
+  type?: string;
+  event?: string;
+  operation?: string;
+  test_call?: boolean;
+  payload?: string;
+  conditions?: string;
+  notifications?: string;
+  error_code?: string;
+  error_message?: string;
+  error?: string;
+  execution_time?: string;
+  response?: string;
+  triggered_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface SigninPayloadType {
   email: string;
   password: string;

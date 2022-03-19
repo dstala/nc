@@ -6663,6 +6663,69 @@
             "type": "string"
           }
         }
+      },
+      "HookLog": {
+        "title": "ApiToken",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "base_id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "fk_hook_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "event": {
+            "type": "string"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "test_call": {
+            "type": "boolean"
+          },
+          "payload": {
+            "type": "string"
+          },
+          "conditions": {
+            "type": "string"
+          },
+          "notifications": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "string"
+          },
+          "error_message": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "execution_time": {
+            "type": "string"
+          },
+          "response": {
+            "type": "string"
+          },
+          "triggered_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
       }
     },
     "requestBodies": {

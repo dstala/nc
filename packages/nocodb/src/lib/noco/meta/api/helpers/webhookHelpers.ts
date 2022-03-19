@@ -4,6 +4,8 @@ import NcPluginMgrv2 from './NcPluginMgrv2';
 import Column from '../../../../noco-models/Column';
 import Hook from '../../../../noco-models/Hook';
 import Filter from '../../../../noco-models/Filter';
+import HookLog from '../../../../noco-models/HookLog';
+import { HookLogType } from 'nc-common';
 
 export function parseBody(
   template: string,
@@ -171,6 +173,8 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
 }
 
 export async function invokeWebhook(hook: Hook, model: Model, data, user) {
+  let hookLog: HookLogType;
+  const startTime = process.hrtime();
   try {
     // for (const hook of hooks) {
     const notification =
@@ -187,52 +191,93 @@ export async function invokeWebhook(hook: Hook, model: Model, data, user) {
 
     switch (notification?.type) {
       case 'Email':
-        await (await NcPluginMgrv2.emailAdapter())?.mailSend({
-          to: parseBody(
-            notification?.payload?.to,
-            user,
-            data,
-            notification?.payload
-          ),
-          subject: parseBody(
-            notification?.payload?.subject,
-            user,
-            data,
-            notification?.payload
-          ),
-          html: parseBody(
-            notification?.payload?.body,
-            user,
-            data,
-            notification?.payload
-          )
-        });
+        {
+          const res = await (await NcPluginMgrv2.emailAdapter())?.mailSend({
+            to: parseBody(
+              notification?.payload?.to,
+              user,
+              data,
+              notification?.payload
+            ),
+            subject: parseBody(
+              notification?.payload?.subject,
+              user,
+              data,
+              notification?.payload
+            ),
+            html: parseBody(
+              notification?.payload?.body,
+              user,
+              data,
+              notification?.payload
+            )
+          });
+          hookLog = {
+            ...hook,
+            type: notification.type,
+            payload: JSON.stringify(notification?.payload),
+            response: JSON.stringify(res),
+            triggered_by: user?.email
+          };
+        }
         break;
       case 'URL':
-        await handleHttpWebHook(notification?.payload, user, data);
+        {
+          const res = await handleHttpWebHook(
+            notification?.payload,
+            user,
+            data
+          );
+
+          hookLog = {
+            ...hook,
+            type: notification.type,
+            payload: JSON.stringify(notification?.payload),
+            response: JSON.stringify(res),
+            triggered_by: user?.email
+          };
+        }
         break;
       default:
-        await (
-          await NcPluginMgrv2.webhookNotificationAdapters(notification.type)
-        ).sendMessage(
-          parseBody(
-            notification?.payload?.body,
-            user,
-            data,
-            notification?.payload
-          ),
-          JSON.parse(JSON.stringify(notification?.payload), (_key, value) => {
-            return typeof value === 'string'
-              ? parseBody(value, user, data, notification?.payload)
-              : value;
-          })
-        );
-        // }
+        {
+          const res = await (
+            await NcPluginMgrv2.webhookNotificationAdapters(notification.type)
+          ).sendMessage(
+            parseBody(
+              notification?.payload?.body,
+              user,
+              data,
+              notification?.payload
+            ),
+            JSON.parse(JSON.stringify(notification?.payload), (_key, value) => {
+              return typeof value === 'string'
+                ? parseBody(value, user, data, notification?.payload)
+                : value;
+            })
+          );
+
+          hookLog = {
+            ...hook,
+            type: notification.type,
+            payload: JSON.stringify(notification?.payload),
+            response: JSON.stringify(res),
+            triggered_by: user?.email
+          };
+        }
         break;
     }
   } catch (e) {
     console.log(e);
+
+    hookLog = {
+      ...hook,
+      error_code: e.error_code,
+      error_message: e.message,
+      error: JSON.stringify(e)
+    };
   }
+  hookLog.execution_time = parseHrtimeToMilliSeconds(process.hrtime(startTime));
+  if (hookLog) await HookLog.insert(hookLog);
 }
 
 export function _transformSubmittedFormDataForEmail(
@@ -273,4 +318,9 @@ export function _transformSubmittedFormDataForEmail(
       transformedData[col._cn] = JSON.stringify(transformedData[col._cn]);
     }
   }
+}
+
+function parseHrtimeToMilliSeconds(hrtime) {
+  const seconds = (hrtime[0] + hrtime[1] / 1e6).toFixed(3);
+  return seconds;
 }

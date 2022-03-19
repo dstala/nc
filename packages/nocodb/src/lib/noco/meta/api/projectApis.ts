@@ -115,8 +115,10 @@ async function projectCreate(
 
     // todo: if existing table create models
 
-    for (const base of await project.getBases())
+    for (const base of await project.getBases()) {
       await populateMeta(base, project);
+      delete base.config;
+    }
 
     res.json(project);
   } catch (e) {
