@@ -366,6 +366,7 @@
           </template>
           <template v-else-if="selectedView.type === viewTypes.GALLERY ">
             <gallery-view
+              :is-locked="isLocked"
               :nodes="nodes"
               :table="table"
               :show-fields="showFields"

@@ -10,7 +10,8 @@
           <v-card
             class="h-100"
             :elevation="hover ? 4 : 1"
-            @click="$emit('expandForm', {row,rowIndex,rowMeta})"
+            :ripple="!isLocked"
+            @click="!isLocked && $emit('expandForm', {row,rowIndex,rowMeta})"
           >
             <v-carousel
               v-if="attachmentColumn"
@@ -116,7 +117,7 @@ export default {
     'showSystemFields',
     'sqlUi',
     'coverImageField',
-    'viewId'
+    'viewId', 'isLocked'
   ],
   data() {
     return {

@@ -264,7 +264,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
     await this.knexConnection(target).insert({
       ...insertObj,
       created_at: insertObj?.created_at || this.knexConnection?.fn?.now(),
-      updated_at: insertObj?.updted_at || this.knexConnection?.fn?.now()
+      updated_at: insertObj?.updated_at || this.knexConnection?.fn?.now()
     });
     return insertObj;
   }

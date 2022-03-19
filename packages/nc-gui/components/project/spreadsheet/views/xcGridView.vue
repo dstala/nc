@@ -505,7 +505,7 @@ export default {
     },
 
     async onKeyDown(e) {
-      if (this.selected.col === null || this.selected.row === null) {
+      if (this.selected.col === null || this.selected.row === null || this.isLocked) {
         return
       }
 
