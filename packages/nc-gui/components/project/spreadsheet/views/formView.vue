@@ -284,8 +284,8 @@
                           :sql-ui="sqlUi"
                           :is-new="true"
                           :is-form="true"
-                          :hint="localParams.fields[col.alias].description"
-                          :required="localParams.fields[col.alias].description"
+                          :hint="col.description"
+                          :required="col.required"
                           @update:localState="state => $set(virtual,col.alias, state)"
                           @updateCol="updateCol"
                         />
@@ -337,7 +337,7 @@
                             :meta="meta"
                             :sql-ui="sqlUi"
                             is-form
-                            :hint="localParams.fields[col.alias].description"
+                            :hint="col.description"
                             @focus="active = col._cn"
                             @blur="active = ''"
                           />
