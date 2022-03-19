@@ -71,6 +71,6 @@ export default class Plugin implements PluginType {
       title
     });
 
-    return plugin?.active;
+    return !!plugin?.active;
   }
 }

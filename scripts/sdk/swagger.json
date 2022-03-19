@@ -4132,6 +4132,39 @@
         ]
       }
     },
+    "/plugins/{pluginTitle}/status": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "pluginTitle",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "plugin-status",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "description": "Check plugin is active or not",
+        "parameters": [],
+        "tags": [
+          "Meta"
+        ]
+      }
+    },
     "/tables/{tableId}/hooks/samplePayload/{operation}": {
       "parameters": [
         {

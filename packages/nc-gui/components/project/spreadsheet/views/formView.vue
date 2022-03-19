@@ -431,7 +431,6 @@
                   inset
                   hide-details
                   class="nc-switch"
-                  @change="checkSMTPStatus"
                 >
                   <template #label>
                     <span class="caption font-weight-bold grey--text ">
@@ -551,6 +550,7 @@ export default {
         data[this.$store.state.users.user.email] = v
         this.view.email = JSON.stringify(data)
         this.updateView()
+        this.checkSMTPStatus()
       }
     },
     allColumnsLoc() {
@@ -790,14 +790,13 @@ export default {
       return isRequired
     },
     async checkSMTPStatus() {
-      // todo:
-      // if (this.localParams.emailMe[this.$store.state.users.user.email]) {
-      //   const emailPlugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', { title: 'SMTP' }])
-      //   if (!emailPlugin.active) {
-      //     this.$set(this.localParams.emailMe, this.$store.state.users.user.email, false)
-      //     this.$toast.info('Please activate SMTP plugin in App store for enabling email notification').goAway(5000)
-      //   }
-      // }
+      if (this.emailMe) {
+        const emailPluginActive = (await this.$api.meta.pluginStatus('SMTP')).data
+        if (!emailPluginActive) {
+          this.emailMe = false
+          this.$toast.info('Please activate SMTP plugin in App store for enabling email notification').goAway(5000)
+        }
+      }
     },
     updateCol(_, column, id) {
       this.$set(this.localState, column, id)

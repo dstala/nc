@@ -205,6 +205,7 @@ export default {
     pluginList: true,
     pluginRead: true,
     pluginTest: true,
+    isPluginActive: true,
     pluginUpdate: true,
     projectCreate: true,
     projectList: true,

@@ -2860,6 +2860,22 @@ export class Api<
       }),
 
     /**
+     * @description Check plugin is active or not
+     *
+     * @tags Meta
+     * @name PluginStatus
+     * @request GET:/plugins/{pluginTitle}/status
+     * @response `200` `boolean` OK
+     */
+    pluginStatus: (pluginTitle: string, params: RequestParams = {}) =>
+      this.request<boolean, any>({
+        path: `/plugins/${pluginTitle}/status`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
      * No description
      *
      * @tags Meta

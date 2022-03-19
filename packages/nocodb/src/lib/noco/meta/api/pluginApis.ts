@@ -29,7 +29,7 @@ export async function pluginUpdate(
 ) {
   res.json(await Plugin.update(req.params.pluginId, req.body));
 }
-export async function isPluginnAvtive(req: Request, res: Response) {
+export async function isPluginActive(req: Request, res: Response) {
   res.json(await Plugin.isPluginActive(req.params.pluginTitle));
 }
 
@@ -38,5 +38,5 @@ router.get('/plugins', ncMetaAclMw(pluginList));
 router.post('/plugins/test', ncMetaAclMw(pluginTest));
 router.get('/plugins/:pluginId', ncMetaAclMw(pluginRead));
 router.put('/plugins/:pluginId', ncMetaAclMw(pluginUpdate));
-router.put('/plugins/:pluginTitle/status', ncMetaAclMw(isPluginnAvtive));
+router.get('/plugins/:pluginTitle/status', ncMetaAclMw(isPluginActive));
 export default router;
