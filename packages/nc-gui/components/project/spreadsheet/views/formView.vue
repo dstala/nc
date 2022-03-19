@@ -567,11 +567,17 @@ export default {
         this.$emit('update:formParams', params)
       }
     },
-    hiddenColumns() {
-      return this.fields.filter(f => !f.show && !this.systemFieldsIds.includes(f.fk_column_id))
+    hiddenColumns: {
+      get() {
+        return this.fields.filter(f => !f.show && !this.systemFieldsIds.includes(f.fk_column_id))
+      },
+      set(v) {}
     },
-    columns() {
-      return this.fields.filter(f => f.show).sort((a, b) => a.order - b.order)
+    columns: {
+      get() {
+        return this.fields.filter(f => f.show).sort((a, b) => a.order - b.order)
+      },
+      set(v) {}
     }
   },
   watch: {
@@ -617,12 +623,13 @@ export default {
         element,
         oldIndex
       } = (event.added || event.moved || event.removed)
+
       if (event.added) {
-        element.show = true
+        this.$set(element, 'show', true)
       }
 
       if (event.removed) {
-        element.show = false
+        this.$set(element, 'show', false)
         this.saveOrUpdateOrderOrVisibility(element, oldIndex)
       } else {
         if (!this.columns.length || this.columns.length === 1) {
@@ -686,7 +693,9 @@ export default {
         ...o,
         [f.fk_column_id]: f
       }), {})
-      this.fields = this.meta.columns.map(c => ({
+
+      const meta = this.$store.state.meta.metas[this.meta.id]
+      this.fields = meta.columns.map(c => ({
         ...c,
         alias: c._cn,
         fk_column_id: c.id,
@@ -804,16 +813,24 @@ export default {
         const index = this.columns.length
         // this.columns = [...this.columns, col]
         col.order = (index ? this.columns[index - 1].order : 0) + 1
-        col.show = true
+        this.$set(col, 'show', true)
         this.$nextTick(() => {
           this.saveOrUpdateOrderOrVisibility(col, index)
         })
       }
     },
-    onNewColCreation(col) {
+    async onNewColCreation(col) {
       this.addNewColMenu = false
       this.addNewColModal = false
       this.$emit('onNewColCreation', col)
+      await this.$store.dispatch('meta/ActLoadMeta', {
+        env: this.nodes.env,
+        dbAlias: this.nodes.dbAlias,
+        id: this.meta.id,
+        force: true
+      })
+
+      await this.loadView()
     },
     async save() {
       try {

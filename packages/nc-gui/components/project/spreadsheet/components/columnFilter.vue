@@ -423,7 +423,6 @@ export default {
       this.saveOrUpdate(this.filters[index], index)
     },
     async saveOrUpdate(filter, i) {
-      debugger
       if (this.shared || !this._isUIAllowed('filterSync')) {
         // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
         this.$emit('updated')
