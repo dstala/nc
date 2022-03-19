@@ -90,6 +90,9 @@ export default class Hook implements HookType {
           // ...(param.operation
           //   ? { operation: param.operation?.toLowerCase?.() }
           //   : {})
+        },
+        orderBy: {
+          created_at: 'asc'
         }
       });
       await NocoCache.setList(CacheScope.HOOK, [param.fk_model_id], hooks);
