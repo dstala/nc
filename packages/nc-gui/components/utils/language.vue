@@ -36,7 +36,6 @@
 </template>
 
 <script>
-const order = l => ({ zh_CN: 10, en: 11, id: -2 })[l] || 0
 export default {
   name: 'Language',
   data: () => ({
@@ -46,8 +45,8 @@ export default {
       es: 'Español',
       fr: 'Français',
       id: 'Bahasa Indonesia',
-      it_IT: 'Italiano',
       ja: '日本語',
+      it_IT: 'Italiano',
       ko: '한국인',
       nl: 'Nederlandse',
       ru: 'Pусский',
