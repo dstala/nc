@@ -64,6 +64,15 @@ export default function formulaQueryBuilder(
             }
           }
           break;
+        case 'DATEADD':
+          if (pt.arguments[1].value) {
+            pt.callee.name = 'DATE_ADD';
+            return fn(pt, alias, prevBinaryOp);
+          } else if (pt.arguments[1].operator == '-') {
+            pt.callee.name = 'DATE_SUB';
+            return fn(pt, alias, prevBinaryOp);
+          }
+          break;
         case 'URL':
           return fn(
             {
@@ -89,15 +98,6 @@ export default function formulaQueryBuilder(
             alias,
             prevBinaryOp
           );
-          break;
-        case 'DATEADD':
-          if (pt.arguments[1].value) {
-            pt.callee.name = 'DATE_ADD';
-            return fn(pt, alias, prevBinaryOp);
-          } else if (pt.arguments[1].operator == '-') {
-            pt.callee.name = 'DATE_SUB';
-            return fn(pt, alias, prevBinaryOp);
-          }
           break;
         default:
           {
