@@ -1753,6 +1753,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
+          'numeric',          
           'serial',
           'serial2',
           'serial8',
@@ -1760,16 +1761,15 @@ export class PgUi {
           'float4',
           'float8',
           'smallint',
-          'smallserial',
-          'numeric'
+          'smallserial'
         ]
 
       case 'Decimal':
         return [
           'double precision',
+          'numeric',
           'float4',
-          'float8',
-          'numeric'
+          'float8'
         ]
 
       case 'Currency':
@@ -1781,13 +1781,13 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
+          'numeric',          
           'serial',
           'serial2',
           'serial8',
           'double precision',
           'money', 'float4',
-          'float8',
-          'numeric'
+          'float8'
         ]
 
       case 'Percent':
@@ -1799,6 +1799,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
+          'numeric',          
           'serial',
           'serial2',
           'serial8',
@@ -1806,8 +1807,7 @@ export class PgUi {
           'float4',
           'float8',
           'smallint',
-          'smallserial',
-          'numeric'
+          'smallserial'
         ]
 
       case 'Duration':
@@ -1819,6 +1819,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
+          'numeric',          
           'serial',
           'serial2',
           'serial8',
@@ -1826,8 +1827,7 @@ export class PgUi {
           'float4',
           'float8',
           'smallint',
-          'smallserial',
-          'numeric'
+          'smallserial'
         ]
 
       case 'Rating':
@@ -1839,6 +1839,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
+          'numeric',
           'serial',
           'serial2',
           'serial8',
@@ -1846,8 +1847,7 @@ export class PgUi {
           'float4',
           'float8',
           'smallint',
-          'smallserial',
-          'numeric'
+          'smallserial'
         ]
 
       case 'Formula':
