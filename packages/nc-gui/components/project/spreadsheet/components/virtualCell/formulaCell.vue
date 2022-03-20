@@ -9,7 +9,7 @@
     </template>
     <span class=" font-weight-bold">{{ column.colOptions.error }}</span>
   </v-tooltip>
-  <div v-else-if="urls" v-html="urls"></div>
+  <div v-else-if="urls" v-html="urls" />
   <div v-else>
     {{ row[column._cn] }}
   </div>
@@ -18,21 +18,22 @@
 <script>
 export default {
   name: 'FormulaCell',
-  props: ['column', 'row'],
+  props: { column: Object, row: Object },
   computed: {
-    urls: function() {
-      if(this.row[this.column._cn] ) {
-        let rawText = this.row[this.column._cn].toString();
-        let matchURLs = rawText.match(/URI::\((.*?)\)/g);
-        if(matchURLs) {
-          for(const url of matchURLs) {
-            let tmpuri = url.match(/URI::\((.*?)\)/)[1];
-            rawText = rawText.replace(url, '<a href="' + tmpuri + '" target="_blank">' + tmpuri + '</a>');
-          }
-          return rawText;
-        }
-      }
-      return false;
+    urls() {
+      if (!this.row[this.column._cn]) { return }
+
+      const rawText = this.row[this.column._cn].toString()
+      let found = false
+      const out = rawText.match(/URI::\((.*?)\)/g, (_, url) => {
+        found = true;
+        const a = document.createElement('a')
+        a.textContent = url
+        a.setAttribute('href', url)
+        return a.innerHTML
+      })
+
+      return found && out
     }
   }
 }
