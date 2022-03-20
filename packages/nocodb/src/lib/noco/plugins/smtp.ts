@@ -33,9 +33,9 @@ const input: XcForm = {
     },
     {
       key: 'ignoreTLS',
-      label: 'IgnoreTLS',
-      placeholder: 'IgnoreTLS',
-      type: XcType.SingleLineText,
+      label: 'Ignore TLS',
+      placeholder: 'Ignore TLS',
+      type: XcType.Checkbox,
       required: true
     },
     {
