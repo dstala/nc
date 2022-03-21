@@ -289,12 +289,19 @@ export default class Project implements ProjectType {
   }
 
   static async getBySlug(slug: string, ncMeta = Noco.ncMeta) {
-    // Todo: redis cache
-    const projectData = await ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
-      slug
-    });
+    let projectData =
+      slug &&
+      (await NocoCache.get(
+        `${CacheScope.PROJECT}:${slug}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!projectData) {
+      projectData = await ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
+        slug
+      });
+      await NocoCache.set(`${CacheScope.PROJECT}:${slug}`, projectData);
+    }
     const project = projectData && new Project(projectData);
-
     return project;
   }
 }

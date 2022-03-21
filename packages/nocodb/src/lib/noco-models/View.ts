@@ -119,8 +119,19 @@ export default class View implements ViewType {
     args: { slug: string; fk_model_id: string },
     ncMeta = Noco.ncMeta
   ) {
-    // todo: redis cache
-    const view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, args);
+    let view =
+      args &&
+      (await NocoCache.get(
+        `${CacheScope.VIEW}:${args.fk_model_id}:${args.slug}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!view) {
+      view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, args);
+      await NocoCache.set(
+        `${CacheScope.VIEW}:${args.fk_model_id}:${args.slug}}`,
+        view
+      );
+    }
 
     return view && new View(view);
   }
@@ -169,7 +180,6 @@ export default class View implements ViewType {
       },
     ncMeta = Noco.ncMeta
   ) {
-    // todo: redis cache by slug and id
     const order =
       (+(
         await ncMeta
@@ -216,6 +226,11 @@ export default class View implements ViewType {
       [view.fk_model_id],
       `${CacheScope.VIEW}:${view_id}`
     );
+
+    await this.getBySlug({
+      slug: insertObj.slug,
+      fk_model_id: insertObj.fk_model_id
+    });
 
     switch (view.type) {
       case ViewTypes.GRID:
