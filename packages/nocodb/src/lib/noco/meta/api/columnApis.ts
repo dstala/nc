@@ -314,6 +314,8 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
             const assocModel = await Model.insert(project.id, base.id, {
               tn: aTn,
               _tn: aTnAlias,
+              // todo: sanitize
+              slug: aTnAlias,
               mm: true,
               columns: associateTableCols
             });

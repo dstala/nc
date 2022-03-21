@@ -21,6 +21,8 @@ export async function formViewGet(req: Request, res: Response<FormType>) {
 export async function formViewCreate(req: Request<any, any>, res) {
   const view = await View.insert({
     ...req.body,
+    // todo: sanitize
+    slug: req.body.title,
     fk_model_id: req.params.tableId,
     type: ViewTypes.FORM
   });

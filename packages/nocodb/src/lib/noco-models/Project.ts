@@ -39,6 +39,7 @@ export default class Project implements ProjectType {
     projectBody: ProjectType & {
       created_at?;
       updated_at?;
+      slug?;
     },
     ncMeta = Noco.ncMeta
   ): Promise<Project> {
@@ -53,7 +54,8 @@ export default class Project implements ProjectType {
         description: projectBody.description,
         is_meta: projectBody.is_meta,
         created_at: projectBody.created_at,
-        updated_at: projectBody.updated_at
+        updated_at: projectBody.updated_at,
+        slug: projectBody.slug
       }
     );
 

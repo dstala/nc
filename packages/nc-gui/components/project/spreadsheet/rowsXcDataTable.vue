@@ -1405,9 +1405,9 @@ export default {
           pageInfo
         } = (await this.$api.data.viewList(
           'noco',
-          this.$store.state.project.project.title,
-          this.meta._tn,
-          this.selectedView.title,
+          this.$store.state.project.project.slug,
+          this.meta.slug,
+          this.selectedView.slug,
           {
             query: {
               ...this.queryParams,

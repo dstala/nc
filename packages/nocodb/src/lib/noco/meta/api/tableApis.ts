@@ -132,6 +132,8 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
   res.json(
     await Model.insert(project.id, base.id, {
       ...req.body,
+      // todo: sanitise
+      slug: req.body._tn,
       order: +(tables?.pop()?.order ?? 0) + 1
     })
   );
