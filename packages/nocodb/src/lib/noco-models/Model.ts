@@ -624,13 +624,21 @@ export default class Model implements TableType {
     },
     ncMeta = Noco.ncMeta
   ) {
-    // todo: redis cache
-    const modelData = await ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.MODELS,
-      param
-    );
+    const modelData =
+      param.project_id &&
+      param.base_id &&
+      param.slug &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${param.project_id}:${param.base_id}:${param.slug}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!modelData) {
+      await ncMeta.metaGet2(null, null, MetaTable.MODELS, param);
+      await NocoCache.set(
+        `${CacheScope.MODEL}:${param.project_id}:${param.base_id}:${param.slug}`,
+        modelData
+      );
+    }
     return modelData;
   }
 }
