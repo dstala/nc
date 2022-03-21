@@ -278,4 +278,21 @@ export default class Project implements ProjectType {
     }
     return projectData?.id && this.get(projectData?.id, ncMeta);
   }
+
+  static async getWithInfoBySlug(slug: string, ncMeta = Noco.ncMeta) {
+    const project = await this.getBySlug(slug, ncMeta);
+    if (project) await project.getBases(ncMeta);
+
+    return project;
+  }
+
+  static async getBySlug(slug: string, ncMeta = Noco.ncMeta) {
+    // Todo: redis cache
+    const projectData = await ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
+      slug
+    });
+    const project = projectData && new Project(projectData);
+
+    return project;
+  }
 }

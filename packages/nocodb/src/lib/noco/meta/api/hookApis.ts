@@ -13,11 +13,9 @@ export async function hookList(
   res: Response<HookListType>
 ) {
   // todo: pagination
-  res.json({
-    hooks: new PagedResponseImpl(
-      await Hook.list({ fk_model_id: req.params.tableId })
-    )
-  });
+  res.json(
+    new PagedResponseImpl(await Hook.list({ fk_model_id: req.params.tableId }))
+  );
 }
 
 export async function hookCreate(

@@ -147,7 +147,7 @@ export default {
       //   dbAlias: this.nodes.dbAlias
       // }, 'tableList'])
 
-      this.tables = result.tables.list
+      this.tables = result.list
     },
     checkLookupExist(v) {
       return (this.lookup.table && (this.meta.v || []).every(c => !(

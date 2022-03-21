@@ -114,6 +114,16 @@ export default class View implements ViewType {
     return view && new View(view);
   }
 
+  public static async getByTitle(
+    args: { title: string; fk_model_id: string },
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo: redis cache
+    const view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, args);
+
+    return view && new View(view);
+  }
+
   public static async list(modelId: string, ncMeta = Noco.ncMeta) {
     let viewsList = await NocoCache.getList(CacheScope.VIEW, [modelId]);
     if (!viewsList.length) {

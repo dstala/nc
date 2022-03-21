@@ -1675,31 +1675,39 @@ export default {
 
       const con = projectJson.envs._noco.db[0]
       const inflection = (con.meta && con.meta.inflection) || {}
+      try {
+        const result = (await this.$api.meta.projectCreate({
+          title: projectJson.title,
+          bases: [{
+            type: con.client,
+            config: con,
+            inflection_column: inflection.cn,
+            inflection_table: inflection.tn
+          }],
+          external: true
+        })).data
 
-      const result = (await this.$api.meta.projectCreate({
-        title: projectJson.title,
-        bases: [{ type: con.client, config: con, inflection_column: inflection.cn, inflection_table: inflection.tn }],
-        external: true
-      })).data
+        clearInterval(interv)
+        toast.goAway(100)
+        console.log('project created redirect to project page', projectJson, result)
 
-      clearInterval(interv)
-      toast.goAway(100)
-      console.log('project created redirect to project page', projectJson, result)
+        await this.$store.dispatch('project/ActLoadProjectInfo')
 
-      await this.$store.dispatch('project/ActLoadProjectInfo')
+        this.projectReloading = false
 
-      this.projectReloading = false
+        if (!this.edit && !this.allSchemas) {
+          this.$router.push({
+            path: `/nc/${result.id}`,
+            query: {
+              new: 1
+            }
+          })
+        }
 
-      if (!this.edit && !this.allSchemas) {
-        this.$router.push({
-          path: `/nc/${result.id}`,
-          query: {
-            new: 1
-          }
-        })
+        this.projectCreated = true
+      } catch (e) {
+        this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
       }
-
-      this.projectCreated = true
 
       this.projectReloading = false
     },

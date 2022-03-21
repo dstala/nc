@@ -713,7 +713,7 @@ export default {
 
       const hooks = await this.$api.meta.hookList(this.meta.id)
 
-      this.hooks = hooks.data.hooks.list.map((h) => {
+      this.hooks = hooks.data.list.map((h) => {
         h.notification = h.notification && JSON.parse(h.notification)
         // h.condition = h.condition && JSON.parse(h.condition)
 

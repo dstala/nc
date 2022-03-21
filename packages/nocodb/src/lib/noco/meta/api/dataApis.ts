@@ -6,65 +6,49 @@ import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import View from '../../../noco-models/View';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import Project from '../../../noco-models/Project';
 
 export async function dataList(req: Request, res: Response, next) {
-  try {
-    const view = await View.get(req.params.viewId);
+  const view = await View.get(req.params.viewId);
 
-    const model = await Model.getByIdOrName({
-      id: view?.fk_model_id || req.params.viewId
-    });
+  const model = await Model.getByIdOrName({
+    id: view?.fk_model_id || req.params.viewId
+  });
 
-    if (!model) return next(new Error('Table not found'));
+  if (!model) return next(new Error('Table not found'));
 
-    const base = await Base.get(model.base_id);
+  res.json(await getDataList(model, view, req));
+}
 
-    const baseModel = await Model.getBaseModelSQL({
-      id: model.id,
-      viewId: view?.id,
-      dbDriver: NcConnectionMgrv2.get(base)
-    });
+export async function dataListNew(req: Request, res: Response, next) {
+  const project = await Project.getWithInfoBySlug(req.params.projectName);
 
-    const key = `${model._tn}List`;
-    const requestObj = {
-      [key]: await baseModel.defaultResolverReq(req.query)
-    };
+  const model = await Model.getBySlug({
+    project_id: project.id,
+    base_id: project.bases?.[0]?.id,
+    slug: req.params.tableName
+  });
 
-    const listArgs: any = { ...req.query };
-    try {
-      listArgs.filterArr = JSON.parse(listArgs.filterArrJson);
-    } catch (e) {}
-    try {
-      listArgs.sortArr = JSON.parse(listArgs.sortArrJson);
-    } catch (e) {}
+  if (!model) return next(new Error('Table not found'));
 
-    const data = (
-      await nocoExecute(
-        requestObj,
-        {
-          [key]: async args => {
-            return await baseModel.list(args);
-          }
-        },
-        {},
-        listArgs
-      )
-    )?.[key];
+  res.json(await getDataList(model, null, req));
+}
 
-    const count = await baseModel.count(listArgs);
+export async function viewDataListNew(req: Request, res: Response, next) {
+  const project = await Project.getWithInfoBySlug(req.params.projectName);
+  const model = await Model.getBySlug({
+    project_id: project.id,
+    base_id: project.bases?.[0]?.id,
+    slug: req.params.tableName
+  });
+  const view = await View.getByTitle({
+    title: req.params.viewName,
+    fk_model_id: model.id
+  });
 
-    res.json({
-      data: new PagedResponseImpl(data, {
-        // todo:
-        totalRows: count,
-        pageSize: 25,
-        page: 1
-      })
-    });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ msg: e.message });
-  }
+  if (!model) return next(new Error('Table not found'));
+
+  res.json(await getDataList(model, view, req));
 }
 
 export async function mmList(req: Request, res: Response, next) {
@@ -282,8 +266,60 @@ async function dataDelete(req: Request, res: Response, next) {
   }
 }
 
+async function getDataList(model, view: View, req) {
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = `${model._tn}List`;
+  const requestObj = {
+    [key]: await baseModel.defaultResolverReq(req.query)
+  };
+
+  const listArgs: any = { ...req.query };
+  try {
+    listArgs.filterArr = JSON.parse(listArgs.filterArrJson);
+  } catch (e) {}
+  try {
+    listArgs.sortArr = JSON.parse(listArgs.sortArrJson);
+  } catch (e) {}
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return await baseModel.list(args);
+        }
+      },
+      {},
+      listArgs
+    )
+  )?.[key];
+
+  const count = await baseModel.count(listArgs);
+
+  return new PagedResponseImpl(data, {
+    // todo:
+    totalRows: count,
+    pageSize: 25,
+    page: 1
+  });
+}
+
 const router = Router({ mergeParams: true });
 router.get('/data/:viewId/', ncMetaAclMw(dataList));
+
+router.get('/data/:orgs/:projectName/:tableName', ncMetaAclMw(dataListNew));
+router.get(
+  '/data/:orgs/:projectName/:tableName/views/:viewName',
+  ncMetaAclMw(viewDataListNew)
+);
+
 router.post('/data/:viewId/', ncMetaAclMw(dataInsert));
 router.get('/data/:viewId/:rowId', ncMetaAclMw(dataRead));
 router.put('/data/:viewId/:rowId', ncMetaAclMw(dataUpdate));

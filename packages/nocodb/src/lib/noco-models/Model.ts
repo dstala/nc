@@ -608,4 +608,22 @@ export default class Model implements TableType {
       id
     );
   }
+
+  static async getBySlug(
+    param: {
+      project_id: string;
+      base_id: string | undefined;
+      slug: string;
+    },
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo: redis cache
+    const modelData = await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.MODELS,
+      param
+    );
+    return modelData;
+  }
 }

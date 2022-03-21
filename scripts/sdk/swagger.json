@@ -3023,6 +3023,154 @@
         }
       }
     },
+    "/data/{orgs}/{projectName}/{tableAlias}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "orgs",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectName",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableAlias",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "model-list",
+        "description": "",
+        "tags": [
+          "Data"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "",
+        "operationId": "model-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
+    "/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "orgs",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectName",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewName",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "view-list",
+        "description": "",
+        "tags": [
+          "Data"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "",
+        "operationId": "view-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      }
+    },
     "/data/{tableId}/export/{type}": {
       "parameters": [
         {
@@ -3471,6 +3619,67 @@
         }
       }
     },
+    "/data/{tableId}/{rowId}/{relationType}/{colId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "rowId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "colId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "relationType",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "mm-list",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "tags": [
+          "Data"
+        ]
+      }
+    },
     "/data/{tableId}/{rowId}": {
       "parameters": [
         {
@@ -3546,13 +3755,37 @@
         "description": ""
       }
     },
-    "/data/{tableId}/{rowId}/{relationType}/{colId}": {
+    "/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
-          "name": "tableId",
+          "name": "orgs",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectName",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "viewName",
           "in": "path",
           "required": true
         },
@@ -3563,37 +3796,14 @@
           "name": "rowId",
           "in": "path",
           "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "colId",
-          "in": "path",
-          "required": true
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "relationType",
-          "in": "path",
-          "required": true
         }
       ],
       "get": {
         "summary": "",
-        "operationId": "mm-list",
+        "operationId": "view-read",
         "responses": {
           "201": {
             "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "": {
             "content": {
               "application/json": {
                 "schema": {}
@@ -3605,6 +3815,134 @@
         "tags": [
           "Data"
         ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "view-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "view-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "description": ""
+      }
+    },
+    "/data/{orgs}/{projectName}/{tableAlias}/{rowId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "orgs",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "projectName",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "tableAlias",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "rowId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "",
+        "operationId": "model-read",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "",
+        "tags": [
+          "Data"
+        ]
+      },
+      "put": {
+        "summary": "",
+        "operationId": "model-update",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "model-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Data"
+        ],
+        "description": ""
       }
     },
     "/audits/comments": {
@@ -3908,27 +4246,22 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "hooks": {
-                      "type": "object",
-                      "properties": {
-                        "list": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 1,
-                          "items": {
-                            "$ref": "#/components/schemas/Hook"
-                          }
-                        },
-                        "pageInfo": {
-                          "$ref": "#/components/schemas/Paginated"
-                        }
-                      },
-                      "required": [
-                        "list",
-                        "pageInfo"
-                      ]
+                    "list": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/components/schemas/Hook"
+                      }
+                    },
+                    "pageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
                     }
-                  }
+                  },
+                  "required": [
+                    "list",
+                    "pageInfo"
+                  ]
                 }
               }
             }
@@ -4719,7 +5052,10 @@
             "type": "string"
           },
           "created_at": {},
-          "updated_at": {}
+          "updated_at": {},
+          "slug": {
+            "type": "string"
+          }
         }
       },
       "ProjectList": {
@@ -4755,30 +5091,21 @@
           }
         },
         "properties": {
-          "projects": {
-            "type": "object",
-            "required": [
-              "list",
-              "pageInfo"
-            ],
-            "properties": {
-              "list": {
-                "type": "array",
-                "uniqueItems": true,
-                "minItems": 1,
-                "items": {
-                  "$ref": "#/components/schemas/Project"
-                }
-              },
-              "pageInfo": {
-                "$ref": "#/components/schemas/Paginated"
-              }
+          "list": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/Project"
             }
+          },
+          "pageInfo": {
+            "$ref": "#/components/schemas/Paginated"
           }
         },
-        "required": [
-          "projects"
-        ]
+        "": {
+          "type": "string"
+        }
       },
       "Base": {
         "title": "Base",
@@ -5015,6 +5342,9 @@
           },
           "columnsById": {
             "type": "object"
+          },
+          "slug": {
+            "type": "string"
           }
         },
         "required": [
@@ -5105,6 +5435,9 @@
             "type": "number"
           },
           "fk_model_id": {
+            "type": "string"
+          },
+          "slug": {
             "type": "string"
           }
         }
@@ -5352,27 +5685,20 @@
           }
         },
         "properties": {
-          "tables": {
-            "type": "object",
-            "required": [
-              "list",
-              "pageInfo"
-            ],
-            "properties": {
-              "list": {
-                "type": "array",
-                "uniqueItems": true,
-                "minItems": 1,
-                "items": {
-                  "$ref": "#/components/schemas/Table"
-                }
-              },
-              "pageInfo": {
-                "$ref": "#/components/schemas/Paginated"
-              }
+          "list": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/Table"
             }
+          },
+          "pageInfo": {
+            "$ref": "#/components/schemas/Paginated"
           }
-        },
+        }
+
+      ,
         "required": [
           "tables"
         ]
@@ -6280,30 +6606,18 @@
           }
         },
         "properties": {
-          "hooks": {
-            "type": "object",
-            "required": [
-              "list",
-              "pageInfo"
-            ],
-            "properties": {
-              "list": {
-                "type": "array",
-                "uniqueItems": true,
-                "minItems": 1,
-                "items": {
-                  "type": "object"
-                }
-              },
-              "pageInfo": {
-                "$ref": "#/components/schemas/Paginated"
-              }
+          "list": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "type": "object"
             }
+          },
+          "pageInfo": {
+            "$ref": "#/components/schemas/Paginated"
           }
-        },
-        "required": [
-          "hooks"
-        ]
+        }
       },
       "SharedView": {
         "title": "SharedView",
@@ -6356,30 +6670,18 @@
           }
         },
         "properties": {
-          "sharedViews": {
-            "type": "object",
-            "required": [
-              "list",
-              "pageInfo"
-            ],
-            "properties": {
-              "list": {
-                "type": "array",
-                "uniqueItems": true,
-                "minItems": 1,
-                "items": {
-                  "$ref": "#/components/schemas/SharedView"
-                }
-              },
-              "pageInfo": {
-                "$ref": "#/components/schemas/Paginated"
-              }
+          "list": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/SharedView"
             }
+          },
+          "pageInfo": {
+            "$ref": "#/components/schemas/Paginated"
           }
-        },
-        "required": [
-          "sharedViews"
-        ]
+        }
       },
       "ViewList": {
         "description": "",
@@ -6414,33 +6716,24 @@
           }
         },
         "properties": {
-          "views": {
-            "type": "object",
-            "required": [
-              "list",
-              "pageInfo"
-            ],
-            "properties": {
-              "list": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Grid"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Form"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Kanban"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Gallery"
-                  }
-                ]
+          "list": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Grid"
               },
-              "pageInfo": {
-                "$ref": "#/components/schemas/Paginated"
+              {
+                "$ref": "#/components/schemas/Form"
+              },
+              {
+                "$ref": "#/components/schemas/Kanban"
+              },
+              {
+                "$ref": "#/components/schemas/Gallery"
               }
-            }
+            ]
+          },
+          "pageInfo": {
+            "$ref": "#/components/schemas/Paginated"
           }
         },
         "required": [
