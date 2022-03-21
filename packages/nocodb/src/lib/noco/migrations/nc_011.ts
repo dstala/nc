@@ -7,6 +7,7 @@ const up = async knex => {
   await knex.schema.createTable(MetaTable.PROJECT, table => {
     table.string('id', 128).primary();
     table.string('title');
+    table.string('slug');
     table.string('prefix');
     table.string('status');
     table.text('description');
@@ -62,6 +63,7 @@ const up = async knex => {
 
     table.string('tn');
     table.string('_tn');
+    table.string('slug');
 
     table.string('type').defaultTo('table');
 
@@ -317,6 +319,7 @@ const up = async knex => {
     table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
 
     table.string('title');
+    table.string('slug');
     table.integer('type');
     table.boolean('is_default');
     table.boolean('show_system_fields');

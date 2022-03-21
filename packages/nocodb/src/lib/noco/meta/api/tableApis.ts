@@ -93,57 +93,50 @@ export async function tableList(
   ).filter(t => tableViewMapping[t.id]);
 
   res // todo: pagination
-    .json({
-      tables: new PagedResponseImpl(
+    .json(
+      new PagedResponseImpl(
         req.query?.includeM2M
           ? tableList
           : (tableList.filter(t => !t.mm) as Model[])
       )
-    });
+    );
 }
 
-export async function tableCreate(
-  req: Request<any, any, TableReqType>,
-  res,
-  next
-) {
-  try {
-    console.log(req.params);
+export async function tableCreate(req: Request<any, any, TableReqType>, res) {
+  console.log(req.params);
 
-    const project = await Project.getWithInfo(req.params.projectId);
-    const base = project.bases.find(b => b.id === req.params.baseId);
-    const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
-    req.body.columns = req.body.columns?.map(c =>
-      getColumnPropsFromUIDT(c as any, base)
-    );
-    await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
+  const project = await Project.getWithInfo(req.params.projectId);
+  const base = project.bases.find(b => b.id === req.params.baseId);
+  const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
+  req.body.columns = req.body.columns?.map(c =>
+    getColumnPropsFromUIDT(c as any, base)
+  );
+  await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
 
-    const tables = await Model.list({
-      project_id: project.id,
-      base_id: base.id
-    });
+  const tables = await Model.list({
+    project_id: project.id,
+    base_id: base.id
+  });
 
-    Audit.insert({
-      project_id: project.id,
-      op_type: AuditOperationTypes.TABLE,
-      op_sub_type: AuditOperationSubTypes.CREATED,
-      user: (req as any)?.user?.email,
-      description: `created table ${req.body.tn} with alias ${req.body._tn}  `,
-      ip: (req as any).clientIp
-    }).then(() => {});
+  Audit.insert({
+    project_id: project.id,
+    op_type: AuditOperationTypes.TABLE,
+    op_sub_type: AuditOperationSubTypes.CREATED,
+    user: (req as any)?.user?.email,
+    description: `created table ${req.body.tn} with alias ${req.body._tn}  `,
+    ip: (req as any).clientIp
+  }).then(() => {});
 
-    mapDefaultPrimaryValue(req.body.columns);
+  mapDefaultPrimaryValue(req.body.columns);
 
-    res.json(
-      await Model.insert(project.id, base.id, {
-        ...req.body,
-        order: +(tables?.pop()?.order ?? 0) + 1
-      })
-    );
-  } catch (e) {
-    console.log(e);
-    next(e);
-  }
+  res.json(
+    await Model.insert(project.id, base.id, {
+      ...req.body,
+      // todo: sanitise
+      slug: req.body._tn,
+      order: +(tables?.pop()?.order ?? 0) + 1
+    })
+  );
 }
 
 export async function tableUpdate(

@@ -224,26 +224,26 @@
                         />
                       </v-list-item-title>
                     </v-list-item>-->
-<!--                    <v-divider />-->
-<!--                    <v-list-item-->
-<!--                      title-->
-<!--                      class="pt-2 nc-create-project-from-excel"-->
-<!--                      @click="onCreateProjectFromExcel()"-->
-<!--                    >-->
-<!--                      <v-list-item-icon class="mr-2">-->
-<!--                        <v-icon small class="">-->
-<!--                          mdi-file-excel-outline-->
-<!--                        </v-icon>-->
-<!--                      </v-list-item-icon>-->
-<!--                      <v-list-item-title>-->
-<!--                        <span-->
-<!--                          class="caption font-weight-regular"-->
-<!--                          v-html="-->
-<!--                            $t('activity.createProjectExtended.excel')-->
-<!--                          "-->
-<!--                        />-->
-<!--                      </v-list-item-title>-->
-<!--                    </v-list-item>-->
+                    <!--                    <v-divider />-->
+                    <!--                    <v-list-item-->
+                    <!--                      title-->
+                    <!--                      class="pt-2 nc-create-project-from-excel"-->
+                    <!--                      @click="onCreateProjectFromExcel()"-->
+                    <!--                    >-->
+                    <!--                      <v-list-item-icon class="mr-2">-->
+                    <!--                        <v-icon small class="">-->
+                    <!--                          mdi-file-excel-outline-->
+                    <!--                        </v-icon>-->
+                    <!--                      </v-list-item-icon>-->
+                    <!--                      <v-list-item-title>-->
+                    <!--                        <span-->
+                    <!--                          class="caption font-weight-regular"-->
+                    <!--                          v-html="-->
+                    <!--                            $t('activity.createProjectExtended.excel')-->
+                    <!--                          "-->
+                    <!--                        />-->
+                    <!--                      </v-list-item-title>-->
+                    <!--                    </v-list-item>-->
                   </v-list>
                 </v-menu>
               </template>
@@ -1082,7 +1082,7 @@ export default {
         //   'projectList'
         // ])
 
-        this.projects = (await this.$api.meta.projectList()).data.projects.list
+        this.projects = (await this.$api.meta.projectList()).data.list
 
         // todo: multiplex
         const user = this.$store.state.users.user
@@ -1181,7 +1181,6 @@ export default {
             //   .success('Successfully exported metadata')
             //   .goAway(3000)
             this.$toast.success(`${this.$t('msg.toast.exportMetadata')}`).goAway(3000)
-
           } catch (e) {
             console.log(e)
             this.$toast.error(e.message).goAway(3000)

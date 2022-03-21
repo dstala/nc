@@ -173,7 +173,7 @@ export default {
       //   dbAlias: this.nodes.dbAlias
       // }, 'tableList'])
 
-      this.tables = result.tables.list
+      this.tables = result.list
     },
     async onTableChange() {
       this.loadingColumns = true

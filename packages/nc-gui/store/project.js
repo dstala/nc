@@ -358,7 +358,7 @@ export const actions = {
         projectId: state.projectId,
         baseId: state.project.bases[0].id,
         includeM2M: rootState.windows.includeM2M || ''
-      })).data.tables.list
+      })).data.list
 
 
       // if (!result.data.list.length) {

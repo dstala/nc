@@ -39,6 +39,7 @@ export default class Project implements ProjectType {
     projectBody: ProjectType & {
       created_at?;
       updated_at?;
+      slug?;
     },
     ncMeta = Noco.ncMeta
   ): Promise<Project> {
@@ -53,7 +54,8 @@ export default class Project implements ProjectType {
         description: projectBody.description,
         is_meta: projectBody.is_meta,
         created_at: projectBody.created_at,
-        updated_at: projectBody.updated_at
+        updated_at: projectBody.updated_at,
+        slug: projectBody.slug
       }
     );
 
@@ -277,5 +279,22 @@ export default class Project implements ProjectType {
       return this.get(projectId);
     }
     return projectData?.id && this.get(projectData?.id, ncMeta);
+  }
+
+  static async getWithInfoBySlug(slug: string, ncMeta = Noco.ncMeta) {
+    const project = await this.getBySlug(slug, ncMeta);
+    if (project) await project.getBases(ncMeta);
+
+    return project;
+  }
+
+  static async getBySlug(slug: string, ncMeta = Noco.ncMeta) {
+    // Todo: redis cache
+    const projectData = await ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
+      slug
+    });
+    const project = projectData && new Project(projectData);
+
+    return project;
   }
 }

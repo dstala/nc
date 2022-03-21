@@ -59,10 +59,12 @@ export interface ProjectType {
   prefix?: string;
   created_at?: any;
   updated_at?: any;
+  slug?: string;
 }
 
 export interface ProjectListType {
-  projects: { list: ProjectType[]; pageInfo: PaginatedType };
+  list?: ProjectType[];
+  pageInfo?: PaginatedType;
 }
 
 export interface BaseType {
@@ -109,6 +111,7 @@ export interface TableType {
   order?: number;
   columns?: ColumnType[];
   columnsById?: object;
+  slug?: string;
 }
 
 export interface ViewType {
@@ -117,6 +120,7 @@ export interface ViewType {
   deleted?: boolean;
   order?: number;
   fk_model_id?: string;
+  slug?: string;
 }
 
 export interface TableInfoType {
@@ -156,7 +160,8 @@ export interface TableReqType {
 }
 
 export interface TableListType {
-  tables: { list: TableType[]; pageInfo: PaginatedType };
+  list?: TableType[];
+  pageInfo?: PaginatedType;
 }
 
 export interface FilterType {
@@ -399,7 +404,8 @@ export interface PaginatedType {
 }
 
 export interface HookListType {
-  hooks: { list: object[]; pageInfo: PaginatedType };
+  list?: object[];
+  pageInfo?: PaginatedType;
 }
 
 export interface SharedViewType {
@@ -410,14 +416,13 @@ export interface SharedViewType {
 }
 
 export interface SharedViewListType {
-  sharedViews: { list: SharedViewType[]; pageInfo: PaginatedType };
+  list?: SharedViewType[];
+  pageInfo?: PaginatedType;
 }
 
 export interface ViewListType {
-  views: {
-    list: GridType | FormType | KanbanType | GalleryType;
-    pageInfo: PaginatedType;
-  };
+  list?: GridType | FormType | KanbanType | GalleryType;
+  pageInfo?: PaginatedType;
 }
 
 export interface AttachmentType {
@@ -632,6 +637,10 @@ export interface SharedViewUpdatePayloadType {
 
 export type CreatePayloadType = any;
 
+export type ModelCreatePayloadType = any;
+
+export type ViewCreatePayloadType = any;
+
 export interface DataListPayloadType {
   password?: string;
   sorts?: SortType[];
@@ -680,6 +689,10 @@ export interface SharedViewMetaGetPayloadType {
 }
 
 export type UpdatePayloadType = any;
+
+export type ViewUpdateBodyType = any;
+
+export type ModelUpdatePayloadType = any;
 
 export interface CommentListParamsType {
   row_id: string;
@@ -3330,6 +3343,98 @@ export class Api<
      * No description
      *
      * @tags Data
+     * @name ModelList
+     * @request GET:/data/{orgs}/{projectName}/{tableAlias}
+     * @response `200` `any` OK
+     */
+    modelList: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ModelCreate
+     * @request POST:/data/{orgs}/{projectName}/{tableAlias}
+     * @response `200` `any` OK
+     */
+    modelCreate: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      data: ModelCreatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ViewList
+     * @request GET:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}
+     * @response `200` `any` OK
+     */
+    viewList: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ViewCreate
+     * @request POST:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}
+     * @response `200` `any` OK
+     */
+    viewCreate: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      data: ViewCreatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
      * @name CsvExport
      * @request GET:/data/{tableId}/export/{type}
      * @response `200` `any` OK
@@ -3342,6 +3447,29 @@ export class Api<
       this.request<any, any>({
         path: `/data/${tableId}/export/${type}`,
         method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name MmList
+     * @request GET:/data/{tableId}/{rowId}/{relationType}/{colId}
+     * @response `201` `any` Created
+     * @response `0` `any`
+     */
+    mmList: (
+      tableId: string,
+      rowId: string,
+      colId: string,
+      relationType: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${tableId}/${rowId}/${relationType}/${colId}`,
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -3403,22 +3531,138 @@ export class Api<
      * No description
      *
      * @tags Data
-     * @name MmList
-     * @request GET:/data/{tableId}/{rowId}/{relationType}/{colId}
+     * @name ViewRead
+     * @request GET:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
      * @response `201` `any` Created
-     * @response `0` `any`
      */
-    mmList: (
-      tableId: string,
+    viewRead: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
       rowId: string,
-      colId: string,
-      relationType: string,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/data/${tableId}/${rowId}/${relationType}/${colId}`,
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
         method: 'GET',
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ViewUpdate
+     * @request PUT:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
+     * @response `200` `any` OK
+     */
+    viewUpdate: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      rowId: string,
+      data: ViewUpdateBodyType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ViewDelete
+     * @request DELETE:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
+     * @response `200` `void` OK
+     */
+    viewDelete: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      rowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ModelRead
+     * @request GET:/data/{orgs}/{projectName}/{tableAlias}/{rowId}
+     * @response `201` `any` Created
+     */
+    modelRead: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      rowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/${rowId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ModelUpdate
+     * @request PUT:/data/{orgs}/{projectName}/{tableAlias}/{rowId}
+     * @response `200` `any` OK
+     */
+    modelUpdate: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      rowId: string,
+      data: ModelUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/${rowId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name ModelDelete
+     * @request DELETE:/data/{orgs}/{projectName}/{tableAlias}/{rowId}
+     * @response `200` `void` OK
+     */
+    modelDelete: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      rowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/${rowId}`,
+        method: 'DELETE',
         ...params,
       }),
   };

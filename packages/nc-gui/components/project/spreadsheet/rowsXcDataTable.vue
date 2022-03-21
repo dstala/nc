@@ -1388,18 +1388,33 @@ export default {
       try {
         // if (this.api) {
         // const { list, count } = await this.api.paginatedList(this.queryParams)
+        // const {
+        //   list,
+        //   pageInfo
+        // } = (await this.$api.data.list(
+        //   this.selectedViewId || this.meta.views[0].id,
+        //   {
+        //     query: {
+        //       ...this.queryParams,
+        //       ...(this._isUIAllowed('sortSync') ? {} : { sortArrJson: JSON.stringify(this.sortList) }),
+        //       ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
+        //     }
+        //   })).data.data
         const {
           list,
           pageInfo
-        } = (await this.$api.data.list(
-          this.selectedViewId || this.meta.views[0].id,
+        } = (await this.$api.data.viewList(
+          'noco',
+          this.$store.state.project.project.slug,
+          this.meta.slug,
+          this.selectedView.slug,
           {
             query: {
               ...this.queryParams,
               ...(this._isUIAllowed('sortSync') ? {} : { sortArrJson: JSON.stringify(this.sortList) }),
               ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
             }
-          })).data.data
+          })).data
 
         this.count = pageInfo.totalRows// count
         this.data = list.map(row => ({

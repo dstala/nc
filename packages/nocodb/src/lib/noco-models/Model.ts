@@ -43,6 +43,7 @@ export default class Model implements TableType {
 
   tn: string;
   _tn: string;
+  slug: string;
 
   mm: boolean;
 
@@ -102,7 +103,12 @@ export default class Model implements TableType {
   public static async insert(
     projectId,
     baseId,
-    model: TableReqType & { mm?: boolean; created_at?: any; updated_at?: any },
+    model: TableReqType & {
+      mm?: boolean;
+      created_at?: any;
+      updated_at?: any;
+      slug?: string;
+    },
     ncMeta = Noco.ncMeta
   ) {
     const { id } = await ncMeta.metaInsert2(
@@ -112,6 +118,7 @@ export default class Model implements TableType {
       {
         tn: model.tn,
         _tn: model._tn,
+        slug: model.slug,
         mm: !!model.mm,
         order:
           model.order ||
@@ -607,5 +614,23 @@ export default class Model implements TableType {
       },
       id
     );
+  }
+
+  static async getBySlug(
+    param: {
+      project_id: string;
+      base_id: string | undefined;
+      slug: string;
+    },
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo: redis cache
+    const modelData = await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.MODELS,
+      param
+    );
+    return modelData;
   }
 }

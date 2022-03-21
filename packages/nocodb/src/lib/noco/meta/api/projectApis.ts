@@ -25,6 +25,7 @@ import { customAlphabet } from 'nanoid';
 import Noco from '../../Noco';
 import isDocker from 'is-docker';
 import { packageVersion } from 'nc-help';
+import { NcError } from './helpers/catchError';
 
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
 
@@ -55,13 +56,13 @@ export async function projectList(
     const projects = await Project.list(req.query);
 
     res // todo: pagination
-      .json({
-        projects: new PagedResponseImpl(projects, {
+      .json(
+        new PagedResponseImpl(projects, {
           totalRows: projects.length,
           pageSize: projects.length,
           page: 1
         })
-      });
+      );
   } catch (e) {
     console.log(e);
     next(e);
@@ -82,49 +83,49 @@ export async function projectDelete(
 
 async function projectCreate(
   req: Request<any, any, ProjectCreatePayloadType>,
-  res,
-  next
+  res
 ) {
-  try {
-    const projectBody = req.body;
-    if (!projectBody.external) {
-      const ranId = nanoid();
-      projectBody.prefix = `nc_${ranId}__`;
-      projectBody.is_meta = true;
-      const db = Noco.getConfig().meta?.db;
-      projectBody.bases = [
-        {
-          type: db?.client,
-          config: null,
-          is_meta: true
-        }
-      ];
-    } else {
-      projectBody.is_meta = false;
-    }
-
-    const project = await Project.createProject(projectBody);
-    await ProjectUser.insert({
-      fk_user_id: (req as any).user.id,
-      project_id: project.id,
-      roles: 'owner'
-    });
-
-    // await ProjectMgrv2.getSqlMgr(project).projectOpenByWeb();
-    await syncMigration(project);
-
-    // todo: if existing table create models
-
-    for (const base of await project.getBases()) {
-      await populateMeta(base, project);
-      delete base.config;
-    }
-
-    res.json(project);
-  } catch (e) {
-    console.log(e);
-    next(e);
+  const projectBody = req.body;
+  if (!projectBody.external) {
+    const ranId = nanoid();
+    projectBody.prefix = `nc_${ranId}__`;
+    projectBody.is_meta = true;
+    const db = Noco.getConfig().meta?.db;
+    projectBody.bases = [
+      {
+        type: db?.client,
+        config: null,
+        is_meta: true
+      }
+    ];
+  } else {
+    projectBody.is_meta = false;
   }
+
+  if (await Project.getBySlug(projectBody?.title)) {
+    NcError.badRequest('Project title already in use');
+  }
+  // todo: sanitize
+  projectBody.slug = projectBody.title;
+
+  const project = await Project.createProject(projectBody);
+  await ProjectUser.insert({
+    fk_user_id: (req as any).user.id,
+    project_id: project.id,
+    roles: 'owner'
+  });
+
+  // await ProjectMgrv2.getSqlMgr(project).projectOpenByWeb();
+  await syncMigration(project);
+
+  // todo: if existing table create models
+
+  for (const base of await project.getBases()) {
+    await populateMeta(base, project);
+    delete base.config;
+  }
+
+  res.json(project);
 }
 
 async function populateMeta(base: Base, project: Project): Promise<any> {
@@ -216,6 +217,8 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       models2[table.tn] = await Model.insert(project.id, base.id, {
         tn: table.tn,
         _tn: meta._tn,
+        // todo: sanitize
+        slug: meta._tn,
         type: table.type || 'table',
         order: table.order
       });
@@ -361,6 +364,8 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       models2[table.tn] = await Model.insert(project.id, base.id, {
         tn: table.tn,
         _tn: meta._tn,
+        // todo: sanitize
+        slug: meta._tn,
         type: ModelTypes.VIEW,
         order: table.order
       });

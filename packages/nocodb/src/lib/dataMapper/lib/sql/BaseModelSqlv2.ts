@@ -794,6 +794,7 @@ class BaseModelSqlv2 {
 
   async insert(data, trx?, cookie?) {
     try {
+      // todo: filter based on view
       const insertObj = await this.model.mapAliasToColumn(data);
 
       await this.validate(insertObj);

@@ -7,12 +7,18 @@ import Hook from '../../../../noco-models/Hook';
 import GridViewColumn from '../../../../noco-models/GridViewColumn';
 import FormViewColumn from '../../../../noco-models/FormViewColumn';
 import GalleryViewColumn from '../../../../noco-models/GalleryViewColumn';
+import Project from '../../../../noco-models/Project';
 
 export default async (req, res, next) => {
   try {
     const { params } = req;
 
     // extract project id based on request path params
+    if (params.projectName) {
+      const project = await Project.getBySlug(params.projectName);
+      req.ncProjectId = project.id;
+      res.locals.project = project;
+    }
     if (params.projectId) {
       req.ncProjectId = params.projectId;
     } else if (req.query.project_id) {

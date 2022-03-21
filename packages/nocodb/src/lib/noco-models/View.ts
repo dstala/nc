@@ -24,6 +24,7 @@ const { v4: uuidv4 } = require('uuid');
 export default class View implements ViewType {
   id?: string;
   title?: string;
+  slug?: string;
   uuid?: string;
   password?: string;
   show: boolean;
@@ -114,6 +115,16 @@ export default class View implements ViewType {
     return view && new View(view);
   }
 
+  public static async getBySlug(
+    args: { slug: string; fk_model_id: string },
+    ncMeta = Noco.ncMeta
+  ) {
+    // todo: redis cache
+    const view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, args);
+
+    return view && new View(view);
+  }
+
   public static async list(modelId: string, ncMeta = Noco.ncMeta) {
     let viewsList = await NocoCache.getList(CacheScope.VIEW, [modelId]);
     if (!viewsList.length) {
@@ -154,9 +165,11 @@ export default class View implements ViewType {
         copy_from_id?: string;
         created_at?;
         updated_at?;
+        slug?;
       },
     ncMeta = Noco.ncMeta
   ) {
+    // todo: redis cache by slug and id
     const order =
       (+(
         await ncMeta
@@ -171,6 +184,7 @@ export default class View implements ViewType {
     const insertObj = {
       id: view.id,
       title: view.title,
+      slug: view.slug || view.title,
       show: true,
       is_default: view.is_default,
       order,
