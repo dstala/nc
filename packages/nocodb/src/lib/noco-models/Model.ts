@@ -616,11 +616,15 @@ export default class Model implements TableType {
     );
   }
 
-  static async getBySlug(
-    param: {
+  static async getByAliasOrId(
+    {
+      project_id,
+      base_id,
+      aliasOrId
+    }: {
       project_id: string;
       base_id: string | undefined;
-      slug: string;
+      aliasOrId: string;
     },
     ncMeta = Noco.ncMeta
   ) {
@@ -629,7 +633,22 @@ export default class Model implements TableType {
       null,
       null,
       MetaTable.MODELS,
-      param
+      { project_id, base_id },
+      null,
+      {
+        _or: [
+          {
+            id: {
+              eq: aliasOrId
+            }
+          },
+          {
+            _tn: {
+              eq: aliasOrId
+            }
+          }
+        ]
+      }
     );
     return modelData;
   }

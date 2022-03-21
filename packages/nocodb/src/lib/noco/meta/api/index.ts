@@ -31,6 +31,7 @@ import metaDiffApis from './metaDiffApis';
 import cacheApis from './cacheApis';
 import apiTokenApis from './apiTokenApis';
 import hookFilterApis from './hookFilterApis';
+import dataAliasApis from './dataAliasApis';
 
 export default function(router: Router) {
   initStrategies(router);
@@ -38,7 +39,10 @@ export default function(router: Router) {
   utilApis(router);
 
   router.use(columnApis);
+
   router.use(dataApis);
+  router.use(dataAliasApis);
+
   router.use(sortApis);
   router.use(filterApis);
   router.use(viewColumnApis);

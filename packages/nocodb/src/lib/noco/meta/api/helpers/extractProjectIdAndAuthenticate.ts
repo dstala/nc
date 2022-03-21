@@ -15,7 +15,7 @@ export default async (req, res, next) => {
 
     // extract project id based on request path params
     if (params.projectName) {
-      const project = await Project.getBySlug(params.projectName);
+      const project = await Project.getByTitle(params.projectName);
       req.ncProjectId = project.id;
       res.locals.project = project;
     }

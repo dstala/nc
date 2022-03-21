@@ -115,12 +115,32 @@ export default class View implements ViewType {
     return view && new View(view);
   }
 
-  public static async getBySlug(
-    args: { slug: string; fk_model_id: string },
+  public static async getByTitleOrId(
+    { fk_model_id, titleOrId }: { titleOrId: string; fk_model_id: string },
     ncMeta = Noco.ncMeta
   ) {
     // todo: redis cache
-    const view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, args);
+    const view = await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.VIEWS,
+      { fk_model_id },
+      null,
+      {
+        _or: [
+          {
+            id: {
+              eq: titleOrId
+            }
+          },
+          {
+            title: {
+              eq: titleOrId
+            }
+          }
+        ]
+      }
+    );
 
     return view && new View(view);
   }
