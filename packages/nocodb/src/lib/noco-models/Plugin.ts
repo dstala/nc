@@ -1,6 +1,7 @@
 import { PluginType } from 'nc-common';
-import { MetaTable } from '../utils/globals';
+import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
+import NocoCache from '../noco-cache/NocoCache';
 
 export default class Plugin implements PluginType {
   id?: string;
@@ -27,38 +28,56 @@ export default class Plugin implements PluginType {
   }
 
   public static async get(pluginId: string, ncMeta = Noco.ncMeta) {
-    // todo: redis - cache
-    const plugin = await ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.PLUGIN,
-      pluginId
-    );
+    let plugin =
+      pluginId &&
+      (await NocoCache.get(
+        `${CacheScope.PLUGIN}:${pluginId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!plugin) {
+      plugin = await ncMeta.metaGet2(null, null, MetaTable.PLUGIN, pluginId);
+      await NocoCache.set(`${CacheScope.PLUGIN}:${pluginId}`, plugin);
+    }
     return plugin && new Plugin(plugin);
   }
 
   static async list(ncMeta = Noco.ncMeta) {
-    // todo: redis - cache
-    return await ncMeta.metaList2(null, null, MetaTable.PLUGIN);
+    const pluginList = await NocoCache.getList(CacheScope.PLUGIN, []);
+    if (!pluginList.length) {
+      await ncMeta.metaList2(null, null, MetaTable.PLUGIN);
+      await NocoCache.setList(CacheScope.PLUGIN, [], pluginList);
+    }
+    return pluginList;
   }
+
   static async count(ncMeta = Noco.ncMeta): Promise<number> {
     return (await ncMeta.knex(MetaTable.PLUGIN).count('id', { as: 'count' }))
       ?.count;
   }
 
   public static async update(pluginId: string, plugin: Partial<PluginType>) {
-    // todo: redis - cache
+    const updateObj = {
+      input:
+        plugin.input && typeof plugin.input === 'object'
+          ? JSON.stringify(plugin.input)
+          : plugin.input,
+      active: plugin.active
+    };
+    // get existing cache
+    const key = `${CacheScope.PLUGIN}:${pluginId}`;
+    let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+    // update alias
+    if (o) {
+      o = { ...o, ...updateObj };
+      // set cache
+      await NocoCache.set(key, o);
+    }
+    // set meta
     await Noco.ncMeta.metaUpdate(
       null,
       null,
       MetaTable.PLUGIN,
-      {
-        input:
-          plugin.input && typeof plugin.input === 'object'
-            ? JSON.stringify(plugin.input)
-            : plugin.input,
-        active: plugin.active
-      },
+      updateObj,
       pluginId
     );
 
@@ -66,11 +85,18 @@ export default class Plugin implements PluginType {
   }
 
   public static async isPluginActive(title: string) {
-    // todo: redis - cache
-    const plugin = await Noco.ncMeta.metaGet2(null, null, MetaTable.PLUGIN, {
-      title
-    });
-
+    const plugin =
+      title &&
+      (await NocoCache.get(
+        `${CacheScope.PLUGIN}:${title}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!plugin) {
+      await Noco.ncMeta.metaGet2(null, null, MetaTable.PLUGIN, {
+        title
+      });
+      await NocoCache.set(`${CacheScope.PLUGIN}:${title}`, !!plugin?.active);
+    }
     return !!plugin?.active;
   }
 }
