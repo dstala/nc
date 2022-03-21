@@ -42,8 +42,12 @@ const parseConditionV2 = async (
 
     return qbP => {
       qbP.where(qb => {
-        for (const qb1 of qbs) {
-          qb.andWhere(qb1);
+        for (const [i, qb1] of Object.entries(qbs)) {
+          qb[
+            _filter[i].logical_op?.toLowerCase() === 'or'
+              ? 'orWhere'
+              : 'andWhere'
+          ](qb1);
         }
       });
     };
@@ -55,17 +59,17 @@ const parseConditionV2 = async (
     );
 
     return qbP => {
-      qbP.where(qb => {
-        if (filter.logical_op?.toLowerCase() === 'or') {
-          for (const qb1 of qbs) {
-            qb.orWhere(qb1);
-          }
-        } else {
-          for (const qb1 of qbs) {
-            qb.andWhere(qb1);
+      qbP[filter.logical_op?.toLowerCase() === 'or' ? 'orWhere' : 'andWhere'](
+        qb => {
+          for (const [i, qb1] of Object.entries(qbs)) {
+            qb[
+              children[i].logical_op?.toLowerCase() === 'or'
+                ? 'orWhere'
+                : 'andWhere'
+            ](qb1);
           }
         }
-      });
+      );
     };
   } else {
     const column = await filter.getColumn();

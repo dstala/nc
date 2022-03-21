@@ -3057,6 +3057,29 @@
         "tags": [
           "Data"
         ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "fields"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "sort"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "where"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3134,6 +3157,29 @@
         "description": "",
         "tags": [
           "Data"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "fields"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "sort"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "where"
+          }
         ],
         "responses": {
           "200": {
@@ -3244,6 +3290,7 @@
             }
           }
         },
+
         "tags": [
           "Public"
         ],
@@ -5696,9 +5743,7 @@
           "pageInfo": {
             "$ref": "#/components/schemas/Paginated"
           }
-        }
-
-      ,
+        },
         "required": [
           "tables"
         ]

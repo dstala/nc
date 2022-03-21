@@ -355,7 +355,6 @@ async function migrateProjectModels(
           tn: modelData.title,
           _tn: modelData.alias,
           // todo: sanitize
-          slug: modelData.alias,
           type: modelData.type === 'table' ? ModelTypes.TABLE : ModelTypes.VIEW,
           created_at: modelData.created_at,
           updated_at: modelData.updated_at,

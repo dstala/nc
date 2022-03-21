@@ -24,6 +24,7 @@ import {
   AuditOperationTypes,
   isSystemColumn,
   RelationTypes,
+  SortType,
   ViewTypes
 } from 'nc-common';
 import formSubmissionEmailTemplate from '../../../noco/common/formSubmissionEmailTemplate';
@@ -94,35 +95,57 @@ class BaseModelSqlv2 {
       offset?;
       filterArr?: Filter[];
       sortArr?: Sort[];
+      sort?: string | string[];
     } = {},
     ignoreFilterSort = false
   ): Promise<any> {
-    const { where, ...rest } = this._getListArgs(args);
+    const { where, ...rest } = this._getListArgs(args as any);
 
     const qb = this.dbDriver(this.model.tn);
     await this.selectObject({ qb });
     qb.xwhere(where, await this.model.getAliasColMapping());
 
-    /*    await qb.conditionv2(
-          await Filter.getFilterObject({ modelId: this.model.id })
-        );*/
-    await this.model.getColumns();
+    const aliasColObjMap = (await this.model.getColumns()).reduce(
+      (sortAgg, c) => ({ ...sortAgg, [c._cn]: c }),
+      {}
+    );
+
+    let sorts = extractSortsObject(args?.sort, aliasColObjMap);
+
+    const filterObj = extractFilterFromXwhere(args?.where, aliasColObjMap);
+
+    console.log(filterObj);
 
     // todo: replace with view id
     if (!ignoreFilterSort) {
       if (this.viewId) {
         await conditionV2(
           [
-            ...((await Filter.rootFilterList({ viewId: this.viewId })) || []),
+            new Filter({
+              children:
+                (await Filter.rootFilterList({ viewId: this.viewId })) || [],
+              is_group: true
+            }),
+            new Filter({
+              children: args.filterArr || [],
+              is_group: true,
+              logical_op: 'and'
+            }),
+            new Filter({
+              children: filterObj,
+              is_group: true,
+              logical_op: 'and'
+            }),
             ...(args.filterArr || [])
           ],
           qb,
           this.dbDriver
         );
 
-        const sorts = args.sortArr?.length
-          ? args.sortArr
-          : await Sort.list({ viewId: this.viewId });
+        if (!sorts)
+          sorts = args.sortArr?.length
+            ? args.sortArr
+            : await Sort.list({ viewId: this.viewId });
 
         await sortV2(sorts, qb, this.dbDriver);
 
@@ -212,7 +235,13 @@ class BaseModelSqlv2 {
       };
     }
 
-    const fields = query?.fields || query?.f;
+    let fields = query?.fields || query?.f;
+    if (fields && fields !== '*') {
+      fields = Array.isArray(fields) ? fields : fields.split(',');
+    } else {
+      fields = null;
+    }
+
     let allowedCols = null;
     if (this.viewId)
       allowedCols = (await View.getColumns(this.viewId)).reduce(
@@ -222,9 +251,7 @@ class BaseModelSqlv2 {
         }),
         {}
       );
-    if (fields && fields !== '*') {
-      return fields.split(',').reduce((obj, f) => ({ ...obj, [f]: 1 }), {});
-    }
+
     const view = await View.get(this.viewId);
 
     return this.model.getColumns().then(columns =>
@@ -235,7 +262,8 @@ class BaseModelSqlv2 {
             [col._cn]:
               allowedCols && (!includePkByDefault || !col.pk)
                 ? allowedCols[col.id] &&
-                  (!isSystemColumn(col) || view.show_system_fields)
+                  (!isSystemColumn(col) || view.show_system_fields) &&
+                  (!fields?.length || fields.include(col._cn))
                 : 1
           }),
           {}
@@ -1286,6 +1314,110 @@ class BaseModelSqlv2 {
     }
     return true;
   }
+}
+
+function extractSortsObject(
+  _sorts: string | string[],
+  aliasColObjMap: { [columnAlias: string]: Column }
+): Sort[] | void {
+  if (!_sorts?.length) return;
+
+  let sorts = _sorts;
+
+  if (!Array.isArray(sorts)) sorts = sorts.split(',');
+
+  return sorts.map(s => {
+    const sort: SortType = { direction: 'asc' };
+    if (s.startsWith('-')) {
+      sort.direction = 'desc';
+      sort.fk_column_id = aliasColObjMap[s.slice(1)]?.id;
+    } else sort.fk_column_id = aliasColObjMap[s]?.id;
+
+    return new Sort(sort);
+  });
+}
+
+function extractFilterFromXwhere(
+  str,
+  aliasColObjMap: { [columnAlias: string]: Column }
+) {
+  if (!str) {
+    return [];
+  }
+
+  let nestedArrayConditions = [];
+
+  let openIndex = str.indexOf('((');
+
+  if (openIndex === -1) openIndex = str.indexOf('(~');
+
+  let nextOpenIndex = openIndex;
+  let closingIndex = str.indexOf('))');
+
+  // if it's a simple query simply return array of conditions
+  if (openIndex === -1) {
+    if (str && str != '~not')
+      nestedArrayConditions = str.split(
+        /(?=~(?:or(?:not)?|and(?:not)?|not)\()/
+      );
+    return extractCondition(nestedArrayConditions || [], aliasColObjMap);
+  }
+
+  // iterate until finding right closing
+  while (
+    (nextOpenIndex = str
+      .substring(0, closingIndex)
+      .indexOf('((', nextOpenIndex + 1)) != -1
+  ) {
+    closingIndex = str.indexOf('))', closingIndex + 1);
+  }
+
+  if (closingIndex === -1)
+    throw new Error(
+      `${str
+        .substring(0, openIndex + 1)
+        .slice(-10)} : Closing bracket not found`
+    );
+
+  // getting operand starting index
+  const operandStartIndex = str.lastIndexOf('~', openIndex);
+  const operator =
+    operandStartIndex != -1
+      ? str.substring(operandStartIndex + 1, openIndex)
+      : '';
+  const lhsOfNestedQuery = str.substring(0, openIndex);
+
+  nestedArrayConditions.push(
+    ...extractFilterFromXwhere(lhsOfNestedQuery, aliasColObjMap),
+    // calling recursively for nested query
+    new Filter({
+      is_group: true,
+      logical_op: operator,
+      children: extractFilterFromXwhere(
+        str.substring(openIndex + 1, closingIndex + 1),
+        aliasColObjMap
+      )
+    }),
+    // RHS of nested query(recursion)
+    ...extractFilterFromXwhere(str.substring(closingIndex + 2), aliasColObjMap)
+  );
+  return nestedArrayConditions;
+}
+
+function extractCondition(nestedArrayConditions, aliasColObjMap) {
+  return nestedArrayConditions?.map(str => {
+    // @ts-ignore
+    const [_, logicOp, alias, op, value] = str.match(
+      /(?:~(and|or|not))?\((.*),(\w+),(.*)\)/
+    );
+
+    return new Filter({
+      comparison_op: op,
+      fk_column_id: aliasColObjMap[alias]?.id,
+      logical_op: logicOp,
+      value
+    });
+  });
 }
 
 export { BaseModelSqlv2 };

@@ -1404,15 +1404,19 @@ export default {
           list,
           pageInfo
         } = (await this.$api.data.viewList(
-          'noco',
-          this.$store.state.project.project.slug,
-          this.meta.slug,
-          this.selectedView.slug,
+          {
+            orgs: 'noco',
+            projectName: this.$store.state.project.project.slug,
+            tableAlias: this.meta.slug,
+            viewName: this.selectedView.slug
+          },
           {
             query: {
               ...this.queryParams,
               ...(this._isUIAllowed('sortSync') ? {} : { sortArrJson: JSON.stringify(this.sortList) }),
-              ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
+              ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) }),
+              sort: ['-FirstName'],
+              where: '(FirstName,like,%ro)~or((FirstName,like,%a)~and(FirstName,like,%e%))'
             }
           })).data
 
