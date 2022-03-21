@@ -102,7 +102,7 @@ async function projectCreate(
     projectBody.is_meta = false;
   }
 
-  if (await Project.getBySlug(projectBody?.title)) {
+  if (await Project.getByTitle(projectBody?.title)) {
     NcError.badRequest('Project title already in use');
   }
   // todo: sanitize

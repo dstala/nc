@@ -231,6 +231,13 @@ export default class Project implements ProjectType {
           projectId
         );
       }
+      if (o.title && updateObj.title && o.title !== updateObj.title) {
+        await NocoCache.del(`${CacheScope.PROJECT}:${o.title}`);
+        await NocoCache.set(
+          `${CacheScope.PROJECT}:${updateObj.title}`,
+          projectId
+        );
+      }
       o = { ...o, ...updateObj };
       // set cache
       await NocoCache.set(key, o);
@@ -253,6 +260,9 @@ export default class Project implements ProjectType {
     const project = await this.get(projectId);
     if (project.uuid) {
       await NocoCache.del(`${CacheScope.PROJECT}:${project.uuid}`);
+    }
+    if (project.title) {
+      await NocoCache.del(`${CacheScope.PROJECT}:${project.title}`);
     }
     await NocoCache.deepDel(
       CacheScope.PROJECT,
@@ -281,27 +291,29 @@ export default class Project implements ProjectType {
     return projectData?.id && this.get(projectData?.id, ncMeta);
   }
 
-  static async getWithInfoBySlug(slug: string, ncMeta = Noco.ncMeta) {
-    const project = await this.getBySlug(slug, ncMeta);
+  static async getWithInfoByTitle(title: string, ncMeta = Noco.ncMeta) {
+    const project = await this.getByTitle(title, ncMeta);
     if (project) await project.getBases(ncMeta);
 
     return project;
   }
 
-  static async getBySlug(slug: string, ncMeta = Noco.ncMeta) {
-    let projectData =
-      slug &&
+  static async getByTitle(title: string, ncMeta = Noco.ncMeta) {
+    const projectId =
+      title &&
       (await NocoCache.get(
-        `${CacheScope.PROJECT}:${slug}`,
+        `${CacheScope.PROJECT}:${title}`,
         CacheGetType.TYPE_OBJECT
       ));
-    if (!projectData) {
-      projectData = await ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
-        slug
+    let projectData = null;
+    if (!projectId) {
+      projectData = await Noco.ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
+        title
       });
-      await NocoCache.set(`${CacheScope.PROJECT}:${slug}`, projectData);
+      await NocoCache.set(`${CacheScope.PROJECT}:${title}`, projectData?.id);
+    } else {
+      return this.get(projectId);
     }
-    const project = projectData && new Project(projectData);
-    return project;
+    return projectData?.id && this.get(projectData?.id, ncMeta);
   }
 }

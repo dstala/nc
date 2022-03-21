@@ -616,29 +616,40 @@ export default class Model implements TableType {
     );
   }
 
-  static async getBySlug(
-    param: {
+  static async getByAliasOrId(
+    {
+      project_id,
+      base_id,
+      aliasOrId
+    }: {
       project_id: string;
       base_id: string | undefined;
-      slug: string;
+      aliasOrId: string;
     },
     ncMeta = Noco.ncMeta
   ) {
-    const modelData =
-      param.project_id &&
-      param.base_id &&
-      param.slug &&
-      (await NocoCache.get(
-        `${CacheScope.MODEL}:${param.project_id}:${param.base_id}:${param.slug}`,
-        CacheGetType.TYPE_OBJECT
-      ));
-    if (!modelData) {
-      await ncMeta.metaGet2(null, null, MetaTable.MODELS, param);
-      await NocoCache.set(
-        `${CacheScope.MODEL}:${param.project_id}:${param.base_id}:${param.slug}`,
-        modelData
-      );
-    }
+
+    const modelData = await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.MODELS,
+      { project_id, base_id },
+      null,
+      {
+        _or: [
+          {
+            id: {
+              eq: aliasOrId
+            }
+          },
+          {
+            _tn: {
+              eq: aliasOrId
+            }
+          }
+        ]
+      }
+    );
     return modelData;
   }
 }
