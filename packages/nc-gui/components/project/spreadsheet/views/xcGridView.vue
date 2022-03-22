@@ -605,7 +605,6 @@ export default {
 
           if (e.ctrlKey ||
             e.altKey ||
-            e.shiftKey ||
             e.metaKey) {
             return
           }
