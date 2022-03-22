@@ -633,7 +633,7 @@ export default class Model implements TableType {
       base_id &&
       aliasOrId &&
       (await NocoCache.get(
-        `${CacheScope.MODEL}:${project_id}:${project_id}:${aliasOrId}`,
+        `${CacheScope.MODEL}:${project_id}:${base_id}:${aliasOrId}`,
         CacheGetType.TYPE_OBJECT
       ));
     if (!modelId) {
@@ -659,13 +659,10 @@ export default class Model implements TableType {
         }
       );
       await NocoCache.set(
-        `${CacheScope.MODEL}:${project_id}:${project_id}:${aliasOrId}`,
+        `${CacheScope.MODEL}:${project_id}:${base_id}:${aliasOrId}`,
         model.id
       );
-      await NocoCache.set(
-        `${CacheScope.MODEL}:${project_id}:${project_id}:${aliasOrId}`,
-        model
-      );
+      await NocoCache.set(`${CacheScope.MODEL}:${model.id}`, model);
       return model && new Model(model);
     }
     return modelId && this.get(modelId);
