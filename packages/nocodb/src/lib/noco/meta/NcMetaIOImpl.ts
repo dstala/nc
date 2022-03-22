@@ -9,6 +9,7 @@ import XcMigrationSource from '../common/XcMigrationSource';
 import NcMetaIO, { META_TABLES } from './NcMetaIO';
 import NcConnectionMgr from '../common/NcConnectionMgr';
 import { MetaTable } from '../../utils/globals';
+import XcMigrationSourcev2 from '../common/XcMigrationSourcev2';
 
 // import { nanoid } from 'nanoid';
 /*import { v4 as uuidv4 } from 'uuid';*/
@@ -107,6 +108,10 @@ export default class NcMetaIOImpl extends NcMetaIO {
     await this.connection.migrate.latest({
       migrationSource: new XcMigrationSource(),
       tableName: 'xc_knex_migrations'
+    });
+    await this.connection.migrate.latest({
+      migrationSource: new XcMigrationSourcev2(),
+      tableName: 'xc_knex_migrationsv2'
     });
     return true;
   }
