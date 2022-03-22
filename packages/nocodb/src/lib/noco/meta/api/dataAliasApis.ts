@@ -9,12 +9,12 @@ import ncMetaAclMw from './helpers/ncMetaAclMw';
 import Project from '../../../noco-models/Project';
 import { NcError } from './helpers/catchError';
 
-export async function dataListNew(req: Request, res: Response) {
+export async function dataList(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequest(req);
   res.json(await getDataList(model, view, req));
 }
 
-async function dataInsertNew(req: Request, res: Response) {
+async function dataInsert(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequest(req);
 
   const base = await Base.get(model.base_id);
@@ -28,7 +28,7 @@ async function dataInsertNew(req: Request, res: Response) {
   res.json(await baseModel.insert(req.body, null, req));
 }
 
-async function dataUpdateNew(req: Request, res: Response) {
+async function dataUpdate(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequest(req);
   const base = await Base.get(model.base_id);
 
@@ -41,7 +41,7 @@ async function dataUpdateNew(req: Request, res: Response) {
   res.json(await baseModel.updateByPk(req.params.rowId, req.body, null, req));
 }
 
-async function dataDeleteNew(req: Request, res: Response) {
+async function dataDelete(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequest(req);
   const base = await Base.get(model.base_id);
   const baseModel = await Model.getBaseModelSQL({
@@ -115,23 +115,23 @@ async function getViewAndModelFromRequest(req) {
 
 const router = Router({ mergeParams: true });
 
-router.get('/data/:orgs/:projectName/:tableName', ncMetaAclMw(dataListNew));
+router.get('/data/:orgs/:projectName/:tableName', ncMetaAclMw(dataList));
 router.get(
   '/data/:orgs/:projectName/:tableName/views/:viewName',
-  ncMetaAclMw(dataListNew)
+  ncMetaAclMw(dataList)
 );
 
 router.post(
   '/data/:orgs/:projectName/:tableName/views/:viewName',
-  ncMetaAclMw(dataInsertNew)
+  ncMetaAclMw(dataInsert)
 );
 router.put(
   '/data/:orgs/:projectName/:tableName/views/:viewName/:rowId',
-  ncMetaAclMw(dataUpdateNew)
+  ncMetaAclMw(dataUpdate)
 );
 router.delete(
   '/data/:orgs/:projectName/:tableName/views/:viewName/:rowId',
-  ncMetaAclMw(dataDeleteNew)
+  ncMetaAclMw(dataDelete)
 );
 
 export default router;
