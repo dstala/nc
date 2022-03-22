@@ -40,6 +40,7 @@ export default function(router: Router) {
 
   router.use(columnApis);
 
+  router.use(exportApis);
   router.use(dataApis);
   router.use(dataAliasApis);
 
@@ -57,7 +58,6 @@ export default function(router: Router) {
   router.use(formViewApis);
   router.use(viewApis);
   router.use(attachmentApis);
-  router.use(exportApis);
   router.use(auditApis);
   router.use(hookApis);
   router.use(pluginApis);
