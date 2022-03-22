@@ -3179,6 +3179,12 @@
             },
             "in": "query",
             "name": "where"
+          },
+          {
+            "schema": {},
+            "in": "query",
+            "name": "nested",
+            "description": "Query params for nested data"
           }
         ],
         "responses": {
@@ -3290,7 +3296,6 @@
             }
           }
         },
-
         "tags": [
           "Public"
         ],
@@ -4472,25 +4477,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "plugins": {
-                      "type": "object",
-                      "properties": {
-                        "list": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 1,
-                          "items": {
-                            "$ref": "#/components/schemas/Plugin"
-                          }
-                        },
-                        "pageInfo": {
-                          "$ref": "#/components/schemas/Paginated"
-                        }
-                      },
-                      "required": [
-                        "list",
-                        "pageInfo"
-                      ]
+                    "list": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/components/schemas/Plugin"
+                      }
+                    },
+                    "pageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
                     }
                   }
                 }

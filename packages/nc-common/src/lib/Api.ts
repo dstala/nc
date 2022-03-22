@@ -652,6 +652,9 @@ export interface ViewListParamsType {
   fields?: any[];
   sort?: any[];
   where?: string;
+
+  /** Query params for nested data */
+  nested?: any;
   orgs: string;
   projectName: string;
   tableAlias: string;
@@ -2874,14 +2877,11 @@ export class Api<
      * @tags Meta
      * @name PluginList
      * @request GET:/plugins
-     * @response `200` `{ plugins?: { list: (PluginType)[], pageInfo: PaginatedType } }` OK
+     * @response `200` `{ list?: (PluginType)[], pageInfo?: PaginatedType }` OK
      * @response `0` `any`
      */
     pluginList: (params: RequestParams = {}) =>
-      this.request<
-        { plugins?: { list: PluginType[]; pageInfo: PaginatedType } },
-        any
-      >({
+      this.request<{ list?: PluginType[]; pageInfo?: PaginatedType }, any>({
         path: `/plugins`,
         method: 'GET',
         format: 'json',

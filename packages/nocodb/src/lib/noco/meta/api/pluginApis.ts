@@ -6,11 +6,11 @@ import NcPluginMgrv2 from './helpers/NcPluginMgrv2';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 
 export async function pluginList(_req: Request, res: Response) {
-  res.json({
-    plugins: new PagedResponseImpl(await Plugin.list(), {
+  res.json(
+    new PagedResponseImpl(await Plugin.list(), {
       totalRows: await Plugin.count()
     })
-  });
+  );
 }
 
 export async function pluginTest(

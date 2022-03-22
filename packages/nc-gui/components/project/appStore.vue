@@ -1,4 +1,4 @@
-<template>
+x<template>
   <div class="d-flex h-100 nc-app-store-tab">
     <v-dialog v-model="pluginInstallOverlay" min-width="400px" max-width="700px" min-height="300">
       <v-card
@@ -249,7 +249,7 @@ export default {
     async loadPluginList() {
       try {
         // const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
-        const plugins = (await this.$api.meta.pluginList()).data.plugins.list
+        const plugins = (await this.$api.meta.pluginList()).data.list
         // plugins.push(...plugins.splice(0, 3))
         this.apps = plugins.map((p) => {
           p.tags = p.tags ? p.tags.split(',') : []
