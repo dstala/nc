@@ -118,30 +118,42 @@ export default class View implements ViewType {
     { fk_model_id, titleOrId }: { titleOrId: string; fk_model_id: string },
     ncMeta = Noco.ncMeta
   ) {
-    // todo: redis cache
-    const view = await ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.VIEWS,
-      { fk_model_id },
-      null,
-      {
-        _or: [
-          {
-            id: {
-              eq: titleOrId
+    const viewId =
+      titleOrId &&
+      (await NocoCache.get(
+        `${CacheScope.VIEW}:${fk_model_id}:${titleOrId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!viewId) {
+      const view = await ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.VIEWS,
+        { fk_model_id },
+        null,
+        {
+          _or: [
+            {
+              id: {
+                eq: titleOrId
+              }
+            },
+            {
+              title: {
+                eq: titleOrId
+              }
             }
-          },
-          {
-            title: {
-              eq: titleOrId
-            }
-          }
-        ]
-      }
-    );
-
-    return view && new View(view);
+          ]
+        }
+      );
+      await NocoCache.set(
+        `${CacheScope.VIEW}:${fk_model_id}:${titleOrId}`,
+        view.id
+      );
+      await NocoCache.set(`${CacheScope.VIEW}:${fk_model_id}:${view.id}`, view);
+      return view && new View(view);
+    }
+    return viewId && this.get(viewId);
   }
 
   public static async list(modelId: string, ncMeta = Noco.ncMeta) {
