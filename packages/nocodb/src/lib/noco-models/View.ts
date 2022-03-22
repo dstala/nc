@@ -196,11 +196,9 @@ export default class View implements ViewType {
         copy_from_id?: string;
         created_at?;
         updated_at?;
-        slug?;
       },
     ncMeta = Noco.ncMeta
   ) {
-    // todo: redis cache by slug and id
     const order =
       (+(
         await ncMeta
