@@ -321,7 +321,6 @@ async function passwordForgot(
 async function tokenValidate(req, res): Promise<any> {
   const token = req.params.token;
 
-  // todo: redis ??
   const user = await Noco.ncMeta.metaGet(null, null, MetaTable.USERS, {
     reset_password_token: token
   });
@@ -338,7 +337,6 @@ async function tokenValidate(req, res): Promise<any> {
 async function passwordReset(req, res): Promise<any> {
   const token = req.params.token;
 
-  // todo: redis ??
   const user = await Noco.ncMeta.metaGet(null, null, MetaTable.USERS, {
     reset_password_token: token
   });
@@ -377,7 +375,6 @@ async function passwordReset(req, res): Promise<any> {
 async function emailVerification(req, res): Promise<any> {
   const token = req.params.token;
 
-  // todo: redis ??
   const user = await Noco.ncMeta.metaGet(null, null, MetaTable.USERS, {
     email_verification_token: token
   });
