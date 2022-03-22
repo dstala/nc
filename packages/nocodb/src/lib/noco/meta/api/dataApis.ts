@@ -60,7 +60,8 @@ export async function mmList(req: Request, res: Response, next) {
         }
       },
       {},
-      req.query
+
+      { nested: { [key]: req.query } }
     )
   )?.[key];
 
@@ -166,7 +167,7 @@ async function dataRead(req: Request, res: Response, next) {
             }
           },
           {},
-          req.params.rowId
+          { nested: { [key]: req.params.rowId } }
         )
       )?.[key]
     );

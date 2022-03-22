@@ -48,7 +48,16 @@ export async function dataList(req: Request, res: Response) {
           }
         },
         {},
-        { ...req.query, sortArr: req.body?.sorts, filterArr: req.body?.filters }
+
+        {
+          nested: {
+            [key]: {
+              ...req.query,
+              sortArr: req.body?.sorts,
+              filterArr: req.body?.filters
+            }
+          }
+        }
       )
     )?.[key];
 
