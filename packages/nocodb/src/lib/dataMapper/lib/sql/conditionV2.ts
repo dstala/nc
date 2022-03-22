@@ -239,6 +239,22 @@ const parseConditionV2 = async (
           case 'gte':
             qb = qb.where(field, customWhereClause ? '<=' : '>=', val);
             break;
+          case 'in':
+            qb = qb.whereIn(
+              field,
+              Array.isArray(val) ? val : val?.split?.(',')
+            );
+            break;
+          case 'is':
+            if (filter.value === 'null')
+              qb = qb.whereNull(customWhereClause || field);
+            else if (filter.value === 'notnull')
+              qb = qb.whereNotNull(customWhereClause || field);
+            else if (filter.value === 'empty')
+              qb = qb.where(customWhereClause || field);
+            else if (filter.value === 'notempty')
+              qb = qb.whereNot(customWhereClause || field);
+            break;
           case 'lt':
             qb = qb.where(field, customWhereClause ? '>' : '<', val);
             break;

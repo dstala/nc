@@ -35,7 +35,9 @@ export default class Filter {
     | 'gte'
     | 'lte'
     | 'ge'
-    | 'le';
+    | 'le'
+    | 'in'
+    | 'is';
   value?: string;
 
   logical_op?: string;

@@ -203,9 +203,8 @@ export default {
             offset: this.size * (this.page - 1),
             query: this.query,
             columnId: this.column.fk_column_id
-          }, {})).data.data
+          }, {})).data
         } else {
-          debugger
           this.data = (await this.$api.public.dataNestedList({
             uuid: this.$route.params.id,
             relationType: 'hm',
@@ -214,7 +213,7 @@ export default {
             offset: this.size * (this.page - 1),
             query: this.query,
             columnId: this.column.fk_column_id
-          }, {})).data.data
+          }, {})).data
         }
 
         return
@@ -233,7 +232,7 @@ export default {
               offset: this.size * (this.page - 1),
               ...this.queryParams
             }
-          })).data.data
+          })).data
       } else {
         this.data = (await this.$api.data.list(
           this.meta.id, {
@@ -242,7 +241,7 @@ export default {
               offset: this.size * (this.page - 1),
               ...this.queryParams
             }
-          })).data.data
+          })).data
       }
     }
   }

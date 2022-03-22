@@ -117,7 +117,7 @@ export async function hmList(req: Request, res: Response, next) {
         }
       },
       {},
-      req.query
+      { nested: { [key]: req.query } }
     )
   )?.[key];
 
@@ -308,7 +308,7 @@ async function getDataList(model, view: View, req) {
         }
       },
       {},
-      listArgs
+      { nested: { [key]: listArgs } }
     )
   )?.[key];
 

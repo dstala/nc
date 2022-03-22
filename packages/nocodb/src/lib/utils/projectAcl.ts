@@ -114,6 +114,7 @@ export default {
     xcExportAsCsv: true
   },
   commenter: {
+    formViewGet: true,
     passwordChange: true,
     // project
     projectGet: true,
@@ -158,6 +159,7 @@ export default {
     xcExportAsCsv: true
   },
   viewer: {
+    formViewGet: true,
     passwordChange: true,
     // project
     projectGet: true,

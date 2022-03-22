@@ -267,6 +267,7 @@ export default class View implements ViewType {
       case ViewTypes.FORM:
         await FormView.insert(
           {
+            heading: view.title,
             ...view,
             fk_view_id: view_id
           },

@@ -152,14 +152,36 @@ class BaseModelSqlv2 {
           qb.orderBy(this.model.primaryKey.cn);
         }
       } else {
+        await conditionV2(
+          [
+            new Filter({
+              children: args.filterArr || [],
+              is_group: true,
+              logical_op: 'and'
+            }),
+            new Filter({
+              children: filterObj,
+              is_group: true,
+              logical_op: 'and'
+            }),
+            ...(args.filterArr || [])
+          ],
+          qb,
+          this.dbDriver
+        );
+
+        if (!sorts) sorts = args.sortArr;
+
+        await sortV2(sorts, qb, this.dbDriver);
+
         // sort by primary key by default
         if (this.model.primaryKey) {
           qb.orderBy(this.model.primaryKey.cn);
         }
       }
-      this._paginateAndSort(qb, rest);
     }
 
+    applyPaginate(qb, rest);
     const proto = await this.getProto();
 
     console.log(qb.toQuery());
@@ -196,6 +218,24 @@ class BaseModelSqlv2 {
               (await Filter.rootFilterList({ viewId: this.viewId })) || [],
             is_group: true
           }),
+          new Filter({
+            children: args.filterArr || [],
+            is_group: true,
+            logical_op: 'and'
+          }),
+          new Filter({
+            children: filterObj,
+            is_group: true,
+            logical_op: 'and'
+          }),
+          ...(args.filterArr || [])
+        ],
+        qb,
+        this.dbDriver
+      );
+    } else {
+      await conditionV2(
+        [
           new Filter({
             children: args.filterArr || [],
             is_group: true,
@@ -703,21 +743,6 @@ class BaseModelSqlv2 {
     return obj;
   }
 
-  _paginateAndSort(
-    query,
-    {
-      limit = 20,
-      offset = 0,
-      // sort = '',
-      ignoreLimit = false
-    }: XcFilter & { ignoreLimit?: boolean }
-  ) {
-    query.offset(offset);
-    if (!ignoreLimit) query.limit(limit);
-
-    return query;
-  }
-
   public async selectObject({ qb }: { qb: QueryBuilder }): Promise<void> {
     const res = {};
     const columns = await this.model.getColumns();
@@ -1032,6 +1057,14 @@ class BaseModelSqlv2 {
     }
   }
 
+  async bulkInsert(datas: any[]) {
+    // todo : start transaction
+    // iterate and insert
+
+    for (const _data of datas) {
+    }
+  }
+
   /**
    *  Hooks
    * */
@@ -1272,10 +1305,12 @@ function extractFilterFromXwhere(
 
 function extractCondition(nestedArrayConditions, aliasColObjMap) {
   return nestedArrayConditions?.map(str => {
-    // @ts-ignore
-    const [_, logicOp, alias, op, value] = str.match(
-      /(?:~(and|or|not))?\((.*),(\w+),(.*)\)/
+    // eslint-disable-next-line prefer-const
+    let [_, logicOp, alias, op, value] = str.match(
+      /(?:~(and|or|not))?\((.*?),(\w+),(.*)\)/
     );
+    if (op === 'is') op = 'is' + value;
+    else if (op === 'in') value = value.split(',');
 
     return new Filter({
       comparison_op: op,
@@ -1284,6 +1319,20 @@ function extractCondition(nestedArrayConditions, aliasColObjMap) {
       value
     });
   });
+}
+
+function applyPaginate(
+  query,
+  {
+    limit = 20,
+    offset = 0,
+    ignoreLimit = false
+  }: XcFilter & { ignoreLimit?: boolean }
+) {
+  query.offset(offset);
+  if (!ignoreLimit) query.limit(limit);
+
+  return query;
 }
 
 export { BaseModelSqlv2 };
