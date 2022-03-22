@@ -122,6 +122,7 @@
               hide-details
               :disabled="filter.readOnly"
               @click.stop
+              @change="saveOrUpdate(filter, i)"
             >
               <template #item="{item}">
                 <span class="caption font-weight-regular">{{ item }}</span>
