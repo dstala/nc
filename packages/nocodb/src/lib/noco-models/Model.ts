@@ -628,28 +628,46 @@ export default class Model implements TableType {
     },
     ncMeta = Noco.ncMeta
   ) {
-
-    const modelData = await ncMeta.metaGet2(
-      null,
-      null,
-      MetaTable.MODELS,
-      { project_id, base_id },
-      null,
-      {
-        _or: [
-          {
-            id: {
-              eq: aliasOrId
+    const modelId =
+      project_id &&
+      base_id &&
+      aliasOrId &&
+      (await NocoCache.get(
+        `${CacheScope.MODEL}:${project_id}:${project_id}:${aliasOrId}`,
+        CacheGetType.TYPE_OBJECT
+      ));
+    if (!modelId) {
+      const model = await ncMeta.metaGet2(
+        null,
+        null,
+        MetaTable.MODELS,
+        { project_id, base_id },
+        null,
+        {
+          _or: [
+            {
+              id: {
+                eq: aliasOrId
+              }
+            },
+            {
+              _tn: {
+                eq: aliasOrId
+              }
             }
-          },
-          {
-            _tn: {
-              eq: aliasOrId
-            }
-          }
-        ]
-      }
-    );
-    return modelData;
+          ]
+        }
+      );
+      await NocoCache.set(
+        `${CacheScope.MODEL}:${project_id}:${project_id}:${aliasOrId}`,
+        model.id
+      );
+      await NocoCache.set(
+        `${CacheScope.MODEL}:${project_id}:${project_id}:${aliasOrId}`,
+        model
+      );
+      return model && new Model(model);
+    }
+    return modelId && this.get(modelId);
   }
 }
