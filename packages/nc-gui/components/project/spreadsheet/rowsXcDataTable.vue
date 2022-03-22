@@ -1406,17 +1406,17 @@ export default {
         } = (await this.$api.data.viewList(
           {
             orgs: 'noco',
-            projectName: this.$store.state.project.project.slug,
-            tableAlias: this.meta.slug,
-            viewName: this.selectedView.slug
+            projectName: this.$store.state.project.project.title,
+            tableAlias: this.meta._tn,
+            viewName: this.selectedView.title
           },
           {
             query: {
               ...this.queryParams,
               ...(this._isUIAllowed('sortSync') ? {} : { sortArrJson: JSON.stringify(this.sortList) }),
-              ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) }),
-              sort: ['-FirstName'],
-              where: '(FirstName,like,%ro)~or((FirstName,like,%a)~and(FirstName,like,%e%))'
+              ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
+              // sort: ['-FirstName'],
+              // where: '(FirstName,like,%ro)~or((FirstName,like,%a)~and(FirstName,like,%e%))'
             }
           })).data
 

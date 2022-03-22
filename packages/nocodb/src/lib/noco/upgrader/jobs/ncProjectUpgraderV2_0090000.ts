@@ -939,6 +939,7 @@ async function migrateViewsParams(
                 : null,
               fk_view_id: view.id,
               comparison_op: filterV1toV2CompOpMap[filter.op],
+              logical_op: filter.logicOp,
               value: filter.value
             },
             ncMeta
@@ -1146,6 +1147,7 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
               ).id
             : null,
           fk_hook_id: hook.id,
+          logical_op: filter.logicOp,
           comparison_op: filterV1toV2CompOpMap[filter.op],
           value: filter.value
         },

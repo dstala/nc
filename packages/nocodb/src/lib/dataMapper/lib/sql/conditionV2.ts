@@ -23,6 +23,19 @@ export default async function conditionV2(
   (await parseConditionV2(conditionObj, knex))(qb);
 }
 
+function getLogicalOpMethod(filter: Filter) {
+  switch (filter.logical_op?.toLowerCase()) {
+    case 'or':
+      return 'orWhere';
+    case 'and':
+      return 'andWhere';
+    case 'not':
+      return 'whereNot';
+    default:
+      return 'where';
+  }
+}
+
 const parseConditionV2 = async (
   _filter: Filter | Filter[],
   knex: XKnex,
@@ -43,11 +56,7 @@ const parseConditionV2 = async (
     return qbP => {
       qbP.where(qb => {
         for (const [i, qb1] of Object.entries(qbs)) {
-          qb[
-            _filter[i].logical_op?.toLowerCase() === 'or'
-              ? 'orWhere'
-              : 'andWhere'
-          ](qb1);
+          qb[getLogicalOpMethod(_filter[i])](qb1);
         }
       });
     };
@@ -59,17 +68,11 @@ const parseConditionV2 = async (
     );
 
     return qbP => {
-      qbP[filter.logical_op?.toLowerCase() === 'or' ? 'orWhere' : 'andWhere'](
-        qb => {
-          for (const [i, qb1] of Object.entries(qbs)) {
-            qb[
-              children[i].logical_op?.toLowerCase() === 'or'
-                ? 'orWhere'
-                : 'andWhere'
-            ](qb1);
-          }
+      qbP[getLogicalOpMethod(filter)](qb => {
+        for (const [i, qb1] of Object.entries(qbs)) {
+          qb[getLogicalOpMethod(children[i])](qb1);
         }
-      );
+      });
     };
   } else {
     const column = await filter.getColumn();

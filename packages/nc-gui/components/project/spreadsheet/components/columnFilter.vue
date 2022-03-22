@@ -104,6 +104,30 @@
             <!--        </v-text-field>-->
             <!--        v-else-->
 
+            <span
+              v-if="!i"
+              :key="i + '_2'"
+              class="caption d-flex align-center"
+            >{{ $t('labels.where') }}</span>
+
+            <v-select
+              v-else
+              :key="i + '_4'"
+              v-model="filter.logical_op"
+              class="flex-shrink-1 flex-grow-0 elevation-0 caption "
+              :items="['and' ,'or', 'not']"
+              solo
+              flat
+              dense
+              hide-details
+              :disabled="filter.readOnly"
+              @click.stop
+            >
+              <template #item="{item}">
+                <span class="caption font-weight-regular">{{ item }}</span>
+              </template>
+            </v-select>
+
             <v-select
               :key="i + '_6'"
               v-model="filter.fk_column_id"
@@ -470,7 +494,7 @@ export default {
 <style scoped>
 .grid {
   display: grid;
-  grid-template-columns:22px auto auto auto;
+  grid-template-columns:22px 80px auto auto auto;
   column-gap: 6px;
   row-gap: 6px
 }

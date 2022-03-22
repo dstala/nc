@@ -103,7 +103,7 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.tn);
     await this.selectObject({ qb });
-    qb.xwhere(where, await this.model.getAliasColMapping());
+    // qb.xwhere(where, await this.model.getAliasColMapping());
 
     const aliasColObjMap = (await this.model.getColumns()).reduce(
       (sortAgg, c) => ({ ...sortAgg, [c._cn]: c }),
@@ -114,10 +114,8 @@ class BaseModelSqlv2 {
 
     const filterObj = extractFilterFromXwhere(args?.where, aliasColObjMap);
 
-    console.log(filterObj);
-
     // todo: replace with view id
-    if (!ignoreFilterSort) {
+    if (!ignoreFilterSort && this.viewId) {
       if (this.viewId) {
         await conditionV2(
           [
@@ -181,17 +179,33 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(this.model.tn);
 
-    qb.xwhere(where, await this.model.getAliasColMapping());
+    // qb.xwhere(where, await this.model.getAliasColMapping());
 
-    /*    await qb.conditionv2(
-          await Filter.getFilterObject({ modelId: this.model.id })
-        );*/
+    const aliasColObjMap = (await this.model.getColumns()).reduce(
+      (sortAgg, c) => ({ ...sortAgg, [c._cn]: c }),
+      {}
+    );
+    const filterObj = extractFilterFromXwhere(where, aliasColObjMap);
 
     // todo: replace with view id
     if (!ignoreFilterSort && this.viewId) {
       await conditionV2(
         [
-          ...(await Filter.rootFilterList({ viewId: this.viewId })),
+          new Filter({
+            children:
+              (await Filter.rootFilterList({ viewId: this.viewId })) || [],
+            is_group: true
+          }),
+          new Filter({
+            children: args.filterArr || [],
+            is_group: true,
+            logical_op: 'and'
+          }),
+          new Filter({
+            children: filterObj,
+            is_group: true,
+            logical_op: 'and'
+          }),
           ...(args.filterArr || [])
         ],
         qb,
@@ -207,20 +221,6 @@ class BaseModelSqlv2 {
 
     return ((await qb) as any).count;
   }
-
-  /*  private async select(qb) {
-    for (const col of await this.model.getColumns()) {
-      switch (col.uidt) {
-        case 'LinkToAnotherRecord':
-        case 'Lookup':
-        case 'Formula':
-          break;
-        default:
-          qb.select(this.dbDriver.raw(`?? as ??`, [col.cn, col.alias]));
-          break;
-      }
-    }
-  }*/
 
   public async defaultResolverReq(
     query?: any,

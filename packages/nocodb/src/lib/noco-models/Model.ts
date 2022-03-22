@@ -106,7 +106,6 @@ export default class Model implements TableType {
       mm?: boolean;
       created_at?: any;
       updated_at?: any;
-      slug?: string;
     },
     ncMeta = Noco.ncMeta
   ) {
@@ -117,7 +116,6 @@ export default class Model implements TableType {
       {
         tn: model.tn,
         _tn: model._tn,
-        slug: model.slug,
         mm: !!model.mm,
         order:
           model.order ||
