@@ -317,7 +317,7 @@ class BaseModelSqlv2 {
               // .select(...fields.split(','));
               // todo: sanitize
               query.limit(args?.limit || 20);
-              query.limit(args?.offset || 0);
+              query.offset(args?.offset || 0);
 
               return this.isSqlite ? this.dbDriver.select().from(query) : query;
             }),
@@ -440,7 +440,7 @@ class BaseModelSqlv2 {
 
         // todo: sanitize
         query.limit(args?.limit || 20);
-        query.limit(args?.offset || 0);
+        query.offset(args?.offset || 0);
 
         // this._paginateAndSort(query, params);
         return this.isSqlite ? this.dbDriver.select().from(query) : query;
