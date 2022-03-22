@@ -540,7 +540,7 @@ export default {
     async loadPluginList() {
       try {
         // const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
-        const plugins = (await this.$api.meta.pluginList()).data.plugins.list
+        const plugins = (await this.$api.meta.pluginList()).data.list
         // plugins.push(...plugins.splice(0, 3))
         this.apps = plugins.reduce((o, p) => {
           p.tags = p.tags ? p.tags.split(',') : []
