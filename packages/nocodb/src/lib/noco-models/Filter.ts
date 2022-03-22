@@ -77,7 +77,12 @@ export default class Filter {
       logical_op: filter.logical_op,
 
       project_id: filter.project_id,
-      base_id: filter.base_id
+      base_id: filter.base_id,
+      order: await ncMeta.metaGetNextOrder(MetaTable.FILTER_EXP, {
+        [filter.fk_hook_id ? 'fk_hook_id' : 'fk_view_id']: filter.fk_hook_id
+          ? filter.fk_hook_id
+          : filter.fk_view_id
+      })
     };
     if (!(filter.project_id && filter.base_id)) {
       const model = await Column.get({ colId: filter.fk_column_id }, ncMeta);
@@ -255,6 +260,9 @@ export default class Filter {
       childFilters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
         condition: {
           fk_parent_id: this.id
+        },
+        orderBy: {
+          order: 'asc'
         }
       });
       await NocoCache.setList(CacheScope.FILTER_EXP, [this.id], childFilters);
@@ -293,7 +301,10 @@ export default class Filter {
     ]);
     if (!filters.length) {
       filters = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: viewId ? { fk_view_id: viewId } : { fk_hook_id: hookId }
+        condition: viewId ? { fk_view_id: viewId } : { fk_hook_id: hookId },
+        orderBy: {
+          order: 'asc'
+        }
       });
 
       await NocoCache.setList(
@@ -398,7 +409,10 @@ export default class Filter {
     let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [viewId]);
     if (!filterObjs.length) {
       filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: { fk_view_id: viewId }
+        condition: { fk_view_id: viewId },
+        orderBy: {
+          order: 'asc'
+        }
       });
       await NocoCache.setList(CacheScope.FILTER_EXP, [viewId], filterObjs);
     }
@@ -412,7 +426,10 @@ export default class Filter {
     let filterObjs = await NocoCache.getList(CacheScope.FILTER_EXP, [hookId]);
     if (!filterObjs.length) {
       filterObjs = await ncMeta.metaList2(null, null, MetaTable.FILTER_EXP, {
-        condition: { fk_hook_id: hookId }
+        condition: { fk_hook_id: hookId },
+        orderBy: {
+          order: 'asc'
+        }
       });
       await NocoCache.setList(CacheScope.FILTER_EXP, [hookId], filterObjs);
     }
@@ -438,6 +455,9 @@ export default class Filter {
         condition: {
           fk_parent_id: parentId,
           fk_view_id: viewId
+        },
+        orderBy: {
+          order: 'asc'
         }
       });
       await NocoCache.setList(
@@ -467,6 +487,9 @@ export default class Filter {
         condition: {
           fk_parent_id: parentId,
           fk_hook_id: hookId
+        },
+        orderBy: {
+          order: 'asc'
         }
       });
       await NocoCache.setList(
