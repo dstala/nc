@@ -41,6 +41,7 @@ export const genTest = (apiType, dbType) => {
         // Run once before test- create project (rest/graphql)
         //
         before(() => {
+            mainPage.tabReset();
             cy.openTableTab("City", 25);
 
             // store base URL- to re-visit and delete form view later

@@ -1,3 +1,4 @@
+import { mainPage } from "../../support/page_objects/mainPage";
 import { isTestSuiteActive } from "../../support/page_objects/projectConstants";
 
 export const genTest = (apiType, dbType) => {
@@ -5,6 +6,7 @@ export const genTest = (apiType, dbType) => {
 
     describe(`${apiType.toUpperCase()} api - M2M Column validation`, () => {
         before(() => {
+            mainPage.tabReset();
             cy.openTableTab("Actor", 25);
         });
 

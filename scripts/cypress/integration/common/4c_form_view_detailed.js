@@ -12,6 +12,7 @@ export const genTest = (apiType, dbType) => {
         // Run once before test- create project (rest/graphql)
         //
         before(() => {
+            mainPage.tabReset();
             // open a table to work on views
             //
             cy.openTableTab("Country", 25);

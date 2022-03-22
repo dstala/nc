@@ -24,6 +24,7 @@ export const genTest = (apiType, dbType) => {
                 dbCmd = `sqliteExec`;
                 tblDisplayPrefix = `${getProjectString()}`;
             }
+            mainPage.tabReset();
             mainPage.openMetaTab();
         });
 

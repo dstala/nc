@@ -50,7 +50,10 @@
             @change="saveOrUpdate(sort, i)"
           >
             <template #item="{item}">
-              <span class="caption font-weight-regular">{{ item._cn }}</span>
+              <span 
+                :class="`caption font-weight-regular nc-sort-fld-${item._cn}`">
+                  {{ item._cn }}
+              </span>
             </template>
           </v-select>
           <v-select

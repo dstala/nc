@@ -23,6 +23,7 @@ export const genTest = (apiType, dbType) => {
 
     describe("Static user creations (different roles)", () => {
         before(() => {
+            mainPage.tabReset();
             mainPage.navigationDraw(mainPage.TEAM_N_AUTH).click();
         });
 

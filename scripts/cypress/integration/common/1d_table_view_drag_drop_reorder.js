@@ -1,3 +1,4 @@
+import { mainPage } from "../../support/page_objects/mainPage";
 import {
     isTestSuiteActive,
     isXcdb,
@@ -19,6 +20,10 @@ export const genTest = (apiType, dbType) => {
             Actor, Address, Category, City, Country, Customer, FIlm, FilmText, Language, Payment, Rental Staff
             ActorInfo, CustomerList, FilmList, NiceButSlowerFilmList, SalesByFilmCategory, SalesByStore, StaffList
         */
+
+        before(() => {
+            mainPage.tabReset();
+        });
 
         it(`Table & SQL View list, Drag/drop`, () => {
             // expand tree-view menu

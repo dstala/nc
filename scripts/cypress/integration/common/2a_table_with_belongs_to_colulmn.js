@@ -1,3 +1,4 @@
+import { mainPage } from "../../support/page_objects/mainPage";
 import { isTestSuiteActive } from "../../support/page_objects/projectConstants";
 
 export const genTest = (apiType, dbType) => {
@@ -5,6 +6,7 @@ export const genTest = (apiType, dbType) => {
 
     describe(`${apiType.toUpperCase()} api - Table: belongs to, link record`, () => {
         before(() => {
+            mainPage.tabReset();
             cy.openTableTab("Country", 25);
         });
 

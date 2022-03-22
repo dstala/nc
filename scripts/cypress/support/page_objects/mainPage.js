@@ -1,3 +1,5 @@
+import { projectsPage } from "./navigation";
+
 const path = require("path");
 
 /**
@@ -490,6 +492,14 @@ export class _mainPage {
         //   .should("exist");
         // cy.toastWait(`Table metadata recreated successfully`);
         // cy.get(`.nc-metasync-row-${tbl}`).should("exist");
+    }
+
+    tabReset() {
+        mainPage.toolBarTopLeft(mainPage.HOME).click({ force: true });
+        cy.get(".project-row").click({ force: true });
+        projectsPage.waitHomePageLoad();
+        // cy.openTableTab("Country", 0);
+        // cy.get(".mdi-close").click({ multiple: true });
     }
 }
 

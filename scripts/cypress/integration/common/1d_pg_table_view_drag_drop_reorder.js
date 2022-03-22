@@ -1,3 +1,4 @@
+import { mainPage } from "../../support/page_objects/mainPage";
 import {
     isTestSuiteActive,
     isXcdb,
@@ -15,11 +16,15 @@ export const genTest = (apiType, dbType) => {
                 .should("exist");
         }
 
+        before(() => {
+            mainPage.tabReset();
+        });
+
         /*
-      Original order of list items
-      Actor, Address, Category, City, Country, Customer, FIlm, FilmText, Language, Payment, Rental Staff
-      ActorInfo, CustomerList, FilmList, NiceButSlowerFilmList, SalesByFilmCategory, SalesByStore, StaffList
-    */
+            Original order of list items
+            Actor, Address, Category, City, Country, Customer, FIlm, FilmText, Language, Payment, Rental Staff
+            ActorInfo, CustomerList, FilmList, NiceButSlowerFilmList, SalesByFilmCategory, SalesByStore, StaffList
+        */
 
         it(`Table & SQL View list, Drag/drop`, () => {
             // expand tree-view menu
