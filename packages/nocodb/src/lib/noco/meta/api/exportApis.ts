@@ -71,7 +71,7 @@ async function exportCsv(req: Request, res: Response, next) {
           }
         },
         {},
-        req.query
+        { nested: { [key]: req.query } }
       )
     )?.[key];
 

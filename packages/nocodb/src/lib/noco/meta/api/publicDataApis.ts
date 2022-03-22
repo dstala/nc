@@ -241,7 +241,7 @@ async function relDataList(req, res) {
         }
       },
       {},
-      req.query
+      { nested: { [key]: req.query } }
     )
   )?.[key];
 
@@ -300,7 +300,7 @@ export async function mmList(req: Request, res: Response): Promise<any> {
         }
       },
       {},
-      req.query
+      { nested: { [key]: req.query } }
     )
   )?.[key];
 
@@ -364,7 +364,7 @@ export async function hmList(req: Request, res: Response): Promise<any> {
         }
       },
       {},
-      req.query
+      { nested: { [key]: req.query } }
     )
   )?.[key];
 
