@@ -272,16 +272,16 @@ class BaseModelSqlv2 {
     );
   }
 
-  async hmList({ colId, ids }) {
+  async hmList({ colId, ids }, args?: { limit?; offset? }) {
     try {
-      /*      const {
-        where,
-        limit,
-        offset,
-        conditionGraph,
-        sort
-        // ...restArgs
-      } = this.dbModels[child]._getChildListArgs(rest);*/
+      // const {
+      //   where,
+      //   limit,
+      //   offset,
+      //   conditionGraph,
+      //   sort
+      //   // ...restArgs
+      // } = this.dbModels[child]._getChildListArgs(args);
       // let { fields } = restArgs;
       // todo: get only required fields
       let fields = '*';
@@ -314,7 +314,10 @@ class BaseModelSqlv2 {
           .union(
             ids.map(p => {
               const query = qb.clone().where({ [chilCol.cn]: p });
-              // .select(...fields.split(','));;
+              // .select(...fields.split(','));
+              // todo: sanitize
+              query.limit(args?.limit || 20);
+              query.limit(args?.offset || 0);
 
               return this.isSqlite ? this.dbDriver.select().from(query) : query;
             }),
@@ -360,6 +363,7 @@ class BaseModelSqlv2 {
             .count(`${chilCol?.cn} as count`)
             .where({ [chilCol?.cn]: p })
             .first();
+
           return this.isSqlite ? this.dbDriver.select().from(query) : query;
         }),
         !this.isSqlite
@@ -373,7 +377,7 @@ class BaseModelSqlv2 {
     }
   }
 
-  public async mmList({ colId, parentIds, ...params }) {
+  public async mmList({ colId, parentIds }, args?: { limit; offset }) {
     // const { where, limit, offset, sort, ...restArgs } = this._getChildListArgs(
     //   rest,
     //   index,
@@ -433,7 +437,12 @@ class BaseModelSqlv2 {
         //     // ...this.dbModels[child].selectQuery(fields)
         //   }); // ...fields.split(','));
         const query = qb.clone().where(`${vtn}.${vcn}`, id);
-        this._paginateAndSort(query, params);
+
+        // todo: sanitize
+        query.limit(args?.limit || 20);
+        query.limit(args?.offset || 0);
+
+        // this._paginateAndSort(query, params);
         return this.isSqlite ? this.dbDriver.select().from(query) : query;
       }),
       !this.isSqlite
@@ -571,10 +580,13 @@ class BaseModelSqlv2 {
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.hmList({
-                    colId: column.id,
-                    ids
-                  });
+                  const data = await this.hmList(
+                    {
+                      colId: column.id,
+                      ids
+                    },
+                    (listLoader as any).args
+                  );
                   return ids.map((id: string) => (data[id] ? data[id] : []));
                 } catch (e) {
                   console.log(e);
@@ -583,7 +595,8 @@ class BaseModelSqlv2 {
               });
               const self: BaseModelSqlv2 = this;
 
-              proto[column._cn] = async function(): Promise<any> {
+              proto[column._cn] = async function(args): Promise<any> {
+                (listLoader as any).args = args;
                 return listLoader.load(
                   this[parentColumn?._cn || self?.model?.primaryKey?._cn]
                 );
@@ -599,10 +612,13 @@ class BaseModelSqlv2 {
             } else if (colOptions.type === 'mm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.mmList({
-                    parentIds: ids,
-                    colId: column.id
-                  });
+                  const data = await this.mmList(
+                    {
+                      parentIds: ids,
+                      colId: column.id
+                    },
+                    (listLoader as any).args
+                  );
 
                   return data;
                 } catch (e) {
@@ -613,7 +629,8 @@ class BaseModelSqlv2 {
 
               const self: BaseModelSqlv2 = this;
               const childColumn = await colOptions.getChildColumn();
-              proto[column._cn] = async function(): Promise<any> {
+              proto[column._cn] = async function(args): Promise<any> {
+                (listLoader as any).args = args;
                 return await listLoader.load(
                   this[childColumn?._cn || self.model.primaryKey._cn]
                 );
@@ -698,82 +715,8 @@ class BaseModelSqlv2 {
     query.offset(offset);
     if (!ignoreLimit) query.limit(limit);
 
-    // if (!table && !sort && this.db === 'mssql' && !isUnion) {
-    //   sort =         this.model.pk?.alias;
-    // }
-
-    /*    if (sort) {
-      sort.split(',').forEach(o => {
-        if (o[0] === '-') {
-          query.orderBy(
-            this.selectObject({})[o.slice(1)] || o.slice(1),
-            'desc'
-          );
-        } else {
-          query.orderBy(this.selectObject({})[o] || o, 'asc');
-        }
-      });
-    }*/
-
     return query;
   }
-
-  // protected get selectFormulas() {
-  //   if (!this._selectFormulas) {
-  //     this._selectFormulas = (this.virtualColumns || [])?.reduce((arr, v) => {
-  //       if (v.formula?.value && !v.formula?.error?.length) {
-  //         arr.push(
-  //           formulaQueryBuilder(
-  //             v.formula?.tree,
-  //             v.alias,
-  //             this.dbDriver,
-  //             this.aliasToColumn
-  //           )
-  //         );
-  //       }
-  //       return arr;
-  //     }, []);
-  //   }
-  //   return this._selectFormulas;
-  // }
-  //
-  // protected get selectFormulasObj() {
-  //   if (!this._selectFormulasObj) {
-  //     this._selectFormulasObj = (this.virtualColumns || [])?.reduce(
-  //       (obj, v) => {
-  //         if (v.formula?.value && !v.formula?.error?.length) {
-  //           obj[v.alias] = formulaQueryBuilder(
-  //             v.formula?.tree,
-  //             null,
-  //             this.dbDriver,
-  //             this.aliasToColumn
-  //           );
-  //         }
-  //         return obj;
-  //       },
-  //       {}
-  //     );
-  //   }
-  //   return this._selectFormulasObj;
-  // }
-
-  // todo: optimize
-  // protected get selectRollups() {
-  //   return (this.virtualColumns || [])?.reduce((arr, v) => {
-  //     if (v.rl) {
-  //       arr.push(
-  //         genRollupSelectv2({
-  //           tn: this.tn,
-  //           knex: this.dbDriver,
-  //           rollup: v.rl,
-  //           hasMany: this.hasManyRelations,
-  //           manyToMany: this.manyToManyRelations
-  //         }).as(v.alias)
-  //       );
-  //     }
-  //     return arr;
-  //   }, []);
-  // }
 
   public async selectObject({ qb }: { qb: QueryBuilder }): Promise<void> {
     const res = {};
@@ -1088,83 +1031,6 @@ class BaseModelSqlv2 {
       throw e;
     }
   }
-
-  /*
-  // todo: update
-  public m2mNotChildren({ pid = null, assoc = null, ...args }): Promise<any> {
-    if (pid === null || assoc === null) {
-      return null;
-    }
-    // @ts-ignore
-    const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
-    this.manyToManyRelations.find(({ vtn }) => assoc === vtn) || {};
-    const childModel = this.dbModels[rtn];
-
-    const {
-      fields,
-      where,
-      limit,
-      offset,
-      sort,
-      condition,
-      conditionGraph = null
-    } = childModel._getListArgs(args);
-
-    const query = childModel.$db
-      .select(childModel.selectQuery(fields))
-      .xwhere(where, childModel.selectQuery(''))
-      .condition(condition, childModel.selectQuery(''))
-      .conditionGraph(conditionGraph)
-      .whereNotIn(
-        rcn,
-        childModel
-          .dbDriver(this.dbModels[rtn].tnPath)
-          .select(`${rtn}.${rcn}`)
-          .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
-          .where(`${vtn}.${vcn}`, pid)
-      );
-    childModel._paginateAndSort(query, { limit, offset, sort });
-
-    return this._run(query);
-  }
-
-  // todo: update
-  public m2mNotChildrenCount({
-                               pid = null,
-                               assoc = null,
-                               ...args
-                             }): Promise<any> {
-    if (pid === null || assoc === null) {
-      return null;
-    }
-    // @ts-ignore
-    const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
-    this.manyToManyRelations.find(({ vtn }) => assoc === vtn) || {};
-    const childModel = this.dbModels[rtn];
-
-    const { where, condition, conditionGraph = null } = childModel._getListArgs(
-      args
-    );
-
-    const query = childModel.$db
-      .count(`${rcn} as count`)
-      .xwhere(where, childModel.selectQuery(''))
-      .condition(condition, childModel.selectQuery(''))
-      .conditionGraph(conditionGraph)
-      .whereNotIn(
-        rcn,
-        childModel
-          .dbDriver(this.dbModels[rtn].tnPath)
-          .select(`${rtn}.${rcn}`)
-          .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
-          .where(`${vtn}.${vcn}`, pid)
-      )
-      .first();
-
-    return this._run(query);
-  }
-
-*/
 
   /**
    *  Hooks

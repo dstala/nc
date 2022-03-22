@@ -62,9 +62,7 @@ async function getDataList(model, view: View, req) {
   });
 
   const key = `${model._tn}List`;
-  const requestObj = {
-    [key]: await baseModel.defaultResolverReq(req.query)
-  };
+  const requestObj = { [key]: await baseModel.defaultResolverReq(req.query) };
 
   const listArgs: any = { ...req.query };
   try {
@@ -83,7 +81,7 @@ async function getDataList(model, view: View, req) {
         }
       },
       {},
-      listArgs
+      { nested: { [key]: listArgs } }
     )
   )?.[key];
 

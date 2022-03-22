@@ -149,7 +149,7 @@
     "mysql2": "^2.2.5",
     "nanoid": "^3.1.20",
     "nc-common": "file:../nc-common",
-    "nc-help": "^0.2.35",
+    "nc-help": "^0.2.36",
     "nc-lib-gui": "0.84.7",
     "nc-plugin": "^0.1.1",
     "ncp": "^2.0.0",

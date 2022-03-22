@@ -115,7 +115,7 @@
               :key="i + '_4'"
               v-model="filter.logical_op"
               class="flex-shrink-1 flex-grow-0 elevation-0 caption "
-              :items="['and' ,'or', 'not']"
+              :items="['and' ,'or']"
               solo
               flat
               dense

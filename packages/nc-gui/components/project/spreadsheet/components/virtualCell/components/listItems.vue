@@ -149,7 +149,7 @@ export default {
               ...this.queryParams
               // where
             }
-          })).data.data
+          })).data
         // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedDataGet', {
         //   password: this.password,
         //   limit: this.size,
@@ -184,7 +184,7 @@ export default {
               ...this.queryParams,
               where
             }
-          })).data.data
+          })).data
 
         //   await this.api.paginatedList({
         //   limit: this.size,
