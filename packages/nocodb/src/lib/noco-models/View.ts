@@ -124,9 +124,8 @@ export default class View implements ViewType {
         `${CacheScope.VIEW}:${fk_model_id}:${titleOrId}`,
         CacheGetType.TYPE_OBJECT
       ));
-    let view = null;
     if (!viewId) {
-      view = await ncMeta.metaGet2(
+      const view = await ncMeta.metaGet2(
         null,
         null,
         MetaTable.VIEWS,
