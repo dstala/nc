@@ -355,7 +355,6 @@ async function migrateProjectModels(
           tn: modelData.title,
           _tn: modelData.alias,
           // todo: sanitize
-          slug: modelData.alias,
           type: modelData.type === 'table' ? ModelTypes.TABLE : ModelTypes.VIEW,
           created_at: modelData.created_at,
           updated_at: modelData.updated_at,
@@ -940,6 +939,7 @@ async function migrateViewsParams(
                 : null,
               fk_view_id: view.id,
               comparison_op: filterV1toV2CompOpMap[filter.op],
+              logical_op: filter.logicOp,
               value: filter.value
             },
             ncMeta
@@ -1147,6 +1147,7 @@ async function migrateWebhooks(ctx: MigrateCtxV1, ncMeta: any) {
               ).id
             : null,
           fk_hook_id: hook.id,
+          logical_op: filter.logicOp,
           comparison_op: filterV1toV2CompOpMap[filter.op],
           value: filter.value
         },

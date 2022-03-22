@@ -218,7 +218,6 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         tn: table.tn,
         _tn: meta._tn,
         // todo: sanitize
-        slug: meta._tn,
         type: table.type || 'table',
         order: table.order
       });
@@ -365,7 +364,6 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         tn: table.tn,
         _tn: meta._tn,
         // todo: sanitize
-        slug: meta._tn,
         type: ModelTypes.VIEW,
         order: table.order
       });

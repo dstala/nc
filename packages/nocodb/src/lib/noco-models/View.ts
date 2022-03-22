@@ -24,7 +24,6 @@ const { v4: uuidv4 } = require('uuid');
 export default class View implements ViewType {
   id?: string;
   title?: string;
-  slug?: string;
   uuid?: string;
   password?: string;
   show: boolean;
@@ -111,6 +110,7 @@ export default class View implements ViewType {
       view = await ncMeta.metaGet2(null, null, MetaTable.VIEWS, viewId);
       await NocoCache.set(`${CacheScope.VIEW}:${viewId}`, view);
     }
+
     return view && new View(view);
   }
 
@@ -118,42 +118,30 @@ export default class View implements ViewType {
     { fk_model_id, titleOrId }: { titleOrId: string; fk_model_id: string },
     ncMeta = Noco.ncMeta
   ) {
-    const viewId =
-      titleOrId &&
-      (await NocoCache.get(
-        `${CacheScope.VIEW}:${fk_model_id}:${titleOrId}`,
-        CacheGetType.TYPE_OBJECT
-      ));
-    if (!viewId) {
-      const view = await ncMeta.metaGet2(
-        null,
-        null,
-        MetaTable.VIEWS,
-        { fk_model_id },
-        null,
-        {
-          _or: [
-            {
-              id: {
-                eq: titleOrId
-              }
-            },
-            {
-              title: {
-                eq: titleOrId
-              }
+    // todo: redis cache
+    const view = await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.VIEWS,
+      { fk_model_id },
+      null,
+      {
+        _or: [
+          {
+            id: {
+              eq: titleOrId
             }
-          ]
-        }
-      );
-      await NocoCache.set(
-        `${CacheScope.VIEW}:${fk_model_id}:${titleOrId}`,
-        view.id
-      );
-      await NocoCache.set(`${CacheScope.VIEW}:${fk_model_id}:${view.id}`, view);
-      return view && new View(view);
-    }
-    return viewId && this.get(viewId);
+          },
+          {
+            title: {
+              eq: titleOrId
+            }
+          }
+        ]
+      }
+    );
+
+    return view && new View(view);
   }
 
   public static async list(modelId: string, ncMeta = Noco.ncMeta) {
@@ -200,6 +188,7 @@ export default class View implements ViewType {
       },
     ncMeta = Noco.ncMeta
   ) {
+    // todo: redis cache by slug and id
     const order =
       (+(
         await ncMeta
@@ -214,7 +203,6 @@ export default class View implements ViewType {
     const insertObj = {
       id: view.id,
       title: view.title,
-      slug: view.slug || view.title,
       show: true,
       is_default: view.is_default,
       order,

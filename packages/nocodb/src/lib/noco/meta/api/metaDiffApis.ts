@@ -573,7 +573,6 @@ export async function metaDiffSync(req, res) {
             await Model.insert(project.id, base.id, {
               ...meta,
               // todo: sanitize
-              slug: meta._tn,
               type: ModelTypes.TABLE
             });
 
@@ -616,7 +615,6 @@ export async function metaDiffSync(req, res) {
             await Model.insert(project.id, base.id, {
               ...meta,
               // todo: sanitize
-              slug: meta._tn,
               type: ModelTypes.VIEW
             });
           }

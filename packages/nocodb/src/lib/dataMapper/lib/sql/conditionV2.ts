@@ -23,6 +23,19 @@ export default async function conditionV2(
   (await parseConditionV2(conditionObj, knex))(qb);
 }
 
+function getLogicalOpMethod(filter: Filter) {
+  switch (filter.logical_op?.toLowerCase()) {
+    case 'or':
+      return 'orWhere';
+    case 'and':
+      return 'andWhere';
+    case 'not':
+      return 'whereNot';
+    default:
+      return 'where';
+  }
+}
+
 const parseConditionV2 = async (
   _filter: Filter | Filter[],
   knex: XKnex,
@@ -42,8 +55,8 @@ const parseConditionV2 = async (
 
     return qbP => {
       qbP.where(qb => {
-        for (const qb1 of qbs) {
-          qb.andWhere(qb1);
+        for (const [i, qb1] of Object.entries(qbs)) {
+          qb[getLogicalOpMethod(_filter[i])](qb1);
         }
       });
     };
@@ -55,15 +68,9 @@ const parseConditionV2 = async (
     );
 
     return qbP => {
-      qbP.where(qb => {
-        if (filter.logical_op?.toLowerCase() === 'or') {
-          for (const qb1 of qbs) {
-            qb.orWhere(qb1);
-          }
-        } else {
-          for (const qb1 of qbs) {
-            qb.andWhere(qb1);
-          }
+      qbP[getLogicalOpMethod(filter)](qb => {
+        for (const [i, qb1] of Object.entries(qbs)) {
+          qb[getLogicalOpMethod(children[i])](qb1);
         }
       });
     };

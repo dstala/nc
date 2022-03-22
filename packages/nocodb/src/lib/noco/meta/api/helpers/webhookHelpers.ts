@@ -93,9 +93,19 @@ export async function validateCondition(filters: Filter[], data: any) {
         res = +data[field] >= +filter.value;
         break;
     }
-    isValid = isValid && res;
-    // return con.logicOp === 'or' ? valid || res : valid && res;
-    // if (!isValid) return isValid;
+
+    switch (filter.logical_op) {
+      case 'or':
+        isValid = isValid || res;
+        break;
+      case 'not':
+        isValid = isValid && !res;
+        break;
+      case 'and':
+      default:
+        isValid = isValid && res;
+        break;
+    }
   }
 
   return isValid;

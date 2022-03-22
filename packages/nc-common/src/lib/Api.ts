@@ -637,7 +637,26 @@ export interface SharedViewUpdatePayloadType {
 
 export type CreatePayloadType = any;
 
+export interface ModelListParamsType {
+  fields?: any[];
+  sort?: any[];
+  where?: string;
+  orgs: string;
+  projectName: string;
+  tableAlias: string;
+}
+
 export type ModelCreatePayloadType = any;
+
+export interface ViewListParamsType {
+  fields?: any[];
+  sort?: any[];
+  where?: string;
+  orgs: string;
+  projectName: string;
+  tableAlias: string;
+  viewName: string;
+}
 
 export type ViewCreatePayloadType = any;
 
@@ -2761,14 +2780,11 @@ export class Api<
      * @tags Meta
      * @name HookList
      * @request GET:/tables/{tableId}/hooks
-     * @response `200` `{ hooks?: { list: (HookType)[], pageInfo: PaginatedType } }` OK
+     * @response `200` `{ list: (HookType)[], pageInfo: PaginatedType }` OK
      * @response `0` `any`
      */
     hookList: (tableId: string, params: RequestParams = {}) =>
-      this.request<
-        { hooks?: { list: HookType[]; pageInfo: PaginatedType } },
-        any
-      >({
+      this.request<{ list: HookType[]; pageInfo: PaginatedType }, any>({
         path: `/tables/${tableId}/hooks`,
         method: 'GET',
         format: 'json',
@@ -3348,14 +3364,13 @@ export class Api<
      * @response `200` `any` OK
      */
     modelList: (
-      orgs: string,
-      projectName: string,
-      tableAlias: string,
+      { orgs, projectName, tableAlias, ...query }: ModelListParamsType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
         path: `/data/${orgs}/${projectName}/${tableAlias}`,
         method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),
@@ -3393,15 +3408,13 @@ export class Api<
      * @response `200` `any` OK
      */
     viewList: (
-      orgs: string,
-      projectName: string,
-      tableAlias: string,
-      viewName: string,
+      { orgs, projectName, tableAlias, viewName, ...query }: ViewListParamsType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
         path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}`,
         method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),

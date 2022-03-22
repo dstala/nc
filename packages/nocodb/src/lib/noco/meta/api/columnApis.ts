@@ -315,7 +315,6 @@ export async function columnAdd(req: Request, res: Response<TableType>, next) {
               tn: aTn,
               _tn: aTnAlias,
               // todo: sanitize
-              slug: aTnAlias,
               mm: true,
               columns: associateTableCols
             });

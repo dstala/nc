@@ -8,6 +8,7 @@ import {
   MetaTable
 } from '../utils/globals';
 import NocoCache from '../noco-cache/NocoCache';
+import { SortType } from 'nc-common';
 
 export default class Sort {
   id: string;
@@ -18,7 +19,7 @@ export default class Sort {
   project_id?: string;
   base_id?: string;
 
-  constructor(data: Sort | SortObject) {
+  constructor(data: Partial<SortType>) {
     Object.assign(this, data);
   }
 
