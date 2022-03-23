@@ -178,8 +178,7 @@ class BaseModelSqlv2 {
         qb.orderBy(this.model.primaryKey.cn);
       }
     }
-
-    applyPaginate(qb, rest);
+    if (!ignoreFilterSort) applyPaginate(qb, rest);
     const proto = await this.getProto();
 
     console.log(qb.toQuery());
