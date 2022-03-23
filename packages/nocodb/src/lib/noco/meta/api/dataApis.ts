@@ -72,14 +72,14 @@ export async function mmList(req: Request, res: Response, next) {
     })
   )?.[0]?.count;
 
-  res.json({
-    data: new PagedResponseImpl(data, {
+  res.json(
+    new PagedResponseImpl(data, {
       // todo:
       totalRows: count,
       pageSize: 25,
       page: 1
     })
-  });
+  );
 }
 
 export async function hmList(req: Request, res: Response, next) {

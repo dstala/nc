@@ -202,7 +202,7 @@ export default {
             limit: this.size,
             offset: this.size * (this.page - 1),
             query: this.query,
-            columnId: this.column.fk_column_id
+            columnId: this.column.fk_column_id || this.column.id
           }, {})).data
         } else {
           this.data = (await this.$api.public.dataNestedList({
@@ -212,7 +212,7 @@ export default {
             limit: this.size,
             offset: this.size * (this.page - 1),
             query: this.query,
-            columnId: this.column.fk_column_id
+            columnId: this.column.fk_column_id || this.column.id
           }, {})).data
         }
 
@@ -226,7 +226,9 @@ export default {
         this.data = (await this.$api.data.mmList(
           this.column.fk_model_id,
           this.rowId,
-          this.column.id, {
+          this.column.id,
+          'mm',
+          {
             query: {
               limit: this.size,
               offset: this.size * (this.page - 1),
