@@ -95,7 +95,9 @@ async function projectCreate(
       {
         type: db?.client,
         config: null,
-        is_meta: true
+        is_meta: true,
+        inflection_column: 'camelize',
+        inflection_table: 'camelize'
       }
     ];
   } else {
