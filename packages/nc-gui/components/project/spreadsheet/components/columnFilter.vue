@@ -433,7 +433,8 @@ export default {
         fk_column_id: null,
         comparison_op: 'eq',
         value: '',
-        status: 'update'
+        status: 'update',
+        logical_op: 'and'
       })
       this.filters = this.filters.slice()
     },
