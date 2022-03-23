@@ -811,7 +811,7 @@ export default class Column<T = any> implements ColumnType {
     return !(await ncMeta.metaGet2(
       null,
       null,
-      MetaTable.MODELS,
+      MetaTable.COLUMNS,
       {
         cn,
         fk_model_id
@@ -828,7 +828,7 @@ export default class Column<T = any> implements ColumnType {
     return !(await ncMeta.metaGet2(
       null,
       null,
-      MetaTable.MODELS,
+      MetaTable.COLUMNS,
       {
         _cn,
         fk_model_id
