@@ -675,7 +675,7 @@ async function migrateProjectModels(
         let orderCount = 1;
         for (const [_cn, column] of aliasColArr) {
           await GridViewColumn.update(
-            viewColumns.find(c => column.id === c.fk_column_id),
+            viewColumns.find(c => column.id === c.fk_column_id).id,
             {
               order: orderCount++,
               show: queryParams?.showFields
@@ -852,7 +852,7 @@ async function migrateProjectModelViews(
         );
       } else if (viewData.show_as === 'grid') {
         await GridViewColumn.update(
-          viewColumns.find(c => column.id === c.fk_column_id),
+          viewColumns.find(c => column.id === c.fk_column_id).id,
           {
             order,
             show,
