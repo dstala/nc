@@ -19,7 +19,7 @@
               :label="$t('labels.columnName')"
               :rules="[
                 v => !!v || 'Required',
-                v => !meta || !meta.columns || !column ||meta.columns.every(c => column === c || (v !== c.cn && v !== c._cn )) || 'Duplicate column name',
+                v => !meta || !meta.columns || !column ||meta.columns.every(c => column === c || (v !== c._cn)) || 'Duplicate column name',
                 validateColumnName
               ]"
               dense

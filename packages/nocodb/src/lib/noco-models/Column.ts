@@ -803,4 +803,38 @@ export default class Column<T = any> implements ColumnType {
   async delete(ncMeta = Noco.ncMeta) {
     return await Column.delete(this.id, ncMeta);
   }
+
+  static async checkTitleAvailable(
+    { cn, fk_model_id, exclude_id }: { cn; fk_model_id; exclude_id? },
+    ncMeta = Noco.ncMeta
+  ) {
+    return !(await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.MODELS,
+      {
+        cn,
+        fk_model_id
+      },
+      null,
+      exclude_id && { id: { neq: 'exclude_id' } }
+    ));
+  }
+
+  static async checkAliasAvailable(
+    { _cn, fk_model_id, exclude_id }: { _cn; fk_model_id; exclude_id? },
+    ncMeta = Noco.ncMeta
+  ) {
+    return !(await ncMeta.metaGet2(
+      null,
+      null,
+      MetaTable.MODELS,
+      {
+        _cn,
+        fk_model_id
+      },
+      null,
+      exclude_id && { id: { neq: 'exclude_id' } }
+    ));
+  }
 }

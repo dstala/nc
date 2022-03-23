@@ -16,6 +16,7 @@ import {
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
+  isVirtualCol,
   LinkToAnotherRecordType,
   RelationTypes,
   TableType
@@ -85,378 +86,391 @@ async function createHmAndBtColumn(
   }
 }
 
-export async function columnAdd(req: Request, res: Response<TableType>, next) {
-  try {
-    const table = await Model.getWithInfo({
-      id: req.params.tableId
-    });
-    const base = await Base.get(table.base_id);
-    const project = await base.getProject();
+export async function columnAdd(req: Request, res: Response<TableType>) {
+  const table = await Model.getWithInfo({
+    id: req.params.tableId
+  });
+  const base = await Base.get(table.base_id);
+  const project = await base.getProject();
 
-    let colBody = req.body;
-    switch (colBody.uidt) {
-      case UITypes.Rollup:
-        {
-          validateParams(
-            [
-              '_cn',
-              'fk_relation_column_id',
-              'fk_rollup_column_id',
-              'rollup_function'
-            ],
-            req.body
-          );
+  if (
+    !isVirtualCol(req.body) &&
+    !(await Column.checkTitleAvailable({
+      cn: req.body.cn,
+      fk_model_id: req.params.tableId
+    }))
+  ) {
+    NcError.badRequest('Duplicate column name');
+  }
+  if (
+    !(await Column.checkAliasAvailable({
+      _cn: req.body._cn || req.body.cn,
+      fk_model_id: req.params.tableId
+    }))
+  ) {
+    NcError.badRequest('Duplicate column alias');
+  }
 
-          const relation = await (
-            await Column.get({
-              colId: req.body.fk_relation_column_id
-            })
-          ).getColOptions<LinkToAnotherRecordType>();
-
-          if (!relation) {
-            throw new Error('Relation column not found');
-          }
-
-          let relatedColumn: Column;
-          switch (relation.type) {
-            case 'hm':
-              relatedColumn = await Column.get({
-                colId: relation.fk_child_column_id
-              });
-              break;
-            case 'mm':
-            case 'bt':
-              relatedColumn = await Column.get({
-                colId: relation.fk_parent_column_id
-              });
-              break;
-          }
-
-          const relatedTable = await relatedColumn.getModel();
-          if (
-            !(await relatedTable.getColumns()).find(
-              c => c.id === req.body.fk_rollup_column_id
-            )
-          )
-            throw new Error('Rollup column not found in related table');
-
-          await Column.insert({
-            ...colBody,
-            fk_model_id: table.id
-          });
-        }
-        break;
-      case UITypes.Lookup:
-        {
-          validateParams(
-            ['_cn', 'fk_relation_column_id', 'fk_lookup_column_id'],
-            req.body
-          );
-
-          const relation = await (
-            await Column.get({
-              colId: req.body.fk_relation_column_id
-            })
-          ).getColOptions<LinkToAnotherRecordType>();
-
-          if (!relation) {
-            throw new Error('Relation column not found');
-          }
-
-          let relatedColumn: Column;
-          switch (relation.type) {
-            case 'hm':
-              relatedColumn = await Column.get({
-                colId: relation.fk_child_column_id
-              });
-              break;
-            case 'mm':
-            case 'bt':
-              relatedColumn = await Column.get({
-                colId: relation.fk_parent_column_id
-              });
-              break;
-          }
-
-          const relatedTable = await relatedColumn.getModel();
-          if (
-            !(await relatedTable.getColumns()).find(
-              c => c.id === req.body.fk_lookup_column_id
-            )
-          )
-            throw new Error('Lookup column not found in related table');
-
-          await Column.insert({
-            ...colBody,
-            fk_model_id: table.id
-          });
-        }
-        break;
-
-      case UITypes.LinkToAnotherRecord:
-        // case UITypes.ForeignKey:
-        {
-          validateParams(['parentId', 'childId', 'type'], req.body);
-
-          // get parent and child models
-          const parent = await Model.getWithInfo({ id: req.body.parentId });
-          const child = await Model.getWithInfo({ id: req.body.childId });
-          let childColumn: Column;
-
-          const sqlMgr = await ProjectMgrv2.getSqlMgr({
-            id: base.project_id
-          });
-          if (req.body.type === 'hm' || req.body.type === 'bt') {
-            // populate fk column name
-            const fkColName = getUniqueColumnName(
-              await child.getColumns(),
-              `${parent.tn}_id`
-            );
-
-            {
-              // create foreign key
-              const newColumn = {
-                cn: fkColName,
-                _cn: fkColName,
-                rqd: false,
-                pk: false,
-                ai: false,
-                cdf: null,
-                dt: parent.primaryKey.dt,
-                dtxp: parent.primaryKey.dtxp,
-                dtxs: parent.primaryKey.dtxs,
-                un: parent.primaryKey.un,
-                altered: Altered.NEW_COLUMN
-              };
-              const tableUpdateBody = {
-                ...child,
-                originalColumns: child.columns,
-                columns: [...child.columns, newColumn]
-              };
-
-              await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
-
-              const { id } = await Column.insert({
-                ...newColumn,
-                uidt: UITypes.ForeignKey,
-                fk_model_id: child.id
-              });
-
-              childColumn = await Column.get({ colId: id });
-
-              // create relation
-              await sqlMgr.sqlOpPlus(base, 'relationCreate', {
-                childColumn: fkColName,
-                childTable: child.tn,
-                parentTable: parent.tn,
-                onDelete: 'NO ACTION',
-                onUpdate: 'NO ACTION',
-                type: 'real',
-                parentColumn: parent.primaryKey.cn
-              });
-            }
-            await createHmAndBtColumn(
-              child,
-              parent,
-              childColumn,
-              req.body.type,
-              req.body._cn
-            );
-          } else if (req.body.type === 'mm') {
-            const aTn = `${project?.prefix ?? ''}_nc_m2m_${randomID()}`;
-            const aTnAlias = aTn;
-
-            const parentPK = parent.primaryKey;
-            const childPK = child.primaryKey;
-
-            const associateTableCols = [];
-
-            const parentCn = 'table1_id';
-            const childCn = 'table2_id';
-
-            associateTableCols.push(
-              {
-                cn: childCn,
-                _cn: childCn,
-                rqd: true,
-                pk: true,
-                ai: false,
-                cdf: null,
-                dt: childPK.dt,
-                dtxp: childPK.dtxp,
-                dtxs: childPK.dtxs,
-                un: childPK.un,
-                altered: 1,
-                uidt: UITypes.ForeignKey
-              },
-              {
-                cn: parentCn,
-                _cn: parentCn,
-                rqd: true,
-                pk: true,
-                ai: false,
-                cdf: null,
-                dt: parentPK.dt,
-                dtxp: parentPK.dtxp,
-                dtxs: parentPK.dtxs,
-                un: parentPK.un,
-                altered: 1,
-                uidt: UITypes.ForeignKey
-              }
-            );
-
-            await sqlMgr.sqlOpPlus(base, 'tableCreate', {
-              tn: aTn,
-              _tn: aTnAlias,
-              columns: associateTableCols
-            });
-
-            const assocModel = await Model.insert(project.id, base.id, {
-              tn: aTn,
-              _tn: aTnAlias,
-              // todo: sanitize
-              mm: true,
-              columns: associateTableCols
-            });
-
-            const rel1Args = {
-              ...req.body,
-              childTable: aTn,
-              childColumn: parentCn,
-              parentTable: parent.tn,
-              parentColumn: parentPK.cn,
-              type: 'real'
-            };
-            const rel2Args = {
-              ...req.body,
-              childTable: aTn,
-              childColumn: childCn,
-              parentTable: child.tn,
-              parentColumn: childPK.cn,
-              type: 'real'
-            };
-
-            await sqlMgr.sqlOpPlus(base, 'relationCreate', rel1Args);
-            await sqlMgr.sqlOpPlus(base, 'relationCreate', rel2Args);
-
-            const parentCol = (await assocModel.getColumns())?.find(
-              c => c.cn === parentCn
-            );
-            const childCol = (await assocModel.getColumns())?.find(
-              c => c.cn === childCn
-            );
-
-            await createHmAndBtColumn(
-              assocModel,
-              child,
-              childCol,
-              null,
-              null,
-              true
-            );
-            await createHmAndBtColumn(
-              assocModel,
-              parent,
-              parentCol,
-              null,
-              null,
-              true
-            );
-
-            await Column.insert({
-              _cn: getUniqueColumnAliasName(
-                await child.getColumns(),
-                `${child._tn}MMList`
-              ),
-              uidt: UITypes.LinkToAnotherRecord,
-              type: 'mm',
-
-              // ref_db_alias
-              fk_model_id: child.id,
-              // db_type:
-
-              fk_child_column_id: childPK.id,
-              fk_parent_column_id: parentPK.id,
-
-              fk_mm_model_id: assocModel.id,
-              fk_mm_child_column_id: childCol.id,
-              fk_mm_parent_column_id: parentCol.id,
-              fk_related_model_id: parent.id
-            });
-            await Column.insert({
-              _cn: getUniqueColumnAliasName(
-                await parent.getColumns(),
-                req.body._cn ?? `${parent._tn}MMList`
-              ),
-
-              uidt: UITypes.LinkToAnotherRecord,
-              type: 'mm',
-
-              fk_model_id: parent.id,
-
-              fk_child_column_id: parentPK.id,
-              fk_parent_column_id: childPK.id,
-
-              fk_mm_model_id: assocModel.id,
-              fk_mm_child_column_id: parentCol.id,
-              fk_mm_parent_column_id: childCol.id,
-              fk_related_model_id: child.id
-            });
-          }
-        }
-        break;
-
-      case UITypes.Formula:
-        colBody.formula = await substituteColumnNameWithIdInFormula(
-          colBody.formula_raw || colBody.formula,
-          table.columns
+  let colBody = req.body;
+  switch (colBody.uidt) {
+    case UITypes.Rollup:
+      {
+        validateParams(
+          [
+            '_cn',
+            'fk_relation_column_id',
+            'fk_rollup_column_id',
+            'rollup_function'
+          ],
+          req.body
         );
+
+        const relation = await (
+          await Column.get({
+            colId: req.body.fk_relation_column_id
+          })
+        ).getColOptions<LinkToAnotherRecordType>();
+
+        if (!relation) {
+          throw new Error('Relation column not found');
+        }
+
+        let relatedColumn: Column;
+        switch (relation.type) {
+          case 'hm':
+            relatedColumn = await Column.get({
+              colId: relation.fk_child_column_id
+            });
+            break;
+          case 'mm':
+          case 'bt':
+            relatedColumn = await Column.get({
+              colId: relation.fk_parent_column_id
+            });
+            break;
+        }
+
+        const relatedTable = await relatedColumn.getModel();
+        if (
+          !(await relatedTable.getColumns()).find(
+            c => c.id === req.body.fk_rollup_column_id
+          )
+        )
+          throw new Error('Rollup column not found in related table');
+
         await Column.insert({
           ...colBody,
           fk_model_id: table.id
         });
+      }
+      break;
+    case UITypes.Lookup:
+      {
+        validateParams(
+          ['_cn', 'fk_relation_column_id', 'fk_lookup_column_id'],
+          req.body
+        );
 
-        break;
-      default:
-        {
-          colBody = getColumnPropsFromUIDT(colBody, base);
-          const tableUpdateBody = {
-            ...table,
-            originalColumns: table.columns,
-            columns: [
-              ...table.columns,
-              {
-                ...colBody,
-                altered: Altered.NEW_COLUMN
-              }
-            ]
+        const relation = await (
+          await Column.get({
+            colId: req.body.fk_relation_column_id
+          })
+        ).getColOptions<LinkToAnotherRecordType>();
+
+        if (!relation) {
+          throw new Error('Relation column not found');
+        }
+
+        let relatedColumn: Column;
+        switch (relation.type) {
+          case 'hm':
+            relatedColumn = await Column.get({
+              colId: relation.fk_child_column_id
+            });
+            break;
+          case 'mm':
+          case 'bt':
+            relatedColumn = await Column.get({
+              colId: relation.fk_parent_column_id
+            });
+            break;
+        }
+
+        const relatedTable = await relatedColumn.getModel();
+        if (
+          !(await relatedTable.getColumns()).find(
+            c => c.id === req.body.fk_lookup_column_id
+          )
+        )
+          throw new Error('Lookup column not found in related table');
+
+        await Column.insert({
+          ...colBody,
+          fk_model_id: table.id
+        });
+      }
+      break;
+
+    case UITypes.LinkToAnotherRecord:
+      // case UITypes.ForeignKey:
+      {
+        validateParams(['parentId', 'childId', 'type'], req.body);
+
+        // get parent and child models
+        const parent = await Model.getWithInfo({ id: req.body.parentId });
+        const child = await Model.getWithInfo({ id: req.body.childId });
+        let childColumn: Column;
+
+        const sqlMgr = await ProjectMgrv2.getSqlMgr({
+          id: base.project_id
+        });
+        if (req.body.type === 'hm' || req.body.type === 'bt') {
+          // populate fk column name
+          const fkColName = getUniqueColumnName(
+            await child.getColumns(),
+            `${parent.tn}_id`
+          );
+
+          {
+            // create foreign key
+            const newColumn = {
+              cn: fkColName,
+              _cn: fkColName,
+              rqd: false,
+              pk: false,
+              ai: false,
+              cdf: null,
+              dt: parent.primaryKey.dt,
+              dtxp: parent.primaryKey.dtxp,
+              dtxs: parent.primaryKey.dtxs,
+              un: parent.primaryKey.un,
+              altered: Altered.NEW_COLUMN
+            };
+            const tableUpdateBody = {
+              ...child,
+              originalColumns: child.columns,
+              columns: [...child.columns, newColumn]
+            };
+
+            await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+
+            const { id } = await Column.insert({
+              ...newColumn,
+              uidt: UITypes.ForeignKey,
+              fk_model_id: child.id
+            });
+
+            childColumn = await Column.get({ colId: id });
+
+            // create relation
+            await sqlMgr.sqlOpPlus(base, 'relationCreate', {
+              childColumn: fkColName,
+              childTable: child.tn,
+              parentTable: parent.tn,
+              onDelete: 'NO ACTION',
+              onUpdate: 'NO ACTION',
+              type: 'real',
+              parentColumn: parent.primaryKey.cn
+            });
+          }
+          await createHmAndBtColumn(
+            child,
+            parent,
+            childColumn,
+            req.body.type,
+            req.body._cn
+          );
+        } else if (req.body.type === 'mm') {
+          const aTn = `${project?.prefix ?? ''}_nc_m2m_${randomID()}`;
+          const aTnAlias = aTn;
+
+          const parentPK = parent.primaryKey;
+          const childPK = child.primaryKey;
+
+          const associateTableCols = [];
+
+          const parentCn = 'table1_id';
+          const childCn = 'table2_id';
+
+          associateTableCols.push(
+            {
+              cn: childCn,
+              _cn: childCn,
+              rqd: true,
+              pk: true,
+              ai: false,
+              cdf: null,
+              dt: childPK.dt,
+              dtxp: childPK.dtxp,
+              dtxs: childPK.dtxs,
+              un: childPK.un,
+              altered: 1,
+              uidt: UITypes.ForeignKey
+            },
+            {
+              cn: parentCn,
+              _cn: parentCn,
+              rqd: true,
+              pk: true,
+              ai: false,
+              cdf: null,
+              dt: parentPK.dt,
+              dtxp: parentPK.dtxp,
+              dtxs: parentPK.dtxs,
+              un: parentPK.un,
+              altered: 1,
+              uidt: UITypes.ForeignKey
+            }
+          );
+
+          await sqlMgr.sqlOpPlus(base, 'tableCreate', {
+            tn: aTn,
+            _tn: aTnAlias,
+            columns: associateTableCols
+          });
+
+          const assocModel = await Model.insert(project.id, base.id, {
+            tn: aTn,
+            _tn: aTnAlias,
+            // todo: sanitize
+            mm: true,
+            columns: associateTableCols
+          });
+
+          const rel1Args = {
+            ...req.body,
+            childTable: aTn,
+            childColumn: parentCn,
+            parentTable: parent.tn,
+            parentColumn: parentPK.cn,
+            type: 'real'
+          };
+          const rel2Args = {
+            ...req.body,
+            childTable: aTn,
+            childColumn: childCn,
+            parentTable: child.tn,
+            parentColumn: childPK.cn,
+            type: 'real'
           };
 
-          const sqlMgr = await ProjectMgrv2.getSqlMgr({ id: base.project_id });
-          await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+          await sqlMgr.sqlOpPlus(base, 'relationCreate', rel1Args);
+          await sqlMgr.sqlOpPlus(base, 'relationCreate', rel2Args);
+
+          const parentCol = (await assocModel.getColumns())?.find(
+            c => c.cn === parentCn
+          );
+          const childCol = (await assocModel.getColumns())?.find(
+            c => c.cn === childCn
+          );
+
+          await createHmAndBtColumn(
+            assocModel,
+            child,
+            childCol,
+            null,
+            null,
+            true
+          );
+          await createHmAndBtColumn(
+            assocModel,
+            parent,
+            parentCol,
+            null,
+            null,
+            true
+          );
+
           await Column.insert({
-            ...colBody,
-            fk_model_id: table.id
+            _cn: getUniqueColumnAliasName(
+              await child.getColumns(),
+              `${child._tn}MMList`
+            ),
+            uidt: UITypes.LinkToAnotherRecord,
+            type: 'mm',
+
+            // ref_db_alias
+            fk_model_id: child.id,
+            // db_type:
+
+            fk_child_column_id: childPK.id,
+            fk_parent_column_id: parentPK.id,
+
+            fk_mm_model_id: assocModel.id,
+            fk_mm_child_column_id: childCol.id,
+            fk_mm_parent_column_id: parentCol.id,
+            fk_related_model_id: parent.id
+          });
+          await Column.insert({
+            _cn: getUniqueColumnAliasName(
+              await parent.getColumns(),
+              req.body._cn ?? `${parent._tn}MMList`
+            ),
+
+            uidt: UITypes.LinkToAnotherRecord,
+            type: 'mm',
+
+            fk_model_id: parent.id,
+
+            fk_child_column_id: parentPK.id,
+            fk_parent_column_id: childPK.id,
+
+            fk_mm_model_id: assocModel.id,
+            fk_mm_child_column_id: parentCol.id,
+            fk_mm_parent_column_id: childCol.id,
+            fk_related_model_id: child.id
           });
         }
-        break;
-    }
+      }
+      break;
 
-    await table.getColumns();
+    case UITypes.Formula:
+      colBody.formula = await substituteColumnNameWithIdInFormula(
+        colBody.formula_raw || colBody.formula,
+        table.columns
+      );
+      await Column.insert({
+        ...colBody,
+        fk_model_id: table.id
+      });
 
-    Audit.insert({
-      project_id: base.project_id,
-      op_type: AuditOperationTypes.TABLE_COLUMN,
-      op_sub_type: AuditOperationSubTypes.CREATED,
-      user: (req as any)?.user?.email,
-      description: `created column ${colBody.cn} with alias ${colBody._cn} from table ${table.tn}`,
-      ip: (req as any).clientIp
-    }).then(() => {});
-    res.json(table);
-  } catch (e) {
-    console.log(e);
-    next(e);
+      break;
+    default:
+      {
+        colBody = getColumnPropsFromUIDT(colBody, base);
+        const tableUpdateBody = {
+          ...table,
+          originalColumns: table.columns,
+          columns: [
+            ...table.columns,
+            {
+              ...colBody,
+              altered: Altered.NEW_COLUMN
+            }
+          ]
+        };
+
+        const sqlMgr = await ProjectMgrv2.getSqlMgr({ id: base.project_id });
+        await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+        await Column.insert({
+          ...colBody,
+          fk_model_id: table.id
+        });
+      }
+      break;
   }
+
+  await table.getColumns();
+
+  Audit.insert({
+    project_id: base.project_id,
+    op_type: AuditOperationTypes.TABLE_COLUMN,
+    op_sub_type: AuditOperationSubTypes.CREATED,
+    user: (req as any)?.user?.email,
+    description: `created column ${colBody.cn} with alias ${colBody._cn} from table ${table.tn}`,
+    ip: (req as any).clientIp
+  }).then(() => {});
+  res.json(table);
 }
 
 export async function columnSetAsPrimary(req: Request, res: Response) {
@@ -470,6 +484,26 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
     id: req.params.tableId
   });
   const base = await Base.get(table.base_id);
+
+  if (
+    !isVirtualCol(req.body) &&
+    !(await Column.checkTitleAvailable({
+      cn: req.body.cn,
+      fk_model_id: req.params.tableId,
+      exclude_id: req.params.columnId
+    }))
+  ) {
+    NcError.badRequest('Duplicate column name');
+  }
+  if (
+    !(await Column.checkAliasAvailable({
+      _cn: req.body._cn,
+      fk_model_id: req.params.tableId,
+      exclude_id: req.params.columnId
+    }))
+  ) {
+    NcError.badRequest('Duplicate column alias');
+  }
 
   const column = table.columns.find(c => c.id === req.params.columnId);
   let colBody = req.body;

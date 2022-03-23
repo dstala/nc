@@ -18,7 +18,8 @@
               color="primary"
               :rules="[
                 v => !!v || 'Required',
-                v => !meta || !meta.columns || meta.columns.every(c => column && c.cn === column.cn || v !== c.cn ) || 'Duplicate column name' ,// && meta.v.every(c => v !== c._cn ) || 'Duplicate column name',
+                v => !meta || !meta.columns || meta.columns.every(c => column && (c.cn || '').toLowerCase() === (column.cn || '').toLowerCase() ||(
+                  (v||'').toLowerCase() !== (c.cn||'').toLowerCase() && (v||'').toLowerCase() !== (c._cn||'').toLowerCase())) || 'Duplicate column name' ,// && meta.v.every(c => v !== c._cn ) || 'Duplicate column name',
                 validateColumnName
               ]"
               class="caption nc-column-name-input"
