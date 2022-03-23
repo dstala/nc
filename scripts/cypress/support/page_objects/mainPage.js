@@ -495,9 +495,11 @@ export class _mainPage {
     }
 
     tabReset() {
-        mainPage.toolBarTopLeft(mainPage.HOME).click({ force: true });
-        cy.get(".project-row").should("exist").click({ force: true });
-        projectsPage.waitHomePageLoad();
+        // temporary disable (kludge)
+        // mainPage.toolBarTopLeft(mainPage.HOME).click({ force: true });
+        // cy.get(".project-row").should("exist").click({ force: true });
+        // projectsPage.waitHomePageLoad();
+        // option-2
         // cy.openTableTab("Country", 0);
         // cy.get(".mdi-close").click({ multiple: true });
     }
