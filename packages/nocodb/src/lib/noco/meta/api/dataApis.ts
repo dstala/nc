@@ -50,12 +50,15 @@ export async function mmList(req: Request, res: Response, next) {
     await nocoExecute(
       requestObj,
       {
-        [key]: async _args => {
+        [key]: async args => {
           return (
-            await baseModel.mmList({
-              colId: req.params.colId,
-              parentIds: [req.params.rowId]
-            })
+            await baseModel.mmList(
+              {
+                colId: req.params.colId,
+                parentIds: [req.params.rowId]
+              },
+              args
+            )
           )?.[0];
         }
       },
@@ -74,10 +77,178 @@ export async function mmList(req: Request, res: Response, next) {
 
   res.json(
     new PagedResponseImpl(data, {
-      // todo:
-      totalRows: count,
-      pageSize: 25,
-      page: 1
+      totalRows: count
+    })
+  );
+}
+
+export async function mmExcludedList(req: Request, res: Response, next) {
+  const view = await View.get(req.params.viewId);
+
+  const model = await Model.getByIdOrName({
+    id: view?.fk_model_id || req.params.viewId
+  });
+
+  if (!model) return next(new Error('Table not found'));
+
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = 'List';
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return await baseModel.getMmChildrenExcludedList(
+            {
+              colId: req.params.colId,
+              pid: req.params.rowId
+            },
+            args
+          );
+        }
+      },
+      {},
+
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = await baseModel.getMmChildrenExcludedListCount(
+    {
+      colId: req.params.colId,
+      pid: req.params.rowId
+    },
+    req.query
+  );
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    })
+  );
+}
+
+export async function hmExcludedList(req: Request, res: Response, next) {
+  const view = await View.get(req.params.viewId);
+
+  const model = await Model.getByIdOrName({
+    id: view?.fk_model_id || req.params.viewId
+  });
+
+  if (!model) return next(new Error('Table not found'));
+
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = 'List';
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return await baseModel.getHmChildrenExcludedList(
+            {
+              colId: req.params.colId,
+              pid: req.params.rowId
+            },
+            args
+          );
+        }
+      },
+      {},
+
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = await baseModel.getHmChildrenExcludedListCount(
+    {
+      colId: req.params.colId,
+      pid: req.params.rowId
+    },
+    req.query
+  );
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    })
+  );
+}
+
+export async function btExcludedList(req: Request, res: Response, next) {
+  const view = await View.get(req.params.viewId);
+
+  const model = await Model.getByIdOrName({
+    id: view?.fk_model_id || req.params.viewId
+  });
+
+  if (!model) return next(new Error('Table not found'));
+
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = 'List';
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return await baseModel.getBtChildrenExcludedList(
+            {
+              colId: req.params.colId,
+              cid: req.params.rowId
+            },
+            args
+          );
+        }
+      },
+      {},
+
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = await baseModel.getBtChildrenExcludedListCount(
+    {
+      colId: req.params.colId,
+      cid: req.params.rowId
+    },
+    req.query
+  );
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
     })
   );
 }
@@ -108,13 +279,16 @@ export async function hmList(req: Request, res: Response, next) {
     await nocoExecute(
       requestObj,
       {
-        [key]: async _args => {
+        [key]: async args => {
           return (
-            await baseModel.hmList({
-              colId: req.params.colId,
-              ids: [req.params.rowId]
-            })
-          )?.[0];
+            await baseModel.hmList(
+              {
+                colId: req.params.colId,
+                ids: [req.params.rowId]
+              },
+              args
+            )
+          )?.[req.params.rowId];
         }
       },
       {},
@@ -127,16 +301,13 @@ export async function hmList(req: Request, res: Response, next) {
       colId: req.params.colId,
       ids: [req.params.rowId]
     })
-  )?.[0]?.count;
+  )?.[0];
 
-  res.json({
-    data: new PagedResponseImpl(data, {
-      // todo:
-      totalRows: count,
-      pageSize: 25,
-      page: 1
-    })
-  });
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    } as any)
+  );
 }
 
 async function dataRead(req: Request, res: Response, next) {
@@ -366,8 +537,19 @@ router.get('/data/:viewId/:rowId', ncMetaAclMw(dataRead));
 router.put('/data/:viewId/:rowId', ncMetaAclMw(dataUpdate));
 router.delete('/data/:viewId/:rowId', ncMetaAclMw(dataDelete));
 router.get('/data/:viewId/:rowId/mm/:colId', ncMetaAclMw(mmList));
-// todo: implement these apis
-// router.get('/data/:viewId/:rowId/mm/:colId/exclude', ncMetaAclMw(mmList));
+
 router.get('/data/:viewId/:rowId/hm/:colId', ncMetaAclMw(hmList));
-// router.get('/data/:viewId/:rowId/hm/:colId/exclude', ncMetaAclMw(mmList));
+
+router.get(
+  '/data/:viewId/:rowId/mm/:colId/exclude',
+  ncMetaAclMw(mmExcludedList)
+);
+router.get(
+  '/data/:viewId/:rowId/hm/:colId/exclude',
+  ncMetaAclMw(hmExcludedList)
+);
+router.get(
+  '/data/:viewId/:rowId/bt/:colId/exclude',
+  ncMetaAclMw(btExcludedList)
+);
 export default router;

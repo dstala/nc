@@ -684,6 +684,15 @@ export interface DataNestedListParamsType {
   columnId: string;
 }
 
+export interface DataNestedExcludedListParamsType {
+  limit?: string;
+  offset?: string;
+  uuid: string;
+  rowId: string;
+  relationType: 'mm' | 'hm';
+  columnId: string;
+}
+
 export interface DataCreatePayloadType {
   data?: any;
   password?: string;
@@ -3212,6 +3221,33 @@ export class Api<
      * No description
      *
      * @tags Public
+     * @name DataNestedExcludedList
+     * @request GET:/public/data/{uuid}/{rowId}/{relationType}/{columnId}/exclude
+     * @response `200` `any` OK
+     * @response `0` `any`
+     */
+    dataNestedExcludedList: (
+      {
+        uuid,
+        rowId,
+        relationType,
+        columnId,
+        ...query
+      }: DataNestedExcludedListParamsType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/public/data/${uuid}/${rowId}/${relationType}/${columnId}/exclude`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Public
      * @name DataCreate
      * @request POST:/public/data/{uuid}/create
      * @response `200` `any` OK
@@ -3467,12 +3503,12 @@ export class Api<
      * No description
      *
      * @tags Data
-     * @name MmList
+     * @name NestedList
      * @request GET:/data/{tableId}/{rowId}/{relationType}/{colId}
      * @response `201` `any` Created
      * @response `0` `any`
      */
-    mmList: (
+    nestedList: (
       tableId: string,
       rowId: string,
       colId: string,
@@ -3481,6 +3517,29 @@ export class Api<
     ) =>
       this.request<any, any>({
         path: `/data/${tableId}/${rowId}/${relationType}/${colId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name NestedExcludedList
+     * @request GET:/data/{tableId}/{rowId}/{relationType}/{colId}/exclude
+     * @response `201` `any` Created
+     * @response `0` `any`
+     */
+    nestedExcludedList: (
+      tableId: string,
+      rowId: string,
+      colId: string,
+      relationType: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${tableId}/${rowId}/${relationType}/${colId}/exclude`,
         method: 'GET',
         format: 'json',
         ...params,

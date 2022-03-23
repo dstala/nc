@@ -222,12 +222,12 @@ export default {
       if (this.isNew) {
         return
       }
-      if (this.column && this.column.colOptions && this.column.colOptions.type === 'mm') {
-        this.data = (await this.$api.data.mmList(
+      if (this.column && this.column.colOptions) {
+        this.data = (await this.$api.data.nestedList(
           this.column.fk_model_id,
           this.rowId,
           this.column.id,
-          'mm',
+          this.column.colOptions.type,
           {
             query: {
               limit: this.size,

@@ -67,6 +67,7 @@
       }"
       :is-public="isPublic"
       :password="password"
+      :row-id="parentId"
       @add-new-record="insertAndAddNewChildRecord"
       @add="addChildToParent"
     />

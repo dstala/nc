@@ -706,4 +706,11 @@ export default class Model implements TableType {
       exclude_id && { id: { neq: exclude_id } }
     ));
   }
+
+  async getAliasColObjMap() {
+    return (await this.getColumns()).reduce(
+      (sortAgg, c) => ({ ...sortAgg, [c._cn]: c }),
+      {}
+    );
+  }
 }

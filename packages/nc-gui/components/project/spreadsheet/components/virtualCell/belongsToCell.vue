@@ -42,6 +42,7 @@
       :is-public="isPublic"
       :tn="bt && bt.rtn"
       :password="password"
+      :row-id="rowId"
       @add-new-record="insertAndMapNewParentRecord"
       @add="addChildToParent"
     />
@@ -172,6 +173,9 @@ export default {
     },
     parentId() {
       return this.pid ?? (this.value && this.parentMeta && this.parentMeta.columns.filter(c => c.pk).map(c => this.value[c._cn]).join('___'))
+    },
+    rowId() {
+      return (this.row && this.meta && this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___'))
     },
     parentPrimaryCol() {
       return this.parentMeta && (this.parentMeta.columns.find(c => c.pv) || {})._cn

@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { RelationTypes } from 'nc-common'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
 
 export default {
@@ -112,7 +113,8 @@ export default {
     parentMeta: [Object],
     isPublic: Boolean,
     password: String,
-    column: Object
+    column: Object,
+    rowId: [Number, String]
   },
   data: () => ({
     data: null,
@@ -162,29 +164,45 @@ export default {
         // if (!this.api) {
         //   return
         // }
+        const where = `(${this.primaryCol},like,%${this.query}%)`
 
-        let where = this.queryParams.where || ''
-        if (this.query) {
-          where = (where ? `(${where})~and` : '') + `(${this.primaryCol},like,%${this.query}%)`
+        // eslint-disable-next-line no-lonely-if
+        if (this.column && this.column.colOptions && this.rowId) {
+          this.data = (await this.$api.data.nestedExcludedList(
+            this.column.fk_model_id,
+            this.rowId,
+            this.column.id,
+            this.column.colOptions.type,
+            {
+              query: {
+                limit: this.size,
+                offset: this.size * (this.page - 1),
+                where: `(${this.primaryCol},like,${this.query})`
+              }
+            })).data
+        } else {
+          // let where = this.queryParams.where || ''
+          // if (this.query) {
+          // }
+
+          // if (this.mm) {
+          //   this.data = await this.api.paginatedM2mNotChildrenList({
+          //     limit: this.size,
+          //     offset: this.size * (this.page - 1),
+          //     ...this.queryParams,
+          //     where
+          //   }, this.mm.vtn, this.parentId)
+          // } else {
+          this.data = (await this.$api.data.list(
+            this.meta.id, {
+              query: {
+                limit: this.size,
+                offset: this.size * (this.page - 1),
+                ...this.queryParams,
+                where
+              }
+            })).data
         }
-
-        // if (this.mm) {
-        //   this.data = await this.api.paginatedM2mNotChildrenList({
-        //     limit: this.size,
-        //     offset: this.size * (this.page - 1),
-        //     ...this.queryParams,
-        //     where
-        //   }, this.mm.vtn, this.parentId)
-        // } else {
-        this.data = (await this.$api.data.list(
-          this.meta.id, {
-            query: {
-              limit: this.size,
-              offset: this.size * (this.page - 1),
-              ...this.queryParams,
-              where
-            }
-          })).data
 
         //   await this.api.paginatedList({
         //   limit: this.size,
