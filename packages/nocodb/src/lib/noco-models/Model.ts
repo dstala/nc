@@ -682,7 +682,7 @@ export default class Model implements TableType {
         tn
       },
       null,
-      exclude_id && { id: { neq: 'exclude_id' } }
+      exclude_id && { id: { neq: exclude_id } }
     ));
   }
 
@@ -703,7 +703,7 @@ export default class Model implements TableType {
         _tn
       },
       null,
-      exclude_id && { id: { neq: 'exclude_id' } }
+      exclude_id && { id: { neq: exclude_id } }
     ));
   }
 }
