@@ -194,20 +194,10 @@ export default {
         //   type: this.type
         // }])
 
-        if (this.column && this.column.colOptions && this.column.colOptions.type === RelationTypes.MANY_TO_MANY) {
+        if (this.column && this.column.colOptions && this.rowId) {
           this.data = (await this.$api.public.dataNestedList({
             uuid: this.$route.params.id,
-            relationType: 'mm',
-            rowId: this.rowId,
-            limit: this.size,
-            offset: this.size * (this.page - 1),
-            query: this.query,
-            columnId: this.column.fk_column_id || this.column.id
-          }, {})).data
-        } else {
-          this.data = (await this.$api.public.dataNestedList({
-            uuid: this.$route.params.id,
-            relationType: 'hm',
+            relationType: this.column.colOptions.type,
             rowId: this.rowId,
             limit: this.size,
             offset: this.size * (this.page - 1),

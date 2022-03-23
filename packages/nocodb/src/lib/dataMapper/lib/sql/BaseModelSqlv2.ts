@@ -530,7 +530,7 @@ class BaseModelSqlv2 {
       }),
       `${tn}_${vcn}`
     );
-    return parentIds.map(id => gs[id] || []);
+    return parentIds.map(id => gs?.[id]?.[0] || []);
   }
 
   // todo: naming & optimizing

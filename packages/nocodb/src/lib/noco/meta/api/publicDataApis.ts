@@ -256,16 +256,17 @@ async function relDataList(req, res) {
 
   const count = await baseModel.count(req.query);
 
-  res.json({
-    data: new PagedResponseImpl(data, {
+  res.json(
+    new PagedResponseImpl(data, {
       // todo:
       totalRows: count,
       pageSize: 25,
       page: 1
     })
-  });
+  );
 }
 
+/*
 export async function mmList(req: Request, res: Response): Promise<any> {
   const view = await View.getByUUID(req.params.publicDataUuid);
 
@@ -394,6 +395,326 @@ export async function hmList(req: Request, res: Response): Promise<any> {
   });
 }
 
+
+*/
+
+export async function publicMmList(req: Request, res: Response) {
+  const view = await View.getByUUID(req.params.publicDataUuid);
+
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
+  const column = await Column.get({ colId: req.params.colId });
+
+  if (column.fk_model_id !== view.fk_model_id)
+    NcError.badRequest("Column doesn't belongs to the model");
+
+  const base = await Base.get(view.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: view.fk_model_id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = `List`;
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return (
+            await baseModel.mmList(
+              {
+                colId: req.params.colId,
+                parentIds: [req.params.rowId]
+              },
+              args
+            )
+          )?.[0];
+        }
+      },
+      {},
+
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = (
+    await baseModel.mmListCount({
+      colId: req.params.colId,
+      parentIds: [req.params.rowId]
+    })
+  )?.[0]?.count;
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    })
+  );
+}
+
+export async function publicHmList(req: Request, res: Response) {
+  const view = await View.getByUUID(req.params.publicDataUuid);
+
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
+  const column = await Column.get({ colId: req.params.colId });
+
+  if (column.fk_model_id !== view.fk_model_id)
+    NcError.badRequest("Column doesn't belongs to the model");
+
+  const base = await Base.get(view.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: view.fk_model_id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = `List`;
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return (
+            await baseModel.hmList(
+              {
+                colId: req.params.colId,
+                ids: [req.params.rowId]
+              },
+              args
+            )
+          )?.[req.params.rowId];
+        }
+      },
+      {},
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = (
+    await baseModel.hmListCount({
+      colId: req.params.colId,
+      ids: [req.params.rowId]
+    })
+  )?.[0];
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    } as any)
+  );
+}
+/*
+
+export async function mmExcludedList(req: Request, res: Response) {
+  const view = await View.getByUUID(req.params.publicDataUuid);
+
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
+  const column = await Column.get({ colId: req.params.colId });
+
+  if (column.fk_model_id !== view.fk_model_id)
+    NcError.badRequest("Column doesn't belongs to the model");
+
+  const base = await Base.get(view.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: view.fk_model_id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = 'List';
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return await baseModel.getMmChildrenExcludedList(
+            {
+              colId: req.params.colId,
+              pid: req.params.rowId
+            },
+            args
+          );
+        }
+      },
+      {},
+
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = await baseModel.getMmChildrenExcludedListCount(
+    {
+      colId: req.params.colId,
+      pid: req.params.rowId
+    },
+    req.query
+  );
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    })
+  );
+}
+
+export async function hmExcludedList(req: Request, res: Response) {
+  const view = await View.getByUUID(req.params.publicDataUuid);
+
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
+  const column = await Column.get({ colId: req.params.colId });
+
+  if (column.fk_model_id !== view.fk_model_id)
+    NcError.badRequest("Column doesn't belongs to the model");
+
+  const base = await Base.get(view.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: view.fk_model_id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = 'List';
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return await baseModel.getHmChildrenExcludedList(
+            {
+              colId: req.params.colId,
+              pid: req.params.rowId
+            },
+            args
+          );
+        }
+      },
+      {},
+
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = await baseModel.getHmChildrenExcludedListCount(
+    {
+      colId: req.params.colId,
+      pid: req.params.rowId
+    },
+    req.query
+  );
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    })
+  );
+}
+export async function btExcludedList(req: Request, res: Response) {
+  const view = await View.getByUUID(req.params.publicDataUuid);
+
+  if (!view) NcError.notFound('Not found');
+  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
+
+  if (view.password && view.password !== req.body?.password) {
+    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
+  }
+
+  const column = await Column.get({ colId: req.params.colId });
+
+  if (column.fk_model_id !== view.fk_model_id)
+    NcError.badRequest("Column doesn't belongs to the model");
+
+  const base = await Base.get(view.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: view.fk_model_id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  const key = 'List';
+  const requestObj: any = {
+    [key]: 1
+  };
+
+  const data = (
+    await nocoExecute(
+      requestObj,
+      {
+        [key]: async args => {
+          return await baseModel.getBtChildrenExcludedList(
+            {
+              colId: req.params.colId,
+              cid: req.params.rowId
+            },
+            args
+          );
+        }
+      },
+      {},
+
+      { nested: { [key]: req.query } }
+    )
+  )?.[key];
+
+  const count = await baseModel.getBtChildrenExcludedListCount(
+    {
+      colId: req.params.colId,
+      cid: req.params.rowId
+    },
+    req.query
+  );
+
+  res.json(
+    new PagedResponseImpl(data, {
+      totalRows: count
+    })
+  );
+}
+*/
+
 const router = Router({ mergeParams: true });
 router.post('/public/data/:publicDataUuid/list', catchError(dataList));
 router.post(
@@ -409,12 +730,25 @@ router.post(
 );
 
 router.get(
-  '/public/data/:publicDataUuid/:rowId/mm/:columnId',
-  catchError(mmList)
+  '/public/data/:publicDataUuid/:rowId/mm/:colId',
+  catchError(publicMmList)
 );
 router.get(
-  '/public/data/:publicDataUuid/:rowId/hm/:columnId',
-  catchError(hmList)
+  '/public/data/:publicDataUuid/:rowId/hm/:colId',
+  catchError(publicHmList)
 );
+
+// router.get(
+//   '/public/data/:publicDataUuid/:rowId/mm/:columnId/exclude',
+//   catchError(mmExcludedList)
+// );
+// router.get(
+//   '/public/data/:publicDataUuid/:rowId/hm/:columnId/exclude',
+//   catchError(hmExcludedList)
+// );
+// router.get(
+//   '/public/data/:publicDataUuid/:rowId/bt/:columnId/exclude',
+//   catchError(btExcludedList)
+// );
 
 export default router;
