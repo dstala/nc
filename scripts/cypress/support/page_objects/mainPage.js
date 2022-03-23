@@ -496,7 +496,7 @@ export class _mainPage {
 
     tabReset() {
         mainPage.toolBarTopLeft(mainPage.HOME).click({ force: true });
-        cy.get(".project-row").click({ force: true });
+        cy.get(".project-row").should("exist").click({ force: true });
         projectsPage.waitHomePageLoad();
         // cy.openTableTab("Country", 0);
         // cy.get(".mdi-close").click({ multiple: true });
