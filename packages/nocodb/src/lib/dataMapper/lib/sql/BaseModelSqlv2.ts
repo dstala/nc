@@ -116,68 +116,66 @@ class BaseModelSqlv2 {
 
     // todo: replace with view id
     if (!ignoreFilterSort && this.viewId) {
-      if (this.viewId) {
-        await conditionV2(
-          [
-            new Filter({
-              children:
-                (await Filter.rootFilterList({ viewId: this.viewId })) || [],
-              is_group: true
-            }),
-            new Filter({
-              children: args.filterArr || [],
-              is_group: true,
-              logical_op: 'and'
-            }),
-            new Filter({
-              children: filterObj,
-              is_group: true,
-              logical_op: 'and'
-            }),
-            ...(args.filterArr || [])
-          ],
-          qb,
-          this.dbDriver
-        );
+      await conditionV2(
+        [
+          new Filter({
+            children:
+              (await Filter.rootFilterList({ viewId: this.viewId })) || [],
+            is_group: true
+          }),
+          new Filter({
+            children: args.filterArr || [],
+            is_group: true,
+            logical_op: 'and'
+          }),
+          new Filter({
+            children: filterObj,
+            is_group: true,
+            logical_op: 'and'
+          }),
+          ...(args.filterArr || [])
+        ],
+        qb,
+        this.dbDriver
+      );
 
-        if (!sorts)
-          sorts = args.sortArr?.length
-            ? args.sortArr
-            : await Sort.list({ viewId: this.viewId });
+      if (!sorts)
+        sorts = args.sortArr?.length
+          ? args.sortArr
+          : await Sort.list({ viewId: this.viewId });
 
-        await sortV2(sorts, qb, this.dbDriver);
+      await sortV2(sorts, qb, this.dbDriver);
 
-        // sort by primary key by default
-        if (!sorts?.length && this.model.primaryKey) {
-          qb.orderBy(this.model.primaryKey.cn);
-        }
-      } else {
-        await conditionV2(
-          [
-            new Filter({
-              children: args.filterArr || [],
-              is_group: true,
-              logical_op: 'and'
-            }),
-            new Filter({
-              children: filterObj,
-              is_group: true,
-              logical_op: 'and'
-            }),
-            ...(args.filterArr || [])
-          ],
-          qb,
-          this.dbDriver
-        );
+      // sort by primary key by default
+      if (!sorts?.length && this.model.primaryKey) {
+        qb.orderBy(this.model.primaryKey.cn);
+      }
+    } else {
+      await conditionV2(
+        [
+          new Filter({
+            children: args.filterArr || [],
+            is_group: true,
+            logical_op: 'and'
+          }),
+          new Filter({
+            children: filterObj,
+            is_group: true,
+            logical_op: 'and'
+          }),
+          ...(args.filterArr || [])
+        ],
+        qb,
+        this.dbDriver
+      );
 
-        if (!sorts) sorts = args.sortArr;
+      if (!sorts) sorts = args.sortArr;
 
-        await sortV2(sorts, qb, this.dbDriver);
+      await sortV2(sorts, qb, this.dbDriver);
 
-        // sort by primary key by default
-        if (this.model.primaryKey) {
-          qb.orderBy(this.model.primaryKey.cn);
-        }
+      // sort by primary key by default
+      if (this.model.primaryKey) {
+        qb.orderBy(this.model.primaryKey.cn);
       }
     }
 
@@ -1306,9 +1304,9 @@ function extractFilterFromXwhere(
 function extractCondition(nestedArrayConditions, aliasColObjMap) {
   return nestedArrayConditions?.map(str => {
     // eslint-disable-next-line prefer-const
-    let [_, logicOp, alias, op, value] = str.match(
-      /(?:~(and|or|not))?\((.*?),(\w+),(.*)\)/
-    );
+    let [logicOp, alias, op, value] = str
+      .match(/(?:~(and|or|not))?\((.*?),(\w+),(.*)\)/)
+      .slice(1);
     if (op === 'is') op = 'is' + value;
     else if (op === 'in') value = value.split(',');
 
