@@ -664,4 +664,46 @@ export default class Model implements TableType {
     }
     return modelId && this.get(modelId);
   }
+
+  static async checkTitleAvailable(
+    {
+      tn,
+      project_id,
+      base_id,
+      exclude_id
+    }: { tn; project_id; base_id; exclude_id? },
+    ncMeta = Noco.ncMeta
+  ) {
+    return !(await ncMeta.metaGet2(
+      project_id,
+      base_id,
+      MetaTable.MODELS,
+      {
+        tn
+      },
+      null,
+      exclude_id && { id: { neq: 'exclude_id' } }
+    ));
+  }
+
+  static async checkAliasAvailable(
+    {
+      _tn,
+      project_id,
+      base_id,
+      exclude_id
+    }: { _tn; project_id; base_id; exclude_id? },
+    ncMeta = Noco.ncMeta
+  ) {
+    return !(await ncMeta.metaGet2(
+      project_id,
+      base_id,
+      MetaTable.MODELS,
+      {
+        _tn
+      },
+      null,
+      exclude_id && { id: { neq: 'exclude_id' } }
+    ));
+  }
 }

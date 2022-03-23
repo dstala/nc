@@ -665,7 +665,7 @@
 
     <textDlgSubmitCancel
       v-if="dialogRenameTable.dialogShow"
-      :rules="[validateTableName]"
+      :rules="[validateTableName, validateUniqueAlias]"
       :dialog-show="dialogRenameTable.dialogShow"
       :heading="dialogRenameTable.heading"
       :cookie="dialogRenameTable.cookie"
@@ -1235,6 +1235,9 @@ export default {
         (item.children && item.children.length) ||
         ['tableDir', 'viewDir', 'functionDir', 'procedureDir', 'sequenceDir'].includes(item.type)
       );
+    },
+    validateUniqueAlias(v){
+      return (this.$store.state.project.tables || []).every(t => this.dialogRenameTable.cookie.id === t.id || t._tn !== (v || '')) || 'Duplicate table alias'
     },
     async handleCreateBtnClick(type, item) {
       this.menuItem = item;

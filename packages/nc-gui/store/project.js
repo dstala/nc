@@ -22,10 +22,14 @@ export const state = () => ({
   activeEnv: null,
   authDbAlias: null,
   projectId: null,
-  project: null
+  project: null,
+  tables: []
 });
 
 export const mutations = {
+  tables(state, tables){
+    state.tables = tables
+  },
   add(state, project) {
     state.list.push(project);
   },
@@ -360,7 +364,7 @@ export const actions = {
         includeM2M: rootState.windows.includeM2M || ''
       })).data.list
 
-
+      commit('tables', tables)
       // if (!result.data.list.length) {
       //   this.$toast.info('No tables in this schema').goAway(2000);
       // }

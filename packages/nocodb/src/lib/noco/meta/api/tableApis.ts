@@ -19,6 +19,7 @@ import { xcVisibilityMetaGet } from './modelVisibilityApis';
 import View from '../../../noco-models/View';
 import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
 import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
+import { NcError } from './helpers/catchError';
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
@@ -103,10 +104,28 @@ export async function tableList(
 }
 
 export async function tableCreate(req: Request<any, any, TableReqType>, res) {
-  console.log(req.params);
-
   const project = await Project.getWithInfo(req.params.projectId);
   const base = project.bases.find(b => b.id === req.params.baseId);
+
+  if (
+    !(await Model.checkTitleAvailable({
+      tn: req.body.tn,
+      project_id: project.id,
+      base_id: base.id
+    }))
+  ) {
+    NcError.badRequest('Duplicate table name');
+  }
+  if (
+    !(await Model.checkAliasAvailable({
+      _tn: req.body.tn,
+      project_id: project.id,
+      base_id: base.id
+    }))
+  ) {
+    NcError.badRequest('Duplicate table alias');
+  }
+
   const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
   req.body.columns = req.body.columns?.map(c =>
     getColumnPropsFromUIDT(c as any, base)
@@ -142,7 +161,18 @@ export async function tableUpdate(
   req: Request<any, any, TableUpdatePayloadType>,
   res
 ) {
-  console.log(req.params);
+  const model = await Model.get(req.params.tableId);
+
+  if (
+    !(await Model.checkAliasAvailable({
+      _tn: req.body._tn,
+      project_id: model.project_id,
+      base_id: model.base_id,
+      exclude_id: req.params.tableId
+    }))
+  ) {
+    NcError.badRequest('Duplicate table name');
+  }
 
   await Model.updateAlias(req.params.tableId, req.body._tn);
 
