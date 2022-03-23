@@ -30,6 +30,8 @@ export const genTest = (apiType, dbType) => {
                     cy.task("sqliteExec", query);
                     cy.wait(1000);
                 });
+
+            // dummy comment
         });
     });
 };
