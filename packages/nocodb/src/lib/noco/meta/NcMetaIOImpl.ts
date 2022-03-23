@@ -187,7 +187,7 @@ export default class NcMetaIOImpl extends NcMetaIO {
 
   public async metaGet2(
     project_id: string,
-    dbAlias: string,
+    baseId: string,
     target: string,
     idOrCondition: string | { [p: string]: any },
     fields?: string[],
@@ -206,8 +206,8 @@ export default class NcMetaIOImpl extends NcMetaIO {
     if (project_id !== null && project_id !== undefined) {
       query.where('project_id', project_id);
     }
-    if (dbAlias !== null && dbAlias !== undefined) {
-      query.where('db_alias', dbAlias);
+    if (baseId !== null && baseId !== undefined) {
+      query.where('base_id', baseId);
     }
 
     if (!idOrCondition) {
