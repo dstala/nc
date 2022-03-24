@@ -60,11 +60,16 @@ export default class GalleryViewColumn {
       insertObj.base_id = viewRef.base_id;
     }
 
-    const { id } = await ncMeta.metaInsert2(
+    const { id, fk_column_id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GALLERY_VIEW_COLUMNS,
       insertObj
+    );
+
+    await NocoCache.set(
+      `${CacheScope.GALLERY_VIEW_COLUMN}:${fk_column_id}`,
+      id
     );
 
     await NocoCache.appendToList(

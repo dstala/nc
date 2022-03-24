@@ -84,12 +84,14 @@ export default class GridViewColumn implements GridColumnType {
       insertObj.base_id = viewRef.base_id;
     }
 
-    const { id } = await ncMeta.metaInsert2(
+    const { id, fk_column_id } = await ncMeta.metaInsert2(
       null,
       null,
       MetaTable.GRID_VIEW_COLUMNS,
       insertObj
     );
+
+    await NocoCache.set(`${CacheScope.GRID_VIEW_COLUMN}:${fk_column_id}`, id);
 
     await NocoCache.appendToList(
       CacheScope.GRID_VIEW_COLUMN,

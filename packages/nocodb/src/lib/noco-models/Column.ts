@@ -613,39 +613,76 @@ export default class Column<T = any> implements ColumnType {
         CacheDelDirection.CHILD_TO_PARENT
       );
     }
+
+    // Grid View Columns
     await ncMeta.metaDelete(null, null, MetaTable.GRID_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    await NocoCache.deepDel(
-      CacheScope.GRID_VIEW_COLUMN,
+    const gridViewColumnId = await NocoCache.get(
       `${CacheScope.GRID_VIEW_COLUMN}:${col.id}`,
-      CacheDelDirection.CHILD_TO_PARENT
+      CacheGetType.TYPE_STRING
     );
+    if (gridViewColumnId) {
+      await NocoCache.deepDel(
+        CacheScope.GRID_VIEW_COLUMN,
+        `${CacheScope.GRID_VIEW_COLUMN}:${gridViewColumnId}`,
+        CacheDelDirection.CHILD_TO_PARENT
+      );
+      await NocoCache.del(`${CacheScope.GRID_VIEW_COLUMN}:${col.id}`);
+    }
+
+    // Form View Columns
     await ncMeta.metaDelete(null, null, MetaTable.FORM_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    await NocoCache.deepDel(
-      CacheScope.FORM_VIEW_COLUMN,
+    const formViewColumnId = await NocoCache.get(
       `${CacheScope.FORM_VIEW_COLUMN}:${col.id}`,
-      CacheDelDirection.CHILD_TO_PARENT
+      CacheGetType.TYPE_STRING
     );
+    if (formViewColumnId) {
+      await NocoCache.deepDel(
+        CacheScope.FORM_VIEW_COLUMN,
+        `${CacheScope.FORM_VIEW_COLUMN}:${formViewColumnId}`,
+        CacheDelDirection.CHILD_TO_PARENT
+      );
+      await NocoCache.del(`${CacheScope.FORM_VIEW_COLUMN}:${col.id}`);
+    }
+
+    // Kanban View Columns
     await ncMeta.metaDelete(null, null, MetaTable.KANBAN_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    await NocoCache.deepDel(
-      CacheScope.KANBAN_VIEW_COLUMN,
+    const kanbanViewColumnId = await NocoCache.get(
       `${CacheScope.KANBAN_VIEW_COLUMN}:${col.id}`,
-      CacheDelDirection.CHILD_TO_PARENT
+      CacheGetType.TYPE_STRING
     );
+    if (kanbanViewColumnId) {
+      await NocoCache.deepDel(
+        CacheScope.KANBAN_VIEW_COLUMN,
+        `${CacheScope.KANBAN_VIEW_COLUMN}:${kanbanViewColumnId}`,
+        CacheDelDirection.CHILD_TO_PARENT
+      );
+      await NocoCache.del(`${CacheScope.KANBAN_VIEW_COLUMN}:${col.id}`);
+    }
+
+    // Gallery View Column
     await ncMeta.metaDelete(null, null, MetaTable.GALLERY_VIEW_COLUMNS, {
       fk_column_id: col.id
     });
-    await NocoCache.deepDel(
-      CacheScope.GALLERY_VIEW_COLUMN,
+    const galleryViewColumnId = await NocoCache.get(
       `${CacheScope.GALLERY_VIEW_COLUMN}:${col.id}`,
-      CacheDelDirection.CHILD_TO_PARENT
+      CacheGetType.TYPE_STRING
     );
+    if (galleryViewColumnId) {
+      await NocoCache.deepDel(
+        CacheScope.GALLERY_VIEW_COLUMN,
+        `${CacheScope.GALLERY_VIEW_COLUMN}:${galleryViewColumnId}`,
+        CacheDelDirection.CHILD_TO_PARENT
+      );
+      await NocoCache.del(`${CacheScope.GALLERY_VIEW_COLUMN}:${col.id}`);
+    }
 
+    // Columns
     await ncMeta.metaDelete(null, null, MetaTable.COLUMNS, col.id);
     await NocoCache.deepDel(
       CacheScope.COLUMN,
