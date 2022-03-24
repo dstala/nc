@@ -40,6 +40,7 @@ import {
 } from '../../../noco/meta/api/helpers/webhookHelpers';
 import Validator from 'validator';
 import { NcError } from '../../../noco/meta/api/helpers/catchError';
+
 const GROUP_COL = '__nc_group_id';
 /**
  * Base class for models
@@ -575,6 +576,7 @@ class BaseModelSqlv2 {
     await conditionV2(filterObj, qb, this.dbDriver);
     return (await qb.first())?.count;
   }
+
   // todo: naming & optimizing
   public async getMmChildrenExcludedList(
     { colId, pid = null },
@@ -1425,6 +1427,150 @@ class BaseModelSqlv2 {
       }
     }
     return true;
+  }
+
+  async addChild({
+    colId,
+    rowId,
+    childId
+  }: {
+    colId: string;
+    rowId: string;
+    childId: string;
+  }) {
+    const columns = await this.model.getColumns();
+    const column = columns.find(c => c.id === colId);
+
+    if (!column || column.uidt !== UITypes.LinkToAnotherRecord)
+      NcError.notFound('Column not found');
+
+    const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
+
+    const childColumn = await colOptions.getChildColumn();
+    const parentColumn = await colOptions.getParentColumn();
+    const parentTable = await parentColumn.getModel();
+    const childTable = await childColumn.getModel();
+    await childTable.getColumns();
+    await parentTable.getColumns();
+
+    switch (colOptions.type) {
+      case RelationTypes.MANY_TO_MANY:
+        {
+          const vChildCol = await colOptions.getMMChildColumn();
+          const vParentCol = await colOptions.getMMParentColumn();
+          const vTable = await colOptions.getMMModel();
+
+          await this.dbDriver(vTable.tn).insert({
+            [vParentCol.cn]: this.dbDriver(parentTable.tn)
+              .select(parentColumn.cn)
+              .where(parentTable.primaryKey.cn, childId)
+              .first(),
+            [vChildCol.cn]: this.dbDriver(childTable.tn)
+              .select(childColumn.cn)
+              .where(childTable.primaryKey.cn, rowId)
+              .first()
+          });
+        }
+        break;
+      case RelationTypes.HAS_MANY:
+        {
+          await this.dbDriver(childTable.tn)
+            .update({
+              [childColumn.cn]: this.dbDriver(parentTable.tn)
+                .select(parentColumn.cn)
+                .where(parentTable.primaryKey.cn, rowId)
+                .first()
+            })
+            .where(childTable.primaryKey?.cn, childId);
+        }
+        break;
+      case RelationTypes.BELONGS_TO:
+        {
+          await this.dbDriver(childTable.tn)
+            .update({
+              [childColumn.cn]: this.dbDriver(parentTable.tn)
+                .select(parentColumn.cn)
+                .where(parentTable.primaryKey.cn, childId)
+                .first()
+            })
+            .where(childTable.primaryKey?.cn, rowId);
+        }
+        break;
+    }
+  }
+
+  async removeChild({
+    colId,
+    rowId,
+    childId
+  }: {
+    colId: string;
+    rowId: string;
+    childId: string;
+  }) {
+    const columns = await this.model.getColumns();
+    const column = columns.find(c => c.id === colId);
+
+    if (!column || column.uidt !== UITypes.LinkToAnotherRecord)
+      NcError.notFound('Column not found');
+
+    const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
+
+    const childColumn = await colOptions.getChildColumn();
+    const parentColumn = await colOptions.getParentColumn();
+    const parentTable = await parentColumn.getModel();
+    const childTable = await childColumn.getModel();
+    await childTable.getColumns();
+    await parentTable.getColumns();
+
+    switch (colOptions.type) {
+      case RelationTypes.MANY_TO_MANY:
+        {
+          const vChildCol = await colOptions.getMMChildColumn();
+          const vParentCol = await colOptions.getMMParentColumn();
+          const vTable = await colOptions.getMMModel();
+
+          await this.dbDriver(vTable.tn)
+            .where({
+              [vParentCol.cn]: this.dbDriver(parentTable.tn)
+                .select(parentColumn.cn)
+                .where(parentTable.primaryKey.cn, childId)
+                .first(),
+              [vChildCol.cn]: this.dbDriver(childTable.tn)
+                .select(childColumn.cn)
+                .where(childTable.primaryKey.cn, rowId)
+                .first()
+            })
+            .delete();
+        }
+        break;
+      case RelationTypes.HAS_MANY:
+        {
+          await this.dbDriver(childTable.tn)
+            // .where({
+            //   [childColumn.cn]: this.dbDriver(parentTable.tn)
+            //     .select(parentColumn.cn)
+            //     .where(parentTable.primaryKey.cn, rowId)
+            //     .first()
+            // })
+            .where(childTable.primaryKey?.cn, childId)
+            .update({ [childColumn.cn]: null });
+        }
+        break;
+      case RelationTypes.BELONGS_TO:
+        {
+          await this.dbDriver(childTable.tn)
+            // .where({
+            //   [childColumn.cn]: this.dbDriver(parentTable.tn)
+            //     .select(parentColumn.cn)
+            //     .where(parentTable.primaryKey.cn, childId)
+            //     .first()
+            // })
+            .where(childTable.primaryKey?.cn, rowId)
+            .update({ [childColumn.cn]: null });
+        }
+        break;
+    }
   }
 }
 

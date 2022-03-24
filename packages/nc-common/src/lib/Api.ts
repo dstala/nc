@@ -3549,6 +3549,51 @@ export class Api<
      * No description
      *
      * @tags Data
+     * @name NestedAdd
+     * @request POST:/data/{tableId}/{rowId}/{relationType}/{colId}/{referenceTableRowId}
+     * @response `201` `any` Created
+     * @response `0` `any`
+     */
+    nestedAdd: (
+      tableId: string,
+      rowId: string,
+      colId: string,
+      relationType: string,
+      referenceTableRowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${tableId}/${rowId}/${relationType}/${colId}/${referenceTableRowId}`,
+        method: 'POST',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name NestedDelete
+     * @request DELETE:/data/{tableId}/{rowId}/{relationType}/{colId}/{referenceTableRowId}
+     * @response `200` `void` OK
+     */
+    nestedDelete: (
+      tableId: string,
+      rowId: string,
+      colId: string,
+      relationType: string,
+      referenceTableRowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/data/${tableId}/${rowId}/${relationType}/${colId}/${referenceTableRowId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
      * @name Read
      * @request GET:/data/{tableId}/{rowId}
      * @response `201` `any` Created

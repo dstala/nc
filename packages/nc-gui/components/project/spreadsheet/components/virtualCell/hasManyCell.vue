@@ -350,7 +350,15 @@ export default {
       const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
       // await this.childApi.update(id, { [_cn]: null }, child)
 
-      await this.$api.data.update(this.childMeta.id, id, { [_cn]: null })
+      // await this.$api.data.update(this.childMeta.id, id, { [_cn]: null })
+
+      await this.$api.data.nestedDelete(
+        this.meta.id,
+        this.parentId,
+        this.column.id,
+        'hm',
+        id
+      )
 
       this.$emit('loadTableData')
       if ((this.childListModal || this.isForm) && this.$refs.childList) {
@@ -391,7 +399,7 @@ export default {
       }
 
       const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-      const _cn = this.childForeignKey
+      // const _cn = this.childForeignKey
       this.newRecordModal = false
 
       // await this.childApi.update(id, {
@@ -400,7 +408,15 @@ export default {
       //   [_cn]: child[this.childForeignKey]
       // })
 
-      await this.$api.data.update(this.childMeta.id, id, { [_cn]: parseIfInteger(this.parentId) })
+      // await this.$api.data.update(this.childMeta.id, id, { [_cn]: parseIfInteger(this.parentId) })
+
+      await this.$api.data.nestedAdd(
+        this.meta.id,
+        this.parentId,
+        this.column.id,
+        'hm',
+        id
+      )
 
       this.$emit('loadTableData')
       if ((this.childListModal || this.isForm) && this.$refs.childList) {

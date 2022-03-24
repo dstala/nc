@@ -53,7 +53,13 @@ export async function hookTest(
     hook,
     payload: { data, user }
   } = req.body;
-  await invokeWebhook(new Hook(hook), model, data, user);
+  await invokeWebhook(
+    new Hook(hook),
+    model,
+    data,
+    user,
+    (hook as any)?.filters
+  );
 
   res.json({ msg: 'Success' });
 }

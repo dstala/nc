@@ -271,7 +271,7 @@ export default {
       this.expandFormModal = true
     },
 
-    async unlink() {
+    async unlink(parent) {
       const column = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)
       const _cn = column._cn
       if (this.isNew) {
@@ -287,7 +287,14 @@ export default {
       const id = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
       // await this.api.update(id, { [_cn]: null }, this.row)
       // todo: audit
-      await this.$api.data.update(this.meta.id, id, { [_cn]: null })
+      // await this.$api.data.update(this.meta.id, id, { [_cn]: null })
+      await this.$api.data.nestedDelete(
+        this.meta.id,
+        id,
+        this.column.id,
+        'bt',
+        parent[this.parentReferenceKey]
+      )
       this.$emit('loadTableData')
       if (this.isForm && this.$refs.childList) {
         this.$refs.childList.loadData()
@@ -366,7 +373,15 @@ export default {
       //   [_cn]: this.value && this.value[this.parentPrimaryKey]
       // })
 
-      await this.$api.data.update(this.meta.id, id, { [_cn]: parseIfInteger(parent[this.parentReferenceKey]) })
+      // await this.$api.data.update(this.meta.id, id, { [_cn]: parseIfInteger(parent[this.parentReferenceKey]) })
+
+      await this.$api.data.nestedAdd(
+        this.meta.id,
+        id,
+        this.column.id,
+        'bt',
+        parent[this.parentReferenceKey]
+      )
 
       this.pid = pid
 

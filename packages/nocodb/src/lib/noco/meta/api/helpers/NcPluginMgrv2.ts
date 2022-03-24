@@ -156,6 +156,8 @@ class NcPluginMgrv2 {
       active: true
     });
 
+    if (!pluginData) throw new Error('Plugin not configured/active');
+
     const pluginConfig = defaultPlugins.find(c => c.title === pluginData.title);
     const plugin = new pluginConfig.builder(ncMeta, pluginData);
 
