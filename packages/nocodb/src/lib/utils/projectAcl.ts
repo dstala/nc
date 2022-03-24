@@ -38,6 +38,10 @@ export default {
     filterChildrenRead: true,
 
     mmList: true,
+    hmList: true,
+    mmExcludedList: true,
+    hmExcludedList: true,
+    btExcludedList: true,
     commentList: true,
     commentRow: true,
 
@@ -175,6 +179,7 @@ export default {
     sortList: true,
 
     mmList: true,
+    hmList: true,
     commentList: true,
     commentRow: false,
 

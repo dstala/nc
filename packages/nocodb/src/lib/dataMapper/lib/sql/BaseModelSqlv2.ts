@@ -709,8 +709,6 @@ class BaseModelSqlv2 {
 
     const proto = await childModel.getProto();
 
-    console.log('---===', qb.toQuery());
-
     return (await qb).map(c => {
       c.__proto__ = proto;
       return c;
@@ -794,8 +792,6 @@ class BaseModelSqlv2 {
     applyPaginate(qb, args);
 
     const proto = await parentModel.getProto();
-
-    console.log(qb.toQuery());
 
     return (await qb).map(c => {
       c.__proto__ = proto;
