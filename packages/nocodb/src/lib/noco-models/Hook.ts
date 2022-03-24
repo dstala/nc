@@ -201,7 +201,7 @@ export default class Hook implements HookType {
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
       // update data
-      o = { ...updateObj, ...o };
+      o = { ...o, ...updateObj };
       o.notification = updateObj.notification;
       // set cache
       await NocoCache.set(key, o);
