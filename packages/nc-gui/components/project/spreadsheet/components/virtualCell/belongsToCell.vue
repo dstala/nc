@@ -361,9 +361,10 @@ export default {
       // }
 
       if (this.isNew) {
+        const _rcn = this.parentMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id)._cn
         this.localState = parent
         this.$emit('update:localState', this.localState)
-        this.$emit('updateCol', this.row, _cn, +pid || pid)
+        this.$emit('updateCol', this.row, _cn, parent[_rcn])
         this.newRecordModal = false
         return
       }
