@@ -3,6 +3,7 @@ export default {
   creator: '*',
   guest: {},
   editor: {
+    auditRowUpdate: true,
     passwordChange: true,
     // new permissions
     // project
