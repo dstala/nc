@@ -720,6 +720,8 @@ export default class View implements ViewType {
       `${CacheScope.VIEW}:${viewId}`,
       CacheDelDirection.CHILD_TO_PARENT
     );
+    await NocoCache.del(`${CacheScope.VIEW}:${view.fk_model_id}:${view.title}`);
+    await NocoCache.del(`${CacheScope.VIEW}:${view.fk_model_id}:${view.id}`);
   }
 
   private static extractViewColumnsTableName(view: View) {
