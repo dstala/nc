@@ -431,6 +431,7 @@
 </template>
 
 <script>
+import { MssqlUi, SqliteUi } from 'nc-common'
 import { UITypes, uiTypes } from '../helpers/uiTypes'
 import RollupOptions from './editColumn/rollupOptions'
 import FormulaOptions from '@/components/project/spreadsheet/components/editColumn/formulaOptions'
@@ -439,7 +440,6 @@ import CustomSelectOptions from '@/components/project/spreadsheet/components/edi
 import RelationOptions from '@/components/project/spreadsheet/components/editColumn/relationOptions'
 import DlgLabelSubmitCancel from '@/components/utils/dlgLabelSubmitCancel'
 import LinkedToAnotherOptions from '@/components/project/spreadsheet/components/editColumn/linkedToAnotherOptions'
-import { SqliteUi, MssqlUi } from '@/helpers/sqlUi'
 import { validateColumnName } from '~/helpers'
 
 export default {
