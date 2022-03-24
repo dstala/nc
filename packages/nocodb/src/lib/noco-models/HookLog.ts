@@ -98,7 +98,7 @@ export default class HookLog implements HookLogType {
       insertObj.base_id = hook.base_id;
     }
 
-    return await ncMeta.metaInsert2(null, null, MetaTable.HOOKS, insertObj);
+    return await ncMeta.metaInsert2(null, null, MetaTable.HOOK_LOGS, insertObj);
 
     // todo: redis cache ??
     // await NocoCache.appendToList(
