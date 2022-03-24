@@ -40,7 +40,7 @@ import {
 } from '../../../noco/meta/api/helpers/webhookHelpers';
 import Validator from 'validator';
 import { NcError } from '../../../noco/meta/api/helpers/catchError';
-
+const GROUP_COL = '__nc_group_id';
 /**
  * Base class for models
  *
@@ -322,10 +322,13 @@ class BaseModelSqlv2 {
 
       const chilCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getChildColumn();
       const childTable = await chilCol.getModel();
+      const parentCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getParentColumn();
+      const parentTable = await parentCol.getModel();
       const childModel = await Model.getBaseModelSQL({
         model: childTable,
         dbDriver: this.dbDriver
       });
+      await parentTable.getColumns();
       // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
       //   fields += ',' + cn;
       // }
@@ -338,12 +341,19 @@ class BaseModelSqlv2 {
       const qb = this.dbDriver(childTable.tn);
       await childModel.selectObject({ qb });
 
-      const childs = await this.dbDriver.queryBuilder().from(
+      const childQb = this.dbDriver.queryBuilder().from(
         this.dbDriver
           .union(
             ids.map(p => {
-              const query = qb.clone().where({ [chilCol.cn]: p });
-              // .select(...fields.split(','));
+              const query = qb
+                .clone()
+                .select(this.dbDriver.raw('? as ??', [p, GROUP_COL]))
+                .whereIn(
+                  chilCol.cn,
+                  this.dbDriver(parentTable.tn)
+                    .select(parentCol.cn)
+                    .where(parentTable.primaryKey.cn, p)
+                );
               // todo: sanitize
               query.limit(args?.limit || 20);
               query.offset(args?.offset || 0);
@@ -355,6 +365,8 @@ class BaseModelSqlv2 {
           .as('list')
       );
 
+      const children = await childQb;
+
       const proto = await (
         await Model.getBaseModelSQL({
           id: childTable.id,
@@ -362,13 +374,12 @@ class BaseModelSqlv2 {
         })
       ).getProto();
 
-      // return _.groupBy(childs, cn);
       return _.groupBy(
-        childs.map(c => {
+        children.map(c => {
           c.__proto__ = proto;
           return c;
         }),
-        chilCol._cn
+        GROUP_COL
       );
     } catch (e) {
       console.log(e);
@@ -382,15 +393,22 @@ class BaseModelSqlv2 {
       const relColumn = (await this.model.getColumns()).find(
         c => c.id === colId
       );
-
       const chilCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getChildColumn();
-      const chilMod = await chilCol.getModel();
+      const childTable = await chilCol.getModel();
+      const parentCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getParentColumn();
+      const parentTable = await parentCol.getModel();
+      await parentTable.getColumns();
 
-      const childs = await this.dbDriver.unionAll(
+      const children = await this.dbDriver.unionAll(
         ids.map(p => {
-          const query = this.dbDriver(chilMod.tn)
+          const query = this.dbDriver(childTable.tn)
             .count(`${chilCol?.cn} as count`)
-            .where({ [chilCol?.cn]: p })
+            .whereIn(
+              chilCol.cn,
+              this.dbDriver(parentTable.tn)
+                .select(parentCol.cn)
+                .where(parentTable.primaryKey.cn, p)
+            )
             .first();
 
           return this.isSqlite ? this.dbDriver.select().from(query) : query;
@@ -398,8 +416,8 @@ class BaseModelSqlv2 {
         !this.isSqlite
       );
 
-      return childs.map(({ count }) => count);
-      // return _.groupBy(childs, cn);
+      return children.map(({ count }) => count);
+      // return _.groupBy(children, cn);
     } catch (e) {
       console.log(e);
       throw e;
@@ -407,71 +425,44 @@ class BaseModelSqlv2 {
   }
 
   public async mmList({ colId, parentIds }, args?: { limit; offset }) {
-    // const { where, limit, offset, sort, ...restArgs } = this._getChildListArgs(
-    //   rest,
-    //   index,
-    //   child,
-    //   'm'
-    // );
-    // const driver = trx || this.dbDriver;
-    // let { fields } = restArgs;
-
     const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
     const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
 
-    const tn = this.model.tn;
+    // const tn = this.model.tn;
     // const cn = (await relColOptions.getChildColumn()).title;
     const vtn = (await relColOptions.getMMModel()).tn;
     const vcn = (await relColOptions.getMMChildColumn()).cn;
     const vrcn = (await relColOptions.getMMParentColumn()).cn;
     const rcn = (await relColOptions.getParentColumn()).cn;
+    const cn = (await relColOptions.getChildColumn()).cn;
     const childTable = await (await relColOptions.getParentColumn()).getModel();
+    const parentTable = await (await relColOptions.getChildColumn()).getModel();
+    await parentTable.getColumns();
     const childModel = await Model.getBaseModelSQL({
       dbDriver: this.dbDriver,
       model: childTable
     });
     const rtn = childTable.tn;
 
-    // const { tn, cn, vtn, vcn, vrcn, rtn, rcn } =
-    // @ts-ignore
-    // const alias = this.dbModels[tn].columnToAlias?.[cn];
-
-    // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
-    //   fields += ',' + cn;
-    // }
-    //
-    // if (!this.dbModels[child]) {
-    //   return;
-    // }
-
-    const qb = this.dbDriver(rtn)
-      .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
-      // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].title])
-      // .xwhere(where, this.dbModels[child].selectQuery(''))
-      .select({
-        [`${tn}_${vcn}`]: `${vtn}.${vcn}`
-        // ...this.dbModels[child].selectQuery(fields)
-      });
+    const qb = this.dbDriver(rtn).join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`);
 
     await childModel.selectObject({ qb });
-    const childs = await this.dbDriver.union(
+    const children = await this.dbDriver.union(
       parentIds.map(id => {
-        // const query = this.dbDriver(rtn)
-        //   .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
-        //   .where(`${vtn}.${vcn}`, id) // p[this.columnToAlias?.[this.pks[0].title] || this.pks[0].title])
-        //   // .xwhere(where, this.dbModels[child].selectQuery(''))
-        //   .select(colSelect)
-        //   .select({
-        //     [`${tn}_${vcn}`]: `${vtn}.${vcn}`
-        //     // ...this.dbModels[child].selectQuery(fields)
-        //   }); // ...fields.split(','));
-        const query = qb.clone().where(`${vtn}.${vcn}`, id);
+        const query = qb
+          .clone()
+          .whereIn(
+            `${vtn}.${vcn}`,
+            this.dbDriver(parentTable.tn)
+              .select(cn)
+              .where(parentTable.primaryKey.cn, id)
+          )
+          .select(this.dbDriver.raw('? as ??', [id, GROUP_COL]));
 
         // todo: sanitize
         query.limit(args?.limit || 20);
         query.offset(args?.offset || 0);
 
-        // this._paginateAndSort(query, params);
         return this.isSqlite ? this.dbDriver.select().from(query) : query;
       }),
       !this.isSqlite
@@ -481,11 +472,11 @@ class BaseModelSqlv2 {
       await Model.getBaseModelSQL({ tn: rtn, dbDriver: this.dbDriver })
     ).getProto();
     const gs = _.groupBy(
-      childs.map(c => {
+      children.map(c => {
         c.__proto__ = proto;
         return c;
       }),
-      `${tn}_${vcn}`
+      GROUP_COL
     );
     return parentIds.map(id => gs[id] || []);
   }
@@ -494,26 +485,35 @@ class BaseModelSqlv2 {
     const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
     const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
 
-    const tn = this.model.tn;
     const vtn = (await relColOptions.getMMModel()).tn;
     const vcn = (await relColOptions.getMMChildColumn()).cn;
     const vrcn = (await relColOptions.getMMParentColumn()).cn;
     const rcn = (await relColOptions.getParentColumn()).cn;
+    const cn = (await relColOptions.getChildColumn()).cn;
     const childTable = await (await relColOptions.getParentColumn()).getModel();
     const rtn = childTable.tn;
+    const parentTable = await (await relColOptions.getChildColumn()).getModel();
+    await parentTable.getColumns();
 
     const qb = this.dbDriver(rtn)
       .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
-      .select({
-        [`${tn}_${vcn}`]: `${vtn}.${vcn}`
-      })
-      .count(`*`, { as: 'count' })
-      .groupBy(`${vtn}.${vcn}`);
+      // .select({
+      //   [`${tn}_${vcn}`]: `${vtn}.${vcn}`
+      // })
+      .count(`${vtn}.${vcn}`, { as: 'count' });
 
     // await childModel.selectObject({ qb });
-    const childs = await this.dbDriver.union(
+    const children = await this.dbDriver.union(
       parentIds.map(id => {
-        const query = qb.clone().where(`${vtn}.${vcn}`, id);
+        const query = qb
+          .clone()
+          .whereIn(
+            `${vtn}.${vcn}`,
+            this.dbDriver(parentTable.tn)
+              .select(cn)
+              .where(parentTable.primaryKey.cn, id)
+          )
+          .select(this.dbDriver.raw('? as ??', [id, GROUP_COL]));
         // this._paginateAndSort(query, { sort, limit, offset }, null, true);
         return this.isSqlite ? this.dbDriver.select().from(query) : query;
       }),
@@ -524,11 +524,11 @@ class BaseModelSqlv2 {
       await Model.getBaseModelSQL({ tn: rtn, dbDriver: this.dbDriver })
     ).getProto();
     const gs = _.groupBy(
-      childs.map(c => {
+      children.map(c => {
         c.__proto__ = proto;
         return c;
       }),
-      `${tn}_${vcn}`
+      GROUP_COL
     );
     return parentIds.map(id => gs?.[id]?.[0] || []);
   }
@@ -545,18 +545,29 @@ class BaseModelSqlv2 {
     const vcn = (await relColOptions.getMMChildColumn()).cn;
     const vrcn = (await relColOptions.getMMParentColumn()).cn;
     const rcn = (await relColOptions.getParentColumn()).cn;
+    const cn = (await relColOptions.getChildColumn()).cn;
     const childTable = await (await relColOptions.getParentColumn()).getModel();
+    const parentTable = await (await relColOptions.getChildColumn()).getModel();
+    await parentTable.getColumns();
     const rtn = childTable.tn;
     const qb = this.dbDriver(rtn)
       .count(`*`, { as: 'count' })
-      .whereNotIn(
-        rcn,
-        this.dbDriver(rtn)
-          .select(`${rtn}.${rcn}`)
-          .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
-          .where(`${vtn}.${vcn}`, pid)
-      )
-      .orWhereNull(rcn);
+      .where(qb => {
+        qb.whereNotIn(
+          rcn,
+          this.dbDriver(rtn)
+            .select(`${rtn}.${rcn}`)
+            .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
+            .whereIn(
+              `${vtn}.${vcn}`,
+              this.dbDriver(parentTable.tn)
+                .select(cn)
+                .where(parentTable.primaryKey.cn, pid)
+            )
+        ).orWhereNull(rcn);
+      });
+
+    console.log('----', qb.toQuery());
 
     const aliasColObjMap = await childTable.getAliasColObjMap();
     const filterObj = extractFilterFromXwhere(args.where, aliasColObjMap);
@@ -576,22 +587,32 @@ class BaseModelSqlv2 {
     const vcn = (await relColOptions.getMMChildColumn()).cn;
     const vrcn = (await relColOptions.getMMParentColumn()).cn;
     const rcn = (await relColOptions.getParentColumn()).cn;
+    const cn = (await relColOptions.getChildColumn()).cn;
     const childTable = await (await relColOptions.getParentColumn()).getModel();
     const childModel = await Model.getBaseModelSQL({
       dbDriver: this.dbDriver,
       model: childTable
     });
+    const parentTable = await (await relColOptions.getChildColumn()).getModel();
+    await parentTable.getColumns();
     const rtn = childTable.tn;
 
-    const qb = this.dbDriver(rtn)
-      .whereNotIn(
-        rcn,
-        this.dbDriver(rtn)
-          .select(`${rtn}.${rcn}`)
-          .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
-          .where(`${vtn}.${vcn}`, pid)
-      )
-      .orWhereNull(rcn);
+    const qb = this.dbDriver(rtn).where(qb =>
+      qb
+        .whereNotIn(
+          rcn,
+          this.dbDriver(rtn)
+            .select(`${rtn}.${rcn}`)
+            .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
+            .whereIn(
+              `${vtn}.${vcn}`,
+              this.dbDriver(parentTable.tn)
+                .select(cn)
+                .where(parentTable.primaryKey.cn, pid)
+            )
+        )
+        .orWhereNull(rcn)
+    );
 
     await childModel.selectObject({ qb });
 
@@ -629,18 +650,20 @@ class BaseModelSqlv2 {
 
     const qb = this.dbDriver(tn)
       .count(`*`, { as: 'count' })
-      .whereNotIn(
-        cn,
-        this.dbDriver(rtn)
-          .select(rcn)
-          .where(parentTable.primaryKey.cn, pid)
-      )
-      .orWhereNull(cn);
+      .where(qb => {
+        qb.whereNotIn(
+          cn,
+          this.dbDriver(rtn)
+            .select(rcn)
+            .where(parentTable.primaryKey.cn, pid)
+        ).orWhereNull(cn);
+      });
 
     const aliasColObjMap = await childTable.getAliasColObjMap();
     const filterObj = extractFilterFromXwhere(args.where, aliasColObjMap);
 
     await conditionV2(filterObj, qb, this.dbDriver);
+
     return (await qb.first())?.count;
   }
 
@@ -667,14 +690,14 @@ class BaseModelSqlv2 {
     const tn = childTable.tn;
     const rtn = parentTable.tn;
 
-    const qb = this.dbDriver(tn)
-      .whereNotIn(
+    const qb = this.dbDriver(tn).where(qb => {
+      qb.whereNotIn(
         cn,
         this.dbDriver(rtn)
           .select(rcn)
           .where(parentTable.primaryKey.cn, pid)
-      )
-      .orWhereNull(cn);
+      ).orWhereNull(cn);
+    });
 
     await childModel.selectObject({ qb });
 
@@ -714,13 +737,14 @@ class BaseModelSqlv2 {
     await childTable.getColumns();
 
     const qb = this.dbDriver(rtn)
-      .whereNotIn(
-        rcn,
-        this.dbDriver(tn)
-          .select(cn)
-          .where(childTable.primaryKey.cn, cid)
-      )
-      .orWhereNull(rcn)
+      .where(qb => {
+        qb.whereNotIn(
+          rcn,
+          this.dbDriver(tn)
+            .select(cn)
+            .where(childTable.primaryKey.cn, cid)
+        ).orWhereNull(rcn);
+      })
       .count(`*`, { as: 'count' });
 
     const aliasColObjMap = await parentTable.getAliasColObjMap();
@@ -752,14 +776,14 @@ class BaseModelSqlv2 {
     const tn = childTable.tn;
     await childTable.getColumns();
 
-    const qb = this.dbDriver(rtn)
-      .whereNotIn(
+    const qb = this.dbDriver(rtn).where(qb => {
+      qb.whereNotIn(
         rcn,
         this.dbDriver(tn)
           .select(cn)
           .where(childTable.primaryKey.cn, cid)
-      )
-      .orWhereNull(rcn);
+      ).orWhereNull(rcn);
+    });
 
     await parentModel.selectObject({ qb });
 
@@ -812,7 +836,7 @@ class BaseModelSqlv2 {
           {
             this._columns[column._cn] = column;
             const colOptions = (await column.getColOptions()) as LinkToAnotherRecordColumn;
-            const parentColumn = await colOptions.getParentColumn();
+            // const parentColumn = await colOptions.getParentColumn();
 
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
@@ -834,9 +858,7 @@ class BaseModelSqlv2 {
 
               proto[column._cn] = async function(args): Promise<any> {
                 (listLoader as any).args = args;
-                return listLoader.load(
-                  this[parentColumn?._cn || self?.model?.primaryKey?._cn]
-                );
+                return listLoader.load(this[self?.model?.primaryKey?._cn]);
               };
 
               // defining HasMany count method within GQL Type class
@@ -865,12 +887,10 @@ class BaseModelSqlv2 {
               });
 
               const self: BaseModelSqlv2 = this;
-              const childColumn = await colOptions.getChildColumn();
+              // const childColumn = await colOptions.getChildColumn();
               proto[column._cn] = async function(args): Promise<any> {
                 (listLoader as any).args = args;
-                return await listLoader.load(
-                  this[childColumn?._cn || self.model.primaryKey._cn]
-                );
+                return await listLoader.load(this[self.model.primaryKey._cn]);
               };
             } else if (colOptions.type === 'bt') {
               // @ts-ignore

@@ -83,7 +83,6 @@
 </template>
 
 <script>
-import { RelationTypes } from 'nc-common'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
 
 export default {
@@ -177,7 +176,7 @@ export default {
               query: {
                 limit: this.size,
                 offset: this.size * (this.page - 1),
-                where: `(${this.primaryCol},like,${this.query})`
+                where: this.query && `(${this.primaryCol},like,${this.query})`
               }
             })).data
         } else {

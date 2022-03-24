@@ -51,6 +51,7 @@
       :is-public="isPublic"
       :query-params="childQueryParams"
       :password="password"
+      :row-id="row && row[parentPrimaryKey]"
       @add-new-record="insertAndAddNewChildRecord"
       @add="addChildToParent"
     />

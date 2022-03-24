@@ -201,7 +201,7 @@ export default {
             rowId: this.rowId,
             limit: this.size,
             offset: this.size * (this.page - 1),
-            query: this.query,
+            // query: this.query,
             columnId: this.column.fk_column_id || this.column.id
           }, {})).data
         }
@@ -221,8 +221,8 @@ export default {
           {
             query: {
               limit: this.size,
-              offset: this.size * (this.page - 1),
-              ...this.queryParams
+              offset: this.size * (this.page - 1)
+              // ...this.queryParams
             }
           })).data
       } else {
