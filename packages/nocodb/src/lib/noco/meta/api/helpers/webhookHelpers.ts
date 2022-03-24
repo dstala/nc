@@ -31,7 +31,8 @@ export async function validateCondition(filters: Filter[], data: any) {
   }
 
   let isValid = true;
-  for (const filter of filters) {
+  for (const _filter of filters) {
+    const filter = _filter instanceof Filter ? _filter : new Filter(_filter);
     let res;
     const field = await filter.getColumn().then(c => c._cn);
     let val = data[field];
@@ -182,7 +183,13 @@ export function axiosRequestMake(_apiMeta, apiReq, data) {
   return req;
 }
 
-export async function invokeWebhook(hook: Hook, model: Model, data, user) {
+export async function invokeWebhook(
+  hook: Hook,
+  model: Model,
+  data,
+  user,
+  testFilters = null
+) {
   let hookLog: HookLogType;
   const startTime = process.hrtime();
   try {
@@ -195,7 +202,9 @@ export async function invokeWebhook(hook: Hook, model: Model, data, user) {
     console.log('Hook handler ::::' + model.tn + ':: Hook ::', hook);
     console.log('Hook handler ::::' + model.tn + ':: Data ::', data);
 
-    if (!(await validateCondition(await hook.getFilters(), data))) {
+    if (
+      !(await validateCondition(testFilters || (await hook.getFilters()), data))
+    ) {
       return;
     }
 
@@ -287,7 +296,7 @@ export async function invokeWebhook(hook: Hook, model: Model, data, user) {
     };
   }
   hookLog.execution_time = parseHrtimeToMilliSeconds(process.hrtime(startTime));
-  if (hookLog) await HookLog.insert(hookLog);
+  if (hookLog) await HookLog.insert({ ...hookLog, test_call: !!testFilters });
 }
 
 export function _transformSubmittedFormDataForEmail(

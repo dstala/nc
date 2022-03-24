@@ -224,6 +224,7 @@
                       v-if="hook.condition"
                       :key="key"
                       ref="filter"
+                      v-model="filters"
                       :meta="meta"
                       :field-list="fieldList"
                       dense
@@ -373,6 +374,7 @@
                   :model-id="meta.id"
                   :hook="{
                     ...hook,
+                    filters,
                     notification: {
                       ...hook.notification,
                       payload: notification
