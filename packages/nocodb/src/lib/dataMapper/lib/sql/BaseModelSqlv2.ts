@@ -353,7 +353,8 @@ class BaseModelSqlv2 {
                   chilCol.cn,
                   this.dbDriver(parentTable.tn)
                     .select(parentCol.cn)
-                    .where(parentTable.primaryKey.cn, p)
+                    // .where(parentTable.primaryKey.cn, p)
+                    .where(_wherePk(parentTable.primaryKeys, p))
                 );
               // todo: sanitize
               query.limit(args?.limit || 20);
@@ -408,7 +409,8 @@ class BaseModelSqlv2 {
               chilCol.cn,
               this.dbDriver(parentTable.tn)
                 .select(parentCol.cn)
-                .where(parentTable.primaryKey.cn, p)
+                // .where(parentTable.primaryKey.cn, p)
+                .where(_wherePk(parentTable.primaryKeys, p))
             )
             .first();
 
@@ -456,7 +458,8 @@ class BaseModelSqlv2 {
             `${vtn}.${vcn}`,
             this.dbDriver(parentTable.tn)
               .select(cn)
-              .where(parentTable.primaryKey.cn, id)
+              // .where(parentTable.primaryKey.cn, id)
+              .where(_wherePk(parentTable.primaryKeys, id))
           )
           .select(this.dbDriver.raw('? as ??', [id, GROUP_COL]));
 
@@ -512,7 +515,8 @@ class BaseModelSqlv2 {
             `${vtn}.${vcn}`,
             this.dbDriver(parentTable.tn)
               .select(cn)
-              .where(parentTable.primaryKey.cn, id)
+              // .where(parentTable.primaryKey.cn, id)
+              .where(_wherePk(parentTable.primaryKeys, id))
           )
           .select(this.dbDriver.raw('? as ??', [id, GROUP_COL]));
         // this._paginateAndSort(query, { sort, limit, offset }, null, true);
@@ -563,7 +567,8 @@ class BaseModelSqlv2 {
               `${vtn}.${vcn}`,
               this.dbDriver(parentTable.tn)
                 .select(cn)
-                .where(parentTable.primaryKey.cn, pid)
+                // .where(parentTable.primaryKey.cn, pid)
+                .where(_wherePk(parentTable.primaryKeys, pid))
             )
         ).orWhereNull(rcn);
       });
@@ -610,7 +615,8 @@ class BaseModelSqlv2 {
               `${vtn}.${vcn}`,
               this.dbDriver(parentTable.tn)
                 .select(cn)
-                .where(parentTable.primaryKey.cn, pid)
+                // .where(parentTable.primaryKey.cn, pid)
+                .where(_wherePk(parentTable.primaryKeys, pid))
             )
         )
         .orWhereNull(rcn)
@@ -657,7 +663,8 @@ class BaseModelSqlv2 {
           cn,
           this.dbDriver(rtn)
             .select(rcn)
-            .where(parentTable.primaryKey.cn, pid)
+            // .where(parentTable.primaryKey.cn, pid)
+            .where(_wherePk(parentTable.primaryKeys, pid))
         ).orWhereNull(cn);
       });
 
@@ -697,7 +704,8 @@ class BaseModelSqlv2 {
         cn,
         this.dbDriver(rtn)
           .select(rcn)
-          .where(parentTable.primaryKey.cn, pid)
+          // .where(parentTable.primaryKey.cn, pid)
+          .where(_wherePk(parentTable.primaryKeys, pid))
       ).orWhereNull(cn);
     });
 
@@ -742,7 +750,8 @@ class BaseModelSqlv2 {
           rcn,
           this.dbDriver(tn)
             .select(cn)
-            .where(childTable.primaryKey.cn, cid)
+            // .where(childTable.primaryKey.cn, cid)
+            .where(_wherePk(childTable.primaryKeys, cid))
         ).orWhereNull(rcn);
       })
       .count(`*`, { as: 'count' });
@@ -781,7 +790,8 @@ class BaseModelSqlv2 {
         rcn,
         this.dbDriver(tn)
           .select(cn)
-          .where(childTable.primaryKey.cn, cid)
+          // .where(childTable.primaryKey.cn, cid)
+          .where(_wherePk(childTable.primaryKeys, cid))
           .whereNotNull(cn)
       ).orWhereNull(rcn);
     });
@@ -1111,12 +1121,7 @@ class BaseModelSqlv2 {
 
   async _wherePk(id) {
     await this.model.getColumns();
-    const ids = (id + '').split('___');
-    const where = {};
-    for (let i = 0; i < this.model.primaryKeys.length; ++i) {
-      where[this.model.primaryKeys[i].cn] = ids[i];
-    }
-    return where;
+    return _wherePk(this.model.primaryKeys, id);
   }
 
   public get tnPath() {
@@ -1466,11 +1471,11 @@ class BaseModelSqlv2 {
           await this.dbDriver(vTable.tn).insert({
             [vParentCol.cn]: this.dbDriver(parentTable.tn)
               .select(parentColumn.cn)
-              .where(parentTable.primaryKey.cn, childId)
+              .where(_wherePk(parentTable.primaryKeys, childId))
               .first(),
             [vChildCol.cn]: this.dbDriver(childTable.tn)
               .select(childColumn.cn)
-              .where(childTable.primaryKey.cn, rowId)
+              .where(_wherePk(childTable.primaryKeys, rowId))
               .first()
           });
         }
@@ -1481,10 +1486,10 @@ class BaseModelSqlv2 {
             .update({
               [childColumn.cn]: this.dbDriver(parentTable.tn)
                 .select(parentColumn.cn)
-                .where(parentTable.primaryKey.cn, rowId)
+                .where(_wherePk(parentTable.primaryKeys, rowId))
                 .first()
             })
-            .where(childTable.primaryKey?.cn, childId);
+            .where(_wherePk(childTable.primaryKeys, childId));
         }
         break;
       case RelationTypes.BELONGS_TO:
@@ -1493,10 +1498,10 @@ class BaseModelSqlv2 {
             .update({
               [childColumn.cn]: this.dbDriver(parentTable.tn)
                 .select(parentColumn.cn)
-                .where(parentTable.primaryKey.cn, childId)
+                .where(_wherePk(parentTable.primaryKeys, childId))
                 .first()
             })
-            .where(childTable.primaryKey?.cn, rowId);
+            .where(_wherePk(childTable.primaryKeys, rowId));
         }
         break;
     }
@@ -1537,11 +1542,11 @@ class BaseModelSqlv2 {
             .where({
               [vParentCol.cn]: this.dbDriver(parentTable.tn)
                 .select(parentColumn.cn)
-                .where(parentTable.primaryKey.cn, childId)
+                .where(_wherePk(parentTable.primaryKeys, childId))
                 .first(),
               [vChildCol.cn]: this.dbDriver(childTable.tn)
                 .select(childColumn.cn)
-                .where(childTable.primaryKey.cn, rowId)
+                .where(_wherePk(childTable.primaryKeys, rowId))
                 .first()
             })
             .delete();
@@ -1556,7 +1561,7 @@ class BaseModelSqlv2 {
             //     .where(parentTable.primaryKey.cn, rowId)
             //     .first()
             // })
-            .where(childTable.primaryKey?.cn, childId)
+            .where(_wherePk(childTable.primaryKeys, childId))
             .update({ [childColumn.cn]: null });
         }
         break;
@@ -1569,7 +1574,7 @@ class BaseModelSqlv2 {
             //     .where(parentTable.primaryKey.cn, childId)
             //     .first()
             // })
-            .where(childTable.primaryKey?.cn, rowId)
+            .where(_wherePk(childTable.primaryKeys, rowId))
             .update({ [childColumn.cn]: null });
         }
         break;
@@ -1695,6 +1700,15 @@ function applyPaginate(
   if (!ignoreLimit) query.limit(limit);
 
   return query;
+}
+
+function _wherePk(primaryKeys: Column[], id) {
+  const ids = (id + '').split('___');
+  const where = {};
+  for (let i = 0; i < primaryKeys.length; ++i) {
+    where[primaryKeys[i].cn] = ids[i];
+  }
+  return where;
 }
 
 export { BaseModelSqlv2 };
