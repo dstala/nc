@@ -555,7 +555,8 @@ class BaseModelSqlv2 {
           .select(`${rtn}.${rcn}`)
           .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
           .where(`${vtn}.${vcn}`, pid)
-      );
+      )
+      .orWhereNull(rcn);
 
     const aliasColObjMap = await childTable.getAliasColObjMap();
     const filterObj = extractFilterFromXwhere(args.where, aliasColObjMap);
@@ -582,13 +583,15 @@ class BaseModelSqlv2 {
     });
     const rtn = childTable.tn;
 
-    const qb = this.dbDriver(rtn).whereNotIn(
-      rcn,
-      this.dbDriver(rtn)
-        .select(`${rtn}.${rcn}`)
-        .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
-        .where(`${vtn}.${vcn}`, pid)
-    );
+    const qb = this.dbDriver(rtn)
+      .whereNotIn(
+        rcn,
+        this.dbDriver(rtn)
+          .select(`${rtn}.${rcn}`)
+          .join(vtn, `${rtn}.${rcn}`, `${vtn}.${vrcn}`)
+          .where(`${vtn}.${vcn}`, pid)
+      )
+      .orWhereNull(rcn);
 
     await childModel.selectObject({ qb });
 
@@ -631,7 +634,8 @@ class BaseModelSqlv2 {
         this.dbDriver(rtn)
           .select(rcn)
           .where(parentTable.primaryKey.cn, pid)
-      );
+      )
+      .orWhereNull(cn);
 
     const aliasColObjMap = await childTable.getAliasColObjMap();
     const filterObj = extractFilterFromXwhere(args.where, aliasColObjMap);
@@ -663,12 +667,14 @@ class BaseModelSqlv2 {
     const tn = childTable.tn;
     const rtn = parentTable.tn;
 
-    const qb = this.dbDriver(tn).whereNotIn(
-      cn,
-      this.dbDriver(rtn)
-        .select(rcn)
-        .where(parentTable.primaryKey.cn, pid)
-    );
+    const qb = this.dbDriver(tn)
+      .whereNotIn(
+        cn,
+        this.dbDriver(rtn)
+          .select(rcn)
+          .where(parentTable.primaryKey.cn, pid)
+      )
+      .orWhereNull(cn);
 
     await childModel.selectObject({ qb });
 
@@ -714,6 +720,7 @@ class BaseModelSqlv2 {
           .select(cn)
           .where(childTable.primaryKey.cn, cid)
       )
+      .orWhereNull(rcn)
       .count(`*`, { as: 'count' });
 
     const aliasColObjMap = await parentTable.getAliasColObjMap();
@@ -745,12 +752,14 @@ class BaseModelSqlv2 {
     const tn = childTable.tn;
     await childTable.getColumns();
 
-    const qb = this.dbDriver(rtn).whereNotIn(
-      rcn,
-      this.dbDriver(tn)
-        .select(cn)
-        .where(childTable.primaryKey.cn, cid)
-    );
+    const qb = this.dbDriver(rtn)
+      .whereNotIn(
+        rcn,
+        this.dbDriver(tn)
+          .select(cn)
+          .where(childTable.primaryKey.cn, cid)
+      )
+      .orWhereNull(rcn);
 
     await parentModel.selectObject({ qb });
 
