@@ -179,6 +179,7 @@ export default {
     sortList: true,
 
     mmList: true,
+    hmList: true,
     commentList: true,
     commentRow: false,
 
