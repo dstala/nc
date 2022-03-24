@@ -293,7 +293,7 @@ export default {
         id,
         this.column.id,
         'bt',
-        parent[this.parentReferenceKey]
+        parent[this.parentPrimaryKey]
       )
       this.$emit('loadTableData')
       if (this.isForm && this.$refs.childList) {
@@ -380,7 +380,7 @@ export default {
         id,
         this.column.id,
         'bt',
-        parent[this.parentReferenceKey]
+        parent[this.parentPrimaryKey]
       )
 
       this.pid = pid

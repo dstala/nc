@@ -782,6 +782,7 @@ class BaseModelSqlv2 {
         this.dbDriver(tn)
           .select(cn)
           .where(childTable.primaryKey.cn, cid)
+          .whereNotNull(cn)
       ).orWhereNull(rcn);
     });
 
@@ -794,6 +795,8 @@ class BaseModelSqlv2 {
     applyPaginate(qb, args);
 
     const proto = await parentModel.getProto();
+
+    console.log('-=====', qb.toQuery());
 
     return (await qb).map(c => {
       c.__proto__ = proto;
