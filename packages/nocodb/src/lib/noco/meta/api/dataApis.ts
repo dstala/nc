@@ -6,6 +6,7 @@ import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import View from '../../../noco-models/View';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { NcError } from './helpers/catchError';
 
 export async function dataList(req: Request, res: Response, next) {
   const view = await View.get(req.params.viewId);
@@ -493,22 +494,59 @@ async function getDataList(model, view: View, req) {
     page: 1
   });
 }
-// async function getViewAndModelFromRequest(req) {
-//   const project = await Project.getWithInfoBySlug(req.params.projectName);
-//   const model = await Model.getBySlug({
-//     project_id: project.id,
-//     base_id: project.bases?.[0]?.id,
-//     slug: req.params.tableName
-//   });
-//   const view =
-//     req.params.viewName &&
-//     (await View.getBySlug({
-//       slug: req.params.viewName,
-//       fk_model_id: model.id
-//     }));
-//   if (!model) NcError.notFound('Table not found');
-//   return { model, view };
-// }
+//@ts-ignore
+async function relationDataDelete(req, res) {
+  const view = await View.get(req.params.viewId);
+
+  const model = await Model.getByIdOrName({
+    id: view?.fk_model_id || req.params.viewId
+  });
+
+  if (!model) NcError.notFound('Table not found');
+
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  await baseModel.removeChild({
+    colId: req.params.colId,
+    childId: req.params.childId,
+    rowId: req.params.rowId
+  });
+
+  res.json({ msg: 'success' });
+}
+
+//@ts-ignore
+async function relationDataAdd(req, res) {
+  const view = await View.get(req.params.viewId);
+
+  const model = await Model.getByIdOrName({
+    id: view?.fk_model_id || req.params.viewId
+  });
+
+  if (!model) NcError.notFound('Table not found');
+
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  await baseModel.addChild({
+    colId: req.params.colId,
+    childId: req.params.childId,
+    rowId: req.params.rowId
+  });
+
+  res.json({ msg: 'success' });
+}
 
 const router = Router({ mergeParams: true });
 
@@ -536,8 +574,8 @@ router.post('/data/:viewId/', ncMetaAclMw(dataInsert));
 router.get('/data/:viewId/:rowId', ncMetaAclMw(dataRead));
 router.put('/data/:viewId/:rowId', ncMetaAclMw(dataUpdate));
 router.delete('/data/:viewId/:rowId', ncMetaAclMw(dataDelete));
-router.get('/data/:viewId/:rowId/mm/:colId', ncMetaAclMw(mmList));
 
+router.get('/data/:viewId/:rowId/mm/:colId', ncMetaAclMw(mmList));
 router.get('/data/:viewId/:rowId/hm/:colId', ncMetaAclMw(hmList));
 
 router.get(
@@ -551,5 +589,14 @@ router.get(
 router.get(
   '/data/:viewId/:rowId/bt/:colId/exclude',
   ncMetaAclMw(btExcludedList)
+);
+
+router.post(
+  '/data/:viewId/:rowId/:relationType/:colId/:childId',
+  ncMetaAclMw(relationDataAdd)
+);
+router.delete(
+  '/data/:viewId/:rowId/:relationType/:colId/:childId',
+  ncMetaAclMw(relationDataDelete)
 );
 export default router;

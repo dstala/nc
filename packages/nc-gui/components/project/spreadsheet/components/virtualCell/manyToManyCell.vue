@@ -311,15 +311,24 @@ export default {
       }
       await Promise.all([this.loadChildMeta(), this.loadAssociateTableMeta()])
 
-      const _pcn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
-      const _ccn = this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id)._cn
+      // const _pcn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
+      // const _ccn = this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id)._cn
+      //
+      // const apcn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id).cn
+      // const accn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id).cn
 
-      const apcn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id).cn
-      const accn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id).cn
-
-      const id = this.assocMeta.columns.filter(c => c.cn === apcn || c.cn === accn).map(c => c.cn === apcn ? this.row[_pcn] : child[_ccn]).join('___')
+      const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
+      const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
+      // const id = this.assocMeta.columns.filter(c => c.cn === apcn || c.cn === accn).map(c => c.cn === apcn ? this.row[_pcn] : child[_ccn]).join('___')
       // await this.assocApi.delete(id)
-      await this.$api.data.delete(this.assocMeta.id, id)
+      // await this.$api.data.delete(this.assocMeta.id, id)
+      await this.$api.data.nestedDelete(
+        this.meta.id,
+        pid,
+        this.column.id,
+        'mm',
+        cid
+      )
       this.$emit('loadTableData')
       if ((this.childListModal || this.isForm) && this.$refs.childList) {
         this.$refs.childList.loadData()
@@ -394,13 +403,22 @@ export default {
       const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
       const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
 
-      const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id)._cn
-      const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id)._cn
+      // const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id)._cn
+      // const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id)._cn
+
+      await this.$api.data.nestedAdd(
+        this.meta.id,
+        pid,
+        this.column.id,
+        'mm',
+        cid
+      )
+
       try {
-        await this.$api.data.create(this.assocMeta.id, {
-          [vcidCol]: parseIfInteger(cid),
-          [vpidCol]: parseIfInteger(pid)
-        })
+        // await this.$api.data.create(this.assocMeta.id, {
+        //   [vcidCol]: parseIfInteger(cid),
+        //   [vpidCol]: parseIfInteger(pid)
+        // })
 
         this.$emit('loadTableData')
       } catch (e) {
