@@ -122,6 +122,10 @@ export default class Project implements ProjectType {
         deleted: false
       });
       await NocoCache.set(`${CacheScope.PROJECT}:${projectId}`, projectData);
+    } else {
+      if (projectData.deleted) {
+        projectData = null;
+      }
     }
     return projectData && new Project(projectData);
   }
@@ -153,6 +157,10 @@ export default class Project implements ProjectType {
           `${CacheScope.PROJECT}:${projectData.uuid}`,
           projectId
         );
+      }
+    } else {
+      if (projectData.deleted) {
+        projectData = null;
       }
     }
     if (projectData) {
