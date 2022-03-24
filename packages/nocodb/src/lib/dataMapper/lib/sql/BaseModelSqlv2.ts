@@ -1025,14 +1025,26 @@ class BaseModelSqlv2 {
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.multipleHmList(
-                    {
-                      colId: column.id,
-                      ids
-                    },
-                    (listLoader as any).args
-                  );
-                  return ids.map((id: string) => (data[id] ? data[id] : []));
+                  if (ids.length > 1) {
+                    const data = await this.multipleHmList(
+                      {
+                        colId: column.id,
+                        ids
+                      },
+                      (listLoader as any).args
+                    );
+                    return ids.map((id: string) => (data[id] ? data[id] : []));
+                  } else {
+                    return [
+                      await this.hmList(
+                        {
+                          colId: column.id,
+                          id: ids[0]
+                        },
+                        (listLoader as any).args
+                      )
+                    ];
+                  }
                 } catch (e) {
                   console.log(e);
                   return [];
@@ -1055,15 +1067,27 @@ class BaseModelSqlv2 {
             } else if (colOptions.type === 'mm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.multipleMmList(
-                    {
-                      parentIds: ids,
-                      colId: column.id
-                    },
-                    (listLoader as any).args
-                  );
+                  if (ids?.length > 1) {
+                    const data = await this.multipleMmList(
+                      {
+                        parentIds: ids,
+                        colId: column.id
+                      },
+                      (listLoader as any).args
+                    );
 
-                  return data;
+                    return data;
+                  } else {
+                    return [
+                      await this.mmList(
+                        {
+                          parentId: ids[0],
+                          colId: column.id
+                        },
+                        (listLoader as any).args
+                      )
+                    ];
+                  }
                 } catch (e) {
                   console.log(e);
                   return [];
