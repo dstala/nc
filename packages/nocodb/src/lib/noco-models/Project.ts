@@ -117,12 +117,10 @@ export default class Project implements ProjectType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!projectData) {
-      projectData = await ncMeta.metaGet2(
-        null,
-        null,
-        MetaTable.PROJECT,
-        projectId
-      );
+      projectData = await ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
+        id: projectId,
+        deleted: false
+      });
       await NocoCache.set(`${CacheScope.PROJECT}:${projectId}`, projectData);
     }
     return projectData && new Project(projectData);
@@ -145,12 +143,10 @@ export default class Project implements ProjectType {
         CacheGetType.TYPE_OBJECT
       ));
     if (!projectData) {
-      projectData = await ncMeta.metaGet2(
-        null,
-        null,
-        MetaTable.PROJECT,
-        projectId
-      );
+      projectData = await ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
+        id: projectId,
+        deleted: false
+      });
       await NocoCache.set(`${CacheScope.PROJECT}:${projectId}`, projectData);
       if (projectData.uuid) {
         await NocoCache.set(
@@ -306,7 +302,8 @@ export default class Project implements ProjectType {
     let projectData = null;
     if (!projectId) {
       projectData = await Noco.ncMeta.metaGet2(null, null, MetaTable.PROJECT, {
-        title
+        title,
+        deleted: false
       });
       await NocoCache.set(`${CacheScope.PROJECT}:${title}`, projectData?.id);
     } else {
