@@ -92,7 +92,7 @@ export default class HookLog implements HookLogType {
       'triggered_by'
     ]);
 
-    if (!(hookLog.project_id && hookLog.base_id)) {
+    if (!(hookLog.project_id && hookLog.base_id) && hookLog.fk_hook_id) {
       const hook = await Hook.get(hookLog.fk_hook_id, ncMeta);
       insertObj.project_id = hook.project_id;
       insertObj.base_id = hook.base_id;
