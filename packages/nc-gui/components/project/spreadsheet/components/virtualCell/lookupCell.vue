@@ -1,5 +1,5 @@
 <template>
-  <div class="chips-wrapper">
+  <div class="d-flex flex-wrap wrapper">
     <!--    <div class="chips d-flex align-center  lookup-items">
       <template v-if="localValue">
         <item-chip
@@ -43,18 +43,40 @@
     />-->
 
     <template v-if="lookupColumnMeta">
-      <div
-        :is="virtualCell"
+      <template
         v-if="isVirtualCol(lookupColumnMeta)"
-        :is-public="true"
-        :metas="metas"
-        :is-locked="true"
-        :column="lookupColumnMeta"
-        :row="{[lookupColumnMeta._cn]:value}"
-        :nodes="nodes"
-        :meta="lookupTableMeta"
-        :sql-ui="sqlUi"
-      />
+      >
+        <template
+          :is="virtualCell"
+          v-if="lookupColumnMeta.uidt === UITypes.LinkToAnotherRecord &&lookupColumnMeta.colOptions.type === RelationTypes.BELONGS_TO && Array.isArray(value) "
+        >
+          <div
+            :is="virtualCell"
+            v-for="(v,i) in value"
+            :key="i"
+            :is-public="true"
+            :metas="metas"
+            :is-locked="true"
+            :column="lookupColumnMeta"
+            :row="{[lookupColumnMeta._cn]:v}"
+            :nodes="nodes"
+            :meta="lookupTableMeta"
+            :sql-ui="sqlUi"
+          />
+        </template>
+        <div
+          :is="virtualCell"
+          v-else
+          :is-public="true"
+          :metas="metas"
+          :is-locked="true"
+          :column="lookupColumnMeta"
+          :row="{[lookupColumnMeta._cn]:value}"
+          :nodes="nodes"
+          :meta="lookupTableMeta"
+          :sql-ui="sqlUi"
+        />
+      </template>
       <template v-else>
         <template v-if="localValue">
           <item-chip
@@ -82,7 +104,7 @@
 </template>
 
 <script>
-import { isVirtualCol } from 'nc-common'
+import { isVirtualCol, RelationTypes, UITypes } from 'nc-common'
 import TableCell from '../cell'
 import ItemChip from '@/components/project/spreadsheet/components/virtualCell/components/itemChip'
 export default {
@@ -106,10 +128,12 @@ export default {
     value: [Object, Array, String, Number]
   },
   data: () => ({
+    UITypes,
     lookupListModal: false,
     lookupTableMeta: null,
     lookupColumnMeta: null,
-    isVirtualCol
+    isVirtualCol,
+    RelationTypes
   }),
   computed: {
     virtualCell() {
@@ -227,24 +251,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.chips-wrapper {
-  .chips {
-    max-width: 100%;
-
-    &.lookup-items {
+.wrapper{
       flex-wrap: wrap;
-      row-gap: 3px;
-      gap: 3px;
-      margin: 3px 0;
-    }
   }
-
-  &.active {
-    .chips {
-      max-width: calc(100% - 44px);
-    }
-  }
-}
 </style>
 <!--
 /**
