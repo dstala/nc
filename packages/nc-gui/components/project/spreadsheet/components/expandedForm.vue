@@ -314,7 +314,7 @@ export default {
     queryParams: Object,
     meta: Object,
     presetValues: Object,
-    isLocked: Boolean,
+    isLocked: Boolean
   },
   data: () => ({
     isVirtualCol,
@@ -356,7 +356,7 @@ export default {
       return Object.values(this.changedColumns).some(Boolean)
     },
     localBreadcrumbs() {
-      return [...this.breadcrumbs, `${this.meta ? this.meta._tn : this.table} (${this.primaryValue()})`]
+      return [...this.breadcrumbs, `${this.meta ? this.meta._tn : this.table} ${this.primaryValue() ? `(${this.primaryValue()})` : ''}`]
     }
   },
   watch: {
