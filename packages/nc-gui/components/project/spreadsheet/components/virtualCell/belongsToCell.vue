@@ -350,11 +350,11 @@ export default {
       this.newRecordModal = true
     },
     async addChildToParent(parent) {
-      const pkColumns = this.parentMeta.columns.filter(c => c.pk)
-      const pid = pkColumns.map(c => parent[c._cn]).join('___')
-      const id = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
+      // const pkColumns = this.parentMeta.columns.filter(c => c.pk)
+      const pid = this._extractRowId(parent, this.parentMeta)
+      const id = this._extractRowId(this.row, this.meta)
       const _cn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
-      const isNum = false
+      // const isNum = false
 
       // if (pkColumns.length === 1) {
       //   isNum = ['float', 'integer'].includes(this.sqlUi.getAbstractType(pkColumns[0]))
@@ -381,7 +381,7 @@ export default {
         id,
         this.column.id,
         'bt',
-        parent[this.parentPrimaryKey]
+        pid
       )
 
       this.pid = pid
