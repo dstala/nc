@@ -551,7 +551,7 @@ export default class Model implements TableType {
 
     if (currentPvCol) {
       // get existing cache
-      const key = `${CacheScope.MODEL}:${currentPvCol.id}`;
+      const key = `${CacheScope.COLUMN}:${currentPvCol.id}`;
       const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
       if (o) {
         o.pv = false;
@@ -571,7 +571,7 @@ export default class Model implements TableType {
     }
 
     // get existing cache
-    const key = `${CacheScope.MODEL}:${newPvCol.id}`;
+    const key = `${CacheScope.COLUMN}:${newPvCol.id}`;
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
       o.pv = true;
