@@ -52,15 +52,13 @@ export async function mmList(req: Request, res: Response, next) {
       requestObj,
       {
         [key]: async args => {
-          return (
-            await baseModel.mmList(
-              {
-                colId: req.params.colId,
-                parentIds: [req.params.rowId]
-              },
-              args
-            )
-          )?.[0];
+          return await baseModel.mmList(
+            {
+              colId: req.params.colId,
+              parentId: req.params.rowId
+            },
+            args
+          );
         }
       },
       {},
@@ -69,12 +67,10 @@ export async function mmList(req: Request, res: Response, next) {
     )
   )?.[key];
 
-  const count = (
-    await baseModel.mmListCount({
-      colId: req.params.colId,
-      parentIds: [req.params.rowId]
-    })
-  )?.[0]?.count;
+  const count: any = await baseModel.mmListCount({
+    colId: req.params.colId,
+    parentId: req.params.rowId
+  });
 
   res.json(
     new PagedResponseImpl(data, {
@@ -281,15 +277,13 @@ export async function hmList(req: Request, res: Response, next) {
       requestObj,
       {
         [key]: async args => {
-          return (
-            await baseModel.hmList(
-              {
-                colId: req.params.colId,
-                ids: [req.params.rowId]
-              },
-              args
-            )
-          )?.[req.params.rowId];
+          return await baseModel.hmList(
+            {
+              colId: req.params.colId,
+              id: req.params.rowId
+            },
+            args
+          );
         }
       },
       {},
@@ -297,12 +291,10 @@ export async function hmList(req: Request, res: Response, next) {
     )
   )?.[key];
 
-  const count = (
-    await baseModel.hmListCount({
-      colId: req.params.colId,
-      ids: [req.params.rowId]
-    })
-  )?.[0];
+  const count = await baseModel.hmListCount({
+    colId: req.params.colId,
+    id: req.params.rowId
+  });
 
   res.json(
     new PagedResponseImpl(data, {

@@ -302,7 +302,7 @@ class BaseModelSqlv2 {
     );
   }
 
-  async hmList({ colId, ids }, args?: { limit?; offset? }) {
+  async multipleHmList({ colId, ids }, args?: { limit?; offset? }) {
     try {
       // const {
       //   where,
@@ -389,7 +389,7 @@ class BaseModelSqlv2 {
     }
   }
 
-  async hmListCount({ colId, ids }) {
+  async multipleHmListCount({ colId, ids }) {
     try {
       // const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
       const relColumn = (await this.model.getColumns()).find(
@@ -427,7 +427,108 @@ class BaseModelSqlv2 {
     }
   }
 
-  public async mmList({ colId, parentIds }, args?: { limit; offset }) {
+  async hmList({ colId, id }, args?: { limit?; offset? }) {
+    try {
+      // const {
+      //   where,
+      //   limit,
+      //   offset,
+      //   conditionGraph,
+      //   sort
+      //   // ...restArgs
+      // } = this.dbModels[child]._getChildListArgs(args);
+      // let { fields } = restArgs;
+      // todo: get only required fields
+      let fields = '*';
+
+      // const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
+      const relColumn = (await this.model.getColumns()).find(
+        c => c.id === colId
+      );
+
+      const chilCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getChildColumn();
+      const childTable = await chilCol.getModel();
+      const parentCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getParentColumn();
+      const parentTable = await parentCol.getModel();
+      const childModel = await Model.getBaseModelSQL({
+        model: childTable,
+        dbDriver: this.dbDriver
+      });
+      await parentTable.getColumns();
+      // if (fields !== '*' && fields.split(',').indexOf(cn) === -1) {
+      //   fields += ',' + cn;
+      // }
+
+      fields = fields
+        .split(',')
+        .map(c => `${chilCol.cn}.${c}`)
+        .join(',');
+
+      const qb = this.dbDriver(childTable.tn);
+
+      qb.whereIn(
+        chilCol.cn,
+        this.dbDriver(parentTable.tn)
+          .select(parentCol.cn)
+          // .where(parentTable.primaryKey.cn, p)
+          .where(_wherePk(parentTable.primaryKeys, id))
+      );
+      // todo: sanitize
+      qb.limit(args?.limit || 20);
+      qb.offset(args?.offset || 0);
+
+      await childModel.selectObject({ qb });
+
+      const children = await qb;
+
+      const proto = await (
+        await Model.getBaseModelSQL({
+          id: childTable.id,
+          dbDriver: this.dbDriver
+        })
+      ).getProto();
+
+      return children.map(c => {
+        c.__proto__ = proto;
+        return c;
+      });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  async hmListCount({ colId, id }) {
+    try {
+      // const { cn } = this.hasManyRelations.find(({ tn }) => tn === child) || {};
+      const relColumn = (await this.model.getColumns()).find(
+        c => c.id === colId
+      );
+      const chilCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getChildColumn();
+      const childTable = await chilCol.getModel();
+      const parentCol = await ((await relColumn.getColOptions()) as LinkToAnotherRecordColumn).getParentColumn();
+      const parentTable = await parentCol.getModel();
+      await parentTable.getColumns();
+
+      const query = this.dbDriver(childTable.tn)
+        .count(`${chilCol?.cn} as count`)
+        .whereIn(
+          chilCol.cn,
+          this.dbDriver(parentTable.tn)
+            .select(parentCol.cn)
+            .where(_wherePk(parentTable.primaryKeys, id))
+        )
+        .first();
+      const { count } = await query;
+      return count;
+      // return _.groupBy(children, cn);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  public async multipleMmList({ colId, parentIds }, args?: { limit; offset }) {
     const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
     const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
 
@@ -450,7 +551,7 @@ class BaseModelSqlv2 {
     const qb = this.dbDriver(rtn).join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`);
 
     await childModel.selectObject({ qb });
-    const children = await this.dbDriver.union(
+    const finalQb = this.dbDriver.union(
       parentIds.map(id => {
         const query = qb
           .clone()
@@ -461,7 +562,7 @@ class BaseModelSqlv2 {
               // .where(parentTable.primaryKey.cn, id)
               .where(_wherePk(parentTable.primaryKeys, id))
           )
-          .select(this.dbDriver.raw('? as ??', [id, GROUP_COL]));
+          .select(this.dbDriver.raw('? as ??', [+id, GROUP_COL]));
 
         // todo: sanitize
         query.limit(args?.limit || 20);
@@ -472,6 +573,7 @@ class BaseModelSqlv2 {
       !this.isSqlite
     );
 
+    const children = await finalQb;
     const proto = await (
       await Model.getBaseModelSQL({ tn: rtn, dbDriver: this.dbDriver })
     ).getProto();
@@ -485,7 +587,53 @@ class BaseModelSqlv2 {
     return parentIds.map(id => gs[id] || []);
   }
 
-  public async mmListCount({ colId, parentIds }) {
+  public async mmList({ colId, parentId }, args?: { limit; offset }) {
+    const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
+    const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
+
+    // const tn = this.model.tn;
+    // const cn = (await relColOptions.getChildColumn()).title;
+    const vtn = (await relColOptions.getMMModel()).tn;
+    const vcn = (await relColOptions.getMMChildColumn()).cn;
+    const vrcn = (await relColOptions.getMMParentColumn()).cn;
+    const rcn = (await relColOptions.getParentColumn()).cn;
+    const cn = (await relColOptions.getChildColumn()).cn;
+    const childTable = await (await relColOptions.getParentColumn()).getModel();
+    const parentTable = await (await relColOptions.getChildColumn()).getModel();
+    await parentTable.getColumns();
+    const childModel = await Model.getBaseModelSQL({
+      dbDriver: this.dbDriver,
+      model: childTable
+    });
+    const rtn = childTable.tn;
+
+    const qb = this.dbDriver(rtn)
+      .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
+      .whereIn(
+        `${vtn}.${vcn}`,
+        this.dbDriver(parentTable.tn)
+          .select(cn)
+          // .where(parentTable.primaryKey.cn, id)
+          .where(_wherePk(parentTable.primaryKeys, parentId))
+      );
+
+    await childModel.selectObject({ qb });
+    // todo: sanitize
+    qb.limit(args?.limit || 20);
+    qb.offset(args?.offset || 0);
+
+    const children = await qb;
+    const proto = await (
+      await Model.getBaseModelSQL({ tn: rtn, dbDriver: this.dbDriver })
+    ).getProto();
+
+    return children.map(c => {
+      c.__proto__ = proto;
+      return c;
+    });
+  }
+
+  public async multipleMmListCount({ colId, parentIds }) {
     const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
     const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
 
@@ -525,17 +673,42 @@ class BaseModelSqlv2 {
       !this.isSqlite
     );
 
-    const proto = await (
-      await Model.getBaseModelSQL({ tn: rtn, dbDriver: this.dbDriver })
-    ).getProto();
-    const gs = _.groupBy(
-      children.map(c => {
-        c.__proto__ = proto;
-        return c;
-      }),
-      GROUP_COL
-    );
+    const gs = _.groupBy(children, GROUP_COL);
     return parentIds.map(id => gs?.[id]?.[0] || []);
+  }
+
+  public async mmListCount({ colId, parentId }) {
+    const relColumn = (await this.model.getColumns()).find(c => c.id === colId);
+    const relColOptions = (await relColumn.getColOptions()) as LinkToAnotherRecordColumn;
+
+    const vtn = (await relColOptions.getMMModel()).tn;
+    const vcn = (await relColOptions.getMMChildColumn()).cn;
+    const vrcn = (await relColOptions.getMMParentColumn()).cn;
+    const rcn = (await relColOptions.getParentColumn()).cn;
+    const cn = (await relColOptions.getChildColumn()).cn;
+    const childTable = await (await relColOptions.getParentColumn()).getModel();
+    const rtn = childTable.tn;
+    const parentTable = await (await relColOptions.getChildColumn()).getModel();
+    await parentTable.getColumns();
+
+    const qb = this.dbDriver(rtn)
+      .join(vtn, `${vtn}.${vrcn}`, `${rtn}.${rcn}`)
+      // .select({
+      //   [`${tn}_${vcn}`]: `${vtn}.${vcn}`
+      // })
+      .count(`${vtn}.${vcn}`, { as: 'count' })
+      .whereIn(
+        `${vtn}.${vcn}`,
+        this.dbDriver(parentTable.tn)
+          .select(cn)
+          // .where(parentTable.primaryKey.cn, id)
+          .where(_wherePk(parentTable.primaryKeys, parentId))
+      )
+      .first();
+
+    const { count } = await qb;
+
+    return count;
   }
 
   // todo: naming & optimizing
@@ -852,7 +1025,7 @@ class BaseModelSqlv2 {
             if (colOptions?.type === 'hm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.hmList(
+                  const data = await this.multipleHmList(
                     {
                       colId: column.id,
                       ids
@@ -882,7 +1055,7 @@ class BaseModelSqlv2 {
             } else if (colOptions.type === 'mm') {
               const listLoader = new DataLoader(async (ids: string[]) => {
                 try {
-                  const data = await this.mmList(
+                  const data = await this.multipleMmList(
                     {
                       parentIds: ids,
                       colId: column.id

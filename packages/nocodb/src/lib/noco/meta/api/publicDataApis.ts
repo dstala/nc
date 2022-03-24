@@ -432,7 +432,7 @@ export async function publicMmList(req: Request, res: Response) {
       {
         [key]: async args => {
           return (
-            await baseModel.mmList(
+            await baseModel.multipleMmList(
               {
                 colId: req.params.colId,
                 parentIds: [req.params.rowId]
@@ -449,7 +449,7 @@ export async function publicMmList(req: Request, res: Response) {
   )?.[key];
 
   const count = (
-    await baseModel.mmListCount({
+    await baseModel.multipleMmListCount({
       colId: req.params.colId,
       parentIds: [req.params.rowId]
     })
@@ -496,7 +496,7 @@ export async function publicHmList(req: Request, res: Response) {
       {
         [key]: async args => {
           return (
-            await baseModel.hmList(
+            await baseModel.multipleHmList(
               {
                 colId: req.params.colId,
                 ids: [req.params.rowId]
@@ -512,7 +512,7 @@ export async function publicHmList(req: Request, res: Response) {
   )?.[key];
 
   const count = (
-    await baseModel.hmListCount({
+    await baseModel.multipleHmListCount({
       colId: req.params.colId,
       ids: [req.params.rowId]
     })
