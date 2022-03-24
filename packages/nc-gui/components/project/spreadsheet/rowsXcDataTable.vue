@@ -651,6 +651,7 @@
         :query-params="queryParams"
         :show-next-prev="false"
         :preset-values="presetValues"
+        :is-locked="isLocked"
         @cancel="showExpandModal = false;"
         @input="showExpandModal = false; (kanban.selectedExpandRow && kanban.selectedExpandRow.rowMeta && delete kanban.selectedExpandRow.rowMeta.new) ; loadKanbanData(false)"
         @commented="reloadComments"
@@ -678,6 +679,7 @@
         :query-params="queryParams"
         :show-next-prev="true"
         :preset-values="presetValues"
+        :is-locked="isLocked"
         @cancel="showExpandModal = false;"
         @input="showExpandModal = false; (data[selectedExpandRowIndex] && data[selectedExpandRowIndex].rowMeta && delete data[selectedExpandRowIndex].rowMeta.new) ; loadTableData()"
         @commented="reloadComments"
@@ -1358,7 +1360,7 @@ export default {
       // }
 
       // load latest table meta
-      await this.$store.dispatch('meta/ActLoadMeta', {
+      const tableMeta = await this.$store.dispatch('meta/ActLoadMeta', {
         env: this.nodes.env,
         dbAlias: this.nodes.dbAlias,
         tn: this.table,

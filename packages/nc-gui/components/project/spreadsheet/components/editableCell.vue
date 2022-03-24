@@ -19,6 +19,7 @@
       :is-public-grid="isPublic && !isForm"
       :is-public-form="isPublic && isForm"
       :view-id="viewId"
+      :is-locked="isLocked"
       v-on="$listeners"
     />
 
@@ -205,9 +206,6 @@ export default {
         $listeners.cancel = this.$listeners.cancel
       }
 
-      if (this.$listeners.update) {
-        $listeners.update = this.$listeners.update
-      }
 
       return $listeners
     }

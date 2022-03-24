@@ -77,6 +77,7 @@
                       :value="row[col._cn]"
                       :column="col"
                       :sql-ui="sqlUi"
+                      :is-locked="isLocked"
                       class="xc-input body-2"
                       :meta="meta"
                     />
@@ -97,7 +98,6 @@ import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'
 import TableCell from '../components/cell'
-
 export default {
   name: 'GalleryView',
   components: {
@@ -117,7 +117,8 @@ export default {
     'showSystemFields',
     'sqlUi',
     'coverImageField',
-    'viewId', 'isLocked'
+    'viewId',
+    'isLocked'
   ],
   data() {
     return {

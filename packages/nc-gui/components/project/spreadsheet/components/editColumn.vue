@@ -208,7 +208,7 @@
                                           dense
                                           hide-details
                                           label="NN"
-                                          @input="newColumn.altered = newColumn.altered || 2"
+                                          @change="newColumn.altered = newColumn.altered || 2"
                                         >
                                           <template #label>
                                             <span class="caption font-weight-bold">NN</span>
@@ -229,7 +229,7 @@
                                           dense
                                           hide-details
                                           label="PK"
-                                          @input="newColumn.altered = newColumn.altered || 2"
+                                          @change="newColumn.altered = newColumn.altered || 2"
                                         >
                                           <template #label>
                                             <span class="caption font-weight-bold">PK</span>
@@ -250,7 +250,7 @@
                                           dense
                                           hide-details
                                           label="AI"
-                                          @input="newColumn.altered = newColumn.altered || 2"
+                                          @change="newColumn.altered = newColumn.altered || 2"
                                         >
                                           <template #label>
                                             <span class="caption font-weight-bold">AI</span>
@@ -271,7 +271,7 @@
                                           hide-details
                                           label="UN"
                                           :disabled="sqlUi.colPropUNDisabled(newColumn) || !sqlUi.columnEditable(newColumn)"
-                                          @input="newColumn.altered = newColumn.altered || 2"
+                                          @change="newColumn.altered = newColumn.altered || 2"
                                         >
                                           <template #label>
                                             <span class="caption font-weight-bold">UN</span>
@@ -292,7 +292,7 @@
                                           hide-details
                                           label="UN"
                                           :disabled=" sqlUi.colPropAuDisabled(newColumn) || !sqlUi.columnEditable(newColumn)"
-                                          @input="newColumn.altered = newColumn.altered || 2"
+                                          @change="newColumn.altered = newColumn.altered || 2"
                                         >
                                           <template #label>
                                             <span class="caption font-weight-bold">AU</span>
