@@ -1,5 +1,5 @@
 import {
-  CacheDelDirection,
+  // CacheDelDirection,
   CacheGetType,
   CacheScope,
   MetaTable
@@ -32,12 +32,6 @@ export default class ProjectUser {
         updated_at: projectUser.updated_at
       },
       true
-    );
-
-    await NocoCache.appendToList(
-      CacheScope.PROJECT_USER,
-      [projectUser.project_id, projectUser.fk_user_id],
-      `${CacheScope.PROJECT_USER}:${project_id}:${fk_user_id}`
     );
 
     return this.get(project_id, fk_user_id, ncMeta);
@@ -157,11 +151,18 @@ export default class ProjectUser {
   }
 
   static async delete(projectId: string, userId, ncMeta = Noco.ncMeta) {
-    await NocoCache.deepDel(
-      CacheScope.PROJECT_USER,
-      `${CacheScope.PROJECT_USER}:${projectId}:${userId}`,
-      CacheDelDirection.CHILD_TO_PARENT
-    );
+    // await NocoCache.deepDel(
+    //   CacheScope.PROJECT_USER,
+    //   `${CacheScope.PROJECT_USER}:${projectId}:${userId}`,
+    //   CacheDelDirection.CHILD_TO_PARENT
+    // );
+    const { email } = await ncMeta.metaGet2(null, null, MetaTable.USERS, {
+      id: userId
+    });
+    if (email) {
+      await NocoCache.delAll(CacheScope.USER, `${email}*`);
+    }
+    await NocoCache.del(`${CacheScope.PROJECT_USER}:${projectId}:${userId}`);
     return await ncMeta.metaDelete(null, null, MetaTable.PROJECT_USERS, {
       fk_user_id: userId,
       project_id: projectId

@@ -99,7 +99,7 @@ export default class RedisCacheMgr extends CacheMgr {
     return Promise.all(
       keys.map(
         async k =>
-          await this.client.deepDel(scope, k, CacheDelDirection.CHILD_TO_PARENT)
+          await this.deepDel(scope, k, CacheDelDirection.CHILD_TO_PARENT)
       )
     );
   }

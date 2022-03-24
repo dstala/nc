@@ -3,12 +3,13 @@ import { Router } from 'express';
 import { PagedResponseImpl } from './helpers/PagedResponse';
 import ProjectUser from '../../../noco-models/ProjectUser';
 import validator from 'validator';
-import XcCache from '../../plugins/adapters/cache/XcCache';
 import { NcError } from './helpers/catchError';
 import { v4 as uuidv4 } from 'uuid';
 import User from '../../../noco-models/User';
 import { Tele } from 'nc-help';
 import Audit from '../../../noco-models/Audit';
+import NocoCache from '../../../noco-cache/NocoCache';
+import { CacheGetType, CacheScope } from '../../../utils/globals';
 
 async function userList(req, res) {
   res.json({
@@ -58,6 +59,19 @@ async function userInvite(req, res, next): Promise<any> {
           roles: req.body.roles || 'editor'
         });
       }
+
+      const cachedUser = await NocoCache.get(
+        `${CacheScope.USER}:${email}___${req.params.projectId}`,
+        CacheGetType.TYPE_OBJECT
+      );
+      if (cachedUser) {
+        cachedUser.roles = req.body.roles || 'editor';
+        await NocoCache.set(
+          `${CacheScope.USER}:${email}___${req.params.projectId}`,
+          cachedUser
+        );
+      }
+
       Audit.insert({
         project_id: req.params.projectId,
         op_type: 'AUTHENTICATION',
@@ -161,8 +175,6 @@ async function projectUserUpdate(req, res, next): Promise<any> {
       req.body.roles
     );
 
-    XcCache.del(`${req.body.email}___${req?.body?.project_id}`);
-
     Audit.insert({
       op_type: 'AUTHENTICATION',
       op_sub_type: 'ROLES_MANAGEMENT',
@@ -197,8 +209,6 @@ async function projectUserDelete(req, res): Promise<any> {
       NcError.forbidden('Insufficient privilege to delete a super admin user.');
     // }
   }
-
-  XcCache.del(`${req?.query?.email}___${req?.req?.project_id}`);
 
   // await this.users.where('id', req.params.id).del();
   await ProjectUser.delete(project_id, req.params.userId);
