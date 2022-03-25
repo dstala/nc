@@ -431,15 +431,13 @@ export async function publicMmList(req: Request, res: Response) {
       requestObj,
       {
         [key]: async args => {
-          return (
-            await baseModel.multipleMmList(
-              {
-                colId: req.params.colId,
-                parentIds: [req.params.rowId]
-              },
-              args
-            )
-          )?.[0];
+          return await baseModel.mmList(
+            {
+              colId: req.params.colId,
+              parentId: req.params.rowId
+            },
+            args
+          );
         }
       },
       {},
@@ -448,12 +446,10 @@ export async function publicMmList(req: Request, res: Response) {
     )
   )?.[key];
 
-  const count = (
-    await baseModel.multipleMmListCount({
-      colId: req.params.colId,
-      parentIds: [req.params.rowId]
-    })
-  )?.[0]?.count;
+  const count: any = await baseModel.mmListCount({
+    colId: req.params.colId,
+    parentId: req.params.rowId
+  });
 
   res.json(
     new PagedResponseImpl(data, {
@@ -495,15 +491,13 @@ export async function publicHmList(req: Request, res: Response) {
       requestObj,
       {
         [key]: async args => {
-          return (
-            await baseModel.multipleHmList(
-              {
-                colId: req.params.colId,
-                ids: [req.params.rowId]
-              },
-              args
-            )
-          )?.[req.params.rowId];
+          return await baseModel.hmList(
+            {
+              colId: req.params.colId,
+              id: req.params.rowId
+            },
+            args
+          );
         }
       },
       {},
@@ -511,12 +505,10 @@ export async function publicHmList(req: Request, res: Response) {
     )
   )?.[key];
 
-  const count = (
-    await baseModel.multipleHmListCount({
-      colId: req.params.colId,
-      ids: [req.params.rowId]
-    })
-  )?.[0];
+  const count = await baseModel.hmListCount({
+    colId: req.params.colId,
+    id: req.params.rowId
+  });
 
   res.json(
     new PagedResponseImpl(data, {
