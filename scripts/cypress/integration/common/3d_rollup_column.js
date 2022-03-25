@@ -110,15 +110,15 @@ export const genTest = (apiType, dbType) => {
         ///////////////////////////////////////////////////
         // Test case
 
-        it("Add Rollup column (City, CityId, sum) & Delete", () => {
-            addLookUpColumn("RollUpCol_2", "City", "CityId", "sum");
+        it("Add Rollup column (City, City, count) & Delete", () => {
+            addLookUpColumn("RollUpCol_2", "City", "City", "count");
 
             // Verify first entry, will be displayed as alias here 'childColumn (from childTable)'
             // intentionally verifying 4th item, as initial items are being masked out by list scroll down
             // to be fixed
             //
             cy.get(`tbody > :nth-child(4) > [data-col="RollUpCol_2"]`)
-                .contains("427")
+                .contains("2")
                 .should("exist");
 
             editColumnByName("RollUpCol_2", "RollUpCol_New");
