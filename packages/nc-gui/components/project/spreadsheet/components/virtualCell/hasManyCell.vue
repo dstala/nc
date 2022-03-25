@@ -145,6 +145,7 @@
 
 <script>
 // import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
+import { isSystemColumn } from 'nc-common'
 import DlgLabelSubmitCancel from '@/components/utils/dlgLabelSubmitCancel'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
@@ -257,12 +258,12 @@ export default {
       return this.selectedChild && !this.isPublic ? () => import('@/components/project/spreadsheet/components/expandedForm') : 'span'
     },
     childAvailableColumns() {
-      const hideCols = ['created_at', 'updated_at']
+      // const hideCols = ['created_at', 'updated_at']
       if (!this.childMeta) { return [] }
 
       const columns = []
       if (this.childMeta.columns) {
-        columns.push(...this.childMeta.columns.filter(c => !(c.pk && c.ai) && !hideCols.includes(c.cn) && !((this.childMeta.v || []).some(v => v.bt && v.bt.cn === c.cn))))
+        columns.push(...this.childMeta.columns.filter(c => !isSystemColumn(c)))
       }
       if (this.childMeta.v) {
         columns.push(...this.childMeta.v.map(v => ({ ...v, virtual: 1 })))
