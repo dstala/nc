@@ -49,7 +49,7 @@
 
 <script>
 
-import { UITypes } from 'nc-common'
+import { isSystemColumn, UITypes } from 'nc-common'
 
 export default {
   name: 'LookupOptions',
@@ -129,7 +129,7 @@ export default {
         this.$store.state.meta.metas &&
         this.$store.state.meta.metas[this.lookup.table.id] &&
         this.$store.state.meta.metas[this.lookup.table.id].columns
-      ) || [])
+      ) || []).filter(c => !isSystemColumn(c))
     }
   },
   async mounted() {
