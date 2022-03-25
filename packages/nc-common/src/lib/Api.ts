@@ -723,6 +723,12 @@ export type UpdatePayloadType = any;
 
 export type ViewUpdateBodyType = any;
 
+export type BulkUpdatePayloadType = any[];
+
+export type BulkDeletePayloadType = any[];
+
+export type BulkInsertPayloadType = any[];
+
 export type ModelUpdatePayloadType = any;
 
 export interface CommentListParamsType {
@@ -3712,6 +3718,76 @@ export class Api<
       this.request<void, any>({
         path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
         method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name BulkUpdate
+     * @request PUT:/bulkData/{orgs}/{projectName}/{tableAlias}/
+     * @response `200` `any` OK
+     */
+    bulkUpdate: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      data: BulkUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/bulkData/${orgs}/${projectName}/${tableAlias}/`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name BulkDelete
+     * @request DELETE:/bulkData/{orgs}/{projectName}/{tableAlias}/
+     * @response `200` `void` OK
+     */
+    bulkDelete: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      data: BulkDeletePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/bulkData/${orgs}/${projectName}/${tableAlias}/`,
+        method: 'DELETE',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Data
+     * @name BulkInsert
+     * @request POST:/bulkData/{orgs}/{projectName}/{tableAlias}/
+     * @response `200` `void` OK
+     */
+    bulkInsert: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      data: BulkInsertPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/bulkData/${orgs}/${projectName}/${tableAlias}/`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 

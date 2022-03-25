@@ -1482,10 +1482,85 @@ class BaseModelSqlv2 {
   }
 
   async bulkInsert(datas: any[]) {
-    // todo : start transaction
-    // iterate and insert
+    try {
+      const insertDatas = await Promise.all(
+        datas.map(d => this.model.mapAliasToColumn(d))
+      );
 
-    for (const _data of datas) {
+      // await this.beforeInsertb(insertDatas, null);
+
+      for (const data of datas) {
+        await this.validate(data);
+      }
+
+      const response = await this.dbDriver
+        .batchInsert(this.model.tn, insertDatas, 50)
+        .returning(this.model.primaryKey.cn);
+
+      // await this.afterInsertb(insertDatas, null);
+
+      return response;
+    } catch (e) {
+      // await this.errorInsertb(e, data, null);
+      throw e;
+    }
+  }
+  async bulkUpdate(datas: any[]) {
+    let transaction;
+    try {
+      const updateDatas = await Promise.all(
+        datas.map(d => this.model.mapAliasToColumn(d))
+      );
+
+      transaction = await this.dbDriver.transaction();
+
+      // await this.beforeUpdateb(updateDatas, transaction);
+      const res = [];
+      for (const d of updateDatas) {
+        await this.validate(d);
+        // this.validate(d);
+        const response = await transaction(this.model.tn)
+          .update(d)
+          .where(_wherePk(this.model.primaryKeys, d));
+        res.push(response);
+      }
+
+      // await this.afterUpdateb(res, transaction);
+      transaction.commit();
+
+      return res;
+    } catch (e) {
+      if (transaction) transaction.rollback();
+      // console.log(e);
+      // await this.errorUpdateb(e, data, null);
+      throw e;
+    }
+  }
+  async bulkDelete(ids: any[]) {
+    let transaction;
+    try {
+      transaction = await this.dbDriver.transaction();
+      // await this.beforeDeleteb(ids, transaction);
+
+      const res = [];
+      for (const d of ids) {
+        if (Object.keys(d).length) {
+          const response = await transaction(this.model.tn)
+            .del()
+            .where(d);
+          res.push(response);
+        }
+      }
+      // await this.afterDeleteb(res, transaction);
+
+      transaction.commit();
+
+      return res;
+    } catch (e) {
+      if (transaction) transaction.rollback();
+      console.log(e);
+      // await this.errorDeleteb(e, ids);
+      throw e;
     }
   }
 
