@@ -1540,6 +1540,28 @@ class BaseModelSqlv2 {
       throw e;
     }
   }
+  async bulkUpdateAll(data: any) {
+    let transaction;
+    try {
+      const updateData = await this.model.mapAliasToColumn(data);
+
+      transaction = await this.dbDriver.transaction();
+
+      await this.validate(updateData);
+
+      const wherePk = _wherePk(this.model.primaryKeys, updateData);
+      const res = wherePk
+        ? null // pk is specified - bypass
+        : await transaction(this.model.tn).update(updateData); // update all records
+      transaction.commit();
+      return res;
+    } catch (e) {
+      if (transaction) transaction.rollback();
+      // console.log(e);
+      // await this.errorUpdateb(e, data, null);
+      throw e;
+    }
+  }
   async bulkDelete(ids: any[]) {
     let transaction;
     try {
