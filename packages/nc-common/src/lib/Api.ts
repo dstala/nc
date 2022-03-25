@@ -782,6 +782,20 @@ export type BulkUpdatePayloadType = object[];
 
 export type BulkUpdateAllPayloadType = object;
 
+export interface BulkUpdateAllParamsType {
+  where?: string;
+  orgs: string;
+  projectName: string;
+  tableAlias: string;
+}
+
+export interface BulkDeleteAllParamsType {
+  where?: string;
+  orgs: string;
+  projectName: string;
+  tableAlias: string;
+}
+
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -3870,17 +3884,35 @@ export class Api<
      * @response `200` `any` OK
      */
     bulkUpdateAll: (
-      orgs: string,
-      projectName: string,
-      tableAlias: string,
+      { orgs, projectName, tableAlias, ...query }: BulkUpdateAllParamsType,
       data: BulkUpdateAllPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
         path: `/bulkData/${orgs}/${projectName}/${tableAlias}/all`,
         method: 'PATCH',
+        query: query,
         body: data,
         type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name BulkDeleteAll
+     * @request DELETE:/bulkData/{orgs}/{projectName}/{tableAlias}/all
+     * @response `200` `any` OK
+     */
+    bulkDeleteAll: (
+      { orgs, projectName, tableAlias, ...query }: BulkDeleteAllParamsType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/bulkData/${orgs}/${projectName}/${tableAlias}/all`,
+        method: 'DELETE',
+        query: query,
         format: 'json',
         ...params,
       }),
