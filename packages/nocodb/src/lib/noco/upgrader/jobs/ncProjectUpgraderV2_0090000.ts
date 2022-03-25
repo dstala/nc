@@ -26,35 +26,43 @@ import GridViewColumn from '../../../noco-models/GridViewColumn';
 import { getUniqueColumnAliasName } from '../../meta/api/helpers/getUniqueName';
 import NcProjectBuilderEE from '../../NcProjectBuilderEE';
 import Audit from '../../../noco-models/Audit';
+import { Tele } from 'nc-help';
 
 export default async function(ctx: NcUpgraderCtx) {
-  const ncMeta = ctx.ncMeta;
+  try {
+    const ncMeta = ctx.ncMeta;
 
-  const projects = await ctx.ncMeta.projectList();
+    const projects = await ctx.ncMeta.projectList();
 
-  for (const project of projects) {
-    // const projectConfig = JSON.parse(project.config);
+    for (const project of projects) {
+      // const projectConfig = JSON.parse(project.config);
 
-    const projectBuilder = new NcProjectBuilderEE(
-      { ncMeta: ctx.ncMeta } as any,
-      { workingEnv: '_noco' } as any,
-      project
-    );
+      const projectBuilder = new NcProjectBuilderEE(
+        { ncMeta: ctx.ncMeta } as any,
+        { workingEnv: '_noco' } as any,
+        project
+      );
 
-    await projectBuilder.init();
+      await projectBuilder.init();
+    }
+
+    await migrateUsers(ncMeta);
+    await migrateProjects(ncMeta);
+    await migrateProjectUsers(ncMeta);
+    const migrationCtx = await migrateProjectModels(ncMeta);
+
+    await migrateUIAcl(migrationCtx, ncMeta);
+    await migrateSharedViews(migrationCtx, ncMeta);
+    await migrateSharedBase(ncMeta);
+    await migratePlugins(ncMeta);
+    await migrateWebhooks(migrationCtx, ncMeta);
+    await migrateAutitLog(migrationCtx, ncMeta);
+
+    Tele.emit('evt', { evt_type: 'MIGRATION_V2_SUCCESS' });
+  } catch (e) {
+    Tele.emit('evt', { evt_type: 'MIGRATION_V2_FAILURE', msg: e.message });
+    throw e;
   }
-
-  await migrateUsers(ncMeta);
-  await migrateProjects(ncMeta);
-  await migrateProjectUsers(ncMeta);
-  const migrationCtx = await migrateProjectModels(ncMeta);
-
-  await migrateUIAcl(migrationCtx, ncMeta);
-  await migrateSharedViews(migrationCtx, ncMeta);
-  await migrateSharedBase(ncMeta);
-  await migratePlugins(ncMeta);
-  await migrateWebhooks(migrationCtx, ncMeta);
-  await migrateAutitLog(migrationCtx, ncMeta);
 }
 
 async function migrateUsers(ncMeta = Noco.ncMeta) {
