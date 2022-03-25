@@ -7,6 +7,7 @@ import { invokeWebhook } from './helpers/webhookHelpers';
 import Model from '../../../noco-models/Model';
 import populateSamplePayload from './helpers/populateSamplePayload';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { Tele } from 'nc-help';
 
 export async function hookList(
   req: Request<any, any, any>,
@@ -22,6 +23,7 @@ export async function hookCreate(
   req: Request<any, HookType>,
   res: Response<HookType>
 ) {
+  Tele.emit('evt', { evt_type: 'webhooks:created' });
   const hook = await Hook.insert({
     ...req.body,
     fk_model_id: req.params.tableId
@@ -33,6 +35,7 @@ export async function hookDelete(
   req: Request<any, HookType>,
   res: Response<any>
 ) {
+  Tele.emit('evt', { evt_type: 'webhooks:deleted' });
   res.json(await Hook.delete(req.params.hookId));
 }
 
@@ -40,6 +43,7 @@ export async function hookUpdate(
   req: Request<any, HookType>,
   res: Response<HookType>
 ) {
+  Tele.emit('evt', { evt_type: 'webhooks:updated' });
   res.json(await Hook.update(req.params.hookId, req.body));
 }
 
@@ -60,6 +64,8 @@ export async function hookTest(
     user,
     (hook as any)?.filters
   );
+
+  Tele.emit('evt', { evt_type: 'webhooks:tested' });
 
   res.json({ msg: 'Success' });
 }

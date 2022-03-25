@@ -15,7 +15,7 @@ import NcHelp from '../../../utils/NcHelp';
 import getTableNameAlias, { getColumnNameAlias } from './helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
-
+import { Tele } from 'nc-help';
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',
   TABLE_REMOVE = 'TABLE_REMOVE',
@@ -728,6 +728,8 @@ export async function metaDiffSync(req, res) {
 
   // populate m2m relations
   await extractAndGenerateManyToManyRelations(await base.getModels());
+
+  Tele.emit('evt', { evt_type: 'metaDiff:synced' });
 
   res.json({ msg: 'success' });
 }

@@ -16,7 +16,7 @@ import Project from '../../../noco-models/Project';
 import View from '../../../noco-models/View';
 import GalleryView from '../../../noco-models/GalleryView';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
-
+import { Tele } from 'nc-help';
 // @ts-ignore
 export async function galleryViewGet(req: Request, res: Response<GalleryType>) {
   res.json(await GalleryView.get(req.params.galleryViewId));
@@ -30,6 +30,7 @@ export async function galleyViewList(
 
 // @ts-ignore
 export async function galleryViewCreate(req: Request<any, any>, res) {
+  Tele.emit('evt', { evt_type: 'view:created', type: 'gallery' });
   const view = await View.insert({
     ...req.body,
     // todo: sanitize
@@ -41,6 +42,7 @@ export async function galleryViewCreate(req: Request<any, any>, res) {
 
 // @ts-ignore
 export async function galleryViewUpdate(req, res) {
+  Tele.emit('evt', { evt_type: 'view:updated', type: 'gallery' });
   res.json(await GalleryView.update(req.params.galleryViewId, req.body));
 }
 

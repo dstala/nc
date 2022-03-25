@@ -2,8 +2,9 @@ import Model from '../../../noco-models/Model';
 import ModelRoleVisibility from '../../../noco-models/ModelRoleVisibility';
 import { Router } from 'express';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
-
+import { Tele } from 'nc-help';
 async function xcVisibilityMetaSetAll(req, res) {
+  Tele.emit('evt', { evt_type: 'uiAcl:updated' });
   for (const d of req.body) {
     for (const role of Object.keys(d.disabled)) {
       const dataInDb = await ModelRoleVisibility.get({

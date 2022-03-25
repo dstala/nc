@@ -6,6 +6,7 @@ import Base from '../../../noco-models/Base';
 import Column from '../../../noco-models/Column';
 import { substituteColumnNameWithIdInFormula } from './helpers/formulaHelpers';
 import validateParams from './helpers/validateParams';
+import { Tele } from 'nc-help';
 
 import { customAlphabet } from 'nanoid';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
@@ -422,6 +423,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           });
         }
       }
+      Tele.emit('evt', { evt_type: 'relation:created' });
       break;
 
     case UITypes.Formula:
@@ -470,6 +472,9 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
     description: `created column ${colBody.cn} with alias ${colBody._cn} from table ${table.tn}`,
     ip: (req as any).clientIp
   }).then(() => {});
+
+  Tele.emit('evt', { evt_type: 'column:created' });
+
   res.json(table);
 }
 
@@ -584,6 +589,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   }).then(() => {});
 
   await table.getColumns();
+  Tele.emit('evt', { evt_type: 'column:updated' });
 
   res.json(table);
 }
@@ -703,6 +709,7 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
             break;
         }
       }
+      Tele.emit('evt', { evt_type: 'raltion:deleted' });
       break;
     case UITypes.ForeignKey:
       NcError.notImplemented();
@@ -746,6 +753,7 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
 
   // await ncMeta.commit();
   // await sqlMgr.commit();
+  Tele.emit('evt', { evt_type: 'column:deleted' });
 
   res.json(table);
   // } catch (e) {

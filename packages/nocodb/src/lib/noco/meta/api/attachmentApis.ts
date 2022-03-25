@@ -2,6 +2,7 @@
 import { Request, Response, Router } from 'express';
 import multer from 'multer';
 import { nanoid } from 'nanoid';
+import { Tele } from 'nc-help';
 import path from 'path';
 import slash from 'slash';
 import mimetypes, { mimeIcons } from '../../../utils/mimeTypes';
@@ -38,6 +39,8 @@ export async function upload(req: Request, res: Response) {
       };
     })
   );
+
+  Tele.emit('evt', { evt_type: 'image:uploaded' });
 
   res.json(attachments);
 }

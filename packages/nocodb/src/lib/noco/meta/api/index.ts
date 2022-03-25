@@ -32,6 +32,7 @@ import cacheApis from './cacheApis';
 import apiTokenApis from './apiTokenApis';
 import hookFilterApis from './hookFilterApis';
 import dataAliasApis from './dataAliasApis';
+import bulkDataAliasApis from './bulkDataAliasApis';
 
 export default function(router: Router) {
   initStrategies(router);
@@ -42,8 +43,9 @@ export default function(router: Router) {
 
   router.use(exportApis);
   router.use(dataApis);
-  router.use(dataAliasApis);
+  router.use(bulkDataAliasApis);
 
+  router.use(dataAliasApis);
   router.use(sortApis);
   router.use(filterApis);
   router.use(viewColumnApis);
