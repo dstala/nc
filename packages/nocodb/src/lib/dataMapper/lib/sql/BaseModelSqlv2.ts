@@ -1518,10 +1518,14 @@ class BaseModelSqlv2 {
       const res = [];
       for (const d of updateDatas) {
         await this.validate(d);
-        // this.validate(d);
+        const wherePk = _wherePk(this.model.primaryKeys, d);
+        if (!wherePk) {
+          // pk not specified - bypass
+          continue;
+        }
         const response = await transaction(this.model.tn)
           .update(d)
-          .where(_wherePk(this.model.primaryKeys, d));
+          .where(wherePk);
         res.push(response);
       }
 
@@ -1997,6 +2001,7 @@ export { BaseModelSqlv2 };
  *
  * @author Naveen MR <oof1lab@gmail.com>
  * @author Pranav C Balan <pranavxc@gmail.com>
+ * @author Wing-Kam Wong <wingkwong.code@gmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
