@@ -562,7 +562,7 @@ class BaseModelSqlv2 {
               // .where(parentTable.primaryKey.cn, id)
               .where(_wherePk(parentTable.primaryKeys, id))
           )
-          .select(this.dbDriver.raw('? as ??', [+id, GROUP_COL]));
+          .select(this.dbDriver.raw('? as ??', [id, GROUP_COL]));
 
         // todo: sanitize
         query.limit(args?.limit || 20);
@@ -1054,7 +1054,9 @@ class BaseModelSqlv2 {
 
               proto[column._cn] = async function(args): Promise<any> {
                 (listLoader as any).args = args;
-                return listLoader.load(this[self?.model?.primaryKey?._cn]);
+                return listLoader.load(
+                  getCompositePk(self.model.primaryKeys, this)
+                );
               };
 
               // defining HasMany count method within GQL Type class
@@ -1098,7 +1100,9 @@ class BaseModelSqlv2 {
               // const childColumn = await colOptions.getChildColumn();
               proto[column._cn] = async function(args): Promise<any> {
                 (listLoader as any).args = args;
-                return await listLoader.load(this[self.model.primaryKey._cn]);
+                return await listLoader.load(
+                  getCompositePk(self.model.primaryKeys, this)
+                );
               };
             } else if (colOptions.type === 'bt') {
               // @ts-ignore
@@ -1906,6 +1910,10 @@ function _wherePk(primaryKeys: Column[], id) {
     where[primaryKeys[i].cn] = ids[i];
   }
   return where;
+}
+
+function getCompositePk(primaryKeys: Column[], row) {
+  return primaryKeys.map(c => row[c._cn]).join('___');
 }
 
 export { BaseModelSqlv2 };
