@@ -91,10 +91,10 @@
 
         <div v-if="isForm" class="mb-2 d-flex align-center justify-center">
           <pagination
-            v-if="!bt && data && data.count > 1"
+            v-if="!bt && data && data.pageInfo&& data.pageInfo.totalRows > 1"
             v-model="page"
             :size="size"
-            :count="data && data.count"
+            :count="data && data.pageInfo&& data.pageInfo.totalRows"
             @input="loadData"
           />
         </div>
