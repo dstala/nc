@@ -1,6 +1,8 @@
+import debug from 'debug';
 import CacheMgr from './CacheMgr';
 import Redis from 'ioredis-mock';
-import { CacheDelDirection, CacheGetType } from '../utils/globals';
+import { CacheDelDirection, CacheGetType, CacheScope } from '../utils/globals';
+const log = debug('nc:cache');
 
 export default class RedisMockCacheMgr extends CacheMgr {
   client: any;
@@ -28,13 +30,13 @@ export default class RedisMockCacheMgr extends CacheMgr {
 
   // @ts-ignore
   async del(key: string): Promise<any> {
-    console.log(`RedisMockCacheMgr::del: deleting key ${key}`);
+    log(`RedisMockCacheMgr::del: deleting key ${key}`);
     return this.client.del(key);
   }
 
   // @ts-ignore
   async get(key: string, type: string, config?: any): Promise<any> {
-    console.log(`RedisMockCacheMgr::get: getting key ${key} with type ${type}`);
+    log(`RedisMockCacheMgr::get: getting key ${key} with type ${type}`);
     if (type === CacheGetType.TYPE_ARRAY) {
       return this.client.smembers(key);
     } else if (type === CacheGetType.TYPE_OBJECT) {
@@ -47,7 +49,7 @@ export default class RedisMockCacheMgr extends CacheMgr {
             Object.keys(o).length === 0 &&
             Object.getPrototypeOf(o) === Object.prototype
           ) {
-            console.log(`RedisMockCacheMgr::get: object is empty!`);
+            log(`RedisMockCacheMgr::get: object is empty!`);
           }
           return Promise.resolve(o);
         }
@@ -58,16 +60,14 @@ export default class RedisMockCacheMgr extends CacheMgr {
     } else if (type === CacheGetType.TYPE_STRING) {
       return await this.client.get(key);
     }
-    console.log(`Invalid CacheGetType: ${type}`);
-    return Promise.resolve(true);
+    log(`Invalid CacheGetType: ${type}`);
+    return Promise.resolve(false);
   }
 
   // @ts-ignore
   async set(key: string, value: any): Promise<any> {
     if (typeof value !== 'undefined' && value) {
-      console.log(
-        `RedisMockCacheMgr::set: setting key ${key} with value ${value}`
-      );
+      log(`RedisMockCacheMgr::set: setting key ${key} with value ${value}`);
       if (typeof value === 'object') {
         if (Array.isArray(value) && value.length) {
           return this.client.sadd(key, value);
@@ -79,9 +79,7 @@ export default class RedisMockCacheMgr extends CacheMgr {
       }
       return this.client.set(key, value);
     } else {
-      console.log(
-        `RedisMockCacheMgr::set: value is empty for ${key}. Skipping ...`
-      );
+      log(`RedisMockCacheMgr::set: value is empty for ${key}. Skipping ...`);
       return Promise.resolve(true);
     }
   }
@@ -95,7 +93,7 @@ export default class RedisMockCacheMgr extends CacheMgr {
   async delAll(scope: string, pattern: string): Promise<any[]> {
     // Example: model:*:<id>
     const keys = await this.client.keys(`${scope}:${pattern}`);
-    console.log(
+    log(
       `RedisMockCacheMgr::delAll: deleting all keys with pattern ${scope}:${pattern}`
     );
     return Promise.all(
@@ -116,7 +114,7 @@ export default class RedisMockCacheMgr extends CacheMgr {
         : `${scope}:${subKeys.join(':')}:list`;
     // e.g. arr = ["<scope>:<model_id_1>", "<scope>:<model_id_2>"]
     const arr = (await this.get(key, CacheGetType.TYPE_ARRAY)) || [];
-    console.log(`RedisMockCacheMgr::getList: getting list with key ${key}`);
+    log(`RedisMockCacheMgr::getList: getting list with key ${key}`);
     return Promise.all(
       arr.map(async k => await this.get(k, CacheGetType.TYPE_OBJECT))
     );
@@ -136,7 +134,7 @@ export default class RedisMockCacheMgr extends CacheMgr {
         ? `${scope}:list`
         : `${scope}:${subListKeys.join(':')}:list`;
     if (!list.length) {
-      console.log(
+      log(
         `RedisMockCacheMgr::setList: List is empty for ${listKey}. Skipping ...`
       );
       return Promise.resolve(true);
@@ -147,15 +145,19 @@ export default class RedisMockCacheMgr extends CacheMgr {
     for (const o of list) {
       // construct key for Get
       // e.g. <scope>:<model_id_1>
-      const getKey = `${scope}:${o.id}`;
+      let getKey = `${scope}:${o.id}`;
+      // special case - MODEL_ROLE_VISIBILITY
+      if (scope === CacheScope.MODEL_ROLE_VISIBILITY) {
+        getKey = `${scope}:${o.id}:${o.role}`;
+      }
       // set Get Key
-      console.log(`RedisMockCacheMgr::setList: setting key ${getKey}`);
+      log(`RedisMockCacheMgr::setList: setting key ${getKey}`);
       await this.set(getKey, JSON.stringify(o, this.getCircularReplacer()));
       // push Get Key to List
       listOfGetKeys.push(getKey);
     }
     // set List Key
-    console.log(`RedisMockCacheMgr::setList: setting list with key ${listKey}`);
+    log(`RedisMockCacheMgr::setList: setting list with key ${listKey}`);
     return this.set(listKey, listOfGetKeys);
   }
 
@@ -164,7 +166,7 @@ export default class RedisMockCacheMgr extends CacheMgr {
     key: string,
     direction: string
   ): Promise<boolean> {
-    console.log(`RedisMockCacheMgr::deepDel: choose direction ${direction}`);
+    log(`RedisMockCacheMgr::deepDel: choose direction ${direction}`);
     if (direction === CacheDelDirection.CHILD_TO_PARENT) {
       // given a child key, delete all keys in corresponding parent lists
       const scopeList = await this.client.keys(`${scope}*list`);
@@ -177,16 +179,16 @@ export default class RedisMockCacheMgr extends CacheMgr {
         // remove target Key
         list = list.filter(k => k !== key);
         // delete list
-        console.log(`RedisMockCacheMgr::deepDel: remove listKey ${listKey}`);
+        log(`RedisMockCacheMgr::deepDel: remove listKey ${listKey}`);
         await this.del(listKey);
         if (list.length) {
           // set target list
-          console.log(`RedisMockCacheMgr::deepDel: set key ${listKey}`);
+          log(`RedisMockCacheMgr::deepDel: set key ${listKey}`);
           await this.del(listKey);
           await this.set(listKey, list);
         }
       }
-      console.log(`RedisMockCacheMgr::deepDel: remove key ${key}`);
+      log(`RedisMockCacheMgr::deepDel: remove key ${key}`);
       return await this.del(key);
     } else if (direction === CacheDelDirection.PARENT_TO_CHILD) {
       // given a list key, delete all the children
@@ -196,7 +198,7 @@ export default class RedisMockCacheMgr extends CacheMgr {
       // delete list key
       return await this.del(key);
     } else {
-      console.log(`Invalid deepDel direction found : ${direction}`);
+      log(`Invalid deepDel direction found : ${direction}`);
       return Promise.resolve(false);
     }
   }
@@ -213,35 +215,31 @@ export default class RedisMockCacheMgr extends CacheMgr {
       subListKeys.length === 0
         ? `${scope}:list`
         : `${scope}:${subListKeys.join(':')}:list`;
-    console.log(
-      `RedisMockCacheMgr::appendToList: append key ${key} to ${listKey}`
-    );
+    log(`RedisMockCacheMgr::appendToList: append key ${key} to ${listKey}`);
     const list = (await this.get(listKey, CacheGetType.TYPE_ARRAY)) || [];
     list.push(key);
     return this.set(listKey, list);
   }
 
   async destroy(): Promise<boolean> {
-    console.log('RedisCacheMgr::destroy: destroy redis');
+    log('RedisMockCacheMgr::destroy: destroy redis');
     return this.client.flushdb();
   }
 
   async export(): Promise<any> {
-    console.log('RedisCacheMgr::export: export data');
+    log('RedisMockCacheMgr::export: export data');
     const data = await this.client.keys('*');
     const res = {};
     return await Promise.all(
       data.map(async k => {
-        const val = await this.get(
+        res[k] = await this.get(
           k,
           k.slice(-4) === 'list'
             ? CacheGetType.TYPE_ARRAY
             : CacheGetType.TYPE_OBJECT
         );
-        res[k] = val;
       })
     ).then(() => {
-      console.log(res);
       return res;
     });
   }
