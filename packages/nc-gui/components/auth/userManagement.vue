@@ -338,7 +338,7 @@
                   small
                   outlined
                   btn.class="grey--text"
-                  @click="invite_token = null, selectedUser = {}"
+                  @click="invite_token = null, selectedUser = {roles: 'editor'}"
                 >
                   <v-icon small color="grey" class="mr-1">
                     mdi-account-multiple-plus-outline
@@ -381,6 +381,7 @@
                     <v-combobox
                       v-model="selectedRoles"
                       outlined
+                      :rules="roleRules"
                       class="role-select caption"
                       hide-details="auto"
                       :items="roles"
@@ -468,6 +469,10 @@ export default {
         const invalidEmails = (v || '').split(/\s*,\s*/).filter(e => !isEmail(e))
         return !invalidEmails.length || `"${invalidEmails.join(', ')}" - invalid email`
       }
+    ],
+    roleRules: [
+       v => !!v || 'User Role is required',
+      (v) => ['creator', 'editor', 'commenter', 'viewer'].includes(v) || `invalid user role`
     ],
     userList: [],
     roleDescriptions: {},
