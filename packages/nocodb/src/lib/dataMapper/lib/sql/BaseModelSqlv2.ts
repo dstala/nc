@@ -1540,38 +1540,46 @@ class BaseModelSqlv2 {
       throw e;
     }
   }
-  async bulkUpdateAll(args: { where?: string } = {}, data) {
-    let transaction;
+  async bulkUpdateAll(
+    args: { where?: string; filterArr?: Filter[] } = {},
+    data
+  ) {
     try {
-      // TODO: validate where clause
-      const where = args?.where || '';
       const updateData = await this.model.mapAliasToColumn(data);
-
-      transaction = await this.dbDriver.transaction();
-
       await this.validate(updateData);
-
       const wherePk = _wherePk(this.model.primaryKeys, updateData);
       let res = null;
       if (wherePk) {
         // pk is specified - by pass
       } else {
-        if (where) {
-          // where clause is specified
-          res = await transaction(this.model.tn)
-            .update(updateData)
-            .where(where);
-        } else {
-          // update all records
-          res = await transaction(this.model.tn).update(updateData);
-        }
+        await this.model.getColumns();
+        const { where } = this._getListArgs(args);
+        const qb = this.dbDriver(this.model.tn);
+        const aliasColObjMap = await this.model.getAliasColObjMap();
+        const filterObj = extractFilterFromXwhere(where, aliasColObjMap);
+
+        await conditionV2(
+          [
+            new Filter({
+              children: args.filterArr || [],
+              is_group: true,
+              logical_op: 'and'
+            }),
+            new Filter({
+              children: filterObj,
+              is_group: true,
+              logical_op: 'and'
+            }),
+            ...(args.filterArr || [])
+          ],
+          qb,
+          this.dbDriver
+        );
+        qb.update(updateData);
+        res = ((await qb) as any).count;
       }
-      transaction.commit();
       return res;
     } catch (e) {
-      if (transaction) transaction.rollback();
-      // console.log(e);
-      // await this.errorUpdateb(e, data, null);
       throw e;
     }
   }
@@ -1603,30 +1611,34 @@ class BaseModelSqlv2 {
     }
   }
 
-  async bulkDeleteAll(args: { where?: string } = {}) {
-    let transaction;
+  async bulkDeleteAll(args: { where?: string; filterArr?: Filter[] } = {}) {
     try {
-      // TODO: validate where clause
-      const where = args?.where || '';
+      await this.model.getColumns();
+      const { where } = this._getListArgs(args);
+      const qb = this.dbDriver(this.model.tn);
+      const aliasColObjMap = await this.model.getAliasColObjMap();
+      const filterObj = extractFilterFromXwhere(where, aliasColObjMap);
 
-      transaction = await this.dbDriver.transaction();
-
-      let res = null;
-      if (where) {
-        // where clause is specified
-        res = await transaction(this.model.tn)
-          .del()
-          .where(where);
-      } else {
-        // delete all records
-        res = await transaction(this.model.tn).del();
-      }
-      transaction.commit();
-      return res;
+      await conditionV2(
+        [
+          new Filter({
+            children: args.filterArr || [],
+            is_group: true,
+            logical_op: 'and'
+          }),
+          new Filter({
+            children: filterObj,
+            is_group: true,
+            logical_op: 'and'
+          }),
+          ...(args.filterArr || [])
+        ],
+        qb,
+        this.dbDriver
+      );
+      qb.del();
+      return ((await qb) as any).count;
     } catch (e) {
-      if (transaction) transaction.rollback();
-      // console.log(e);
-      // await this.errorUpdateb(e, data, null);
       throw e;
     }
   }
