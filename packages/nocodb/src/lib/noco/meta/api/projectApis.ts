@@ -73,9 +73,9 @@ export async function projectDelete(
   req: Request<any, any, any, ProjectListParamsType>,
   res: Response<ProjectListType>
 ) {
-  res // todo: pagination
-    // .json(await Project.delete(req.params.projectId));
-    .json(await Project.softDelete(req.params.projectId));
+  const result = await Project.softDelete(req.params.projectId);
+  Tele.emit('evt', { evt_type: 'project:deleted' });
+  res.json(result);
 }
 
 //

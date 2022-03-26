@@ -4,6 +4,7 @@ import Plugin from '../../../noco-models/Plugin';
 import { PluginTestPayloadType, PluginType } from 'nc-common';
 import NcPluginMgrv2 from './helpers/NcPluginMgrv2';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { Tele } from 'nc-help';
 
 export async function pluginList(_req: Request, res: Response) {
   res.json(new PagedResponseImpl(await Plugin.list()));
@@ -13,6 +14,7 @@ export async function pluginTest(
   req: Request<any, any, PluginTestPayloadType>,
   res: Response
 ) {
+  Tele.emit('evt', { evt_type: 'plugin:tested' });
   res.json(await NcPluginMgrv2.test(req.body));
 }
 
@@ -23,6 +25,7 @@ export async function pluginUpdate(
   req: Request<any, any, PluginType>,
   res: Response
 ) {
+  Tele.emit('evt', { evt_type: 'plugin:updated' });
   res.json(await Plugin.update(req.params.pluginId, req.body));
 }
 export async function isPluginActive(req: Request, res: Response) {

@@ -31,6 +31,7 @@ async function xcVisibilityMetaSetAll(req, res) {
       }
     }
   }
+  Tele.emit('evt', { evt_type: 'uiAcl:updated' });
 
   res.json({ msg: 'success' });
 }

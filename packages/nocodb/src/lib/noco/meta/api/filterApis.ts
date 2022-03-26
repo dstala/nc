@@ -11,6 +11,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Filter from '../../../noco-models/Filter';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { Tele } from 'nc-help';
 
 // @ts-ignore
 export async function filterGet(req: Request, res: Response, next) {
@@ -69,6 +70,7 @@ export async function filterCreate(
       fk_view_id: req.params.viewId
     });
 
+    Tele.emit('evt', { evt_type: 'filter:created' });
     res.json(filter);
   } catch (e) {
     console.log(e);
@@ -83,6 +85,7 @@ export async function filterUpdate(req, res, next) {
       ...req.body,
       fk_view_id: req.params.viewId
     });
+    Tele.emit('evt', { evt_type: 'table:updated' });
     res.json(filter);
   } catch (e) {
     console.log(e);
@@ -94,6 +97,7 @@ export async function filterUpdate(req, res, next) {
 export async function filterDelete(req: Request, res: Response, next) {
   try {
     const filter = await Filter.delete(req.params.filterId);
+    Tele.emit('evt', { evt_type: 'table:deleted' });
     res.json(filter);
   } catch (e) {
     console.log(e);

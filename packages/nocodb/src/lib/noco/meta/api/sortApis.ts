@@ -15,6 +15,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Sort from '../../../noco-models/Sort';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { Tele } from 'nc-help';
 
 // @ts-ignore
 export async function sortGet(req: Request, res: Response<TableType>) {}
@@ -36,17 +37,20 @@ export async function sortCreate(req: Request<any, any, TableReqType>, res) {
     ...req.body,
     fk_view_id: req.params.viewId
   });
+  Tele.emit('evt', { evt_type: 'sort:created' });
   res.json(sort);
 }
 
 // @ts-ignore
 export async function sortUpdate(req, res, next) {
   const sort = await Sort.update(req.params.sortId, req.body);
+  Tele.emit('evt', { evt_type: 'sort:updated' });
   res.json(sort);
 }
 
 // @ts-ignore
 export async function sortDelete(req: Request, res: Response, next) {
+  Tele.emit('evt', { evt_type: 'sort:deleted' });
   const sort = await Sort.delete(req.params.sortId);
   res.json(sort);
 }

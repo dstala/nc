@@ -14,13 +14,13 @@ import { Tele } from 'nc-help';
 
 // @ts-ignore
 export async function gridViewCreate(req: Request<any, any>, res) {
-  Tele.emit('evt', { evt_type: 'view:created', type: 'grid' });
   const view = await View.insert({
     ...req.body,
     // todo: sanitize
     fk_model_id: req.params.tableId,
     type: ViewTypes.GRID
   });
+  Tele.emit('evt', { evt_type: 'view:created', type: 'grid' });
   res.json(view);
 }
 
