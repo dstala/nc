@@ -145,7 +145,7 @@
 
 <script>
 // import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
-import { isSystemColumn } from 'nc-common'
+import { isSystemColumn, RelationTypes, UITypes } from 'nc-common'
 import DlgLabelSubmitCancel from '@/components/utils/dlgLabelSubmitCancel'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
@@ -294,6 +294,10 @@ export default {
   },
   async mounted() {
     await this.loadChildMeta()
+
+    if (this.isNew && this.value) {
+      this.localState = [...this.value]
+    }
   },
   created() {
     this.loadChildMeta()
@@ -438,7 +442,14 @@ export default {
       await this.loadChildMeta()
       this.isNewChild = true
       this.selectedChild = {
-        [this.childForeignKey]: parseIfInteger(this.parentId)
+        [this.childForeignKey]: parseIfInteger(this.parentId),
+        [(this.childMeta.columns.find(c => c.uidt === UITypes.LinkToAnotherRecord &&
+            c.colOptions &&
+            this.column.colOptions &&
+      c.colOptions.fk_child_column_id === this.column.colOptions.fk_child_column_id &&
+      c.colOptions.fk_parent_column_id === this.column.colOptions.fk_parent_column_id &&
+      c.colOptions.type === RelationTypes.BELONGS_TO
+        ) || {})._cn]: this.row
       }
       this.expandFormModal = true
       if (!this.isNew) {

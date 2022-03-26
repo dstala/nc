@@ -126,6 +126,7 @@
 
 <script>
 // import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
+import { RelationTypes, UITypes } from 'nc-common'
 import DlgLabelSubmitCancel from '@/components/utils/dlgLabelSubmitCancel'
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'
@@ -285,6 +286,10 @@ export default {
     if (this.isForm) {
       await Promise.all([this.loadChildMeta(), this.loadAssociateTableMeta()])
     }
+
+    if (this.isNew && this.value) {
+      this.localState = [...this.value]
+    }
   },
   created() {
     this.loadChildMeta()
@@ -436,7 +441,15 @@ export default {
       await this.loadChildMeta()
       this.isNewChild = true
       this.selectedChild = {
-        [this.childForeignKey]: this.parentId
+        [this.childForeignKey]: this.parentId,
+        [(this.childMeta.columns.find(c => c.uidt === UITypes.LinkToAnotherRecord &&
+            c.colOptions &&
+            this.column.colOptions &&
+            c.colOptions.fk_child_column_id === this.column.colOptions.fk_parent_column_id &&
+            c.colOptions.fk_parent_column_id === this.column.colOptions.fk_child_column_id &&
+            c.colOptions.fk_mm_model_id === this.column.colOptions.fk_mm_model_id &&
+            c.colOptions.type === RelationTypes.MANY_TO_MANY
+        ) || {})._cn]: [this.row]
       }
       this.expandFormModal = true
       setTimeout(() => {

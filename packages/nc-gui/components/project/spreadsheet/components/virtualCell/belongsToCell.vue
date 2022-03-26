@@ -108,6 +108,7 @@
 
 <script>
 // import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
+import { RelationTypes, UITypes } from 'nc-common'
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'
 import ItemChip from '~/components/project/spreadsheet/components/virtualCell/components/itemChip'
@@ -248,6 +249,9 @@ export default {
     }
   },
   async mounted() {
+    if (this.isNew && this.value) {
+      this.localState = this.value
+    }
     if (this.isForm) {
       await this.loadParentMeta()
     }
@@ -267,7 +271,15 @@ export default {
       await this.loadParentMeta()
       this.newRecordModal = false
       this.isNewParent = true
-      this.selectedParent = {}
+      this.selectedParent = {
+        [(this.parentMeta.columns.find(c => c.uidt === UITypes.LinkToAnotherRecord &&
+          c.colOptions &&
+          this.column.colOptions &&
+          c.colOptions.fk_child_column_id === this.column.colOptions.fk_child_column_id &&
+          c.colOptions.fk_parent_column_id === this.column.colOptions.fk_parent_column_id &&
+          c.colOptions.type === RelationTypes.HAS_MANY
+        ) || {})._cn]: [this.row]
+      }
       this.expandFormModal = true
     },
 
