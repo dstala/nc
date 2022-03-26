@@ -123,7 +123,9 @@ async function projectCreate(
   // todo: if existing table create models
 
   for (const base of await project.getBases()) {
-    await populateMeta(base, project);
+    const info = await populateMeta(base, project);
+
+    Tele.emit('evt_api_created', info);
     delete base.config;
   }
 
@@ -138,6 +140,15 @@ async function projectCreate(
 }
 
 async function populateMeta(base: Base, project: Project): Promise<any> {
+  const info = {
+    type: 'rest',
+    apiCount: 0,
+    tablesCount: 0,
+    relationsCount: 0,
+    viewsCount: 0,
+    client: base?.getConnectionConfig()?.client,
+    timeTaken: 0
+  };
   const sqlClient = NcConnectionMgrv2.getSqlClient(base);
   let order = 1;
   const metasArr = [];
@@ -148,7 +159,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
   /* Get all relations */
   const relations = (await sqlClient.relationListAll())?.data?.list;
 
-  // const relationsCount = relations.length;
+  info.relationsCount = relations.length;
 
   let tables = (await sqlClient.tableList())?.data?.list
     ?.filter(({ tn }) => !IGNORE_TABLES.includes(tn))
@@ -165,6 +176,8 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       return t?.tn?.startsWith(project?.prefix);
     });
   }
+
+  this.tablesCount = tables.length;
 
   relations.forEach(r => {
     r._tn = getTableNameAlias(r.tn, project.prefix, base);
@@ -230,6 +243,9 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         type: table.type || 'table',
         order: table.order
       });
+
+      // table crud apis
+      this.apiCount += 5;
 
       let colOrder = 1;
 
@@ -301,6 +317,9 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
               fk_related_model_id: column.hm ? tnId : rtnId,
               system: column.system
             });
+
+            // nested relations data apis
+            this.apiCount += 5;
           } catch (e) {
             console.log(e);
           }
@@ -336,6 +355,8 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       return t?.tn?.startsWith(project?.prefix);
     });
   }
+
+  info.viewsCount = views.length;
 
   const viewMetasInsert = views.map(table => {
     return async () => {
@@ -379,6 +400,9 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
 
       let colOrder = 1;
 
+      // view apis
+      info.apiCount += 2;
+
       for (const column of meta.columns) {
         await Column.insert({
           fk_model_id: models2[table.tn].id,
@@ -391,35 +415,8 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
   });
 
   await NcHelp.executeOperations(viewMetasInsert, base.type);
-  // this.baseModels2 = (
-  //   await Model.list({ project_id: this.projectId, db_alias: this.dbAlias })
-  // ).reduce((models, m) => {
-  //   return {
-  //     ...models,
-  //     [m.title]: new BaseModelSqlv2({
-  //       model: m,
-  //       dbDriver: this.dbDriver,
-  //       baseModels: this.baseModels2
-  //     })
-  //   };
-  // }, {});
 
-  // this.nocoTypes = await NocoTypeGenerator.generate(
-  //   Object.values(models2),
-  //   {
-  //     ncMeta: Noco.xcMeta,
-  //     baseModels2: this.baseModels2
-  //   }
-  // );
-  //
-  // this.nocoRootResolvers = await NocoResolverGenerator.generate(
-  //   Object.values(models2),
-  //   {
-  //     ncMeta: Noco.xcMeta,
-  //     types: this.nocoTypes,
-  //     baseModels2: this.baseModels2
-  //   }
-  // );
+  return info;
 }
 
 async function getManyToManyRelations(

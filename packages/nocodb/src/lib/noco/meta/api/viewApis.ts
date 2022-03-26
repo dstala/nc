@@ -59,13 +59,16 @@ export async function viewCreate(req: Request<any, any>, res, next) {}
 
 // @ts-ignore
 export async function viewUpdate(req, res) {
-  res.json(await View.update(req.params.viewId, req.body));
+  const result = await View.update(req.params.viewId, req.body);
+  Tele.emit('evt', { evt_type: 'vtable:updated' });
+  res.json(result);
 }
 
 // @ts-ignore
 export async function viewDelete(req: Request, res: Response, next) {
+  const result = await View.delete(req.params.viewId);
   Tele.emit('evt', { evt_type: 'vtable:deleted' });
-  res.json(await View.delete(req.params.viewId));
+  res.json(result);
 }
 
 async function shareViewPasswordUpdate(req: Request<any, any>, res) {
