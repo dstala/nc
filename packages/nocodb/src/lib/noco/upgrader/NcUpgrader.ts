@@ -7,7 +7,7 @@ import ncProjectEnvUpgrader0011045 from './jobs/ncProjectEnvUpgrader0011045';
 import ncProjectUpgraderV2_0090000 from './jobs/ncProjectUpgraderV2_0090000';
 
 const log = debug('nc:upgrader');
-
+import { Tele } from 'nc-help';
 export interface NcUpgraderCtx {
   ncMeta: NcMetaIO;
 }
@@ -18,6 +18,7 @@ export default class NcUpgrader {
   // Todo: transaction
   public static async upgrade(ctx: NcUpgraderCtx): Promise<any> {
     this.log(`upgrade :`);
+    let oldVersion;
 
     try {
       ctx.ncMeta = await ctx.ncMeta.startTransaction();
@@ -41,6 +42,7 @@ export default class NcUpgrader {
       if (config) {
         const configObj: NcConfig = JSON.parse(config.value);
         if (configObj.version !== process.env.NC_VERSION) {
+          oldVersion = configObj.version;
           for (const version of NC_VERSIONS) {
             // compare current version and old version
             if (version.name > configObj.version) {
@@ -91,9 +93,20 @@ export default class NcUpgrader {
         }
       }
       await ctx.ncMeta.commit();
+      Tele.emit('evt', {
+        evt_type: 'appMigration:upgraded',
+        from: oldVersion,
+        to: process.env.NC_VERSION
+      });
     } catch (e) {
       await ctx.ncMeta.rollback(e);
       console.log('Error', e);
+      Tele.emit('evt', {
+        evt_type: 'appMigration:failed',
+        from: oldVersion,
+        to: process.env.NC_VERSION,
+        msg: e.msg
+      });
     }
   }
 
