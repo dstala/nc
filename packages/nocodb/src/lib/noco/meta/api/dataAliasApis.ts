@@ -61,8 +61,7 @@ async function getDataList(model, view: View, req) {
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
-  const key = `${model._tn}List`;
-  const requestObj = { [key]: await baseModel.defaultResolverReq(req.query) };
+  const requestObj = await baseModel.defaultResolverReq(req.query);
 
   const listArgs: any = { ...req.query };
   try {
@@ -72,18 +71,12 @@ async function getDataList(model, view: View, req) {
     listArgs.sortArr = JSON.parse(listArgs.sortArrJson);
   } catch (e) {}
 
-  const data = (
-    await nocoExecute(
-      requestObj,
-      {
-        [key]: async args => {
-          return await baseModel.list(args);
-        }
-      },
-      {},
-      { nested: { [key]: listArgs } }
-    )
-  )?.[key];
+  const data = await nocoExecute(
+    requestObj,
+    await baseModel.list(listArgs),
+    {},
+    listArgs
+  );
 
   const count = await baseModel.count(listArgs);
 
