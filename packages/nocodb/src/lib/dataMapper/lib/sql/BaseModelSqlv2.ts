@@ -1540,9 +1540,10 @@ class BaseModelSqlv2 {
       throw e;
     }
   }
-  async bulkUpdateAll(data: any) {
+  async bulkUpdateAll(args: { where?: string } = {}, data) {
     let transaction;
     try {
+      const where = args?.where || '';
       const updateData = await this.model.mapAliasToColumn(data);
 
       transaction = await this.dbDriver.transaction();
@@ -1550,9 +1551,20 @@ class BaseModelSqlv2 {
       await this.validate(updateData);
 
       const wherePk = _wherePk(this.model.primaryKeys, updateData);
-      const res = wherePk
-        ? null // pk is specified - bypass
-        : await transaction(this.model.tn).update(updateData); // update all records
+      let res = null;
+      if (wherePk) {
+        // pk is specified - by pass
+      } else {
+        if (where) {
+          // where clause is specified
+          res = await transaction(this.model.tn)
+            .update(updateData)
+            .where(where);
+        } else {
+          // update all records
+          res = await transaction(this.model.tn).update(updateData);
+        }
+      }
       transaction.commit();
       return res;
     } catch (e) {
