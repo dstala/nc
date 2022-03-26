@@ -1615,8 +1615,8 @@ class BaseModelSqlv2 {
       if (where) {
         // where clause is specified
         res = await transaction(this.model.tn)
-            .del()
-            .where(where);
+          .del()
+          .where(where);
       } else {
         // delete all records
         res = await transaction(this.model.tn).del();
@@ -1629,6 +1629,7 @@ class BaseModelSqlv2 {
       // await this.errorUpdateb(e, data, null);
       throw e;
     }
+  }
 
   /**
    *  Hooks
