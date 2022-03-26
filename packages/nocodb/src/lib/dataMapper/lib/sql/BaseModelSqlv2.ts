@@ -1543,6 +1543,7 @@ class BaseModelSqlv2 {
   async bulkUpdateAll(args: { where?: string } = {}, data) {
     let transaction;
     try {
+      // TODO: validate where clause
       const where = args?.where || '';
       const updateData = await this.model.mapAliasToColumn(data);
 
@@ -1601,6 +1602,33 @@ class BaseModelSqlv2 {
       throw e;
     }
   }
+
+  async bulkDeleteAll(args: { where?: string } = {}) {
+    let transaction;
+    try {
+      // TODO: validate where clause
+      const where = args?.where || '';
+
+      transaction = await this.dbDriver.transaction();
+
+      let res = null;
+      if (where) {
+        // where clause is specified
+        res = await transaction(this.model.tn)
+            .del()
+            .where(where);
+      } else {
+        // delete all records
+        res = await transaction(this.model.tn).del();
+      }
+      transaction.commit();
+      return res;
+    } catch (e) {
+      if (transaction) transaction.rollback();
+      // console.log(e);
+      // await this.errorUpdateb(e, data, null);
+      throw e;
+    }
 
   /**
    *  Hooks
