@@ -177,7 +177,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
     });
   }
 
-  this.tablesCount = tables.length;
+  info.tablesCount = tables.length;
 
   relations.forEach(r => {
     r._tn = getTableNameAlias(r.tn, project.prefix, base);
@@ -245,7 +245,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
       });
 
       // table crud apis
-      this.apiCount += 5;
+      info.apiCount += 5;
 
       let colOrder = 1;
 
@@ -319,7 +319,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
             });
 
             // nested relations data apis
-            this.apiCount += 5;
+            info.apiCount += 5;
           } catch (e) {
             console.log(e);
           }
