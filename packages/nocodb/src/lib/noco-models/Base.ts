@@ -10,7 +10,7 @@ import Model from './Model';
 import { BaseType } from 'nc-common';
 import NocoCache from '../noco-cache/NocoCache';
 import CryptoJS from 'crypto-js';
-import extractProps from '../noco/meta/api/helpers/extractProps';
+import extractProps from '../noco/meta/helpers/extractProps';
 
 // todo: hide credentials
 export default class Base implements BaseType {

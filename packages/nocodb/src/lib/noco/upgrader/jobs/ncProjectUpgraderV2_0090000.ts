@@ -9,7 +9,7 @@ import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import UITypes from '../../../sqlUi/UITypes';
 import NcHelp from '../../../utils/NcHelp';
-import { substituteColumnAliasWithIdInFormula } from '../../meta/api/helpers/formulaHelpers';
+import { substituteColumnAliasWithIdInFormula } from '../../meta/helpers/formulaHelpers';
 import RollupColumn from '../../../noco-models/RollupColumn';
 import View from '../../../noco-models/View';
 import GridView from '../../../noco-models/GridView';
@@ -23,7 +23,7 @@ import { MetaTable } from '../../../utils/globals';
 import Hook from '../../../noco-models/Hook';
 import FormViewColumn from '../../../noco-models/FormViewColumn';
 import GridViewColumn from '../../../noco-models/GridViewColumn';
-import { getUniqueColumnAliasName } from '../../meta/api/helpers/getUniqueName';
+import { getUniqueColumnAliasName } from '../../meta/helpers/getUniqueName';
 import NcProjectBuilderEE from '../../NcProjectBuilderEE';
 import Audit from '../../../noco-models/Audit';
 

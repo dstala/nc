@@ -1,6 +1,6 @@
 // // Project CRUD
 
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import Model from '../../../noco-models/Model';
 import Project from '../../../noco-models/Project';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
@@ -10,11 +10,11 @@ import Base from '../../../noco-models/Base';
 import ModelXcMetaFactory from '../../../sqlMgr/code/models/xc/ModelXcMetaFactory';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import { getUniqueColumnAliasName } from './helpers/getUniqueName';
+import { getUniqueColumnAliasName } from '../helpers/getUniqueName';
 import NcHelp from '../../../utils/NcHelp';
-import getTableNameAlias, { getColumnNameAlias } from './helpers/getTableName';
+import getTableNameAlias, { getColumnNameAlias } from '../helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
-import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
+import mapDefaultPrimaryValue from '../helpers/mapDefaultPrimaryValue';
 import { Tele } from 'nc-help';
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',

@@ -1,11 +1,11 @@
 import { Request, Response, Router } from 'express';
-import Model from '../../../noco-models/Model';
-import Base from '../../../noco-models/Base';
-import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
-import View from '../../../noco-models/View';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
-import Project from '../../../noco-models/Project';
-import { NcError } from './helpers/catchError';
+import Model from '../../../../noco-models/Model';
+import Base from '../../../../noco-models/Base';
+import NcConnectionMgrv2 from '../../../common/NcConnectionMgrv2';
+import View from '../../../../noco-models/View';
+import ncMetaAclMw from '../../helpers/ncMetaAclMw';
+import Project from '../../../../noco-models/Project';
+import { NcError } from '../../helpers/catchError';
 
 async function bulkDataInsert(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequest(req);

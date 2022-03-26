@@ -9,7 +9,7 @@ import { isSystemColumn, UITypes } from 'nc-common';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 
 async function exportCsv(req: Request, res: Response, next) {
   // // get all nested props by default

@@ -1,11 +1,11 @@
 import { Request, Response, Router } from 'express';
-import catchError, { NcError } from './helpers/catchError';
-import View from '../../../noco-models/View';
-import Model from '../../../noco-models/Model';
-import UITypes from '../../../sqlUi/UITypes';
+import catchError, { NcError } from '../../helpers/catchError';
+import View from '../../../../noco-models/View';
+import Model from '../../../../noco-models/Model';
+import UITypes from '../../../../sqlUi/UITypes';
 import { ErrorMessages, LinkToAnotherRecordType } from 'nc-common';
-import Column from '../../../noco-models/Column';
-import Base from '../../../noco-models/Base';
+import Column from '../../../../noco-models/Column';
+import Base from '../../../../noco-models/Base';
 
 export async function viewMetaGet(req: Request, res: Response) {
   const view: View & {

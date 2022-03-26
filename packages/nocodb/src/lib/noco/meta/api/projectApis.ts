@@ -7,9 +7,9 @@ import {
   ProjectListType
 } from 'nc-common';
 
-import { PagedResponseImpl } from './helpers/PagedResponse';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
 // import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
-import syncMigration from './helpers/syncMigration';
+import syncMigration from '../helpers/syncMigration';
 import { IGNORE_TABLES } from '../../common/BaseApiBuilder';
 import ModelXcMetaFactory from '../../../sqlMgr/code/models/xc/ModelXcMetaFactory';
 import Column from '../../../noco-models/Column';
@@ -17,16 +17,16 @@ import Model from '../../../noco-models/Model';
 import NcHelp from '../../../utils/NcHelp';
 import Base from '../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
-import getTableNameAlias, { getColumnNameAlias } from './helpers/getTableName';
+import getTableNameAlias, { getColumnNameAlias } from '../helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import ProjectUser from '../../../noco-models/ProjectUser';
 import { customAlphabet } from 'nanoid';
 import Noco from '../../Noco';
 import isDocker from 'is-docker';
 import { packageVersion, Tele } from 'nc-help';
-import { NcError } from './helpers/catchError';
+import { NcError } from '../helpers/catchError';
 
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
 

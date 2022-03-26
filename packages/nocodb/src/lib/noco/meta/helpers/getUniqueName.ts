@@ -1,4 +1,4 @@
-import Column from '../../../../noco-models/Column';
+import Column from '../../../noco-models/Column';
 
 export function getUniqueColumnName(columns: Column[], initialName = 'field') {
   let c = 0;

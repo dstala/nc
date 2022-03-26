@@ -19,8 +19,8 @@ import View from './View';
 import Noco from '../noco/Noco';
 import Sort from './Sort';
 import Filter from './Filter';
-import addFormulaErrorIfMissingColumn from '../noco/meta/api/helpers/addFormulaErrorIfMissingColumn';
-import { NcError } from '../noco/meta/api/helpers/catchError';
+import addFormulaErrorIfMissingColumn from '../noco/meta/helpers/addFormulaErrorIfMissingColumn';
+import { NcError } from '../noco/meta/helpers/catchError';
 
 export default class Column<T = any> implements ColumnType {
   public fk_model_id: string;

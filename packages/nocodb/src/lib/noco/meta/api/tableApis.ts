@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
-import { PagedResponseImpl } from './helpers/PagedResponse';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
 import { Tele } from 'nc-help';
 import {
   AuditOperationSubTypes,
@@ -15,12 +15,12 @@ import {
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { xcVisibilityMetaGet } from './modelVisibilityApis';
 import View from '../../../noco-models/View';
-import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
-import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
-import { NcError } from './helpers/catchError';
+import getColumnPropsFromUIDT from '../helpers/getColumnPropsFromUIDT';
+import mapDefaultPrimaryValue from '../helpers/mapDefaultPrimaryValue';
+import { NcError } from '../helpers/catchError';
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId

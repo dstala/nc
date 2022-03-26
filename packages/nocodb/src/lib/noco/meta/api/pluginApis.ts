@@ -1,9 +1,9 @@
 import { Request, Response, Router } from 'express';
-import { PagedResponseImpl } from './helpers/PagedResponse';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
 import Plugin from '../../../noco-models/Plugin';
 import { PluginTestPayloadType, PluginType } from 'nc-common';
-import NcPluginMgrv2 from './helpers/NcPluginMgrv2';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import NcPluginMgrv2 from '../helpers/NcPluginMgrv2';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';
 
 export async function pluginList(_req: Request, res: Response) {

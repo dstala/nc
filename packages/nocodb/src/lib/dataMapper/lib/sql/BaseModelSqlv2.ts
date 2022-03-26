@@ -32,14 +32,14 @@ import ejs from 'ejs';
 import Audit from '../../../noco-models/Audit';
 import FormView from '../../../noco-models/FormView';
 import Hook from '../../../noco-models/Hook';
-import NcPluginMgrv2 from '../../../noco/meta/api/helpers/NcPluginMgrv2';
+import NcPluginMgrv2 from '../../../noco/meta/helpers/NcPluginMgrv2';
 import {
   _transformSubmittedFormDataForEmail,
   invokeWebhook,
   parseBody
-} from '../../../noco/meta/api/helpers/webhookHelpers';
+} from '../../../noco/meta/helpers/webhookHelpers';
 import Validator from 'validator';
-import { NcError } from '../../../noco/meta/api/helpers/catchError';
+import { NcError } from '../../../noco/meta/helpers/catchError';
 
 const GROUP_COL = '__nc_group_id';
 /**

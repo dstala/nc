@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import FormViewColumn from '../../../noco-models/FormViewColumn';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';
 
 export async function columnUpdate(req: Request, res: Response) {

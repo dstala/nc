@@ -1,13 +1,13 @@
 import { Request, Response, Router } from 'express';
-import Model from '../../../noco-models/Model';
+import Model from '../../../../noco-models/Model';
 import { nocoExecute } from 'nc-help';
-import Base from '../../../noco-models/Base';
-import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
-import { PagedResponseImpl } from './helpers/PagedResponse';
-import View from '../../../noco-models/View';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
-import Project from '../../../noco-models/Project';
-import { NcError } from './helpers/catchError';
+import Base from '../../../../noco-models/Base';
+import NcConnectionMgrv2 from '../../../common/NcConnectionMgrv2';
+import { PagedResponseImpl } from '../../helpers/PagedResponse';
+import View from '../../../../noco-models/View';
+import ncMetaAclMw from '../../helpers/ncMetaAclMw';
+import Project from '../../../../noco-models/Project';
+import { NcError } from '../../helpers/catchError';
 
 export async function dataList(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequest(req);
@@ -86,7 +86,7 @@ async function getDataList(model, view: View, req) {
   });
 }
 async function getViewAndModelFromRequest(req) {
-  const project = await Project.getWithInfoByTitle(req.params.projectName);
+  const project = await Project.get(req.params.projectId);
   const model = await Model.getByAliasOrId({
     project_id: project.id,
     base_id: project.bases?.[0]?.id,
@@ -102,24 +102,36 @@ async function getViewAndModelFromRequest(req) {
   return { model, view };
 }
 
+async function dataRead(req: Request, res: Response) {
+  const { model, view } = await getViewAndModelFromRequest(req);
+
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  res.json(
+    await nocoExecute(
+      await baseModel.defaultResolverReq(),
+      await baseModel.readByPk(req.params.rowId),
+      {},
+      {}
+    )
+  );
+}
+
 const router = Router({ mergeParams: true });
 
-router.get('/data/:orgs/:projectName/:tableName', ncMetaAclMw(dataList));
-router.get(
-  '/data/:orgs/:projectName/:tableName/views/:viewName',
-  ncMetaAclMw(dataList)
-);
+router.get('/nc/:projectId/api/v2/:tableName', ncMetaAclMw(dataList));
 
-router.post(
-  '/data/:orgs/:projectName/:tableName/views/:viewName',
-  ncMetaAclMw(dataInsert)
-);
-router.put(
-  '/data/:orgs/:projectName/:tableName/views/:viewName/:rowId',
-  ncMetaAclMw(dataUpdate)
-);
+router.post('/nc/:projectId/api/v2/:tableName', ncMetaAclMw(dataInsert));
+router.get('/nc/:projectId/api/v2/:tableName/:rowId', ncMetaAclMw(dataRead));
+router.put('/nc/:projectId/api/v2/:tableName/:rowId', ncMetaAclMw(dataUpdate));
 router.delete(
-  '/data/:orgs/:projectName/:tableName/views/:viewName/:rowId',
+  '/nc/:projectId/api/v2/:tableName/:rowId',
   ncMetaAclMw(dataDelete)
 );
 

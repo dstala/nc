@@ -1,5 +1,5 @@
 import { SqlUIColumn, SqlUiFactory, UITypes } from 'nc-common';
-import Base from '../../../../noco-models/Base';
+import Base from '../../../noco-models/Base';
 
 export default function getColumnPropsFromUIDT(
   column: SqlUIColumn & { uidt: UITypes },

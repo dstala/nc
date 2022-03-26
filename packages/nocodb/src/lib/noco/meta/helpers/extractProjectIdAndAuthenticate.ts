@@ -1,13 +1,13 @@
 import { promisify } from 'util';
 
 import passport from 'passport';
-import Model from '../../../../noco-models/Model';
-import View from '../../../../noco-models/View';
-import Hook from '../../../../noco-models/Hook';
-import GridViewColumn from '../../../../noco-models/GridViewColumn';
-import FormViewColumn from '../../../../noco-models/FormViewColumn';
-import GalleryViewColumn from '../../../../noco-models/GalleryViewColumn';
-import Project from '../../../../noco-models/Project';
+import Model from '../../../noco-models/Model';
+import View from '../../../noco-models/View';
+import Hook from '../../../noco-models/Hook';
+import GridViewColumn from '../../../noco-models/GridViewColumn';
+import FormViewColumn from '../../../noco-models/FormViewColumn';
+import GalleryViewColumn from '../../../noco-models/GalleryViewColumn';
+import Project from '../../../noco-models/Project';
 
 export default async (req, res, next) => {
   try {

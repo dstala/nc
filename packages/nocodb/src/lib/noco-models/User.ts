@@ -1,7 +1,7 @@
 import { UserType } from 'nc-common';
 import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
-import extractProps from '../noco/meta/api/helpers/extractProps';
+import extractProps from '../noco/meta/helpers/extractProps';
 import NocoCache from '../noco-cache/NocoCache';
 export default class User implements UserType {
   id: number;

@@ -7,7 +7,7 @@ import {
   CacheScope,
   MetaTable
 } from '../utils/globals';
-import extractProps from '../noco/meta/api/helpers/extractProps';
+import extractProps from '../noco/meta/helpers/extractProps';
 import NocoCache from '../noco-cache/NocoCache';
 
 export default class Project implements ProjectType {

@@ -4,8 +4,8 @@ import UITypes from '../../../sqlUi/UITypes';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Base from '../../../noco-models/Base';
 import Column from '../../../noco-models/Column';
-import { substituteColumnAliasWithIdInFormula } from './helpers/formulaHelpers';
-import validateParams from './helpers/validateParams';
+import { substituteColumnAliasWithIdInFormula } from '../helpers/formulaHelpers';
+import validateParams from '../helpers/validateParams';
 import { Tele } from 'nc-help';
 
 import { customAlphabet } from 'nanoid';
@@ -13,7 +13,7 @@ import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordC
 import {
   getUniqueColumnAliasName,
   getUniqueColumnName
-} from './helpers/getUniqueName';
+} from '../helpers/getUniqueName';
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
@@ -26,10 +26,10 @@ import Audit from '../../../noco-models/Audit';
 import SqlMgrv2 from '../../../sqlMgr/v2/SqlMgrv2';
 import Noco from '../../Noco';
 import NcMetaIO from '../NcMetaIO';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
-import { NcError } from './helpers/catchError';
-import getColumnPropsFromUIDT from './helpers/getColumnPropsFromUIDT';
-import mapDefaultPrimaryValue from './helpers/mapDefaultPrimaryValue';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
+import { NcError } from '../helpers/catchError';
+import getColumnPropsFromUIDT from '../helpers/getColumnPropsFromUIDT';
+import mapDefaultPrimaryValue from '../helpers/mapDefaultPrimaryValue';
 
 const randomID = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 10);
 

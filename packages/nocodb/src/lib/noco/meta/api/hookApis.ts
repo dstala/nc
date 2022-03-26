@@ -1,12 +1,12 @@
-import catchError from './helpers/catchError';
+import catchError from '../helpers/catchError';
 import { Request, Response, Router } from 'express';
 import Hook from '../../../noco-models/Hook';
 import { HookListType, HookTestPayloadType, HookType } from 'nc-common';
-import { PagedResponseImpl } from './helpers/PagedResponse';
-import { invokeWebhook } from './helpers/webhookHelpers';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
+import { invokeWebhook } from '../helpers/webhookHelpers';
 import Model from '../../../noco-models/Model';
-import populateSamplePayload from './helpers/populateSamplePayload';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import populateSamplePayload from '../helpers/populateSamplePayload';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';
 
 export async function hookList(

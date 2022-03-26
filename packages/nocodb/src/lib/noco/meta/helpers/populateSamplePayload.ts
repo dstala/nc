@@ -1,11 +1,11 @@
-import View from '../../../../noco-models/View';
-import Column from '../../../../noco-models/Column';
+import View from '../../../noco-models/View';
+import Column from '../../../noco-models/Column';
 import { RelationTypes, UITypes } from 'nc-common';
-import Model from '../../../../noco-models/Model';
-import LinkToAnotherRecordColumn from '../../../../noco-models/LinkToAnotherRecordColumn';
-import LookupColumn from '../../../../noco-models/LookupColumn';
-import MultiSelectColumn from '../../../../noco-models/MultiSelectColumn';
-import SingleSelectColumn from '../../../../noco-models/SingleSelectColumn';
+import Model from '../../../noco-models/Model';
+import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
+import LookupColumn from '../../../noco-models/LookupColumn';
+import MultiSelectColumn from '../../../noco-models/MultiSelectColumn';
+import SingleSelectColumn from '../../../noco-models/SingleSelectColumn';
 
 export default async function populateSamplePayload(
   viewOrModel: View | Model,

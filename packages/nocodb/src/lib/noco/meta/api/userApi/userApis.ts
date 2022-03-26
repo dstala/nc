@@ -4,7 +4,7 @@ import {
   PasswordForgotPayloadType,
   TableType
 } from 'nc-common';
-import catchError, { NcError } from '../helpers/catchError';
+import catchError, { NcError } from '../../helpers/catchError';
 const { isEmail } = require('validator');
 import * as ejs from 'ejs';
 
@@ -17,15 +17,15 @@ const { v4: uuidv4 } = require('uuid');
 import * as jwt from 'jsonwebtoken';
 import Audit from '../../../../noco-models/Audit';
 import crypto from 'crypto';
-import NcPluginMgrv2 from '../helpers/NcPluginMgrv2';
+import NcPluginMgrv2 from '../../helpers/NcPluginMgrv2';
 
 // todo: read from database
 const secret = 'dkjfkdjfkjdfjdfjdkfjdkfjkdfkjdkfjdkjfkdk';
 const jwtConfig = {};
 
 import passport from 'passport';
-import extractProjectIdAndAuthenticate from '../helpers/extractProjectIdAndAuthenticate';
-import ncMetaAclMw from '../helpers/ncMetaAclMw';
+import extractProjectIdAndAuthenticate from '../../helpers/extractProjectIdAndAuthenticate';
+import ncMetaAclMw from '../../helpers/ncMetaAclMw';
 import { MetaTable } from '../../../../utils/globals';
 import Noco from '../../../Noco';
 

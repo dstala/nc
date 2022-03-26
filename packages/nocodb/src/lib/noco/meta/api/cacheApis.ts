@@ -1,4 +1,4 @@
-import catchError from './helpers/catchError';
+import catchError from '../helpers/catchError';
 import NocoCache from '../../../noco-cache/NocoCache';
 import { Router } from 'express';
 

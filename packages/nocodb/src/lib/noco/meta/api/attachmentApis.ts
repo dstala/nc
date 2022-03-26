@@ -6,9 +6,9 @@ import { Tele } from 'nc-help';
 import path from 'path';
 import slash from 'slash';
 import mimetypes, { mimeIcons } from '../../../utils/mimeTypes';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
-import catchError from './helpers/catchError';
-import NcPluginMgrv2 from './helpers/NcPluginMgrv2';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
+import catchError from '../helpers/catchError';
+import NcPluginMgrv2 from '../helpers/NcPluginMgrv2';
 
 // const storageAdapter = new Local();
 export async function upload(req: Request, res: Response) {

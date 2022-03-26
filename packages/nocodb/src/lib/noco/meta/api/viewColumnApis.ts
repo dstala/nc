@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import View from '../../../noco-models/View';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';
 
 export async function columnList(req: Request, res: Response) {

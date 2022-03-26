@@ -1,4 +1,4 @@
-import projectAcl from '../../../../utils/projectAcl';
+import projectAcl from '../../../utils/projectAcl';
 import { NextFunction, Request, Response } from 'express';
 import catchError, { NcError } from './catchError';
 import extractProjectIdAndAuthenticate from './extractProjectIdAndAuthenticate';

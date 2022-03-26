@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 // @ts-ignore
 import Model from '../../../noco-models/Model';
 // @ts-ignore
-import { PagedResponseImpl } from './helpers/PagedResponse';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
 import {
   GalleryType,
   TableListParamsType,
@@ -15,7 +15,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import View from '../../../noco-models/View';
 import GalleryView from '../../../noco-models/GalleryView';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';
 // @ts-ignore
 export async function galleryViewGet(req: Request, res: Response<GalleryType>) {

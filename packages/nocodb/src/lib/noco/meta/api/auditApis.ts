@@ -10,8 +10,8 @@ import {
   ProjectAuditListParamsType
 } from 'nc-common';
 import Model from '../../../noco-models/Model';
-import { PagedResponseImpl } from './helpers/PagedResponse';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 
 export async function commentRow(
   req: Request<any, any, CommentRowPayloadType>,

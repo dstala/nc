@@ -1,15 +1,15 @@
 import { Request, Response, Router } from 'express';
-import View from '../../../noco-models/View';
-import Model from '../../../noco-models/Model';
-import Base from '../../../noco-models/Base';
-import NcConnectionMgrv2 from '../../common/NcConnectionMgrv2';
+import View from '../../../../noco-models/View';
+import Model from '../../../../noco-models/Model';
+import Base from '../../../../noco-models/Base';
+import NcConnectionMgrv2 from '../../../common/NcConnectionMgrv2';
 import { nocoExecute } from 'nc-help';
 import papaparse from 'papaparse';
 import { ErrorMessages, isSystemColumn, UITypes, ViewTypes } from 'nc-common';
-import Column from '../../../noco-models/Column';
-import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
-import LookupColumn from '../../../noco-models/LookupColumn';
-import catchError, { NcError } from './helpers/catchError';
+import Column from '../../../../noco-models/Column';
+import LinkToAnotherRecordColumn from '../../../../noco-models/LinkToAnotherRecordColumn';
+import LookupColumn from '../../../../noco-models/LookupColumn';
+import catchError, { NcError } from '../../helpers/catchError';
 
 async function exportCsv(req: Request, res: Response) {
   const view = await View.getByUUID(req.params.publicDataUuid);

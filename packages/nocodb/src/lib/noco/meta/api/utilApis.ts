@@ -2,11 +2,11 @@
 import { Request, Response } from 'express';
 
 import { packageVersion } from 'nc-help';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import SqlMgrv2 from '../../../sqlMgr/v2/SqlMgrv2';
 import { defaultConnectionConfig } from '../../../utils/NcConfigFactory';
 import User from '../../../noco-models/User';
-import catchError from './helpers/catchError';
+import catchError from '../helpers/catchError';
 
 export async function testConnection(req: Request, res: Response) {
   res.json(await SqlMgrv2.testConnection(req.body));

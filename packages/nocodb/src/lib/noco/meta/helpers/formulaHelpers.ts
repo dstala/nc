@@ -1,6 +1,6 @@
 import jsep from 'jsep';
-import jsepTreeToFormula from '../../../common/helpers/jsepTreeToFormula';
-import Column from '../../../../noco-models/Column';
+import jsepTreeToFormula from '../../common/helpers/jsepTreeToFormula';
+import Column from '../../../noco-models/Column';
 
 export async function substituteColumnAliasWithIdInFormula(
   formula,

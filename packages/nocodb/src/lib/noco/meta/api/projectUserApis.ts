@@ -1,9 +1,9 @@
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Router } from 'express';
-import { PagedResponseImpl } from './helpers/PagedResponse';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
 import ProjectUser from '../../../noco-models/ProjectUser';
 import validator from 'validator';
-import { NcError } from './helpers/catchError';
+import { NcError } from '../helpers/catchError';
 import { v4 as uuidv4 } from 'uuid';
 import User from '../../../noco-models/User';
 import { Tele } from 'nc-help';

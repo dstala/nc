@@ -19,7 +19,7 @@ import {
   MetaTable
 } from '../utils/globals';
 import View from './View';
-import { NcError } from '../noco/meta/api/helpers/catchError';
+import { NcError } from '../noco/meta/helpers/catchError';
 import Audit from './Audit';
 
 export default class Model implements TableType {

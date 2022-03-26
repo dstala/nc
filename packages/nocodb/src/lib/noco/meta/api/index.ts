@@ -1,6 +1,5 @@
 import projectApis from './projectApis';
 import tableApis from './tableApis';
-import dataApis from './dataApis';
 import columnApis from './columnApis';
 import { Router } from 'express';
 import sortApis from './sortApis';
@@ -12,8 +11,6 @@ import galleryViewApis from './galleryViewApis';
 import formViewApis from './formViewApis';
 import formViewColumnApis from './formViewColumnApis';
 import attachmentApis from './attachmentApis';
-import publicDataApis from './publicDataApis';
-import publicMetaApis from './publicMetaApis';
 import exportApis from './exportApis';
 import auditApis from './auditApis';
 import hookApis from './hookApis';
@@ -26,13 +23,21 @@ import projectUserApis from './projectUserApis';
 import sharedBaseApis from './sharedBaseApis';
 import { initStrategies } from './userApi/initStrategies';
 import modelVisibilityApis from './modelVisibilityApis';
-import publicDataExportApis from './publicDataExportApis';
 import metaDiffApis from './metaDiffApis';
 import cacheApis from './cacheApis';
 import apiTokenApis from './apiTokenApis';
 import hookFilterApis from './hookFilterApis';
-import dataAliasApis from './dataAliasApis';
-import bulkDataAliasApis from './bulkDataAliasApis';
+import {
+  bulkDataAliasApis,
+  dataAliasApis,
+  dataApis,
+  oldDataApis
+} from './dataApis';
+import {
+  publicDataApis,
+  publicDataExportApis,
+  publicMetaApis
+} from './publicApis';
 
 export default function(router: Router) {
   initStrategies(router);
@@ -40,12 +45,11 @@ export default function(router: Router) {
   utilApis(router);
 
   router.use(columnApis);
-
   router.use(exportApis);
   router.use(dataApis);
   router.use(bulkDataAliasApis);
-
   router.use(dataAliasApis);
+  router.use(oldDataApis);
   router.use(sortApis);
   router.use(filterApis);
   router.use(viewColumnApis);

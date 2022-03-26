@@ -1,7 +1,7 @@
 import Noco from '../../lib/noco/Noco';
 import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import NocoCache from '../noco-cache/NocoCache';
-import extractProps from '../noco/meta/api/helpers/extractProps';
+import extractProps from '../noco/meta/helpers/extractProps';
 
 export default class FormulaColumn {
   formula: string;

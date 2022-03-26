@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 // @ts-ignore
 import Model from '../../../noco-models/Model';
 // @ts-ignore
-import { PagedResponseImpl } from './helpers/PagedResponse';
+import { PagedResponseImpl } from '../helpers/PagedResponse';
 // @ts-ignore
 import { Table, TableList, TableListParams, TableReq } from 'nc-common';
 // @ts-ignore
@@ -10,7 +10,7 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
 import Project from '../../../noco-models/Project';
 import Filter from '../../../noco-models/Filter';
-import ncMetaAclMw from './helpers/ncMetaAclMw';
+import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';
 
 // @ts-ignore

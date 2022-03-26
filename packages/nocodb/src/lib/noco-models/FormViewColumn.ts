@@ -3,7 +3,7 @@ import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import { FormColumnType } from 'nc-common';
 import View from './View';
 import NocoCache from '../noco-cache/NocoCache';
-import extractProps from '../noco/meta/api/helpers/extractProps';
+import extractProps from '../noco/meta/helpers/extractProps';
 
 export default class FormViewColumn implements FormColumnType {
   id?: string;

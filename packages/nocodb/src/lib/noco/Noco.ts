@@ -36,7 +36,7 @@ import NcUpgrader from './upgrader/NcUpgrader';
 import NcMetaMgrv2 from './meta/NcMetaMgrv2';
 import NocoCache from '../noco-cache/NocoCache';
 import registerMetaApis from './meta/api';
-import NcPluginMgrv2 from './meta/api/helpers/NcPluginMgrv2';
+import NcPluginMgrv2 from './meta/helpers/NcPluginMgrv2';
 import User from '../noco-models/User';
 import { Tele } from 'nc-help';
 
