@@ -69,6 +69,7 @@ async function disableSharedBaseLink(req, res): Promise<any> {
   };
 
   await Project.update(project.id, data);
+  Tele.emit('evt', { evt_type: 'sharedBase:disable-link' });
   res.json({ uuid: null });
 }
 

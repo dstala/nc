@@ -11,6 +11,7 @@ import Project from '../../../noco-models/Project';
 import View from '../../../noco-models/View';
 import FormView from '../../../noco-models/FormView';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { Tele } from 'nc-help';
 
 // @ts-ignore
 export async function formViewGet(req: Request, res: Response<FormType>) {
@@ -19,6 +20,7 @@ export async function formViewGet(req: Request, res: Response<FormType>) {
 }
 
 export async function formViewCreate(req: Request<any, any>, res) {
+  Tele.emit('evt', { evt_type: 'view:created', type: 'form' });
   const view = await View.insert({
     ...req.body,
     // todo: sanitize
@@ -29,6 +31,7 @@ export async function formViewCreate(req: Request<any, any>, res) {
 }
 // @ts-ignore
 export async function formViewUpdate(req, res) {
+  Tele.emit('evt', { evt_type: 'view:updated', type: 'grid' });
   res.json(await FormView.update(req.params.formViewId, req.body));
 }
 

@@ -6,6 +6,7 @@ import {
   ProjectListParamsType,
   ProjectListType
 } from 'nc-common';
+
 import { PagedResponseImpl } from './helpers/PagedResponse';
 // import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import syncMigration from './helpers/syncMigration';
@@ -24,7 +25,7 @@ import ProjectUser from '../../../noco-models/ProjectUser';
 import { customAlphabet } from 'nanoid';
 import Noco from '../../Noco';
 import isDocker from 'is-docker';
-import { packageVersion } from 'nc-help';
+import { packageVersion, Tele } from 'nc-help';
 import { NcError } from './helpers/catchError';
 
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
@@ -126,6 +127,13 @@ async function projectCreate(
     await populateMeta(base, project);
     delete base.config;
   }
+
+  Tele.emit('evt', {
+    evt_type: 'project:created',
+    xcdb: !projectBody.external
+  });
+
+  Tele.emit('evt', { evt_type: 'project:rest' });
 
   res.json(project);
 }

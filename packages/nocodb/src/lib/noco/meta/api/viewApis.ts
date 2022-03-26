@@ -12,7 +12,7 @@ import Project from '../../../noco-models/Project';
 import View from '../../../noco-models/View';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
 import { xcVisibilityMetaGet } from './modelVisibilityApis';
-
+import { Tele } from 'nc-help';
 // @ts-ignore
 export async function viewGet(req: Request, res: Response<Table>) {}
 
@@ -50,6 +50,7 @@ export async function shareView(
   req: Request<any, any, any>,
   res: Response<View>
 ) {
+  Tele.emit('evt', { evt_type: 'sharedView:generated-link' });
   res.json(await View.share(req.params.viewId));
 }
 
@@ -63,14 +64,17 @@ export async function viewUpdate(req, res) {
 
 // @ts-ignore
 export async function viewDelete(req: Request, res: Response, next) {
+  Tele.emit('evt', { evt_type: 'vtable:deleted' });
   res.json(await View.delete(req.params.viewId));
 }
 
 async function shareViewPasswordUpdate(req: Request<any, any>, res) {
+  Tele.emit('evt', { evt_type: 'sharedView:password-updated' });
   res.json(await View.passwordUpdate(req.params.viewId, req.body));
 }
 
 async function shareViewDelete(req: Request<any, any>, res) {
+  Tele.emit('evt', { evt_type: 'sharedView:deleted' });
   res.json(await View.sharedViewDelete(req.params.viewId));
 }
 

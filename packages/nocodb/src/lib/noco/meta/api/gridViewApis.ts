@@ -10,9 +10,11 @@ import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import View from '../../../noco-models/View';
 import ncMetaAclMw from './helpers/ncMetaAclMw';
+import { Tele } from 'nc-help';
 
 // @ts-ignore
 export async function gridViewCreate(req: Request<any, any>, res) {
+  Tele.emit('evt', { evt_type: 'view:created', type: 'grid' });
   const view = await View.insert({
     ...req.body,
     // todo: sanitize

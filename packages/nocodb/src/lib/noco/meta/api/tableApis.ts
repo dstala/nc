@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from './helpers/PagedResponse';
+import { Tele } from 'nc-help';
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
@@ -148,6 +149,8 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
 
   mapDefaultPrimaryValue(req.body.columns);
 
+  Tele.emit('evt', { evt_type: 'table:created' });
+
   res.json(
     await Model.insert(project.id, base.id, {
       ...req.body,
@@ -175,6 +178,8 @@ export async function tableUpdate(
   }
 
   await Model.updateAlias(req.params.tableId, req.body._tn);
+
+  Tele.emit('evt', { evt_type: 'table:updated' });
 
   res.json({ msg: 'success' });
 }
@@ -205,6 +210,8 @@ export async function tableDelete(req: Request, res: Response, next) {
       description: `Deleted ${table.type} ${table.tn} with alias ${table._tn}  `,
       ip: (req as any).clientIp
     }).then(() => {});
+
+    Tele.emit('evt', { evt_type: 'table:deleted' });
 
     res.json(await table.delete());
   } catch (e) {

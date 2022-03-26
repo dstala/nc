@@ -37,6 +37,8 @@ import NcMetaMgrv2 from './meta/NcMetaMgrv2';
 import NocoCache from '../noco-cache/NocoCache';
 import registerMetaApis from './meta/api';
 import NcPluginMgrv2 from './meta/api/helpers/NcPluginMgrv2';
+import User from '../noco-models/User';
+import { Tele } from 'nc-help';
 
 const log = debug('nc:app');
 require('dotenv').config();
@@ -257,7 +259,7 @@ export default class Noco {
       }
       next();
     });
-
+    Tele.emit('evt_app_started', await User.count());
     return this.router;
   }
 

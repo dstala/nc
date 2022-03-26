@@ -90,7 +90,10 @@ export async function signup(req: Request, res: Response<TableType>) {
     if (await User.isFirst()) {
       // todo: update in nc_store
       // roles = 'owner,creator,editor'
-      Tele.emit('evt', { evt_type: 'project:invite', count: 1 });
+      Tele.emit('evt', {
+        evt_type: 'project:invite',
+        count: 1
+      });
     } else {
       if (process.env.NC_INVITE_ONLY_SIGNUP) {
         NcError.badRequest('Not allowed to signup, contact super admin.');
