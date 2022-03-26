@@ -7,13 +7,14 @@
         @click="localState.splice(i,1)"
       >
         mdi-arrow-down-drop-circle
-      </v-icon>   <v-text-field
+      </v-icon>
+      <v-text-field
         :autofocus="true"
         :value="localState[i]"
+        @input="listenForComma(i, $event)"
         class="caption"
         dense
         outlined
-        @input="listenForComma(i, $event)"
       />
       <v-icon class="ml-2" color="error lighten-2" size="13" @click="localState.splice(i,1)">
         mdi-close
