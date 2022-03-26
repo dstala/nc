@@ -4,7 +4,7 @@ import UITypes from '../../../sqlUi/UITypes';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Base from '../../../noco-models/Base';
 import Column from '../../../noco-models/Column';
-import { substituteColumnNameWithIdInFormula } from './helpers/formulaHelpers';
+import { substituteColumnAliasWithIdInFormula } from './helpers/formulaHelpers';
 import validateParams from './helpers/validateParams';
 import { Tele } from 'nc-help';
 
@@ -427,7 +427,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
       break;
 
     case UITypes.Formula:
-      colBody.formula = await substituteColumnNameWithIdInFormula(
+      colBody.formula = await substituteColumnAliasWithIdInFormula(
         colBody.formula_raw || colBody.formula,
         table.columns
       );
@@ -523,7 +523,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   ) {
     if (column.uidt === colBody.uidt) {
       if (column.uidt === UITypes.Formula) {
-        colBody.formula = await substituteColumnNameWithIdInFormula(
+        colBody.formula = await substituteColumnAliasWithIdInFormula(
           colBody.formula_raw || colBody.formula,
           table.columns
         );

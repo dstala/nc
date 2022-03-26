@@ -9,7 +9,7 @@ import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import UITypes from '../../../sqlUi/UITypes';
 import NcHelp from '../../../utils/NcHelp';
-import { substituteColumnNameWithIdInFormula } from '../../meta/api/helpers/formulaHelpers';
+import { substituteColumnAliasWithIdInFormula } from '../../meta/api/helpers/formulaHelpers';
 import RollupColumn from '../../../noco-models/RollupColumn';
 import View from '../../../noco-models/View';
 import GridView from '../../../noco-models/GridView';
@@ -588,7 +588,7 @@ async function migrateProjectModels(
               const colBody: any = {
                 _cn: columnMeta._cn
               };
-              colBody.formula = await substituteColumnNameWithIdInFormula(
+              colBody.formula = await substituteColumnAliasWithIdInFormula(
                 columnMeta.formula.value,
                 await model.getColumns(ncMeta)
               );

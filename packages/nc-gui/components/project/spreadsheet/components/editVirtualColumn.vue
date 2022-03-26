@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { UITypes } from 'nc-common'
+import { UITypes, substituteColumnIdWithAliasInFormula } from 'nc-common'
 import FormulaOptions from '@/components/project/spreadsheet/components/editColumn/formulaOptions'
 import { validateColumnName } from '~/helpers'
 
@@ -81,7 +81,7 @@ export default {
       this.newColumn = rest
 
       if (rest.uidt === UITypes.Formula) {
-        this.newColumn.formula_raw = colOptions.formula_raw
+        this.newColumn.formula_raw = substituteColumnIdWithAliasInFormula(colOptions.formula, this.meta.columns)
       }
     }
   },
@@ -92,7 +92,7 @@ export default {
     this.newColumn = rest
 
     if (rest.uidt === UITypes.Formula) {
-      this.newColumn.formula_raw = colOptions.formula_raw
+      this.newColumn.formula_raw = substituteColumnIdWithAliasInFormula(colOptions.formula, this.meta.columns)
     }
   },
   methods: {
