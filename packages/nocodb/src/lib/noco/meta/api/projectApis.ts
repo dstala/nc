@@ -59,9 +59,8 @@ export async function projectList(
     res // todo: pagination
       .json(
         new PagedResponseImpl(projects, {
-          totalRows: projects.length,
-          pageSize: projects.length,
-          page: 1
+          count: projects.length,
+          limit: projects.length
         })
       );
   } catch (e) {

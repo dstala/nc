@@ -74,7 +74,8 @@ export async function mmList(req: Request, res: Response, next) {
 
   res.json(
     new PagedResponseImpl(data, {
-      totalRows: count
+      count,
+      ...req.query
     })
   );
 }
@@ -131,7 +132,8 @@ export async function mmExcludedList(req: Request, res: Response, next) {
 
   res.json(
     new PagedResponseImpl(data, {
-      totalRows: count
+      count,
+      ...req.query
     })
   );
 }
@@ -188,7 +190,8 @@ export async function hmExcludedList(req: Request, res: Response, next) {
 
   res.json(
     new PagedResponseImpl(data, {
-      totalRows: count
+      count,
+      ...req.query
     })
   );
 }
@@ -245,7 +248,8 @@ export async function btExcludedList(req: Request, res: Response, next) {
 
   res.json(
     new PagedResponseImpl(data, {
-      totalRows: count
+      count,
+      ...req.query
     })
   );
 }
@@ -480,10 +484,8 @@ async function getDataList(model, view: View, req) {
   const count = await baseModel.count(listArgs);
 
   return new PagedResponseImpl(data, {
-    // todo:
-    totalRows: count,
-    pageSize: 25,
-    page: 1
+    count,
+    ...req.query
   });
 }
 //@ts-ignore

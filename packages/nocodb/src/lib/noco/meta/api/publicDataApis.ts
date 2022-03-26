@@ -67,12 +67,7 @@ export async function dataList(req: Request, res: Response) {
     });
 
     res.json({
-      data: new PagedResponseImpl(data, {
-        // todo:
-        totalRows: count,
-        pageSize: 25,
-        page: 1
-      })
+      data: new PagedResponseImpl(data, { ...req.query, count })
     });
   } catch (e) {
     console.log(e);
@@ -256,14 +251,7 @@ async function relDataList(req, res) {
 
   const count = await baseModel.count(req.query);
 
-  res.json(
-    new PagedResponseImpl(data, {
-      // todo:
-      totalRows: count,
-      pageSize: 25,
-      page: 1
-    })
-  );
+  res.json(new PagedResponseImpl(data, { ...req.query, count }));
 }
 
 /*
@@ -451,11 +439,7 @@ export async function publicMmList(req: Request, res: Response) {
     parentId: req.params.rowId
   });
 
-  res.json(
-    new PagedResponseImpl(data, {
-      totalRows: count
-    })
-  );
+  res.json(new PagedResponseImpl(data, { ...req.query, count }));
 }
 
 export async function publicHmList(req: Request, res: Response) {

@@ -61,7 +61,8 @@ export async function auditList(
     audits: new PagedResponseImpl(
       await Audit.projectAuditList(req.params.projectId),
       {
-        totalRows: await Audit.projectAuditCount(req.params.projectId)
+        count: await Audit.projectAuditCount(req.params.projectId),
+        ...req.query
       }
     )
   });

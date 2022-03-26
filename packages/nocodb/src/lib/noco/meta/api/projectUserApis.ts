@@ -19,7 +19,8 @@ async function userList(req, res) {
         project_id: req.params.projectId
       }),
       {
-        totalRows: await ProjectUser.getUsersCount(req.query)
+        ...req.query,
+        count: await ProjectUser.getUsersCount(req.query)
       }
     )
   });

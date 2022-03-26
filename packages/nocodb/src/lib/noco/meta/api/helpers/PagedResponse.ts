@@ -1,14 +1,24 @@
 import { PaginatedType } from 'nc-common';
 
 export class PagedResponseImpl<T> {
-  constructor(list: T[], pageInfo?: PaginatedType) {
+  constructor(
+    list: T[],
+    {
+      limit = 25,
+      offset = 0,
+      count = null
+    }: { limit?: number; offset?: number; count?: number } = {}
+  ) {
     this.list = list;
-    this.pageInfo = pageInfo;
-    if (pageInfo) {
-      pageInfo.isFirstPage = pageInfo.isFirstPage ?? pageInfo.page === 1;
-      pageInfo.isLastPage =
-        pageInfo.isLastPage ??
-        pageInfo.page === Math.ceil(pageInfo.totalRows / pageInfo.pageSize);
+    if (count !== null) {
+      this.pageInfo = { totalRows: +count };
+      this.pageInfo.page = offset ? offset / limit + 1 : 1;
+      this.pageInfo.pageSize = limit;
+      this.pageInfo.isFirstPage =
+        this.pageInfo.isFirstPage ?? this.pageInfo.page === 1;
+      this.pageInfo.isLastPage =
+        this.pageInfo.page ===
+        (Math.ceil(this.pageInfo.totalRows / this.pageInfo.pageSize) || 1);
     }
   }
 

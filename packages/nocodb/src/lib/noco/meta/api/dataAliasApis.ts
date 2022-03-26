@@ -81,10 +81,8 @@ async function getDataList(model, view: View, req) {
   const count = await baseModel.count(listArgs);
 
   return new PagedResponseImpl(data, {
-    // todo:
-    totalRows: count,
-    pageSize: 25,
-    page: 1
+    ...req.query,
+    count
   });
 }
 async function getViewAndModelFromRequest(req) {
