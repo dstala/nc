@@ -26,7 +26,7 @@ export const genTest = (apiType, dbType) => {
                 let storedRecords = [
                     `Country,CityList`,
                     `Afghanistan,Kabul`,
-                    `Algeria,"Batna, Bchar, Skikda"`,
+                    `Algeria,"Skikda, Bchar, Batna"`,
                     `American Samoa,Tafuna`,
                     `Angola,"Benguela, Namibe"`,
                 ];

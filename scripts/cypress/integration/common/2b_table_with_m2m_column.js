@@ -62,7 +62,7 @@ export const genTest = (apiType, dbType) => {
                     cy.getActiveModal()
                         .find(".child-card")
                         .eq(0)
-                        .contains("ACADEMY DINOSAUR")
+                        .contains("ACE GOLDFINGER")
                         .should("exist");
                     cy.get("body").type("{esc}");
                 });

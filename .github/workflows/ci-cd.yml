@@ -19,6 +19,182 @@ on:
             - ".github/workflows/ci-cd.yml"
 
 jobs:
+    cypress-pg-restTableOps-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
+                  spec: "./scripts/cypress/integration/test/pg-restTableOps.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-pg-restViews-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
+                  spec: "./scripts/cypress/integration/test/pg-restViews.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-pg-restRoles-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
+                  spec: "./scripts/cypress/integration/test/pg-restRoles.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-pg-restMisc-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/cypress/docker-compose-pg.yml up -d
+                  spec: "./scripts/cypress/integration/test/pg-restMisc.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
     cypress-restTableOps-run:
         runs-on: ubuntu-20.04
         steps:
@@ -57,6 +233,12 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
     cypress-restViews-run:
         runs-on: ubuntu-20.04
         steps:
@@ -95,6 +277,12 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
     cypress-restRoles-run:
         runs-on: ubuntu-20.04
         steps:
@@ -133,6 +321,12 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
     cypress-restMisc-run:
         runs-on: ubuntu-20.04
         steps:
@@ -171,6 +365,540 @@ jobs:
                   wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
                   wait-on-timeout: 1200
                   config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restTableOps-run:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restTableOps.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restViews-run:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restViews.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restRoles-run:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restRoles.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restMisc-run:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restMisc.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-restTableOps-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common          
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/restTableOps.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-restViews-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/restViews.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-restRoles-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/restRoles.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-restMisc-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/restMisc.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restTableOps-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restTableOps.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restViews-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restViews.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restRoles-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restRoles.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
+    cypress-xcdb-restMisc-run-cache:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Cache node modules
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
+            - name: Set env
+              run: echo "NODE_ENV=test" >> $GITHUB_ENV
+            - name: Cypress run
+              uses: cypress-io/github-action@v2
+              with:
+                  start: |
+                      npm run build:common
+                      npm run start:xcdb-api:cache
+                      npm run start:web
+                      docker-compose -f ./scripts/docker-compose-cypress.yml up -d
+                  spec: "./scripts/cypress/integration/test/xcdb-restMisc.js"
+                  wait-on: "http://localhost:8080, http://localhost:3000/_nuxt/runtime.js"
+                  wait-on-timeout: 1200
+                  config-file: scripts/cypress/cypress.json
+            - name: Upload screenshots
+              uses: actions/upload-artifact@v2
+              with:
+                  name: restTableOps-snapshots
+                  path: scripts/cypress/videos
+                  retention-days: 2
     docker:
         runs-on: ubuntu-latest
         steps:
