@@ -39,7 +39,9 @@ import {
   publicMetaApis
 } from './publicApis';
 
-export default function(router: Router) {
+import Server from 'socket.io';
+import PostHog from 'posthog-node';
+export default function(router: Router, server) {
   initStrategies(router);
   projectApis(router);
   utilApis(router);
@@ -76,4 +78,36 @@ export default function(router: Router) {
   router.use(hookFilterApis);
 
   userApis(router);
+
+  const client = new PostHog(
+    'phc_lQE1SrNLeEAuqHKoIaLYJEbDRnES4RBXPdERQCcIvwa',
+    { host: 'https://app.posthog.com' } // You can omit this line if using PostHog Cloud
+  );
+
+  const io = new Server(server);
+  io.on('connection', socket => {
+    console.log('a user connected');
+
+    socket.on('page', args => {
+      client.capture({
+        distinctId: args.id || 'test_user',
+        event: '$pageview',
+        properties: { $current_url: args.path }
+      });
+
+      client.capture({
+        distinctId: args.id || 'test_user',
+        event: 'pageChanged',
+        properties: { path: args.path }
+      });
+    });
+    // other events
+    socket.on('event', args => {
+      client.capture({
+        distinctId: args.id || 'test_user',
+        event: 'pageChanged',
+        properties: { path: args.path }
+      });
+    });
+  });
 }

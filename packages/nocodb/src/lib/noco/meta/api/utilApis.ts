@@ -36,7 +36,8 @@ export async function appInfo(_req: Request, res: Response) {
       +process.env.DB_QUERY_LIMIT_MIN || 1
     ),
     timezone: defaultConnectionConfig.timezone,
-    ncMin: !!process.env.NC_MIN
+    ncMin: !!process.env.NC_MIN,
+    teleEnabled: !process.env.NC_DISABLE_TELE
   };
 
   res.json(result);

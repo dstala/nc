@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="project-container ma-0 pa-0 " style="position: relative">
+  <v-container fluid class="ph-no-capture project-container ma-0 pa-0 " style="position: relative">
     <v-tabs
       ref="projectTabs"
       v-model="activeTab"
