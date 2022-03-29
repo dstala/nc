@@ -7,9 +7,9 @@ const log = debug('nc:cache');
 export default class RedisMockCacheMgr extends CacheMgr {
   client: any;
 
-  constructor(config: any) {
+  constructor() {
     super();
-    this.client = new Redis(config);
+    this.client = new Redis();
     // flush the existing db with selected key (Default: 0)
     this.client.flushdb();
   }

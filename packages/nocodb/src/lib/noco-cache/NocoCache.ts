@@ -15,7 +15,7 @@ export default class NocoCache {
     if (process.env.NC_REDIS_URL) {
       this.client = new RedisCacheMgr(process.env.NC_REDIS_URL);
     } else {
-      this.client = new RedisMockCacheMgr(process.env.NC_REDIS_MOCK_URL);
+      this.client = new RedisMockCacheMgr();
     }
   }
 
