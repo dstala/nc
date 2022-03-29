@@ -8,7 +8,6 @@
     <node-interpreter value="project" />
     <envs>
       <env name="NC_DISABLE_CACHE" value="true" />
-      <env name="NC_DISABLE_TELE" value="true" />
     </envs>
     <method v="2" />
   </configuration>

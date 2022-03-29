@@ -78,6 +78,7 @@
 
           <th
             v-if="!isLocked && !isVirtual && !isPublicView && _isUIAllowed('add-column')"
+            v-t="['column:add']"
             :class="$store.state.windows.darkTheme ? 'grey darken-3 grey--text text--lighten-1' : 'grey lighten-4  grey--text text--darken-2'"
             class="grey-border new-column-header pointer  nc-grid-header-cell"
             @click="addNewColMenu = true"
@@ -243,7 +244,7 @@
           </td>
         </tr>
         <tr v-if="!isView && !isLocked && !isPublicView && isEditable && relationType !== 'bt'">
-          <td :colspan="visibleColLength + 1" class="text-left pointer nc-grid-add-new-cell" @click="insertNewRow(true)">
+          <td v-t="['row:add']" :colspan="visibleColLength + 1" class="text-left pointer nc-grid-add-new-cell" @click="insertNewRow(true)">
             <v-tooltip top>
               <template #activator="{on}">
                 <v-icon small color="pink" v-on="on">

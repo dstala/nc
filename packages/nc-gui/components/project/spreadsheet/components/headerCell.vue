@@ -59,7 +59,11 @@
         </v-icon>
       </template>
       <v-list dense>
-        <v-list-item class="nc-column-edit" dense @click="editColumnMenu = true">
+        <v-list-item
+          class="nc-column-edit"
+          dense
+          @click="editColumnMenu = true"
+        >
           <x-icon small class="mr-1" color="primary">
             mdi-pencil
           </x-icon>
@@ -68,7 +72,11 @@
             {{ $t('general.edit') }}
           </span>
         </v-list-item>
-        <v-list-item dense @click="setAsPrimaryValue">
+        <v-list-item
+          v-t="['column:setAsPrimary']"
+          dense
+          @click="setAsPrimaryValue"
+        >
           <x-icon small class="mr-1" color="primary">
             mdi-key-star
           </x-icon>
@@ -82,7 +90,10 @@
             <span class="caption font-weight-bold">Primary value will be shown in place of primary key</span>
           </v-tooltip>
         </v-list-item>
-        <v-list-item class="nc-column-delete" @click="columnDeleteDialog = true">
+        <v-list-item
+          class="nc-column-delete"
+          @click="columnDeleteDialog = true"
+        >
           <x-icon small class="mr-1" color="error">
             mdi-delete-outline
           </x-icon>
@@ -132,11 +143,20 @@
         <v-divider />
         <v-card-actions class="d-flex pa-4">
           <v-spacer />
-          <v-btn small @click="columnDeleteDialog = false">
+          <v-btn
+            v-t="['column:delete:cancel']"
+            small
+            @click="columnDeleteDialog = false"
+          >
             <!-- Cancel -->
             {{ $t('general.cancel') }}
           </v-btn>
-          <v-btn small color="error" @click="deleteColumn">
+          <v-btn
+            v-t="['column:delete']"
+            small
+            color="error"
+            @click="deleteColumn"
+          >
             Confirm
           </v-btn>
         </v-card-actions>

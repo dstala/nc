@@ -48,8 +48,6 @@ const NcProjectBuilder = process.env.EE
   ? NcProjectBuilderEE
   : NcProjectBuilderCE;
 
-import proxy from 'express-http-proxy';
-
 export default class Noco {
   private static _this: Noco;
 
@@ -162,7 +160,7 @@ export default class Noco {
       afterMetaMigrationInit?: Function;
     },
     server?: http.Server,
-    app?: express.Express
+    _app?: express.Express
   ) {
     // @ts-ignore
     const {
@@ -173,17 +171,6 @@ export default class Noco {
     } = args || {};
 
     log('Initializing app');
-
-    app.use(
-      '/proxy',
-      proxy('https://app.posthog.com', {
-        preserveHostHdr: true,
-        proxyReqOptDecorator: function(proxyReqOpts) {
-          proxyReqOpts.rejectUnauthorized = false;
-          return proxyReqOpts;
-        }
-      })
-    );
 
     // create tool directory if missing
     mkdirp.sync(this.config.toolDir);
