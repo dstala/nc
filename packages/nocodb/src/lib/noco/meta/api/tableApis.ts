@@ -21,6 +21,7 @@ import View from '../../../noco-models/View';
 import getColumnPropsFromUIDT from '../helpers/getColumnPropsFromUIDT';
 import mapDefaultPrimaryValue from '../helpers/mapDefaultPrimaryValue';
 import { NcError } from '../helpers/catchError';
+import getTableNameAlias from '../helpers/getTableName';
 export async function tableGet(req: Request, res: Response<TableType>) {
   const table = await Model.getWithInfo({
     id: req.params.tableId
@@ -108,6 +109,16 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
   const project = await Project.getWithInfo(req.params.projectId);
   const base = project.bases.find(b => b.id === req.params.baseId);
 
+  if (!req.body.tn) {
+    NcError.badRequest('Missing table name `tn` property in request body');
+  }
+
+  if (project.prefix) {
+    if (!req.body.tn.startsWith(project.prefix)) {
+      req.body.tn = `${project.prefix}_${req.body.tn}`;
+    }
+  }
+
   if (
     !(await Model.checkTitleAvailable({
       tn: req.body.tn,
@@ -117,9 +128,14 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
   ) {
     NcError.badRequest('Duplicate table name');
   }
+
+  if (!req.body._tn) {
+    req.body._tn = getTableNameAlias(req.body.tn, project.prefix, base);
+  }
+
   if (
     !(await Model.checkAliasAvailable({
-      _tn: req.body.tn,
+      _tn: req.body._tn,
       project_id: project.id,
       base_id: base.id
     }))
