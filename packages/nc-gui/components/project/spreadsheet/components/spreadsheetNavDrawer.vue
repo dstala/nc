@@ -520,7 +520,7 @@
 
 <script>
 import draggable from 'vuedraggable'
-import { ViewTypes } from 'nc-common'
+import { ViewTypes } from 'nocodb-sdk'
 import CreateViewDialog from '@/components/project/spreadsheet/dialog/createViewDialog'
 import Extras from '~/components/project/spreadsheet/components/extras'
 import viewIcons from '~/helpers/viewIcons'

@@ -21,7 +21,7 @@ import {
   LinkToAnotherRecordType,
   RelationTypes,
   TableType
-} from 'nc-common';
+} from 'nocodb-sdk';
 import Audit from '../../../noco-models/Audit';
 import SqlMgrv2 from '../../../sqlMgr/v2/SqlMgrv2';
 import Noco from '../../Noco';

@@ -105,7 +105,7 @@
 <script>
 
 import FileSaver from 'file-saver'
-import { ExportTypes } from 'nc-common'
+import { ExportTypes } from 'nocodb-sdk'
 import DropOrSelectFileModal from '~/components/import/dropOrSelectFileModal'
 import ColumnMappingModal from '~/components/project/spreadsheet/components/importExport/columnMappingModal'
 import CSVTemplateAdapter from '~/components/import/templateParsers/CSVTemplateAdapter'

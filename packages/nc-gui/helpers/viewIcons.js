@@ -1,4 +1,4 @@
-import { ViewTypes } from 'nc-common'
+import { ViewTypes } from 'nocodb-sdk'
 
 export default {
   [ViewTypes.GRID]: { icon: 'mdi-grid-large', color: 'blue' },

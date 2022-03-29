@@ -9,7 +9,7 @@ import {
   MetaTable
 } from '../utils/globals';
 import View from './View';
-import { FilterType } from 'nc-common';
+import { FilterType } from 'nocodb-sdk';
 import NocoCache from '../noco-cache/NocoCache';
 
 export default class Filter {

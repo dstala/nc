@@ -9,7 +9,7 @@ import genRollupSelectv2 from './genRollupSelectv2';
 import RollupColumn from '../../../noco-models/RollupColumn';
 import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
 import FormulaColumn from '../../../noco-models/FormulaColumn';
-import { RelationTypes } from 'nc-common';
+import { RelationTypes } from 'nocodb-sdk';
 // import LookupColumn from '../../../noco-models/LookupColumn';
 
 export default async function conditionV2(

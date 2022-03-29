@@ -4,7 +4,7 @@ import User from '../../../noco-models/User';
 import Project from '../../../noco-models/Project';
 import ProjectUser from '../../../noco-models/ProjectUser';
 import Model from '../../../noco-models/Model';
-import { ModelTypes, ViewTypes } from 'nc-common';
+import { ModelTypes, ViewTypes } from 'nocodb-sdk';
 import Column from '../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import UITypes from '../../../sqlUi/UITypes';

@@ -704,7 +704,7 @@
 
 import { mapActions } from 'vuex'
 import debounce from 'debounce'
-import { SqlUiFactory, ViewTypes } from 'nc-common'
+import { SqlUiFactory, ViewTypes } from 'nocodb-sdk'
 import FileSaver from 'file-saver'
 import FormView from './views/formView'
 import XcGridView from './views/xcGridView'

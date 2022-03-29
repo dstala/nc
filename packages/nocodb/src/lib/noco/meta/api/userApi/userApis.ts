@@ -3,7 +3,7 @@ import {
   PasswordChangePayloadType,
   PasswordForgotPayloadType,
   TableType
-} from 'nc-common';
+} from 'nocodb-sdk';
 import catchError, { NcError } from '../../helpers/catchError';
 const { isEmail } = require('validator');
 import * as ejs from 'ejs';

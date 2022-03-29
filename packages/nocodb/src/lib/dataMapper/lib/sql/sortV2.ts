@@ -8,7 +8,7 @@ import RollupColumn from '../../../noco-models/RollupColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
 import formulaQueryBuilderv2 from './formulav2/formulaQueryBuilderv2';
 import FormulaColumn from '../../../noco-models/FormulaColumn';
-import { RelationTypes } from 'nc-common';
+import { RelationTypes } from 'nocodb-sdk';
 
 export default async function sortV2(
   sortList: Sort[],

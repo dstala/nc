@@ -64,7 +64,7 @@
 
 <script>
 
-import { isSystemColumn, UITypes } from 'nc-common'
+import { isSystemColumn, UITypes } from 'nocodb-sdk'
 
 export default {
   name: 'RollupOptions',

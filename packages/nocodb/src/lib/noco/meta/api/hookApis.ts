@@ -1,7 +1,7 @@
 import catchError from '../helpers/catchError';
 import { Request, Response, Router } from 'express';
 import Hook from '../../../noco-models/Hook';
-import { HookListType, HookTestPayloadType, HookType } from 'nc-common';
+import { HookListType, HookTestPayloadType, HookType } from 'nocodb-sdk';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import { invokeWebhook } from '../helpers/webhookHelpers';
 import Model from '../../../noco-models/Model';

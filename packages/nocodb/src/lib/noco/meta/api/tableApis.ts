@@ -11,7 +11,7 @@ import {
   TableReqType,
   TableType,
   TableUpdatePayloadType
-} from 'nc-common';
+} from 'nocodb-sdk';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
 import Audit from '../../../noco-models/Audit';

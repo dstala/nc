@@ -1,4 +1,4 @@
-import { ModelTypes } from 'nc-common'
+import { ModelTypes } from 'nocodb-sdk'
 
 export default {
   projectsDir: {

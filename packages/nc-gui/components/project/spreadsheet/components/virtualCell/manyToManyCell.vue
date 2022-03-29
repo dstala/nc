@@ -126,7 +126,7 @@
 
 <script>
 // import ApiFactory from '@/components/project/spreadsheet/apis/apiFactory'
-import { RelationTypes, UITypes } from 'nc-common'
+import { RelationTypes, UITypes } from 'nocodb-sdk'
 import DlgLabelSubmitCancel from '@/components/utils/dlgLabelSubmitCancel'
 import ListItems from '@/components/project/spreadsheet/components/virtualCell/components/listItems'
 import ListChildItems from '@/components/project/spreadsheet/components/virtualCell/components/listChildItems'

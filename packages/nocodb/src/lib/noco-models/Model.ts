@@ -10,7 +10,7 @@ import {
   TableReqType,
   TableType,
   ViewTypes
-} from 'nc-common';
+} from 'nocodb-sdk';
 import UITypes from '../sqlUi/UITypes';
 import {
   CacheDelDirection,

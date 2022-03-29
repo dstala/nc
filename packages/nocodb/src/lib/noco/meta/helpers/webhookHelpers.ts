@@ -5,7 +5,7 @@ import Column from '../../../noco-models/Column';
 import Hook from '../../../noco-models/Hook';
 import Filter from '../../../noco-models/Filter';
 import HookLog from '../../../noco-models/HookLog';
-import { HookLogType } from 'nc-common';
+import { HookLogType } from 'nocodb-sdk';
 
 export function parseBody(
   template: string,

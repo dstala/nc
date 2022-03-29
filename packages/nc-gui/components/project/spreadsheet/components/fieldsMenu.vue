@@ -173,7 +173,7 @@
 
 <script>
 import draggable from 'vuedraggable'
-import { getSystemColumnsIds } from 'nc-common'
+import { getSystemColumnsIds } from 'nocodb-sdk'
 
 export default {
   name: 'FieldsMenu',

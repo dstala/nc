@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { ViewTypes } from 'nc-common'
+import { ViewTypes } from 'nocodb-sdk'
 import viewIcons from '~/helpers/viewIcons'
 import { copyTextToClipboard } from '~/helpers/xutils'
 

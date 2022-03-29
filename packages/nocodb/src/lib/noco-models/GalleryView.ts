@@ -1,6 +1,6 @@
 import Noco from '../noco/Noco';
 import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
-import { GalleryColumnType, GalleryType } from 'nc-common';
+import { GalleryColumnType, GalleryType } from 'nocodb-sdk';
 import View from './View';
 import UITypes from '../sqlUi/UITypes';
 import NocoCache from '../noco-cache/NocoCache';

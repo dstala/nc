@@ -1,4 +1,4 @@
-import { XcActionType, XcType } from 'nc-common';
+import { XcActionType, XcType } from 'nocodb-sdk';
 import { XcPluginConfig } from 'nc-plugin';
 import ScalewayObjectStoragePlugin from './ScalewayObjectStoragePlugin';
 
@@ -58,8 +58,7 @@ const config: XcPluginConfig = {
         type: XcType.Button
       }
     ],
-    msgOnInstall:
-      'Successfully installed Scaleway Object Storage',
+    msgOnInstall: 'Successfully installed Scaleway Object Storage',
     msgOnUninstall: ''
   },
   category: 'Storage'

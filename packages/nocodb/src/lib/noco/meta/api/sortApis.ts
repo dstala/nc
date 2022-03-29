@@ -8,7 +8,7 @@ import {
   TableListParamsType,
   TableReqType,
   TableType
-} from 'nc-common';
+} from 'nocodb-sdk';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore

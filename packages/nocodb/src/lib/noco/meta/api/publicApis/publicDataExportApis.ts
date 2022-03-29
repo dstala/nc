@@ -5,7 +5,7 @@ import Base from '../../../../noco-models/Base';
 import NcConnectionMgrv2 from '../../../common/NcConnectionMgrv2';
 import { nocoExecute } from 'nc-help';
 import papaparse from 'papaparse';
-import { ErrorMessages, isSystemColumn, UITypes, ViewTypes } from 'nc-common';
+import { ErrorMessages, isSystemColumn, UITypes, ViewTypes } from 'nocodb-sdk';
 import Column from '../../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../../noco-models/LinkToAnotherRecordColumn';
 import LookupColumn from '../../../../noco-models/LookupColumn';

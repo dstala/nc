@@ -1,11 +1,11 @@
 {
-  "name": "nc-common",
+  "name": "nocodb-sdk",
   "version": "0.0.6",
   "description": "Xc common library",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
-  "repository": "https://github.com/pranavxc/nc-common",
+  "repository": "https://github.com/nocodb/nocodb",
   "license": "MIT",
   "keywords": [],
   "scripts": {

@@ -8,7 +8,7 @@ import SingleSelectColumn from './SingleSelectColumn';
 import MultiSelectColumn from './MultiSelectColumn';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
-import { ColumnType } from 'nc-common';
+import { ColumnType } from 'nocodb-sdk';
 import {
   CacheDelDirection,
   CacheGetType,

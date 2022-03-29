@@ -50,9 +50,10 @@
             @change="saveOrUpdate(sort, i)"
           >
             <template #item="{item}">
-              <span 
-                :class="`caption font-weight-regular nc-sort-fld-${item._cn}`">
-                  {{ item._cn }}
+              <span
+                :class="`caption font-weight-regular nc-sort-fld-${item._cn}`"
+              >
+                {{ item._cn }}
               </span>
             </template>
           </v-select>
@@ -87,7 +88,7 @@
 </template>
 
 <script>
-import { RelationTypes, UITypes } from 'nc-common'
+import { RelationTypes, UITypes } from 'nocodb-sdk'
 
 export default {
   name: 'SortListMenu',

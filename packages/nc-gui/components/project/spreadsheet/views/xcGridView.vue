@@ -274,7 +274,7 @@
 </template>
 
 <script>
-import { isVirtualCol } from 'nc-common'
+import { isVirtualCol } from 'nocodb-sdk'
 import HeaderCell from '../components/headerCell'
 import EditableCell from '../components/editableCell'
 import EditColumn from '../components/editColumn'

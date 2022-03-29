@@ -265,7 +265,7 @@
 <script>
 
 import dayjs from 'dayjs'
-import { AuditOperationSubTypes, AuditOperationTypes, isVirtualCol, UITypes } from 'nc-common'
+import { AuditOperationSubTypes, AuditOperationTypes, isVirtualCol, UITypes } from 'nocodb-sdk'
 import form from '../mixins/form'
 import HeaderCell from '@/components/project/spreadsheet/components/headerCell'
 import EditableCell from '@/components/project/spreadsheet/components/editableCell'

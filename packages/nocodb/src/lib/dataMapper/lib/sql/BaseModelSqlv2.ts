@@ -26,7 +26,7 @@ import {
   RelationTypes,
   SortType,
   ViewTypes
-} from 'nc-common';
+} from 'nocodb-sdk';
 import formSubmissionEmailTemplate from '../../../noco/common/formSubmissionEmailTemplate';
 import ejs from 'ejs';
 import Audit from '../../../noco-models/Audit';

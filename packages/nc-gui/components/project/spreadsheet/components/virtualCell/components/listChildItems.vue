@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { RelationTypes } from 'nc-common'
+import { RelationTypes } from 'nocodb-sdk'
 import Pagination from '@/components/project/spreadsheet/components/pagination'
 
 export default {

@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { UITypes } from 'nc-common'
+import { UITypes } from 'nocodb-sdk'
 import RollupCell from './virtualCell/rollupCell'
 import FormulaCell from './virtualCell/formulaCell'
 import hasManyCell from './virtualCell/hasManyCell'
