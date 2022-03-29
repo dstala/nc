@@ -1740,7 +1740,7 @@ export class PgUi {
         return ['text'];
 
       case 'SingleSelect':
-        return ['anyenum', 'text'];
+        return ['text'];
 
       case 'Year':
         return ['int'];
