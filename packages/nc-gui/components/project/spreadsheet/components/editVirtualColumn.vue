@@ -40,11 +40,22 @@
           </v-col>
           <v-col cols="12" class="d-flex pt-0">
             <v-spacer />
-            <v-btn x-small outlined @click="close">
+            <v-btn
+              v-t="['vitual:column:edit:cancel']"
+              x-small
+              outlined
+              @click="close"
+            >
               <!-- Cancel -->
               {{ $t('general.cancel') }}
             </v-btn>
-            <v-btn x-small color="primary" :disabled="!valid" @click="save">
+            <v-btn
+              v-t="['virtual:column:edit']"
+              x-small
+              color="primary"
+              :disabled="!valid"
+              @click="save"
+            >
               <!-- Save -->
               {{ $t('general.save') }}
             </v-btn>

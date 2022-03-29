@@ -38,8 +38,10 @@ import {
   publicDataExportApis,
   publicMetaApis
 } from './publicApis';
+import { Tele } from 'nc-help';
+import Server from 'socket.io';
 
-export default function(router: Router) {
+export default function(router: Router, server) {
   initStrategies(router);
   projectApis(router);
   utilApis(router);
@@ -76,4 +78,10 @@ export default function(router: Router) {
   router.use(hookFilterApis);
 
   userApis(router);
+
+  const io = new Server(server);
+  io.on('connection', socket => {
+    socket.on('page', args => Tele.page(args));
+    socket.on('event', args => Tele.event(args));
+  });
 }

@@ -39,6 +39,7 @@ import registerMetaApis from './meta/api';
 import NcPluginMgrv2 from './meta/helpers/NcPluginMgrv2';
 import User from '../noco-models/User';
 import { Tele } from 'nc-help';
+import * as http from 'http';
 
 const log = debug('nc:app');
 require('dotenv').config();
@@ -62,18 +63,22 @@ export default class Noco {
     return `${siteUrl}${Noco._this?.config?.dashboardPath}`;
   }
 
-  public static async init(args?: {
-    progressCallback?: Function;
-    registerRoutes?: Function;
-    registerGql?: Function;
-    registerContext?: Function;
-    afterMetaMigrationInit?: Function;
-  }): Promise<Router> {
+  public static async init(
+    args?: {
+      progressCallback?: Function;
+      registerRoutes?: Function;
+      registerGql?: Function;
+      registerContext?: Function;
+      afterMetaMigrationInit?: Function;
+    },
+    server?: http.Server,
+    app?: express.Express
+  ): Promise<Router> {
     if (Noco._this) {
       return Noco._this.router;
     }
     Noco._this = new Noco();
-    return Noco._this.init(args);
+    return Noco._this.init(args, server, app);
   }
 
   private static config: NcConfig;
@@ -146,13 +151,17 @@ export default class Noco {
     /******************* prints : end *******************/
   }
 
-  public async init(args?: {
-    progressCallback?: Function;
-    registerRoutes?: Function;
-    registerGql?: Function;
-    registerContext?: Function;
-    afterMetaMigrationInit?: Function;
-  }) {
+  public async init(
+    args?: {
+      progressCallback?: Function;
+      registerRoutes?: Function;
+      registerGql?: Function;
+      registerContext?: Function;
+      afterMetaMigrationInit?: Function;
+    },
+    server?: http.Server,
+    _app?: express.Express
+  ) {
     // @ts-ignore
     const {
       progressCallback
@@ -240,7 +249,7 @@ export default class Noco {
     // await this.metaMgrv2.initHandler(this.router);
 
     await NcPluginMgrv2.init(Noco.ncMeta);
-    registerMetaApis(this.router);
+    registerMetaApis(this.router, server);
 
     this.router.use(
       this.config.dashboardPath,

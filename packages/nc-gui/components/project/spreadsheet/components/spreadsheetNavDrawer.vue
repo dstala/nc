@@ -812,6 +812,7 @@ export default {
         return
       }
 
+      this.$te
       // const oldTitle = view.title
 
       this.$set(view, 'edit', false)

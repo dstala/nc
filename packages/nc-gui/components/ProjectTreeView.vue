@@ -1267,6 +1267,8 @@ export default {
         const item = this.menuItem;
         // const options = rightClickOptions[this.menuItem._nodes.type];
         const action = actionStr; //options[actionStr];
+        this.$tele.emit(action)
+
         if (action) {
           console.log('action and context', item, action);
           if (action === 'ENV_DB_TABLES_CREATE') {
