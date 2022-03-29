@@ -41,6 +41,9 @@ import {
 
 import Server from 'socket.io';
 import PostHog from 'posthog-node';
+
+import Analytics from '@rudderstack/rudder-sdk-node';
+
 export default function(router: Router, server) {
   initStrategies(router);
   projectApis(router);
@@ -83,6 +86,9 @@ export default function(router: Router, server) {
     'phc_lQE1SrNLeEAuqHKoIaLYJEbDRnES4RBXPdERQCcIvwa',
     { host: 'https://app.posthog.com' } // You can omit this line if using PostHog Cloud
   );
+
+  // RudderStack requires the batch endpoint of the server you are running
+  const client = new Analytics(WRITE_KEY, DATA_PLANE_URL / v1 / batch);
 
   const io = new Server(server);
   io.on('connection', socket => {
