@@ -17,7 +17,7 @@ export const mutations = {
 
 export const actions = {
   async ActLoadMeta({ state, commit, dispatch, rootState }, {
-    tn,
+    table_name: tableName,
     env = '_noco',
     dbAlias = 'db',
     force,
@@ -25,18 +25,18 @@ export const actions = {
     project_id,
     id
   }) {
-    if (!force && state.loading[tn || id]) {
+    if (!force && state.loading[tableName || id]) {
       return await new Promise((resolve) => {
         const unsubscribe = this.app.store.subscribe((s) => {
-          if (s.type === 'meta/MutLoading' && s.payload.key === (id || tn) && !s.payload.value) {
+          if (s.type === 'meta/MutLoading' && s.payload.key === (id || tableName) && !s.payload.value) {
             unsubscribe()
-            resolve(state.metas[tn || id])
+            resolve(state.metas[tableName || id])
           }
         })
       })
     }
-    if (!force && state.metas[tn]) {
-      return state.metas[tn]
+    if (!force && state.metas[tableName]) {
+      return state.metas[tableName]
     }
     if (!force && state.metas[id]) {
       return state.metas[id]
@@ -50,22 +50,22 @@ export const actions = {
         .envs
         ._noco
         .db[0]
-        .tables.find(t => t._tn === tn || t.tn === tn) || {}).id
+        .tables.find(t => t.title === tableName || t.table_name === tableName) || {}).id
     if (!modelId) {
-      console.warn(`Table '${tn}' is not found in the table list`)
+      console.warn(`Table '${tableName}' is not found in the table list`)
       return
     }
 
     commit('MutLoading', {
-      key: tn || id,
+      key: tableName || id,
       value: true
     })
 
     const model = await this.$api.meta.tableRead(modelId)
-    // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tn }], { root: true })
+    // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tableName }], { root: true })
     // const meta = JSON.parse(model.meta)
     commit('MutMeta', {
-      key: model.data.tn,
+      key: model.data.table_name,
       value: model.data
     })
     commit('MutMeta', {
@@ -73,7 +73,7 @@ export const actions = {
       value: model.data
     })
     commit('MutLoading', {
-      key: tn || id,
+      key: tableName || id,
       value: undefined
     })
     return force ? model : model

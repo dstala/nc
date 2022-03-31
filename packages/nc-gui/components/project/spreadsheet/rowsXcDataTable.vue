@@ -30,10 +30,10 @@
           <v-list dense>
             <v-list-item
               v-for="col in availableRealColumns"
-              :key="col.cn"
-              @click="searchField = col._cn"
+              :key="col.column_name"
+              @click="searchField = col.title"
             >
-              <span class="caption">{{ col._cn }}</span>
+              <span class="caption">{{ col.title }}</span>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -45,7 +45,7 @@
         <v-text-field
           v-model="searchQueryVal"
           autocomplete="new-password"
-          style="min-width: 100px ; width: 150px"
+          style="min-width: 100px ; width: 120px"
           flat
           dense
           solo
@@ -570,8 +570,8 @@
       <v-list dense>
         <template v-if="isEditable && !isLocked">
           <v-list-item
-            v-t="['record:right-click:insert']"
             v-if="relationType !== 'bt'"
+            v-t="['record:right-click:insert']"
             @click="insertNewRow(false)"
           >
             <span class="caption">
@@ -595,7 +595,7 @@
         <template v-if="rowContextMenu.col && !rowContextMenu.col.rqd && !rowContextMenu.col.virtual">
           <v-tooltip bottom>
             <template #activator="{on}">
-              <v-list-item v-on="on" v-t="['record:right-click:clear']" @click="clearCellValue">
+              <v-list-item v-t="['record:right-click:clear']" v-on="on" @click="clearCellValue">
                 <span class="caption">Clear</span>
               </v-list-item>
             </template>
@@ -609,7 +609,7 @@
           <span class="ml-3 grey&#45;&#45;text " style="font-size: 9px">Has Many</span>
 
           <v-list-item v-for="(hm,i) in meta.hasMany" :key="i" @click="addNewRelationTabCtxMenu(hm,'hm')">
-            <span class="caption text-capitalize">{{ hm._tn }}</span>
+            <span class="caption text-capitalize">{{ hm.title }}</span>
           </v-list-item>
         </template>
 
@@ -906,7 +906,7 @@ export default {
       this.loadingMeta = false
       // if (this.relationType === 'hm') {
       //   this.filters.push({
-      //     field: this.meta.columns.find(c => c.cn === this.relation.cn)._cn,
+      //     field: this.meta.columns.find(c => c.column_name === this.relation.column_name).title,
       //     op: 'is equal',
       //     value: this.relationIdValue,
       //     readOnly: true
@@ -914,7 +914,7 @@ export default {
       // } else if (this.relationType === 'bt') {
       //   this.filters.push({
       //     // field: this.relation.rcn,
-      //     field: this.meta.columns.find(c => c.cn === this.relation.rcn)._cn,
+      //     field: this.meta.columns.find(c => c.column_name === this.relation.rcn).title,
       //     op: 'is equal',
       //     value: this.relationIdValue,
       //     readOnly: true
@@ -1026,7 +1026,7 @@ export default {
         // await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableUpdate', {
         //   id: this.selectedViewId,
         //   query_params: queryParams,
-        //   tn: this.meta.tn,
+        //   tn: this.meta.table_name,
         //   view_name: this.$route.query.view
         // })
       } catch (e) {
@@ -1039,7 +1039,7 @@ export default {
     },
     async createTableIfNewTable() {
       if (this.nodes.newTable && !this.nodes.tableCreated) {
-        const columns = this.sqlUi.getNewTableColumns().filter(col => this.nodes.newTable.columns.includes(col.cn))
+        const columns = this.sqlUi.getNewTableColumns().filter(col => this.nodes.newTable.columns.includes(col.column_name))
         // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
         //   {
         //     env: this.nodes.env,
@@ -1047,8 +1047,8 @@ export default {
         //   },
         //   'tableCreate',
         //   {
-        //     tn: this.nodes.tn,
-        //     _tn: this.nodes._tn,
+        //     tn: this.nodes.table_name,
+        //     title: this.nodes.title,
         //     columns
         //   }])
 
@@ -1056,8 +1056,8 @@ export default {
           this.$store.state.project.projectId,
           this.$store.state.project.project.bases[0].id,
           {
-            tn: this.nodes.tn,
-            _tn: this.nodes._tn,
+            tn: this.nodes.table_name,
+            title: this.nodes.title,
             columns
           }
         )
@@ -1083,11 +1083,11 @@ export default {
       this.addNewRelationTab(
         obj,
         this.table,
-        this.meta._tn || this.table,
-        type === 'hm' ? obj.tn : obj.rtn,
-        type === 'hm' ? obj._tn : obj._rtn,
+        this.meta.title || this.table,
+        type === 'hm' ? obj.table_name : obj.rtn,
+        type === 'hm' ? obj.title : obj._rtn,
         // todo: column name alias
-        rowObj[type === 'hm' ? obj.rcn : obj._cn],
+        rowObj[type === 'hm' ? obj.rcn : obj.title],
         type,
         rowObj,
         rowObj[this.primaryValueColumn]
@@ -1096,7 +1096,7 @@ export default {
     changed(col, row) {
       this.$set(this.data[row].rowMeta, 'changed', this.data[row].rowMeta.changed || {})
       if (this.data[row].rowMeta) {
-        this.$set(this.data[row].rowMeta.changed, this.availableColumns[col].cn, true)
+        this.$set(this.data[row].rowMeta.changed, this.availableColumns[col].column_name, true)
       }
     },
     async save() {
@@ -1113,18 +1113,18 @@ export default {
             })
             if (this.meta.columns.every((col) => {
               return !col.ai
-            }) && pks.length && pks.every(col => !rowObj[col._cn] && !(col.columnDefault || col.default))) {
+            }) && pks.length && pks.every(col => !rowObj[col.title] && !(col.columnDefault || col.default))) {
               return this.$toast.info('Primary column is empty please provide some value').goAway(3000)
             }
             if (this.meta.columns.some((col) => {
-              return !col.ai && col.rqd && (rowObj[col._cn] === undefined || rowObj[col._cn] === null) && !col.cdf
+              return !col.ai && col.rqd && (rowObj[col.title] === undefined || rowObj[col.title] === null) && !col.cdf
             })) {
               return
             }
 
             const insertObj = this.meta.columns.reduce((o, col) => {
-              if (!col.ai && (rowObj && rowObj[col._cn]) !== null) {
-                o[col._cn] = rowObj && rowObj[col._cn]
+              if (!col.ai && (rowObj && rowObj[col.title]) !== null) {
+                o[col.title] = rowObj && rowObj[col.title]
               }
               return o
             }, {})
@@ -1167,10 +1167,10 @@ export default {
         return
       }
       const { row: rowObj, rowMeta, oldRow, saving, lastSave } = this.data[row]
-      if (!lastSave) { this.$set(this.data[row], 'lastSave', rowObj[column._cn]) }
+      if (!lastSave) { this.$set(this.data[row], 'lastSave', rowObj[column.title]) }
       if (rowMeta.new) {
         // return if there is no change
-        if ((column && oldRow[column._cn] === rowObj[column._cn]) || saving) {
+        if ((column && oldRow[column.title] === rowObj[column.title]) || saving) {
           return
         }
         await this.save()
@@ -1180,11 +1180,11 @@ export default {
           //   return
           // }
           // return if there is no change
-          if (oldRow[column._cn] === rowObj[column._cn] && ((lastSave || null) === rowObj[column._cn])) {
+          if (oldRow[column.title] === rowObj[column.title] && ((lastSave || null) === rowObj[column.title])) {
             return
           }
-          if (saved) { this.$set(this.data[row], 'lastSave', oldRow[column._cn]) }
-          const id = this.meta.columns.filter(c => c.pk).map(c => rowObj[c._cn]).join('___')
+          if (saved) { this.$set(this.data[row], 'lastSave', oldRow[column.title]) }
+          const id = this.meta.columns.filter(c => c.pk).map(c => rowObj[c.title]).join('___')
 
           if (!id) {
             return this.$toast.info('Update not allowed for table which doesn\'t have primary Key').goAway(3000)
@@ -1193,24 +1193,24 @@ export default {
 
           // eslint-disable-next-line promise/param-names
           const newData = (await this.$api.data.update(this.meta.id, id, {
-            [column._cn]: rowObj[column._cn],
+            [column.title]: rowObj[column.title],
             _cellSaved: saved
-          })).data// { [column._cn]: oldRow[column._cn] })
+          })).data// { [column.title]: oldRow[column.title] })
 
           // audit
           this.$api.meta.auditRowUpdate({
             fk_model_id: this.meta.id,
-            column_name: column._cn,
+            column_name: column.title,
             row_id: id,
-            value: rowObj[column._cn],
-            prev_value: oldRow[column._cn]
+            value: rowObj[column.title],
+            prev_value: oldRow[column.title]
           }).then(() => {
           })
 
           this.$set(this.data[row], 'row', { ...rowObj, ...newData })
 
-          this.$set(oldRow, column._cn, rowObj[column._cn])
-          /*    this.$toast.success(`${rowObj[this.primaryValueColumn] ? `${rowObj[this.primaryValueColumn]}'s c` : 'C'}olumn '${column.cn}' updated successfully.`, {
+          this.$set(oldRow, column.title, rowObj[column.title])
+          /*    this.$toast.success(`${rowObj[this.primaryValueColumn] ? `${rowObj[this.primaryValueColumn]}'s c` : 'C'}olumn '${column.column_name}' updated successfully.`, {
             position: 'bottom-center'
           }).goAway(3000) */
         } catch (e) {
@@ -1228,7 +1228,7 @@ export default {
       try {
         const rowObj = this.rowContextMenu.row
         if (!this.rowContextMenu.rowMeta.new) {
-          const id = this.meta && this.meta.columns && this.meta.columns.filter(c => c.pk).map(c => rowObj[c._cn]).join('___')
+          const id = this.meta && this.meta.columns && this.meta.columns.filter(c => c.pk).map(c => rowObj[c.title]).join('___')
 
           if (!id) {
             return this.$toast.info('Delete not allowed for table which doesn\'t have primary Key').goAway(3000)
@@ -1256,7 +1256,7 @@ export default {
             continue
           }
           if (!rowMeta.new) {
-            const id = this.meta.columns.filter(c => c.pk).map(c => rowObj[c._cn]).join('___')
+            const id = this.meta.columns.filter(c => c.pk).map(c => rowObj[c.title]).join('___')
 
             if (!id) {
               return this.$toast.info('Delete not allowed for table which doesn\'t have primary Key').goAway(3000)
@@ -1281,10 +1281,10 @@ export default {
         row,
         index
       } = this.rowContextMenu
-      if (row[col._cn] === null) {
+      if (row[col.title] === null) {
         return
       }
-      this.$set(this.data[index].row, col._cn, null)
+      this.$set(this.data[index].row, col.title, null)
       await this.onCellValueChange(colIndex, index, col, true)
     },
     async insertNewRow(atEnd = false, expand = false, presetValues = {}) {
@@ -1299,7 +1299,7 @@ export default {
                 ...o,
                 [f]: presetValues[f] ?? null
               }), {}),
-              [this.relation.cn]: this.relationIdValue
+              [this.relation.column_name]: this.relationIdValue
             }
           : this.fieldList.reduce((o, f) => ({
             ...o,
@@ -1354,40 +1354,14 @@ export default {
           break
       }
     },
-    async loadMeta(updateShowFields = true, col, oldCol) {
-      // update column name in column meta data
-      // if (oldCol && col) {
-      //   this.$set(this.columnsWidth, col, this.columnsWidth[oldCol])
-      //   this.$set(this.showFields, col, this.showFields[oldCol])
-      //   const i = (this.fieldsOrder || []).indexOf(oldCol)
-      //   if (i > -1) {
-      //     this.$set(this.fieldsOrder, i, col)
-      //   }
-      //   const s = (this.sortList || []).find(s => s.field === oldCol)
-      //   if (s) {
-      //     this.$set(s, 'field', col)
-      //   }
-      // }
-
+    async loadMeta() {
       // load latest table meta
-      const tableMeta = await this.$store.dispatch('meta/ActLoadMeta', {
+      await this.$store.dispatch('meta/ActLoadMeta', {
         env: this.nodes.env,
         dbAlias: this.nodes.dbAlias,
-        tn: this.table,
+        table_name: this.table,
         force: true
       })
-
-      // // update column visibility
-      // if (updateShowFields) {
-      //   try {
-      //     const qp = JSON.parse(tableMeta.query_params)
-      //     this.showFields = qp.showFields || this.showFields
-      //     if (col) {
-      //       this.$set(this.showFields, col, true)
-      //     }
-      //   } catch (e) {
-      //   }
-      // }
     },
     clickPagination() {
       this.loadTableData()
@@ -1423,7 +1397,7 @@ export default {
           {
             orgs: 'noco',
             projectName: this.$store.state.project.project.title,
-            tableAlias: this.meta._tn,
+            tableAlias: this.meta.title,
             viewName: this.selectedView.title
           },
           {
@@ -1522,12 +1496,11 @@ export default {
         }
 
         if (this.api) {
-          const groupingColumn = this.meta.columns.find(c => c._cn === this.groupingField)
+          const groupingColumn = this.meta.columns.find(c => c.title === this.groupingField)
 
           if (!groupingColumn) {
             return
           }
-
           const initialLimit = 10
           const uncategorized = 'Uncategorized'
 
@@ -1550,7 +1523,7 @@ export default {
               })
               data.forEach((d) => {
                 // handle composite primary key
-                d.c_pk = this.meta.columns.filter(c => c.pk).map(c => d[c._cn]).join('___')
+                d.c_pk = this.meta.columns.filter(c => c.pk).map(c => d[c.title]).join('___')
                 if (!d.id) {
                   // id is required for <kanban-board/>
                   d.id = d.c_pk
@@ -1604,7 +1577,7 @@ export default {
       })
       data.map((d) => {
         // handle composite primary key
-        d.c_pk = this.meta.columns.filter(c => c.pk).map(c => d[c._cn]).join('___')
+        d.c_pk = this.meta.columns.filter(c => c.pk).map(c => d[c.title]).join('___')
         if (!d.id) {
           // id is required for <kanban-board/>
           d.id = d.c_pk
@@ -1732,9 +1705,9 @@ export default {
       return this.meta && this.$ncApis.get({
         env: this.nodes.env,
         dbAlias: this.nodes.dbAlias,
-        table: this.meta.tn
+        table: this.meta.table_name
       })
-      // return this.meta && this.meta._tn ? ApiFactory.create(this.$store.getters['project/GtrProjectType'], this.meta && this.meta._tn, this.meta && this.meta.columns, this, this.meta) : null
+      // return this.meta && this.meta.title ? ApiFactory.create(this.$store.getters['project/GtrProjectType'], this.meta && this.meta.title, this.meta && this.meta.columns, this, this.meta) : null
     }
   }
 }

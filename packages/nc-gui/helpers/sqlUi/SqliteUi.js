@@ -426,7 +426,7 @@ export class SqliteUi {
     // console.log(col);
     if (col.dt === 'integer') {
       for (let i = 0; i < columns.length; ++i) {
-        if (columns[i].cn !== col.cn && columns[i].ai) {
+        if (columns[i].column_name !== col.column_name && columns[i].ai) {
           return true
         }
       }
@@ -475,9 +475,9 @@ export class SqliteUi {
         columns[i].dt === 'smallint' ||
         columns[i].dt === 'mediumint'))) {
         columns[i].un = false
-        console.log('>> resetting unsigned value', columns[i].cn)
+        console.log('>> resetting unsigned value', columns[i].column_name)
       }
-      console.log(columns[i].cn)
+      console.log(columns[i].column_name)
     }
   }
 

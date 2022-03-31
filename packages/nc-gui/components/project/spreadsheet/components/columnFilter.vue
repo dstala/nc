@@ -147,9 +147,9 @@
             >
               <template #item="{item}">
                 <span
-                  :class="`caption font-weight-regular nc-filter-fld-${item._cn}`"
+                  :class="`caption font-weight-regular nc-filter-fld-${item.title}`"
                 >
-                  {{ item._cn }}
+                  {{ item.title }}
                 </span>
               </template>
             </v-select>
@@ -210,7 +210,8 @@
     <v-btn
       small
       class="elevation-0 grey--text my-3"
-      @click.stop="addFilter">
+      @click.stop="addFilter"
+    >
       <v-icon small color="grey">
         mdi-plus
       </v-icon>
@@ -327,10 +328,10 @@ export default {
         switch (col.uidt) {
           case UITypes.Number:
           case UITypes.Decimal:
-            obj[col._cn] = obj[col.cn] = 'number'
+            obj[col.title] = obj[col.column_name] = 'number'
             break
           case UITypes.Checkbox:
-            obj[col._cn] = obj[col.cn] = 'boolean'
+            obj[col.title] = obj[col.column_name] = 'boolean'
             break
           default:
             break
@@ -453,7 +454,7 @@ export default {
       this.saveOrUpdate(this.filters[index], index)
     },
     filterUpdateCondition(filter, i) {
-      this.saveOrUpdate(filter, i);
+      this.saveOrUpdate(filter, i)
       this.$tele.emit(`filter:condition:${filter.logical_op}:${filter.comparison_op}`)
     },
     async saveOrUpdate(filter, i) {

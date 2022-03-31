@@ -107,7 +107,7 @@
         :db-alias="nodes.dbAlias"
         :has-many="childMeta.hasMany"
         :belongs-to="childMeta.belongsTo"
-        :table="childMeta.tn"
+        :table="childMeta.table_name"
         :old-row="{...selectedChild}"
         :meta="childMeta"
         :primary-value-column="childPrimaryCol"
@@ -201,10 +201,10 @@ export default {
       //   id: this.column.colOptions.fk_related_model_id
       // })
       //
-      // return this.childMeta && this.childMeta._tn
+      // return this.childMeta && this.childMeta.title
       //   ? ApiFactory.create(
       //     this.$store.getters['project/GtrProjectType'],
-      //     this.childMeta._tn,
+      //     this.childMeta.title,
       //     this.childMeta.columns,
       //     this,
       //     this.childMeta
@@ -218,10 +218,10 @@ export default {
       //   dbAlias: this.nodes.dbAlias,
       //   id: this.column.colOptions.fk_mm_model_id
       // })
-      // return this.assocMeta && this.assocMeta._tn
+      // return this.assocMeta && this.assocMeta.title
       //   ? ApiFactory.create(
       //     this.$store.getters['project/GtrProjectType'],
-      //     this.assocMeta._tn,
+      //     this.assocMeta.title,
       //     this.assocMeta.columns,
       //     this,
       //     this.assocMeta
@@ -229,19 +229,19 @@ export default {
       //   : null
     },
     childPrimaryCol() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {}).title
     },
     childPrimaryKey() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {}).title
     },
     parentPrimaryKey() {
-      return this.meta && (this.meta.columns.find(c => c.pk) || {})._cn
+      return this.meta && (this.meta.columns.find(c => c.pk) || {}).title
     },
     childQueryParams() {
       if (!this.childMeta) { return {} }
       // todo: use reduce
       return {
-        hm: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.hm).map(({ hm }) => hm.tn).join()) || '',
+        hm: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.hm).map(({ hm }) => hm.table_name).join()) || '',
         bt: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.bt).map(({ bt }) => bt.rtn).join()) || '',
         mm: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.mm).map(({ mm }) => mm.rtn).join()) || ''
       }
@@ -249,9 +249,9 @@ export default {
     conditionGraph() {
       // if (!this.childMeta || !this.assocMeta) { return null }
       // return {
-      //   [this.assocMeta.tn]: {
+      //   [this.assocMeta.table_name]: {
       //     relationType: 'hm',
-      //     [this.assocMeta.columns.find(c => c.cn === this.mm.vcn).cn]: {
+      //     [this.assocMeta.columns.find(c => c.column_name === this.mm.vcn).column_name]: {
       //       eq: this.row[this.parentPrimaryKey]
       //     }
       //   }
@@ -263,7 +263,7 @@ export default {
 
       const columns = []
       if (this.childMeta.columns) {
-        columns.push(...this.childMeta.columns.filter(c => !(c.pk && c.ai) && !hideCols.includes(c.cn) && !((this.childMeta.v || []).some(v => v.bt && v.bt.cn === c.cn))))
+        columns.push(...this.childMeta.columns.filter(c => !(c.pk && c.ai) && !hideCols.includes(c.column_name) && !((this.childMeta.v || []).some(v => v.bt && v.bt.column_name === c.column_name))))
       }
       if (this.childMeta.v) {
         columns.push(...this.childMeta.v.map(v => ({ ...v, virtual: 1 })))
@@ -316,15 +316,15 @@ export default {
       }
       await Promise.all([this.loadChildMeta(), this.loadAssociateTableMeta()])
 
-      // const _pcn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
-      // const _ccn = this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id)._cn
+      // const _pcn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id).title
+      // const _ccn = this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id).title
       //
-      // const apcn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id).cn
-      // const accn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id).cn
+      // const apcn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id).column_name
+      // const accn = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id).column_name
 
-      const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-      const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
-      // const id = this.assocMeta.columns.filter(c => c.cn === apcn || c.cn === accn).map(c => c.cn === apcn ? this.row[_pcn] : child[_ccn]).join('___')
+      const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
+      const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c.title]).join('___')
+      // const id = this.assocMeta.columns.filter(c => c.column_name === apcn || c.column_name === accn).map(c => c.column_name === apcn ? this.row[_pcn] : child[_ccn]).join('___')
       // await this.assocApi.delete(id)
       // await this.$api.data.delete(this.assocMeta.id, id)
       await this.$api.data.nestedDelete(
@@ -347,7 +347,7 @@ export default {
         if (act === 'hideDialog') {
           this.dialogShow = false
         } else {
-          const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
+          const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
           await this.childApi.delete(id)
           this.dialogShow = false
           this.$emit('loadTableData')
@@ -405,11 +405,11 @@ export default {
         this.newRecordModal = false
         return
       }
-      const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-      const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
+      const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
+      const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c.title]).join('___')
 
-      // const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id)._cn
-      // const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id)._cn
+      // const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id).title
+      // const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id).title
 
       await this.$api.data.nestedAdd(
         this.meta.id,
@@ -449,7 +449,7 @@ export default {
             c.colOptions.fk_parent_column_id === this.column.colOptions.fk_child_column_id &&
             c.colOptions.fk_mm_model_id === this.column.colOptions.fk_mm_model_id &&
             c.colOptions.type === RelationTypes.MANY_TO_MANY
-        ) || {})._cn]: [this.row]
+        ) || {}).title]: [this.row]
       }
       this.expandFormModal = true
       setTimeout(() => {
@@ -471,11 +471,11 @@ export default {
       while (child = this.localState.pop()) {
         if (row) {
           // todo: use common method
-          const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-          const pid = this.meta.columns.filter(c => c.pk).map(c => row[c._cn]).join('___')
+          const cid = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
+          const pid = this.meta.columns.filter(c => c.pk).map(c => row[c.title]).join('___')
 
-          const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id)._cn
-          const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id)._cn
+          const vcidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_parent_column_id).title
+          const vpidCol = this.assocMeta.columns.find(c => c.id === this.column.colOptions.fk_mm_child_column_id).title
           await this.assocApi.insert({
             [vcidCol]: parseIfInteger(cid),
             [vpidCol]: parseIfInteger(pid)

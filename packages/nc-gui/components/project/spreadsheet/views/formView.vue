@@ -63,7 +63,7 @@
                 @mouseup="handleMouseUp(col)"
               >
                 <div class="d-flex">
-                  <label :for="`data-table-form-${col._cn}`" class="body-2 text-capitalize flex-grow-1">
+                  <label :for="`data-table-form-${col.title}`" class="body-2 text-capitalize flex-grow-1">
                     <virtual-header-cell
                       v-if="isVirtualCol(col)"
                       class="caption"
@@ -76,7 +76,7 @@
                       v-else
                       class="caption"
                       :is-form="true"
-                      :value="col._cn"
+                      :value="col.title"
                       :column="col"
                       :sql-ui="sqlUi"
                     />
@@ -197,7 +197,7 @@
                     <div
                       v-if="localParams.fields && localParams.fields[col.alias]"
                       :class="{
-                        'active-row' : active === col._cn,
+                        'active-row' : active === col.title,
                         required: isRequired(col, localState, localParams.fields[col.alias].required)
                       }"
                     >
@@ -216,6 +216,7 @@
                           </label>
                           <v-switch
                             v-model="col.required"
+                            v-t="['form-view:field:mark-required']"
                             class="nc-required-switch ml-1 mt-0"
                             hide-details
                             flat
@@ -223,7 +224,6 @@
                             dense
                             inset
                             @change="updateColMeta(col,i)"
-                            v-t="['form-view:field:mark-required']"
                           />
                         </div>
                         <!--placeholder=" Enter form input label"-->
@@ -246,13 +246,13 @@
                       </div>
                       <label
                         :class="{'nc-show' : !isActiveRow(col)}"
-                        :for="`data-table-form-${col._cn}`"
+                        :for="`data-table-form-${col.title}`"
                         class="body-2 text-capitalize nc-field-labels"
                       >
                         <virtual-header-cell
                           v-if="isVirtualCol(col)"
                           class="caption"
-                          :column="{...col, _cn: col.label || col._cn}"
+                          :column="{...col, _cn: col.label || col.title}"
                           :nodes="nodes"
                           :is-form="true"
                           :meta="meta"
@@ -262,7 +262,7 @@
                           v-else
                           class="caption"
                           :is-form="true"
-                          :value="col.label || col._cn"
+                          :value="col.label || col.title"
                           :column="col"
                           :sql-ui="sqlUi"
                           :required="isRequired(col, localState, localParams.fields[col.alias].required)"
@@ -299,10 +299,10 @@
 
                         <!-- todo: optimize -->
                         <template
-                          v-if="col.bt && $v.localState && $v.localState.$dirty && $v.localState[meta.columns.find(c => c.cn === col.bt.cn)._cn]"
+                          v-if="col.bt && $v.localState && $v.localState.$dirty && $v.localState[meta.columns.find(c => c.column_name === col.bt.column_name).title]"
                         >
                           <div
-                            v-if="!$v.localState[meta.columns.find(c => c.cn === col.bt.cn)._cn].required"
+                            v-if="!$v.localState[meta.columns.find(c => c.column_name === col.bt.column_name).title].required"
                             class="error--text caption"
                           >
                             Field is required.
@@ -311,7 +311,7 @@
                       </div>
                       <template v-else>
                         <div
-                          v-if="col.ai || (col.pk && !isNew) || disabledColumns[col._cn]"
+                          v-if="col.ai || (col.pk && !isNew) || disabledColumns[col.title]"
                           style="height:100%; width:100%"
                           class="caption xc-input"
                           @click.stop
@@ -321,7 +321,7 @@
                             style="height:100%; width: 100%"
                             readonly
                             disabled
-                            :value="localState[col._cn]"
+                            :value="localState[col.title]"
                           >
                         </div>
 
@@ -330,8 +330,8 @@
                           @click.stop
                         >
                           <editable-cell
-                            :id="`data-table-form-${col._cn}`"
-                            v-model="localState[col._cn]"
+                            :id="`data-table-form-${col.title}`"
+                            v-model="localState[col.title]"
                             :db-alias="dbAlias"
                             :column="col"
                             class="xc-input body-2"
@@ -339,12 +339,12 @@
                             :sql-ui="sqlUi"
                             is-form
                             :hint="col.description"
-                            @focus="active = col._cn"
+                            @focus="active = col.title"
                             @blur="active = ''"
                           />
                         </div>
-                        <template v-if="$v.localState&& $v.localState.$dirty && $v.localState[col._cn] ">
-                          <div v-if="!$v.localState[col._cn].required" class="error--text caption">
+                        <template v-if="$v.localState&& $v.localState.$dirty && $v.localState[col.title] ">
+                          <div v-if="!$v.localState[col.title].required" class="error--text caption">
                             Field is required.
                           </div>
                         </template>
@@ -398,12 +398,12 @@
 
                 <v-switch
                   v-model="view.submit_another_form"
+                  v-t="[`form-view:option:submit-another-form`]"
                   dense
                   inset
                   hide-details
                   class="nc-switch"
                   @change="updateView"
-                  v-t="[`form-view:option:submit-another-form`]"
                 >
                   <template #label>
                     <span class="font-weight-bold grey--text caption">
@@ -414,12 +414,12 @@
                 </v-switch>
                 <v-switch
                   v-model="view.show_blank_form"
+                  v-t="[`form-view:option:show-blank-form`]"
                   dense
                   inset
                   hide-details
                   class="nc-switch"
                   @change="updateView"
-                  v-t="[`form-view:option:show-blank-form`]"
                 >
                   <template #label>
                     <span class="font-weight-bold grey--text caption">
@@ -430,11 +430,11 @@
                 </v-switch>
                 <v-switch
                   v-model="emailMe"
+                  v-t="[`form-view:option:email-me`]"
                   dense
                   inset
                   hide-details
                   class="nc-switch"
-                  v-t="[`form-view:option:email-me`]"
                 >
                   <template #label>
                     <span class="caption font-weight-bold grey--text ">
@@ -516,11 +516,11 @@ export default {
         continue
       }
       if (!column.virtual && (((column.rqd || column.notnull) && !column.default) || (column.pk && !(column.ai || column.default)) || this.localParams.fields[column.alias].required)) {
-        obj.localState[column._cn] = { required }
+        obj.localState[column.title] = { required }
       } else if (column.bt) {
-        const col = this.meta.columns.find(c => c.cn === column.bt.cn)
+        const col = this.meta.columns.find(c => c.column_name === column.bt.column_name)
         if ((col.rqd && !col.default) || this.localParams.fields[column.alias].required) {
-          obj.localState[col._cn] = { required }
+          obj.localState[col.title] = { required }
         }
       } else if (column.virtual && this.localParams.fields[column.alias].required && (column.mm || column.hm)) {
         obj.virtual[column.alias] = {
@@ -558,7 +558,7 @@ export default {
       }
     },
     allColumnsLoc() {
-      return this.fields// this.mets.columns.filter(c => !hiddenCols.includes(c.cn) && !(c.pk && c.ai) && this.meta.belongsTo.every(bt => c.cn !== bt.cn))
+      return this.fields// this.mets.columns.filter(c => !hiddenCols.includes(c.column_name) && !(c.pk && c.ai) && this.meta.belongsTo.every(bt => c.column_name !== bt.column_name))
     },
     isEditable() {
       return this._isUIAllowed('editFormView')
@@ -607,7 +607,7 @@ export default {
   },
   mounted() {
     const localParams = Object.assign({
-      name: this.meta._tn,
+      name: this.meta.title,
       description: 'Form view description',
       submit: {},
       emailMe: {},
@@ -618,7 +618,7 @@ export default {
     })
     this.localParams = localParams
     // this.columns = [...this.availableColumns]
-    // this.hiddenColumns = this.meta.columns.filter(c => this.availableColumns.find(c1 => c.cn === c1.cn && c._cn === c1._cn))
+    // this.hiddenColumns = this.meta.columns.filter(c => this.availableColumns.find(c1 => c.column_name === c1.column_name && c.title === c1.title))
   },
   methods: {
     onMove(event) {
@@ -677,7 +677,7 @@ export default {
           show
         })).data.id
       }
-      this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+      this.$emit('update:fieldsOrder', this.fields.map(c => c.title))
     },
     async updateColMeta(col, i) {
       if (col.id) {
@@ -703,7 +703,7 @@ export default {
       const meta = this.$store.state.meta.metas[this.meta.id]
       this.fields = meta.columns.map(c => ({
         ...c,
-        alias: c._cn,
+        alias: c.title,
         fk_column_id: c.id,
         fk_view_id: this.viewId,
         ...(fieldById[c.id] ? fieldById[c.id] : {}),
@@ -717,9 +717,9 @@ export default {
     //   let order = 1
     //   const fieldById = this.formColumns.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
     //   this.fields = this.meta.columns.map(c => ({
-    //     _cn: c._cn,
+    //     _cn: c.title,
     //     uidt: c.uidt,
-    //     alias: c._cn,
+    //     alias: c.title,
     //     fk_column_id: c.id,
     //     ...(fieldById[c.id] ? fieldById[c.id] : {}),
     //     order: (fieldById[c.id] && fieldById[c.id].order) || order++
@@ -852,7 +852,7 @@ export default {
         }
 
         this.loading = true
-        // const id = this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___')
+        // const id = this.meta.columns.filter(c => c.pk).map(c => this.localState[c.title]).join('___')
 
         // const updatedObj = Object.keys(this.changedColumns).reduce((obj, col) => {
         //   obj[col] = this.localState[col]

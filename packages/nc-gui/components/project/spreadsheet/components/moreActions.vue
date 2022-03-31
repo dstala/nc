@@ -28,9 +28,9 @@
 
       <v-list dense>
         <v-list-item
+          v-t="['actions:download-csv']"
           dense
           @click="exportCsv"
-          v-t="['actions:download-csv']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1">
@@ -44,9 +44,9 @@
         </v-list-item>
         <v-list-item
           v-if="_isUIAllowed('csvImport') && !isView"
+          v-t="['actions:upload-csv']"
           dense
           @click="importModal = true"
-          v-t="['actions:upload-csv']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1" color="">
@@ -64,9 +64,9 @@
         </v-list-item>
         <v-list-item
           v-if="_isUIAllowed('csvImport') && !isView"
+          v-t="['actions:shared-view-list']"
           dense
           @click="$emit('showAdditionalFeatOverlay', 'shared-views')"
-          v-t="['actions:shared-view-list']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1" color="">
@@ -80,9 +80,9 @@
         </v-list-item>
         <v-list-item
           v-if="_isUIAllowed('csvImport') && !isView"
+          v-t="['actions:webhook:trigger']"
           dense
           @click="$emit('webhook')"
-          v-t="['actions:webhook:trigger']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1" color="">
@@ -163,22 +163,22 @@ export default {
             let prop, cn
             if (col.mm || (col.lk && col.lk.type === 'mm')) {
               const tn = col.mm ? col.mm.rtn : col.lk.ltn
-              const _tn = col.mm ? col.mm._rtn : col.lk._ltn
+              const title = col.mm ? col.mm._rtn : col.lk._ltn
               await this.$store.dispatch('meta/ActLoadMeta', {
                 env: this.nodes.env,
                 dbAlias: this.nodes.dbAlias,
                 tn
               })
 
-              prop = `${_tn}MMList`
+              prop = `${title}MMList`
               cn = col.lk
                 ? col.lk._lcn
-                : (this.$store.state.meta.metas[tn].columns.find(c => c.pv) || this.$store.state.meta.metas[tn].columns.find(c => c.pk) || {})._cn
+                : (this.$store.state.meta.metas[tn].columns.find(c => c.pv) || this.$store.state.meta.metas[tn].columns.find(c => c.pk) || {}).title
 
-              row[col._cn] = r.row[prop] && r.row[prop].map(r => cn && r[cn])
+              row[col.title] = r.row[prop] && r.row[prop].map(r => cn && r[cn])
             } else if (col.hm || (col.lk && col.lk.type === 'hm')) {
-              const tn = col.hm ? col.hm.tn : col.lk.ltn
-              const _tn = col.hm ? col.hm._tn : col.lk._ltn
+              const tn = col.hm ? col.hm.table_name : col.lk.ltn
+              const title = col.hm ? col.hm.title : col.lk._ltn
 
               await this.$store.dispatch('meta/ActLoadMeta', {
                 env: this.nodes.env,
@@ -186,51 +186,51 @@ export default {
                 tn
               })
 
-              prop = `${_tn}List`
+              prop = `${title}List`
               cn = col.lk
                 ? col.lk._lcn
                 : (this.$store.state.meta.metas[tn].columns.find(c => c.pv) ||
-                  this.$store.state.meta.metas[tn].columns.find(c => c.pk))._cn
-              row[col._cn] = r.row[prop] && r.row[prop].map(r => cn && r[cn])
+                  this.$store.state.meta.metas[tn].columns.find(c => c.pk)).title
+              row[col.title] = r.row[prop] && r.row[prop].map(r => cn && r[cn])
             } else if (col.bt || (col.lk && col.lk.type === 'bt')) {
               const tn = col.bt ? col.bt.rtn : col.lk.ltn
-              const _tn = col.bt ? col.bt._rtn : col.lk._ltn
+              const title = col.bt ? col.bt._rtn : col.lk._ltn
               await this.$store.dispatch('meta/ActLoadMeta', {
                 env: this.nodes.env,
                 dbAlias: this.nodes.dbAlias,
                 tn
               })
 
-              prop = `${_tn}Read`
+              prop = `${title}Read`
               cn = col.lk
                 ? col.lk._lcn
                 : (this.$store.state.meta.metas[tn].columns.find(c => c.pv) ||
-                  this.$store.state.meta.metas[tn].columns.find(c => c.pk) || {})._cn
-              row[col._cn] = r.row[prop] &&
+                  this.$store.state.meta.metas[tn].columns.find(c => c.pk) || {}).title
+              row[col.title] = r.row[prop] &&
                 r.row[prop] && cn && r.row[prop][cn]
             } else {
-              row[col._cn] = r.row[col._cn]
+              row[col.title] = r.row[col.title]
             }
           } else if (col.uidt === 'Attachment') {
             let data = []
             try {
-              if (typeof r.row[col._cn] === 'string') {
-                data = JSON.parse(r.row[col._cn])
-              } else if (r.row[col._cn]) {
-                data = r.row[col._cn]
+              if (typeof r.row[col.title] === 'string') {
+                data = JSON.parse(r.row[col.title])
+              } else if (r.row[col.title]) {
+                data = r.row[col.title]
               }
             } catch {
             }
-            row[col._cn] = (data || []).map(a => `${a.title}(${a.url})`)
+            row[col.title] = (data || []).map(a => `${a.title}(${a.url})`)
           } else {
-            row[col._cn] = r.row[col._cn]
+            row[col.title] = r.row[col.title]
           }
         }
         return row
       }))
     },
     async exportCsv() {
-      // const fields = this.availableColumns.map(c => c._cn)
+      // const fields = this.availableColumns.map(c => c.title)
       // const blob = new Blob([Papaparse.unparse(await this.extractCsvData())], { type: 'text/plain;charset=utf-8' })
 
       let offset = 0
@@ -255,7 +255,7 @@ export default {
           //         }
           //       : {
           //           view_name: this.selectedView.title,
-          //           model_name: this.meta.tn
+          //           model_name: this.meta.table_name
           //         })
           //   },
           //   null,
@@ -279,7 +279,7 @@ export default {
 
           offset = +res.headers['nc-export-offset']
           const blob = new Blob([data], { type: 'text/plain;charset=utf-8' })
-          FileSaver.saveAs(blob, `${this.meta._tn}_exported_${c++}.csv`)
+          FileSaver.saveAs(blob, `${this.meta.title}_exported_${c++}.csv`)
           if (offset > -1) {
             this.$toast.info('Downloading more files').goAway(3000)
           } else {
@@ -294,7 +294,7 @@ export default {
     async importData(columnMappings) {
       try {
         const api = this.$ncApis.get({
-          table: this.meta.tn
+          table: this.meta.table_name
         })
 
         const data = this.parsedCsv.data
@@ -302,7 +302,7 @@ export default {
           const batchData = data.slice(i, i + 500).map(row => columnMappings.reduce((res, col) => {
             // todo: parse data
             if (col.enabled && col.destCn) {
-              const v = this.meta && this.meta.columns.find(c => c._cn === col.destCn)
+              const v = this.meta && this.meta.columns.find(c => c.title === col.destCn)
               let input = row[col.sourceCn]
               // parse potential boolean values
               if (v.uidt == UITypes.Checkbox) {

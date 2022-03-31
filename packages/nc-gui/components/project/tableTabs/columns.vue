@@ -19,7 +19,7 @@
                        href: '#'
                      },
                      {
-                       text: nodes._tn + ' (table)',
+                       text: nodes.title + ' (table)',
                        disabled: true,
                        href: '#'
                      }]"
@@ -328,10 +328,10 @@
         </template>
 
         <template #item="props">
-          <tr :disabled="nodes.tn==='_evolutions' || nodes.tn==='nc_evolutions'">
+          <tr :disabled="nodes.table_name==='_evolutions' || nodes.table_name==='nc_evolutions'">
             <td
               ref="column"
-              :title="props.item.cn"
+              :title="props.item.column_name"
               style="width:200px"
             >
               <div class="d-flex">
@@ -356,16 +356,16 @@
                   @close="saveColumnName(props.item)"
                 >
                   <div
-                    :title="props.item.cn"
+                    :title="props.item.column_name"
                     style="width:180px;overflow:hidden;white-space: nowrap;text-overflow:ellipsis"
                   >
                     {{
-                      props.item.cn
+                      props.item.column_name
                     }}
                   </div>
                   <template #input>
                     <v-text-field
-                      v-model="props.item.cn"
+                      v-model="props.item.column_name"
                       :disabled="props.item.rcn || !sqlUi.columnEditable(props.item)"
                       :rules="form.validation.required"
                       :label="$t('general.edit')"
@@ -373,7 +373,7 @@
                     />
                   </template>
                 </v-edit-dialog>
-                <span v-else @click="onFKShowWarning">{{ props.item.cn }}</span>
+                <span v-else @click="onFKShowWarning">{{ props.item.column_name }}</span>
               </div>
             </td>
             <td class="pa-0">
@@ -794,7 +794,7 @@ export default {
           'projectGenerateBackend',
           {
             env: '_noco',
-            tn: this.nodes.tn,
+            table_name: this.nodes.table_name,
             scaffold
           }
         ])
@@ -817,7 +817,7 @@ export default {
           'projectGenerateBackendGql',
           {
             env: '_noco',
-            tn: this.nodes.tn,
+            tn: this.nodes.table_name,
             scaffold
           }
         ])
@@ -849,15 +849,15 @@ export default {
     },
     loadJsonColumn(jsonString) {
       try {
-        const columns = this.sqlUi.getColumnsFromJson(JSON5.parse(jsonString), this.nodes.tn)
-        const dup = columns.find(col => this.columns.some(exCol => exCol.cn === col.cn))
+        const columns = this.sqlUi.getColumnsFromJson(JSON5.parse(jsonString), this.nodes.table_name)
+        const dup = columns.find(col => this.columns.some(exCol => exCol.column_name === col.column_name))
         if (!dup) {
           this.columns = [...this.columns, ...columns]
           this.showJsonToColumDlg = false
           this.edited = true
           this.$toast.info(`${columns.length} column${columns.length > 1 ? 's' : ''} added`).goAway(3000)
         } else {
-          this.$toast.error(`Duplicate column found : ${dup.cn}`).goAway(3000)
+          this.$toast.error(`Duplicate column found : ${dup.column_name}`).goAway(3000)
         }
       } catch (e) {
         console.log(e)
@@ -960,7 +960,7 @@ export default {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias
         }, 'columnList', {
-          tn: this.nodes.tn
+          tn: this.nodes.table_name
         }])
         const columns = result.data.list
 
@@ -968,7 +968,7 @@ export default {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias
         }, 'xcRelationList', {
-          tn: this.nodes.tn
+          tn: this.nodes.table_name
         }])
 
         for (let i = 0; i < relations.length; i++) {
@@ -976,7 +976,7 @@ export default {
           for (let i = 0; i < columns.length; i++) {
             const column = columns[i]
 
-            if (column.cn === relation.cn) {
+            if (column.column_name === relation.column_name) {
               columns[i] = { ...column, ...relation }
             }
           }
@@ -1095,7 +1095,7 @@ export default {
               env: this.nodes.env,
               dbAlias: this.nodes.dbAlias
             }, 'tableUpdate', {
-              tn: this.nodes.tn,
+              tn: this.nodes.table_name,
               originalColumns: this.originalColumns,
               columns
             }])
@@ -1150,7 +1150,7 @@ export default {
             },
             'tableCreate',
             {
-              tn: this.nodes.tn,
+              tn: this.nodes.table_name,
               columns: this.columns
             }])
           this.mtdNewTableUpdate(false)
@@ -1166,7 +1166,7 @@ export default {
             env: this.nodes.env,
             dbAlias: this.nodes.dbAlias
           }, 'tableUpdate', {
-            tn: this.nodes.tn,
+            tn: this.nodes.table_name,
             originalColumns: this.originalColumns,
             columns: this.columns
           }])
@@ -1235,8 +1235,8 @@ export default {
             },
             this.selectedColForRelationDelete.type === 'virtual' ? 'xcVirtualRelationDelete' : 'relationDelete',
             {
-              childColumn: this.selectedColForRelationDelete.cn,
-              childTable: this.nodes.tn,
+              childColumn: this.selectedColForRelationDelete.column_name,
+              childTable: this.nodes.table_name,
               parentTable: this.selectedColForRelationDelete
                 .rtn,
               parentColumn: this.selectedColForRelationDelete

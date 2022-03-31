@@ -17,7 +17,9 @@ export async function substituteColumnAliasWithIdInFormula(
       const colNameOrId = pt.name;
       const column = columns.find(
         c =>
-          c.id === colNameOrId || c.cn === colNameOrId || c._cn === colNameOrId
+          c.id === colNameOrId ||
+          c.column_name === colNameOrId ||
+          c.title === colNameOrId
       );
       pt.name = column.id;
     } else if (pt.type === 'BinaryExpression') {
@@ -46,7 +48,9 @@ export function substituteColumnIdWithAliasInFormula(
       const colNameOrId = pt.name;
       const column = columns.find(
         c =>
-          c.id === colNameOrId || c.cn === colNameOrId || c._cn === colNameOrId
+          c.id === colNameOrId ||
+          c.column_name === colNameOrId ||
+          c.title === colNameOrId
       );
       pt.name = column.id;
     } else if (pt.type === 'BinaryExpression') {

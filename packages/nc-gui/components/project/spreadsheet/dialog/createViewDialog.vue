@@ -95,11 +95,11 @@ export default {
       //   showFields = { [this.primaryValueColumn]: true }
       //   attachmentCol = this.meta.columns.find(c => c.uidt === 'Attachment')
       //   if (attachmentCol) {
-      //     showFields[attachmentCol.cn] = true
+      //     showFields[attachmentCol.column_name] = true
       //   }
       //   this.meta.columns.forEach((c) => {
       //     if (c.pk) {
-      //       showFields[c.cn] = true
+      //       showFields[c.column_name] = true
       //     }
       //   })
       // }
@@ -108,11 +108,11 @@ export default {
       //   showFields = { [this.primaryValueColumn]: true }
       //   singleSelectCol = this.meta.columns.find(c => c.uidt === 'SingleSelect')
       //   if (singleSelectCol) {
-      //     showFields[singleSelectCol.cn] = true
+      //     showFields[singleSelectCol.column_name] = true
       //   }
       //   this.meta.columns.forEach((c) => {
       //     if (c.pk) {
-      //       showFields[c.cn] = true
+      //       showFields[c.column_name] = true
       //     }
       //   })
       // }
@@ -147,8 +147,8 @@ export default {
         //   title: this.view_name,
         //   query_params: {
         //     showFields,
-        //     coverImageField: attachmentCol ? attachmentCol._cn : '',
-        //     groupingField: singleSelectCol ? singleSelectCol._cn : '',
+        //     coverImageField: attachmentCol ? attachmentCol.title : '',
+        //     groupingField: singleSelectCol ? singleSelectCol.title : '',
         //     ...this.queryParams
         //   },
         //   parent_model_title: this.table,

@@ -2,7 +2,7 @@
   <!--  <v-dialog v-model="show" width="600">-->
   <v-card width="600" color="">
     <v-card-title v-if="!isForm" class="textColor--text mx-2" :class="{'py-2':isForm}">
-      <span v-if="!isForm">{{ meta ? meta._tn : 'Children' }}</span>
+      <span v-if="!isForm">{{ meta ? meta.title : 'Children' }}</span>
       <v-spacer />
       <v-icon small class="mr-1" @click="loadData()">
         mdi-reload
@@ -19,7 +19,7 @@
         >
           mdi-link
         </v-icon>&nbsp;
-        Link to '{{ meta._tn }}'
+        Link to '{{ meta.title }}'
       </v-btn>
     </v-card-title>
     <v-card-text>
@@ -38,7 +38,7 @@
             >
               mdi-link
             </v-icon>&nbsp;
-            Link to '{{ meta._tn }}'
+            Link to '{{ meta.title }}'
           </v-btn>
         </div>
         <template v-if="isDataAvail">
@@ -52,7 +52,7 @@
             <div class="remove-child-icon d-flex align-center">
               <x-icon
                 v-if="((isPublic && isForm) || (!isPublic && _isUIAllowed('xcDatatableEditable'))) && !readOnly "
-                :tooltip="`Unlink this '${meta._tn}' from '${parentMeta._tn}'`"
+                :tooltip="`Unlink this '${meta.title}' from '${parentMeta.title}'`"
                 :color="['error','grey']"
                 small
                 icon.class="mr-1 mt-n1"
@@ -62,7 +62,7 @@
               </x-icon>
               <x-icon
                 v-if="!isPublic && type === RelationTypes.HAS_MANY && !readOnly && _isUIAllowed('xcDatatableEditable')"
-                :tooltip="`Delete row in '${meta._tn}'`"
+                :tooltip="`Delete row in '${meta.title}'`"
                 :color="['error','grey']"
                 small
                 @click.stop="$emit('delete',ch,i)"
@@ -183,14 +183,14 @@ export default {
         // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedChildDataGet', {
         //   password: this.password,
         //   limit: this.size,
-        //   tn: this.tn,
+        //   tn: this.table_name,
         //   view_id: this.$route.params.id,
         //   row_id: this.rowId,
         //   offset: this.size * (this.page - 1),
         //   query: this.query,
-        //   _cn: this.column._cn,
-        //   ptn: this.parentMeta.tn,
-        //   ctn: this.meta.tn,
+        //   _cn: this.column.title,
+        //   ptn: this.parentMeta.table_name,
+        //   ctn: this.meta.table_name,
         //   type: this.type
         // }])
 

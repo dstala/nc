@@ -195,7 +195,7 @@ export default {
       })(v))) */
 
       await Promise.all(this.templateData.tables.map(v => (async(tableMeta) => {
-        const table = tableMeta.tn
+        const table = tableMeta.table_name
         const data = this.importData[tableMeta.refTn]
 
         await this.$store.dispatch('meta/ActLoadMeta', {
@@ -221,7 +221,7 @@ export default {
     remapColNames(batchData, columns) {
       return batchData.map(data => (columns || []).reduce((aggObj, col) => ({
         ...aggObj,
-        [col.cn]: data[col.refCn]
+        [col.column_name]: data[col.refCn]
       }), {})
       )
     }

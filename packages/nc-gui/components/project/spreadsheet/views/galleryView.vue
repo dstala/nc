@@ -43,11 +43,11 @@
                 <v-row class="">
                   <v-col
                     v-for="(col) in fields"
-                    v-show="showFields[col.alias|| col._cn]"
-                    :key="col.alias || col._cn"
+                    v-show="showFields[col.alias|| col.title]"
+                    :key="col.alias || col.title"
                     class="col-12 mt-1 mb-2 "
                   >
-                    <label :for="`data-table-form-${col._cn}`" class="body-2 text-capitalize caption grey--text">
+                    <label :for="`data-table-form-${col.title}`" class="body-2 text-capitalize caption grey--text">
                       <virtual-header-cell
                         v-if="isVirtualCol(col)"
                         :column="col"
@@ -58,7 +58,7 @@
                       <header-cell
                         v-else
                         :is-form="true"
-                        :value="col._cn"
+                        :value="col.title"
                         :column="col"
                       />
 
@@ -74,7 +74,7 @@
                     />
                     <table-cell
                       v-else
-                      :value="row[col._cn]"
+                      :value="row[col.title]"
                       :column="col"
                       :sql-ui="sqlUi"
                       :is-locked="isLocked"
@@ -139,8 +139,8 @@ export default {
       if (this.showSystemFields) {
         return this.meta.columns || []
       } else {
-        return this.meta.columns.filter(c => !(c.pk && c.ai) && !hideCols.includes(c.cn) &&
-          !((this.meta.v || []).some(v => v.bt && v.bt.cn === c.cn))
+        return this.meta.columns.filter(c => !(c.pk && c.ai) && !hideCols.includes(c.column_name) &&
+          !((this.meta.v || []).some(v => v.bt && v.bt.column_name === c.column_name))
         ) || []
       }
     }
@@ -166,10 +166,10 @@ export default {
     },
     getCovers(row) {
       if (this.attachmentColumn &&
-        row[this.attachmentColumn.cn] && row[this.attachmentColumn.cn][0] &&
-        row[this.attachmentColumn.cn]) {
+        row[this.attachmentColumn.column_name] && row[this.attachmentColumn.column_name][0] &&
+        row[this.attachmentColumn.column_name]) {
         try {
-          return JSON.parse(row[this.attachmentColumn.cn])
+          return JSON.parse(row[this.attachmentColumn.column_name])
         } catch (e) {
 
         }

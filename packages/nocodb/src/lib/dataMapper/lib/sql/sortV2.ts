@@ -76,9 +76,11 @@ export default async function sortV2(
               const parentModel = await parentColumn.getModel();
               await parentModel.getColumns();
 
-              selectQb = knex(`${parentModel.tn} as ${alias}`).where(
-                `${alias}.${parentColumn.cn}`,
-                knex.raw(`??`, [`${childModel.tn}.${childColumn.cn}`])
+              selectQb = knex(`${parentModel.table_name} as ${alias}`).where(
+                `${alias}.${parentColumn.column_name}`,
+                knex.raw(`??`, [
+                  `${childModel.table_name}.${childColumn.column_name}`
+                ])
               );
             }
             let lookupColumn = await lookup.getLookupColumn();
@@ -104,9 +106,9 @@ export default async function sortV2(
               await parentModel.getColumns();
 
               selectQb.join(
-                `${parentModel.tn} as ${nestedAlias}`,
-                `${nestedAlias}.${parentColumn.cn}`,
-                `${prevAlias}.${childColumn.cn}`
+                `${parentModel.table_name} as ${nestedAlias}`,
+                `${nestedAlias}.${parentColumn.column_name}`,
+                `${prevAlias}.${childColumn.column_name}`
               );
 
               lookupColumn = await nestedLookup.getLookupColumn();
@@ -143,11 +145,11 @@ export default async function sortV2(
 
                   selectQb
                     .join(
-                      `${parentModel.tn} as ${nestedAlias}`,
-                      `${nestedAlias}.${parentColumn.cn}`,
-                      `${prevAlias}.${childColumn.cn}`
+                      `${parentModel.table_name} as ${nestedAlias}`,
+                      `${nestedAlias}.${parentColumn.column_name}`,
+                      `${prevAlias}.${childColumn.column_name}`
                     )
-                    .select(parentModel?.primaryValue?.cn);
+                    .select(parentModel?.primaryValue?.column_name);
                 }
                 break;
               case UITypes.Formula:
@@ -166,7 +168,7 @@ export default async function sortV2(
                 break;
               default:
                 {
-                  selectQb.select(`${prevAlias}.${lookupColumn.cn}`);
+                  selectQb.select(`${prevAlias}.${lookupColumn.column_name}`);
                 }
 
                 break;
@@ -191,18 +193,20 @@ export default async function sortV2(
           const parentModel = await parentColumn.getModel();
           await parentModel.getColumns();
 
-          const selectQb = knex(parentModel.tn)
-            .select(parentModel?.primaryValue?.cn)
+          const selectQb = knex(parentModel.table_name)
+            .select(parentModel?.primaryValue?.column_name)
             .where(
-              `${parentModel.tn}.${parentColumn.cn}`,
-              knex.raw(`??`, [`${childModel.tn}.${childColumn.cn}`])
+              `${parentModel.table_name}.${parentColumn.column_name}`,
+              knex.raw(`??`, [
+                `${childModel.table_name}.${childColumn.column_name}`
+              ])
             );
 
           qb.orderBy(selectQb, sort.direction || 'asc');
         }
         break;
       default:
-        qb.orderBy(`${column.cn}`, sort.direction || 'asc');
+        qb.orderBy(`${column.column_name}`, sort.direction || 'asc');
         break;
     }
   }

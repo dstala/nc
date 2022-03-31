@@ -213,10 +213,10 @@
                     >
                       <transition-group type="transition" :name="!drag ? 'flip-list' : null">
                         <v-list-item
-                          v-t="['project:open']"
                           v-for="child in item.children || []"
                           v-show="!search || child.name.toLowerCase().includes(search.toLowerCase())"
                           :key="child.key"
+                          v-t="['project:open']"
                           color="x-active"
                           active-class="font-weight-bold"
                           :selectable="true"
@@ -287,8 +287,8 @@
 
                                 <v-list dense>
                                   <v-list-item
-                                    v-t="['table:rename:trigger:3-dot-menu']"
                                     v-if="_isUIAllowed('treeview-rename-button')"
+                                    v-t="['table:rename:trigger:3-dot-menu']"
                                     dense
                                     @click="
                                       menuItem = child;
@@ -310,8 +310,8 @@
                                     </v-list-item-title>
                                   </v-list-item>
                                   <v-list-item
-                                    v-t="['table:trigger:ui-acl']"
                                     v-if="_isUIAllowed('ui-acl')"
+                                    v-t="['table:trigger:ui-acl']"
                                     dense
                                     @click="openUIACL(child)"
                                   >
@@ -434,7 +434,7 @@
             <template v-if="_isUIAllowed('treeViewProjectSettings')">
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-appstore" @click="appsTabAdd" v-on="on" v-t="['settings:appstore']">
+                  <v-list-item v-t="['settings:appstore']" dense class="body-2 nc-settings-appstore" @click="appsTabAdd" v-on="on">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-storefront-outline
@@ -454,7 +454,7 @@
 
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-teamauth" @click="rolesTabAdd" v-on="on" v-t="['settings:team-auth']">
+                  <v-list-item v-t="['settings:team-auth']" dense class="body-2 nc-settings-teamauth" @click="rolesTabAdd" v-on="on">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-account-group
@@ -473,7 +473,7 @@
               </v-tooltip>
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-projmeta" @click="disableOrEnableModelTabAdd" v-on="on" v-t="['settings:proj-metadata']">
+                  <v-list-item v-t="['settings:proj-metadata']" dense class="body-2 nc-settings-projmeta" @click="disableOrEnableModelTabAdd" v-on="on">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-table-multiple
@@ -493,7 +493,7 @@
 
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-audit" @click="openAuditTab" v-on="on" v-t="['settings:audit']">
+                  <v-list-item v-t="['settings:audit']" dense class="body-2 nc-settings-audit" @click="openAuditTab" v-on="on">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-notebook-outline
@@ -764,7 +764,6 @@ export default {
       disabled: false,
       ghostClass: "ghost"
     },
-    validateTableName,
     roleIcon: {
       owner: 'mdi-account-star',
       creator: 'mdi-account-hard-hat',
@@ -913,7 +912,7 @@ export default {
       }
 
       // await this.$store.dispatch('sqlMgr/ActSqlOp', [{dbAlias: 'db'}, 'xcModelOrderSet', {
-      //   tn: children[event.moved.newIndex].tn,
+      //   tn: children[event.moved.newIndex].table_name,
       //   order: children[event.moved.newIndex].order,
       // }])
       await this.$api.meta.tableReorder(children[event.moved.newIndex].id, {
@@ -923,7 +922,6 @@ export default {
     },
     openUIACL(child) {
       console.log(child)
-      debugger
       this.disableOrEnableModelTabAdd()
       setTimeout(() => {
         this.$router.push({
@@ -1245,7 +1243,7 @@ export default {
       );
     },
     validateUniqueAlias(v){
-      return (this.$store.state.project.tables || []).every(t => this.dialogRenameTable.cookie.id === t.id || t._tn !== (v || '')) || 'Duplicate table alias'
+      return (this.$store.state.project.tables || []).every(t => this.dialogRenameTable.cookie.id === t.id || t.title !== (v || '')) || 'Duplicate table alias'
     },
     async handleCreateBtnClick(type, item) {
       this.menuItem = item;
@@ -1425,7 +1423,7 @@ export default {
       }
     },
 
-    async mtdDialogRenameTableSubmit(_tn, cookie) {
+    async mtdDialogRenameTableSubmit(title, cookie) {
       let item = cookie
       // await this.$store.dispatch(
       //   // 'sqlMgr/ActSqlOpPlus',[
@@ -1437,12 +1435,12 @@ export default {
       //     // 'tableRename',
       //     'ncTableAliasRename',
       //     {
-      //       tn: _tn,
+      //       tn: title,
       //       tn_old: item.name,
       //     },
       //   ]);
       await this.$api.meta.tableUpdate(item.id, {
-        _tn
+        title
       })
       await this.removeTabsByName(item)
       await this.loadTablesFromParentTreeNode({
@@ -1454,20 +1452,20 @@ export default {
         _nodes: {
           env: this.menuItem._nodes.env,
           dbAlias: this.menuItem._nodes.dbAlias,
-          tn: this.menuItem._nodes.tn,
-          _tn: _tn,
+          table_name: this.menuItem._nodes.table_name,
+          title: title,
           dbConnection: this.menuItem._nodes.dbConnection,
 
           type: 'table',
           dbKey: this.menuItem._nodes.dbKey,
           key: this.menuItem._nodes.key,
         },
-        name: _tn,
+        name: title,
       });
       this.dialogRenameTable.dialogShow = false;
       this.dialogRenameTable.defaultValue = null;
       this.$toast.success('Table renamed successfully').goAway(3000);
-      console.log(_tn, cookie);
+      console.log(title, cookie);
       this.$tele.emit('table:rename:submit')
     },
     mtdDialogRenameTableCancel() {
@@ -1490,7 +1488,7 @@ export default {
               env: this.menuItem._nodes.env,
               dbAlias: this.menuItem._nodes.dbAlias,
               tn: table.name,
-              _tn: table.alias,
+              title: table.alias,
               type: 'table',
               dbKey: this.menuItem._nodes.dbKey,
               key: this.menuItem._nodes.key,
@@ -1518,7 +1516,7 @@ export default {
               env: this.menuItem._nodes.env,
               dbAlias: this.menuItem._nodes.dbAlias,
               view_name: view.name,
-              _tn: view.alias,
+              title: view.alias,
               type: 'view',
               dbKey: this.menuItem._nodes.key,
               key: this.menuItem._nodes.key,
@@ -1690,7 +1688,7 @@ export default {
             },
             'columnList',
             {
-              tn: item._nodes.tn,
+              table_name: item._nodes.table_name,
             },
           ]);
 
@@ -1700,7 +1698,7 @@ export default {
               dbAlias: item._nodes.dbAlias,
             },
             'tableDelete',
-            {tn: item._nodes.tn, columns: columns.data.list}
+            {table_name: item._nodes.table_name, columns: columns.data.list}
           );
           await this.loadTablesFromParentTreeNode({
             _nodes: {

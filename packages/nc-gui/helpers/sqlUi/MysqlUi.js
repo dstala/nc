@@ -557,7 +557,7 @@ export class MysqlUi {
       col.dt === 'bigint' ||
       col.dt === 'smallint') {
       for (let i = 0; i < columns.length; ++i) {
-        if (columns[i].cn !== col.cn && columns[i].ai) {
+        if (columns[i].column_name !== col.column_name && columns[i].ai) {
           return true
         }
       }
@@ -621,14 +621,14 @@ export class MysqlUi {
         columns[i].dt === 'smallint' ||
         columns[i].dt === 'mediumint'))) {
         columns[i].un = false
-        console.log('>> resetting unsigned value', columns[i].cn)
+        console.log('>> resetting unsigned value', columns[i].column_name)
       }
-      console.log(columns[i].cn)
+      console.log(columns[i].column_name)
     }
   }
 
   static columnEditable(colObj) {
-    return colObj.tn !== '_evolutions' || colObj.tn !== 'nc_evolutions'
+    return colObj.table_name !== '_evolutions' || colObj.table_name !== 'nc_evolutions'
   }
 
   static extractFunctionName(query) {

@@ -132,7 +132,7 @@ export default {
     hmParentPrimaryValCol() {
       return this.hm &&
         this.parentMeta &&
-        this.parentMeta.columns.find(v => v.pv)._cn
+        this.parentMeta.columns.find(v => v.pv).title
     }
   },
   mounted() {
@@ -154,7 +154,7 @@ export default {
         // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedDataGet', {
         //   password: this.password,
         //   limit: this.size,
-        //   tn: this.tn,
+        //   tn: this.table_name,
         //   view_id: this.$route.params.id,
         //   offset: this.size * (this.page - 1),
         //   query: this.query

@@ -47,10 +47,10 @@
           <v-list dense>
             <v-list-item
               v-for="col in meta.columns"
-              :key="col._cn"
-              @click="searchField = col._cn"
+              :key="col.title"
+              @click="searchField = col.title"
             >
-              <span class="caption">{{ col._cn }}</span>
+              <span class="caption">{{ col.title }}</span>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -381,19 +381,19 @@ export default {
     // belongsTo() {
     //   return this.meta && this.meta.belongsTo
     //     ? this.meta.belongsTo.reduce((bt, o) => {
-    //       bt[o._cn] = o
+    //       bt[o.title] = o
     //       return bt
     //     }, {})
     //     : {}
     // },
     table() {
       if (this.relationType === 'hm') {
-        return this.relation.tn
+        return this.relation.table_name
       } else if (this.relationType === 'bt') {
         return this.relation.rtn
       }
 
-      return this.nodes.tn || this.nodes.view_name
+      return this.nodes.table_name || this.nodes.view_name
     },
     primaryValueColumn() {
       if (!this.meta || !this.meta.columns) {
@@ -403,15 +403,15 @@ export default {
       const pvIndex = this.meta.columns.findIndex(c => c.pv)
 
       if (pvIndex > -1 && pvIndex <= this.colLength - 1) {
-        return this.meta.columns[pvIndex]._cn
+        return this.meta.columns[pvIndex].title
       }
 
       const pkIndex = this.meta.columns.findIndex(c => c.pv)
 
       if (pkIndex > -1 && pkIndex < this.colLength - 1) {
-        return this.meta.columns[pkIndex + 1]._cn
+        return this.meta.columns[pkIndex + 1].title
       }
-      return this.meta.columns[0]._cn
+      return this.meta.columns[0].title
     }
   },
   async mounted() {
@@ -428,7 +428,7 @@ export default {
   created() {
     /*    if (this.relationType === 'hm') {
       this.filters.push({
-        field: this.relation.cn,
+        field: this.relation.column_name,
         op: 'is equal',
         value: this.relationIdValue,
         readOnly: true
@@ -580,13 +580,13 @@ export default {
         //         c.prop = `${c.mm.rtn}MMList`
         //       }
         //       if (c.virtual && c.hm) {
-        //         c.prop = `${c.hm.tn}List`
+        //         c.prop = `${c.hm.table_name}List`
         //       }
         //
         //       // if (c.virtual && c.lk) {
         //       //   c.alias = `${c.lk._lcn} (from ${c.lk._ltn})`
         //       // } else {
-        //       c.alias = c._cn
+        //       c.alias = c.title
         //       // }
         //       if (c.alias in _ref) {
         //         c.alias += _ref[c.alias]++

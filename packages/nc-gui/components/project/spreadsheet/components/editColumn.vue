@@ -13,13 +13,13 @@
             <!--label: Column Name-->
             <v-text-field
               ref="column"
-              v-model="newColumn.cn"
+              v-model="newColumn.column_name"
               hide-details="auto"
               color="primary"
               :rules="[
                 v => !!v || 'Required',
-                v => !meta || !meta.columns || meta.columns.every(c => column && (c.cn || '').toLowerCase() === (column.cn || '').toLowerCase() ||(
-                  (v||'').toLowerCase() !== (c.cn||'').toLowerCase() && (v||'').toLowerCase() !== (c._cn||'').toLowerCase())) || 'Duplicate column name' ,// && meta.v.every(c => v !== c._cn ) || 'Duplicate column name',
+                v => !meta || !meta.columns || meta.columns.every(c => column && (c.column_name || '').toLowerCase() === (column.column_name || '').toLowerCase() ||(
+                  (v||'').toLowerCase() !== (c.column_name||'').toLowerCase() && (v||'').toLowerCase() !== (c.title||'').toLowerCase())) || 'Duplicate column name' ,// && meta.v.every(c => v !== c.title ) || 'Duplicate column name',
                 validateColumnName
               ]"
               class="caption nc-column-name-input"
@@ -142,7 +142,7 @@
                           :nodes="nodes"
                           :meta="meta"
                           :is-s-q-lite="isSQLite"
-                          :alias="newColumn.cn"
+                          :alias="newColumn.column_name"
                           :is-m-s-s-q-l="isMSSQL"
                           v-on="$listeners"
                         />
@@ -157,7 +157,7 @@
                           :nodes="nodes"
                           :meta="meta"
                           :is-s-q-lite="isSQLite"
-                          :alias="newColumn.cn"
+                          :alias="newColumn.column_name"
                           :is-m-s-s-q-l="isMSSQL"
                           v-on="$listeners"
                         />
@@ -172,7 +172,7 @@
                           :nodes="nodes"
                           :meta="meta"
                           :is-s-q-lite="isSQLite"
-                          :alias="newColumn.cn"
+                          :alias="newColumn.column_name"
                           :is-m-s-s-q-l="isMSSQL"
                           @onColumnSelect="onRelColumnSelect"
                         />
@@ -192,7 +192,7 @@
                         />
                       </v-col>
 
-                      <template v-if="newColumn.cn && newColumn.uidt && !isVirtual">
+                      <template v-if="newColumn.column_name && newColumn.uidt && !isVirtual">
                         <v-col cols="12">
                           <v-container fluid class="wrapper">
                             <v-row>
@@ -371,7 +371,7 @@
                           :nodes="nodes"
                           :meta="meta"
                           :is-s-q-lite="isSQLite"
-                          :alias="newColumn.cn"
+                          :alias="newColumn.column_name"
                           :is-m-s-s-q-l="isMSSQL"
                           :sql-ui="sqlUi"
                           v-on="$listeners"
@@ -513,7 +513,7 @@ export default {
       return this.newColumn && this.newColumn.uidt === 'Rollup'
     },
     relation() {
-      return this.meta && this.column && this.meta.belongsTo && this.meta.belongsTo.find(bt => bt.cn === this.column.cn)
+      return this.meta && this.column && this.meta.belongsTo && this.meta.belongsTo.find(bt => bt.column_name === this.column.column_name)
     },
     isVirtual() {
       return this.isLinkToAnotherRecord || this.isLookup || this.isRollup
@@ -545,7 +545,7 @@ export default {
     },
     genColumnData() {
       this.newColumn = this.column ? { ...this.column } : this.sqlUi.getNewColumn([...this.meta.columns, ...(this.meta.v || [])].length + 1)
-      this.newColumn.cno = this.newColumn.cn
+      this.newColumn.cno = this.newColumn.column_name
     },
     /*
       async loadDataTypes() {
@@ -591,14 +591,14 @@ export default {
           return await this.$refs.formula.save()
         }
 
-        this.newColumn.tn = this.nodes.tn
-        this.newColumn._cn = this.newColumn.cn
+        this.newColumn.table_name = this.nodes.table_name
+        this.newColumn.title = this.newColumn.column_name
 
         if (this.editColumn) {
           const col = await this.$api.meta.columnUpdate(this.meta.id, this.column.id, this.newColumn)
           console.log(col)
-          //   tn: this.nodes.tn,
-          //   _tn: this.meta._tn,
+          //   tn: this.nodes.table_name,
+          //   title: this.meta.title,
           //   originalColumns: this.meta.columns,
           //   columns
           // }
@@ -608,8 +608,8 @@ export default {
           const col = await this.$api.meta.columnCreate(this.meta.id, this.newColumn)
           // const col = await this.$api.meta.columnCreate(this.meta.id, {
           //   cn: this
-          //     .newColumn.cn,
-          //   _cn: this.newColumn.cn,
+          //     .newColumn.column_name,
+          //   _cn: this.newColumn.column_name,
           //   uidt: this.newColumn.uidt
           // })
           console.log(col)
@@ -619,7 +619,7 @@ export default {
         // const columns = [...this.meta.columns]
         //
         // if (columns.length) {
-        //   columns[0].tn = this.nodes.tn
+        //   columns[0].table_name = this.nodes.table_name
         // }
         //
 
@@ -628,8 +628,8 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'tableUpdate', {
-        //   tn: this.nodes.tn,
-        //   _tn: this.meta._tn,
+        //   tn: this.nodes.table_name,
+        //   title: this.meta.title,
         //   originalColumns: this.meta.columns,
         //   columns
         // }])
@@ -638,14 +638,14 @@ export default {
         //   await this.$refs.relation.saveRelation()
         // }
 
-        this.$emit('saved', this.newColumn._cn, this.editColumn ? this.meta.columns[this.columnIndex]._cn : null)
+        this.$emit('saved', this.newColumn.title, this.editColumn ? this.meta.columns[this.columnIndex].title : null)
       } catch (e) {
         console.log(e)
       }
 
       this.$emit('close')
 
-      this.$tele.emit(`column:edit:save:${this.newColumn.uidt}`);
+      this.$tele.emit(`column:edit:save:${this.newColumn.uidt}`)
     },
     onDataTypeChange() {
       this.newColumn.rqd = false
@@ -715,8 +715,8 @@ export default {
             },
             this.relation.type === 'virtual' ? 'xcVirtualRelationDelete' : 'relationDelete',
             {
-              childColumn: this.relation.cn,
-              childTable: this.nodes.tn,
+              childColumn: this.relation.column_name,
+              childTable: this.nodes.table_name,
               parentTable: this.relation
                 .rtn,
               parentColumn: this.relation

@@ -12,14 +12,14 @@
             :label="$t('labels.childTable')"
             :full-width="false"
             :items="refTables"
-            item-text="_tn"
+            item-text="title"
             :item-value="v => v"
             :rules="[v => !!v || 'Required']"
             dense
           >
             <template #item="{item}">
               <span class="caption"><span class="font-weight-bold"> {{
-                item._tn || item.tn
+                item.title || item.table_name
               }}</span> <small>({{ relationNames[item.col.type] }})
               </small></span>
             </template>
@@ -79,35 +79,35 @@ export default {
 
       // return (this.meta
       //   ? [
-      //       ...(this.meta.belongsTo || []).map(({ rtn, _rtn, rcn, tn, cn }) => ({
+      //       ...(this.meta.belongsTo || []).map(({ rtn, _rtn, rcn, table_name, cn }) => ({
       //         type: 'bt',
       //         rtn,
       //         _rtn,
       //         rcn,
-      //         tn,
+      //         table_name,
       //         cn,
       //         ltn: rtn,
       //         _ltn: _rtn
       //       })),
       //       ...(this.meta.hasMany || []).map(({
-      //         tn,
-      //         _tn,
+      //         table_name,
+      //         title,
       //         cn,
       //         rcn,
       //         rtn
       //       }) => ({
       //         type: 'hm',
-      //         tn,
-      //         _tn,
+      //         table_name,
+      //         title,
       //         cn,
       //         rcn,
       //         rtn,
-      //         ltn: tn,
-      //         _ltn: _tn
+      //         ltn: table_name,
+      //         _ltn: title
       //       })),
-      //       ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, tn, cn }) => ({
+      //       ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, table_name, cn }) => ({
       //         type: 'mm',
-      //         tn,
+      //         table_name,
       //         cn,
       //         vtn,
       //         _vtn,
@@ -178,10 +178,10 @@ export default {
         // await this.$store.dispatch('meta/ActLoadMeta', {
         //   dbAlias: this.nodes.dbAlias,
         //   env: this.nodes.env,
-        //   tn: this.meta.tn,
+        //   table_name: this.meta.table_name,
         //   force: true
         // })
-        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
 
         // meta.v.push({
         //   _cn: this.alias,
@@ -207,7 +207,7 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'xcModelSet', {
-        //   tn: this.nodes.tn,
+        //   table_name: this.nodes.table_name,
         //   meta
         // }])
 

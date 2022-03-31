@@ -3,7 +3,7 @@ import Column from '../../../noco-models/Column';
 export function getUniqueColumnName(columns: Column[], initialName = 'field') {
   let c = 0;
 
-  while (columns.some(col => col.cn === `${initialName}${c || ''}`)) {
+  while (columns.some(col => col.column_name === `${initialName}${c || ''}`)) {
     c++;
   }
 
@@ -16,7 +16,7 @@ export function getUniqueColumnAliasName(
 ) {
   let c = 0;
 
-  while (columns.some(col => col._cn === `${initialName}${c || ''}`)) {
+  while (columns.some(col => col.title === `${initialName}${c || ''}`)) {
     c++;
   }
 

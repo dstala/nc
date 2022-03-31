@@ -44,7 +44,7 @@
             @xcresizing="onXcResizing(col.alias,$event)"
             @xcresized="resizingCol = null"
           >
-            <!--            :style="columnsWidth[col._cn]  ? `min-width:${columnsWidth[col._cn]}; max-width:${columnsWidth[col._cn]}` : ''"
+            <!--            :style="columnsWidth[col.title]  ? `min-width:${columnsWidth[col.title]}; max-width:${columnsWidth[col.title]}` : ''"
 -->
 
             <virtual-header-cell
@@ -63,7 +63,7 @@
               v-else
               :is-public-view="isPublicView"
               :nodes="nodes"
-              :value="col._cn"
+              :value="col.title"
               :sql-ui="sqlUi"
               :meta="meta"
               :column-index="meta && meta.columns && meta.columns.indexOf(col)"
@@ -175,7 +175,7 @@
             class="cell pointer nc-grid-cell"
             :class="{
               'active' :!isPublicView && selected.col === col && selected.row === row && isEditable ,
-              'primary-column' : primaryValueColumn === columnObj._cn,
+              'primary-column' : primaryValueColumn === columnObj.title,
               'text-center': isCentrallyAligned(columnObj),
               'required': isRequired(columnObj,rowObj)
             }"
@@ -199,7 +199,7 @@
               :sql-ui="sqlUi"
               :is-new="rowMeta.new"
               v-on="$listeners"
-              @updateCol="(...args) => updateCol(...args, columnObj.bt && meta.columns.find( c => c.cn === columnObj.bt.cn), col, row)"
+              @updateCol="(...args) => updateCol(...args, columnObj.bt && meta.columns.find( c => c.column_name === columnObj.bt.column_name), col, row)"
               @saveRow="onCellValueChange(col, row, columnObj, true)"
             />
 
@@ -212,7 +212,7 @@
                   && (editEnabled.col === col && editEnabled.row === row)
                   || enableEditable(columnObj)
               "
-              v-model="rowObj[columnObj._cn]"
+              v-model="rowObj[columnObj.title]"
               :column="columnObj"
               :meta="meta"
               :active="selected.col === col && selected.row === row"
@@ -231,13 +231,13 @@
 
             <table-cell
               v-else
-              :class="{'primary--text' : primaryValueColumn === columnObj._cn}"
+              :class="{'primary--text' : primaryValueColumn === columnObj.title}"
               :selected="selected.col === col && selected.row === row"
               :is-locked="isLocked"
               :column="columnObj"
               :meta="meta"
               :db-alias="nodes.dbAlias"
-              :value="rowObj[columnObj._cn]"
+              :value="rowObj[columnObj.title]"
               :sql-ui="sqlUi"
               @enableedit="makeSelected(col,row);makeEditable(col,row,columnObj.ai, rowMeta)"
             />
@@ -360,7 +360,7 @@ export default {
       return (this.meta &&
         this.meta.columns &&
         this.data &&
-        this.data.map(({ oldRow }) => this.meta.columns.filter(c => c.pk).map(c => oldRow[c._cn]).join('___'))) || []
+        this.data.map(({ oldRow }) => this.meta.columns.filter(c => c.pk).map(c => oldRow[c.title]).join('___'))) || []
     },
     haveHasManyrelation() {
       return !!Object.keys(this.hasMany).length
@@ -372,7 +372,7 @@ export default {
       return (this.data && this.data.length) || 0
     },
     availColNames() {
-      return (this.availableColumns && this.availableColumns.map(c => c._cn)) || []
+      return (this.availableColumns && this.availableColumns.map(c => c.title)) || []
     },
     groupedAggCount() {
       // eslint-disable-next-line camelcase
@@ -444,11 +444,11 @@ export default {
 
       let columnObj = _columnObj
       if (columnObj.bt) {
-        columnObj = this.meta.columns.find(c => c.cn === columnObj.bt.cn)
+        columnObj = this.meta.columns.find(c => c.column_name === columnObj.bt.column_name)
       }
 
       return columnObj && (columnObj.rqd &&
-        (ignoreCurrentValue || rowObj[columnObj._cn] === undefined || rowObj[columnObj._cn] === null) &&
+        (ignoreCurrentValue || rowObj[columnObj.title] === undefined || rowObj[columnObj.title] === null) &&
         !columnObj.default)
     },
     updateCol(row, column, value, columnObj, colIndex, rowIndex) {
@@ -459,10 +459,10 @@ export default {
       // setTimeout(() => {
       //   const obj = {}
       //   this.meta && this.meta.columns && this.meta.columns.forEach((c) => {
-      //     obj[c._cn] = (columnStyling[c.uidt] && columnStyling[c.uidt].w) || undefined
+      //     obj[c.title] = (columnStyling[c.uidt] && columnStyling[c.uidt].w) || undefined
       //   })
       //   this.meta && this.meta.v && this.meta.v.forEach((v) => {
-      //     obj[v._cn] = v.bt ? '100px' : '200px'
+      //     obj[v.title] = v.bt ? '100px' : '200px'
       //   })
       //   Array.from(this.$el.querySelectorAll('th')).forEach((el) => {
       //     const width = el.getBoundingClientRect().width
@@ -490,16 +490,16 @@ export default {
       // const aggCount = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   dbAlias: this.nodes.dbAlias
       // }, 'xcAuditModelCommentsCount', {
-      //   model_name: this.meta._tn,
+      //   model_name: this.meta.title,
       //   ids: this.data.map(({ row: r }) => {
-      //     return this.meta.columns.filter(c => c.pk).map(c => r[c._cn]).join('___')
+      //     return this.meta.columns.filter(c => c.pk).map(c => r[c.title]).join('___')
       //   })
       // }])
       //
 
       this.aggCount = (await this.$api.meta.commentCount({
         ids: this.data.map(({ row: r }) => {
-          return this.meta.columns.filter(c => c.pk).map(c => r[c._cn]).join('___')
+          return this.meta.columns.filter(c => c.pk).map(c => r[c.title]).join('___')
         }),
         fk_model_id: this.meta.id
       })).data
@@ -548,7 +548,7 @@ export default {
             return
           }
 
-          this.$set(rowObj, columnObj._cn, null)
+          this.$set(rowObj, columnObj.title, null)
           // update/save cell value
           this.onCellValueChange(this.selected.col, this.selected.row, columnObj, true)
         }
@@ -593,12 +593,12 @@ export default {
             switch (e.keyCode) {
               // copy - ctrl/cmd +c
               case 67:
-                copyTextToClipboard(rowObj[columnObj._cn] || '')
+                copyTextToClipboard(rowObj[columnObj.title] || '')
                 break
               // // paste ctrl/cmd + v
               // case 86: {
               //   const text = await navigator.clipboard.readText()
-              //   this.$set(rowObj, columnObj._cn, text)
+              //   this.$set(rowObj, columnObj.title, text)
               // }
               // break
             }
@@ -615,7 +615,7 @@ export default {
               return this.$toast.info('Update not allowed for table which doesn\'t have primary Key').goAway(3000)
             }
 
-            this.$set(this.data[this.selected.row].row, this.availableColumns[this.selected.col]._cn, '')
+            this.$set(this.data[this.selected.row].row, this.availableColumns[this.selected.col].title, '')
             this.editEnabled = { ...this.selected }
           }
         }

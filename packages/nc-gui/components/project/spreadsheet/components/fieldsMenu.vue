@@ -109,7 +109,7 @@
           v-for="(field,i) in fields"
         >
           <v-list-item
-            v-show="(!fieldFilter || (field._cn||'').toLowerCase().includes(fieldFilter.toLowerCase()))
+            v-show="(!fieldFilter || (field.title||'').toLowerCase().includes(fieldFilter.toLowerCase()))
               && !(!showSystemFieldsLoc && systemColumnsIds.includes(field.fk_column_id))
             "
             :key="field.id"
@@ -124,7 +124,7 @@
               @change="saveOrUpdate(field, i)"
             >
               <template #label>
-                <span class="caption">{{ field._cn }}</span>
+                <span class="caption">{{ field.title }}</span>
               </template>
             </v-checkbox>
             <v-spacer />
@@ -241,7 +241,7 @@ export default {
       return this.meta && this.meta.columns
         ? this.meta.columns.reduce((o, c) => ({
           ...o,
-          [c._cn]: c
+          [c.title]: c
         }), {})
         : {}
     },
@@ -257,8 +257,8 @@ export default {
       },
       set(v) {
         this.$emit('update:showSystemFields', v)
-        this.showFields = this.fields.reduce((o, c) => ({ [c._cn]: c.show, ...o }), {})
-        this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+        this.showFields = this.fields.reduce((o, c) => ({ [c.title]: c.show, ...o }), {})
+        this.$emit('update:fieldsOrder', this.fields.map(c => c.title))
 
         this.$tele.emit('fields:system-field-checkbox')
       }
@@ -319,7 +319,7 @@ export default {
           [f.fk_column_id]: f
         }), {})
         fields = this.meta.columns.map(c => ({
-          _cn: c._cn,
+          title: c.title,
           fk_column_id: c.id,
           ...(fieldById[c.id] ? fieldById[c.id] : {}),
           order: (fieldById[c.id] && fieldById[c.id].order) || order++
@@ -333,9 +333,9 @@ export default {
 
       this.$emit('input', this.fields.reduce((o, c) => ({
         ...o,
-        [c._cn]: c.show
+        [c.title]: c.show
       }), {}))
-      this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+      this.$emit('update:fieldsOrder', this.fields.map(c => c.title))
     },
     async saveOrUpdate(field, i) {
       if (!this.isPublic && this._isUIAllowed('fieldsSync')) {
@@ -348,9 +348,9 @@ export default {
       this.$emit('updated')
       this.$emit('input', this.fields.reduce((o, c) => ({
         ...o,
-        [c._cn]: c.show
+        [c.title]: c.show
       }), {}))
-      this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+      this.$emit('update:fieldsOrder', this.fields.map(c => c.title))
 
       this.$tele.emit('fields:show-hide-checkbox')
     },

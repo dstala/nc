@@ -99,8 +99,8 @@ export interface TableType {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
-  tn: string;
-  _tn: string;
+  table_name: string;
+  title: string;
   type?: string;
   enabled?: boolean;
   parent_id?: string;
@@ -128,7 +128,7 @@ export interface TableInfoType {
   fk_project_id?: string;
   fk_base_id?: string;
   title: string;
-  alias: string;
+  table_nameme: string;
   type?: string;
   enabled?: string;
   parent_id?: string;
@@ -146,8 +146,8 @@ export interface TableReqType {
   id?: string;
   fk_project_id?: string;
   fk_base_id?: string;
-  tn: string;
-  _tn: string;
+  table_name: string;
+  title: string;
   type?: string;
   enabled?: string;
   parent_id?: string;
@@ -203,7 +203,6 @@ export interface ColumnType {
   base_id?: string;
   fk_model_id?: string;
   title?: string;
-  alias?: string;
   uidt: string;
   dt?: string;
   np?: string;
@@ -213,6 +212,7 @@ export interface ColumnType {
   pk?: boolean;
   pv?: boolean;
   rqd?: boolean;
+  column_name?: string;
   un?: boolean;
   ct?: string;
   ai?: boolean;
@@ -232,9 +232,8 @@ export interface ColumnType {
     | FormulaType
     | RollupType
     | LookupType
-    | SelectOptionsType[];
-  cn?: string;
-  _cn?: string;
+    | SelectOptionsType[]
+    | object;
 }
 
 export interface ColumnListType {
@@ -603,7 +602,7 @@ export interface TableListParamsType {
 }
 
 export interface TableUpdatePayloadType {
-  _tn?: string;
+  title?: string;
 }
 
 export interface TableReorderPayloadType {
@@ -954,7 +953,7 @@ export class Api<
 > extends HttpClient<SecurityDataType> {
   auth = {
     /**
-     * No description
+     * @description App user registration
      *
      * @tags AUTH
      * @name Signup
@@ -3145,7 +3144,7 @@ export class Api<
   };
   projects = {
     /**
-     * No description
+     * @description USer registration apis
      *
      * @name ProjectUpdate
      * @request PUT:/projects/{projectId}

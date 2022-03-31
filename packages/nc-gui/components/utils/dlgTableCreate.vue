@@ -174,10 +174,10 @@ export default {
       return validateTableName(v, this.$store.getters['project/GtrProjectIsGraphql'])
     },
     validateDuplicateAlias(v) {
-      return (this.$store.state.project.tables || []).every(t => t._tn !== (v || '')) || 'Duplicate table alias'
+      return (this.$store.state.project.tables || []).every(t => t.title !== (v || '')) || 'Duplicate table alias'
     },
     validateDuplicate(v) {
-      return (this.$store.state.project.tables || []).every(t => t.tn.toLowerCase() !== (v || '').toLowerCase()) || 'Duplicate table name'
+      return (this.$store.state.project.tables || []).every(t => t.table_name.toLowerCase() !== (v || '').toLowerCase()) || 'Duplicate table name'
     }
   }
 }

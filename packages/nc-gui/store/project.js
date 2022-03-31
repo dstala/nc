@@ -369,7 +369,7 @@ export const actions = {
       //   this.$toast.info('No tables in this schema').goAway(2000);
       // }
 
-      // result.data.list = result.data.list.filter(t => rootState.windows.metatables || !isMetaTable(t.tn));
+      // result.data.list = result.data.list.filter(t => rootState.windows.metatables || !isMetaTable(t.table_name));
       console.log("tablelist", tables);
       deepSet(state.unserializedList, tables, `${key}`);
       commit("list", state.unserializedList);

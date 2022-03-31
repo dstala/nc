@@ -18,10 +18,10 @@ export  function substituteColumnIdWithAliasInFormula(
       const colNameOrId = pt.name;
       const column = columns.find(
         c =>
-          c.id === colNameOrId || c.cn === colNameOrId || c._cn === colNameOrId
+          c.id === colNameOrId || c.column_name === colNameOrId || c.title === colNameOrId
       );
       // eslint-disable-next-line functional/immutable-data
-      pt.name = column._cn;
+      pt.name = column.title;
     } else if (pt.type === 'BinaryExpression') {
        substituteId(pt.left);
        substituteId(pt.right);

@@ -69,8 +69,8 @@ export async function xcVisibilityMetaGet(
     const views = await model.getViews();
     for (const view of views) {
       obj[view.id] = {
-        ptn: model.tn,
-        _ptn: model._tn,
+        ptn: model.table_name,
+        _ptn: model.title,
         ptype: model.type,
         tn: view.title,
         _tn: view.title,

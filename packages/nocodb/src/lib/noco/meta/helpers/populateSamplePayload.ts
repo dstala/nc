@@ -33,10 +33,10 @@ export default async function populateSamplePayload(
       [UITypes.LinkToAnotherRecord, UITypes.Lookup].includes(column.uidt)
     )
       continue;
-    if (operation === 'delete' && model.primaryKey?._cn !== column._cn)
+    if (operation === 'delete' && model.primaryKey?.title !== column.title)
       continue;
 
-    out[column._cn] = await getSampleColumnValue(column);
+    out[column.title] = await getSampleColumnValue(column);
   }
 
   return out;

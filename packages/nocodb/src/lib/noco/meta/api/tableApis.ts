@@ -109,19 +109,21 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
   const project = await Project.getWithInfo(req.params.projectId);
   const base = project.bases.find(b => b.id === req.params.baseId);
 
-  if (!req.body.tn) {
-    NcError.badRequest('Missing table name `tn` property in request body');
+  if (!req.body.table_name) {
+    NcError.badRequest(
+      'Missing table name `table_name` property in request body'
+    );
   }
 
   if (project.prefix) {
-    if (!req.body.tn.startsWith(project.prefix)) {
-      req.body.tn = `${project.prefix}_${req.body.tn}`;
+    if (!req.body.table_name.startsWith(project.prefix)) {
+      req.body.table_name = `${project.prefix}_${req.body.table_name}`;
     }
   }
 
   if (
     !(await Model.checkTitleAvailable({
-      tn: req.body.tn,
+      table_name: req.body.table_name,
       project_id: project.id,
       base_id: base.id
     }))
@@ -129,13 +131,17 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
     NcError.badRequest('Duplicate table name');
   }
 
-  if (!req.body._tn) {
-    req.body._tn = getTableNameAlias(req.body.tn, project.prefix, base);
+  if (!req.body.title) {
+    req.body.title = getTableNameAlias(
+      req.body.table_name,
+      project.prefix,
+      base
+    );
   }
 
   if (
     !(await Model.checkAliasAvailable({
-      _tn: req.body._tn,
+      title: req.body.title,
       project_id: project.id,
       base_id: base.id
     }))
@@ -159,7 +165,7 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
     op_type: AuditOperationTypes.TABLE,
     op_sub_type: AuditOperationSubTypes.CREATED,
     user: (req as any)?.user?.email,
-    description: `created table ${req.body.tn} with alias ${req.body._tn}  `,
+    description: `created table ${req.body.table_name} with alias ${req.body.title}  `,
     ip: (req as any).clientIp
   }).then(() => {});
 
@@ -184,7 +190,7 @@ export async function tableUpdate(
 
   if (
     !(await Model.checkAliasAvailable({
-      _tn: req.body._tn,
+      title: req.body.title,
       project_id: model.project_id,
       base_id: model.base_id,
       exclude_id: req.params.tableId
@@ -193,7 +199,7 @@ export async function tableUpdate(
     NcError.badRequest('Duplicate table name');
   }
 
-  await Model.updateAlias(req.params.tableId, req.body._tn);
+  await Model.updateAlias(req.params.tableId, req.body.title);
 
   Tele.emit('evt', { evt_type: 'table:updated' });
 
@@ -215,7 +221,7 @@ export async function tableDelete(req: Request, res: Response, next) {
     else if (table.type === ModelTypes.VIEW)
       await sqlMgr.sqlOpPlus(base, 'viewDelete', {
         ...table,
-        view_name: table.tn
+        view_name: table.table_name
       });
 
     Audit.insert({
@@ -223,7 +229,7 @@ export async function tableDelete(req: Request, res: Response, next) {
       op_type: AuditOperationTypes.TABLE,
       op_sub_type: AuditOperationSubTypes.DELETED,
       user: (req as any)?.user?.email,
-      description: `Deleted ${table.type} ${table.tn} with alias ${table._tn}  `,
+      description: `Deleted ${table.type} ${table.table_name} with alias ${table.title}  `,
       ip: (req as any).clientIp
     }).then(() => {});
 

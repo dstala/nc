@@ -60,8 +60,8 @@ const up = async knex => {
     table.string('project_id', 128);
     table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
-    table.string('tn');
-    table.string('_tn');
+    table.string('table_name');
+    table.string('title');
 
     table.string('type').defaultTo('table');
 
@@ -91,8 +91,8 @@ const up = async knex => {
     table.string('fk_model_id', 20);
     table.foreign('fk_model_id').references(`${MetaTable.MODELS}.id`);
 
-    table.string('_cn');
-    table.string('cn');
+    table.string('title');
+    table.string('column_name');
 
     // todo: decide type
     table.string('uidt');
@@ -506,27 +506,6 @@ const up = async knex => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable(MetaTable.ACL, table => {
-    table
-      .string('id', 20)
-      .primary()
-      .notNullable();
-
-    table.string('db_alias').defaultTo('db');
-    table.string('project_id', 128);
-    table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
-
-    table.string('tn');
-    table.string('_tn');
-    table.string('cn');
-    table.string('_cn');
-    table.string('role');
-    table.string('permission');
-    table.boolean('enabled');
-
-    table.timestamps(true, true);
-  });
-
   await knex.schema.createTable(MetaTable.FORM_VIEW, table => {
     // table
     //   .string('id', 20)
@@ -649,11 +628,6 @@ const up = async knex => {
   });
 
   await knex.schema.createTable(MetaTable.GRID_VIEW, table => {
-    // table
-    //   .string('id', 20)
-    //   .primary()
-    //   .notNullable();
-
     table.string('fk_view_id', 20).primary();
     table.foreign('fk_view_id').references(`${MetaTable.VIEWS}.id`);
 
@@ -663,11 +637,6 @@ const up = async knex => {
     // table.foreign('project_id').references(`${MetaTable.PROJECT}.id`);
 
     table.string('uuid');
-    table.string('tn');
-    table.string('_tn');
-    table.string('cn');
-    table.string('_cn');
-    // todo:  type
 
     table.timestamps(true, true);
   });
@@ -713,10 +682,7 @@ const up = async knex => {
     table.float('order');
 
     table.string('uuid');
-    table.string('tn');
-    table.string('_tn');
-    table.string('cn');
-    table.string('_cn');
+    table.string('title');
     // todo:  type
     table.boolean('public');
     table.string('password');
@@ -915,7 +881,6 @@ const down = async knex => {
   await knex.schema.dropTable(MetaTable.FILTER_EXP);
   await knex.schema.dropTable(MetaTable.SORT);
   await knex.schema.dropTable(MetaTable.SHARED_VIEWS);
-  await knex.schema.dropTable(MetaTable.ACL);
   await knex.schema.dropTable(MetaTable.FORM_VIEW);
   await knex.schema.dropTable(MetaTable.FORM_VIEW_COLUMNS);
   await knex.schema.dropTable(MetaTable.GALLERY_VIEW);
