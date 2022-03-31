@@ -34,7 +34,7 @@ npm run watch:run
 
 ```sh
 # Navigate to `nc-gui` package and install dependencies
-cd packages/nocodb
+cd packages/nc-gui
 npm install
 npm run dev
 ```
