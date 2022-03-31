@@ -8,10 +8,10 @@ If you are doing a git pull on same day - you will have to remove existing metad
 
 - Clone `nocodb/nocodb` GitHub repo and checkout to `feat/v2` branch
   ```sh
-  git clone https://github.com/nocodb/nocodb
-  git checkout feat/v2
+  git clone https://github.com/nocodb/nc
   cd nocodb
   ```
+  
 - Navigate to `nocodb-sdk` package folder, install and build the package
   ```sh
   cd packages/nocodb-sdk
@@ -25,8 +25,11 @@ If you are doing a git pull on same day - you will have to remove existing metad
 # Navigate to `nocodb` package and install dependencies
 cd packages/nocodb
 npm install
-# require sqlite3
+
+# requires sqlite3
+
 npm run watch:run
+
 # if you have mysql, then use
 # npm run watch:run:mysql
 ```
