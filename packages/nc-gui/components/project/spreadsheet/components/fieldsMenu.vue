@@ -8,6 +8,7 @@
         overlap
       >
         <v-btn
+          v-t="['fields:trigger']"
           class="nc-fields-menu-btn px-2 nc-remove-border"
           :disabled="isLocked"
           outlined
@@ -258,6 +259,8 @@ export default {
         this.$emit('update:showSystemFields', v)
         this.showFields = this.fields.reduce((o, c) => ({ [c._cn]: c.show, ...o }), {})
         this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+
+        this.$tele.emit('fields:system-field-checkbox')
       }
     }
     // viewId() {
@@ -348,6 +351,8 @@ export default {
         [c._cn]: c.show
       }), {}))
       this.$emit('update:fieldsOrder', this.fields.map(c => c._cn))
+
+      this.$tele.emit('fields:show-hide-checkbox')
     },
     async showAll() {
       if (!this.isPublic) {
@@ -360,6 +365,8 @@ export default {
 
       // eslint-disable-next-line no-return-assign,no-sequences
       this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = true, o), {})
+
+      this.$tele.emit('fields:show-all')
     },
     async hideAll() {
       if (!this.isPublic) {
@@ -373,6 +380,8 @@ export default {
       this.$nextTick(() => {
         this.showFields = (this.fieldsOrderLoc || Object.keys(this.showFields)).reduce((o, k) => (o[k] = false, o), {})
       })
+
+      this.$tele.emit('fields:hide-all')
     },
     onMove(event) {
       if (this.fields.length - 1 === event.moved.newIndex) {
@@ -385,6 +394,7 @@ export default {
         )
       }
       this.saveOrUpdate(this.fields[event.moved.newIndex], event.moved.newIndex)
+      this.$tele.emit('fields:drag')
     }
   }
 }

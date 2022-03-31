@@ -609,6 +609,7 @@ export default {
           this.$toast.error(msg).goAway(3000)
         }
         this.dialogShow = false
+        this.$tele.emit('table:delete:submit')
       }
     },
     onTabChange() {

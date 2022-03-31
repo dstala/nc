@@ -65,7 +65,7 @@
         >
           mdi-github
         </v-icon>-->
-        <v-btn small outlined class="mr-1" @click="createTablesDialog = true">
+        <v-btn small outlined class="mr-1" @click="createTableClick">
           <v-icon small>
             mdi-plus
           </v-icon>
@@ -581,7 +581,7 @@
           color="primary"
           right
           style="top:45%"
-          @click="createTablesDialog = true"
+          @click="createTableClick"
           v-on="on"
         >
           <v-icon>mdi-plus</v-icon>
@@ -741,6 +741,10 @@ export default {
     }
   },
   methods: {
+    createTableClick() {
+      this.createTablesDialog = true;
+      this.$tele.emit('table:create:mdi-plus-circle')
+    },
     parseAndLoadTemplate() {
       if (this.projectTemplate) {
         this.parseTemplate(this.projectTemplate)

@@ -175,7 +175,7 @@
           :tooltip="$t('general.reload')"
           icon.class="nc-table-reload-btn mx-1"
           small
-          @click="reload"
+          @click="reloadClick"
         >
           mdi-reload
         </x-icon>
@@ -207,7 +207,7 @@
           :disabled="isLocked"
           small
           :color="['success','']"
-          @click="insertNewRow(true,true)"
+          @click="clickAddNewIcon"
         >
           mdi-plus-outline
         </x-icon>
@@ -302,7 +302,7 @@
         small
         text
         :btn-class="{ 'primary lighten-5 nc-toggle-nav-drawer' : !toggleDrawer}"
-        @click="toggleDrawer = !toggleDrawer"
+        @click="toggleDrawer = !toggleDrawer; toggleClick()"
       >
         <v-icon
           small
@@ -448,7 +448,7 @@
             v-model="page"
             :count="count"
             :size="size"
-            @input="loadTableData"
+            @input="clickPagination"
           />
         </template>
       </div>
@@ -570,6 +570,7 @@
       <v-list dense>
         <template v-if="isEditable && !isLocked">
           <v-list-item
+            v-t="['record:right-click:insert']"
             v-if="relationType !== 'bt'"
             @click="insertNewRow(false)"
           >
@@ -578,13 +579,13 @@
               {{ $t('activity.insertRow') }}
             </span>
           </v-list-item>
-          <v-list-item @click="deleteRow">
+          <v-list-item v-t="['record:right-click:delete']" @click="deleteRow">
             <span class="caption">
               <!-- Delete Row -->
               {{ $t('activity.deleteRow') }}
             </span>
           </v-list-item>
-          <v-list-item @click="deleteSelectedRows">
+          <v-list-item v-t="['record:right-click:delete-selected']" @click="deleteSelectedRows">
             <span class="caption">
               <!-- Delete Selected Rows -->
               {{ $t('activity.deleteSelectedRow') }}
@@ -594,7 +595,7 @@
         <template v-if="rowContextMenu.col && !rowContextMenu.col.rqd && !rowContextMenu.col.virtual">
           <v-tooltip bottom>
             <template #activator="{on}">
-              <v-list-item v-on="on" @click="clearCellValue">
+              <v-list-item v-on="on" v-t="['record:right-click:clear']" @click="clearCellValue">
                 <span class="caption">Clear</span>
               </v-list-item>
             </template>
@@ -935,6 +936,13 @@ export default {
     // await this.loadViews();
   },
   methods: {
+    clickAddNewIcon() {
+      this.insertNewRow(true, true)
+      this.$tele.emit('record:add-row:icon:trigger')
+    },
+    toggleClick() {
+      this.$tele.emit('right-nav:toggle')
+    },
     ...mapActions({
       loadTablesFromChildTreeNode: 'project/loadTablesFromChildTreeNode'
     }),
@@ -961,6 +969,11 @@ export default {
       // if (confirm('Do you want to delete the table?')) {
       //   await this.$api.meta.tableDelete(this.meta.id)
       // }
+      this.$tele.emit('table:delete:trigger')
+    },
+    async reloadClick() {
+      await this.reload()
+      this.$tele.emit('table:reload')
     },
     async reload() {
       this.$store.dispatch('meta/ActLoadMeta', {
@@ -1318,7 +1331,6 @@ export default {
           this.expandRow(data.length - 1, rowMeta)
         }
       }
-      // this.save()
     },
 
     async handleKeyDown({
@@ -1376,6 +1388,10 @@ export default {
       //   } catch (e) {
       //   }
       // }
+    },
+    clickPagination() {
+      this.loadTableData()
+      this.$tele.emit('pagination:click')
     },
     loadTableData() {
       this.loadTableDataDeb(this)

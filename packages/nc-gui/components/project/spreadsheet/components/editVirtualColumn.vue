@@ -41,7 +41,6 @@
           <v-col cols="12" class="d-flex pt-0">
             <v-spacer />
             <v-btn
-              v-t="['vitual:column:edit:cancel']"
               x-small
               outlined
               @click="close"

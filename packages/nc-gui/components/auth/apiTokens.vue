@@ -92,7 +92,7 @@
         </tr>
         <tr>
           <td colspan="3" class="text-center">
-            <x-btn tooltip="Generate new api token" outlined x-small color="primary" @click="newTokenDialog = true">
+            <x-btn tooltip="Generate new api token" outlined x-small color="primary" @click="showNewTokenDlg">
               <v-icon>mdi-plus</v-icon>
               <!--Add New Token-->
               {{ $t('activity.newToken') }}
@@ -152,9 +152,15 @@ export default {
     this.loadApiTokens()
   },
   methods: {
+    showNewTokenDlg(){
+      this.newTokenDialog = true;
+      this.$tele.emit('api-mgmt:token:generate:trigger')
+    },
     copyToken(token) {
       copyTextToClipboard(token)
       this.$toast.info('Copied to clipboard').goAway(1000)
+
+      this.$tele.emit('api-mgmt:token:copy')
     },
     async loadApiTokens() {
       this.tokens = (await this.$api.meta.apiTokenList(this.$store.state.project.projectId)).data// await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenList'])
@@ -170,6 +176,8 @@ export default {
         console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit('api-mgmt:token:generate:submit')
     },
     async deleteToken(item) {
       try {
@@ -181,6 +189,8 @@ export default {
         console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit('api-mgmt:token:delete')
     }
   }
 }

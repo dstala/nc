@@ -1710,6 +1710,7 @@ export default {
       }
 
       this.projectReloading = false
+      this.$tele.emit('project:create:extdb:submit')
     },
 
     mtdDialogGetEnvNameSubmit(envName, cookie) {
@@ -1987,6 +1988,7 @@ export default {
     getDatabaseForTestConnection(dbType) {
     },
     async testConnection(db, env, panelIndex) {
+      this.$tele.emit('project:create:extdb:test-connection')
       this.$store.commit('notification/MutToggleProgressBar', true)
       try {
         if (!(await this.newTestConnection(db, env, panelIndex))) {

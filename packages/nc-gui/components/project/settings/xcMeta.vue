@@ -66,6 +66,7 @@
           </td>
           <td>
             <v-btn
+              v-t="['proj-meta:export-zip:trigger']"
               min-width="150"
               color="primary"
               small
@@ -88,6 +89,7 @@
           </td>
           <td>
             <v-btn
+              v-t="['proj-meta:import-zip']"
               min-width="150"
               :loading="loading === 'import-zip'"
               color="info"
@@ -234,6 +236,8 @@ export default {
           this.loading = null
         }
       }
+
+      this.$tele.emit('proj-meta:export-zip:submit')
     },
     async resetMeta() {
       this.dialogShow = true

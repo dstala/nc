@@ -213,7 +213,7 @@
               <v-spacer />
               <v-divider />
               <div class="d-flex align-center justify-center">
-                <v-switch v-model="commentsOnly" class="mt-1" dense hide-details @change="getAuditsAndComments">
+                <v-switch v-model="commentsOnly" class="mt-1" dense hide-details @change="getAuditsAndComments" v-t="['record:comment:comments-only']">
                   <template #label>
                     <span class="caption grey--text">Comments only</span>
                   </template>
@@ -250,6 +250,7 @@
     </div>
 
     <v-btn
+      v-t="['record:comment-toggle']"
       v-if="_isUIAllowed('rowComments')"
       v-show="!toggleDrawer"
       class="comment-icon"
@@ -481,6 +482,7 @@ export default {
       } catch (e) {
         this.$toast.error(`Failed to update row : ${e.message}`).goAway(3000)
       }
+      this.$tele.emit('record:add:submit')
     },
     async reload() {
       const id = this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___')
@@ -520,6 +522,8 @@ export default {
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit('record:comment:insert')
     },
     primaryValue() {
       if (this.localState) {

@@ -213,6 +213,7 @@
                     >
                       <transition-group type="transition" :name="!drag ? 'flip-list' : null">
                         <v-list-item
+                          v-t="['project:open']"
                           v-for="child in item.children || []"
                           v-show="!search || child.name.toLowerCase().includes(search.toLowerCase())"
                           :key="child.key"
@@ -286,6 +287,7 @@
 
                                 <v-list dense>
                                   <v-list-item
+                                    v-t="['table:rename:trigger:3-dot-menu']"
                                     v-if="_isUIAllowed('treeview-rename-button')"
                                     dense
                                     @click="
@@ -307,7 +309,12 @@
                                       </span>
                                     </v-list-item-title>
                                   </v-list-item>
-                                  <v-list-item v-if="_isUIAllowed('ui-acl')" dense @click="openUIACL(child)">
+                                  <v-list-item
+                                    v-t="['table:trigger:ui-acl']"
+                                    v-if="_isUIAllowed('ui-acl')"
+                                    dense
+                                    @click="openUIACL(child)"
+                                  >
                                     <v-list-item-icon>
                                       <v-icon x-small>
                                         mdi-shield-outline
@@ -427,7 +434,7 @@
             <template v-if="_isUIAllowed('treeViewProjectSettings')">
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-appstore" @click="appsTabAdd" v-on="on">
+                  <v-list-item dense class="body-2 nc-settings-appstore" @click="appsTabAdd" v-on="on" v-t="['settings:appstore']">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-storefront-outline
@@ -447,7 +454,7 @@
 
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-teamauth" @click="rolesTabAdd" v-on="on">
+                  <v-list-item dense class="body-2 nc-settings-teamauth" @click="rolesTabAdd" v-on="on" v-t="['settings:team-auth']">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-account-group
@@ -466,7 +473,7 @@
               </v-tooltip>
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-projmeta" @click="disableOrEnableModelTabAdd" v-on="on">
+                  <v-list-item dense class="body-2 nc-settings-projmeta" @click="disableOrEnableModelTabAdd" v-on="on" v-t="['settings:proj-metadata']">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-table-multiple
@@ -486,7 +493,7 @@
 
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-list-item dense class="body-2 nc-settings-audit" @click="openAuditTab" v-on="on">
+                  <v-list-item dense class="body-2 nc-settings-audit" @click="openAuditTab" v-on="on" v-t="['settings:audit']">
                     <v-list-item-icon>
                       <v-icon x-small>
                         mdi-notebook-outline
@@ -928,6 +935,7 @@ export default {
       }, 100)
     },
     setPreviewUSer(previewAs) {
+      this.$tele.emit(`preview-as:${previewAs}`)
       if (!process.env.EE) {
         this.$toast.info('Available in Enterprise edition').goAway(3000);
       } else {
@@ -1273,6 +1281,7 @@ export default {
           console.log('action and context', item, action);
           if (action === 'ENV_DB_TABLES_CREATE') {
             this.dialogGetTableName.dialogShow = true;
+            this.$tele.emit('table:create:trigger:right-click')
           } else if (action === 'ENV_DB_VIEWS_CREATE') {
             this.dialogGetViewName.dialogShow = true;
           } else if (action === 'ENV_DB_PROCEDURES_CREATE') {
@@ -1286,6 +1295,7 @@ export default {
           } else if (action === "ENV_DB_TABLES_REFRESH") {
             await this.loadTables(this.menuItem);
             this.$toast.success('Tables refreshed').goAway(1000);
+            this.$tele.emit('table:refresh')
           } else if (action === 'ENV_DB_VIEWS_REFRESH') {
             await this.loadViews(this.menuItem);
             this.$toast.success('Views refreshed').goAway(1000);
@@ -1305,6 +1315,7 @@ export default {
             this.dialogRenameTable.cookie = item;
             this.dialogRenameTable.dialogShow = true;
             this.dialogRenameTable.defaultValue = item.name;
+            this.$tele.emit('table:rename:trigger:right-click')
           } else if (action === 'ENV_DB_MIGRATION_DOWN') {
             await this.sqlMgr.migrator().migrationsDown({
               env: item._nodes.env,
@@ -1457,6 +1468,7 @@ export default {
       this.dialogRenameTable.defaultValue = null;
       this.$toast.success('Table renamed successfully').goAway(3000);
       console.log(_tn, cookie);
+      this.$tele.emit('table:rename:submit')
     },
     mtdDialogRenameTableCancel() {
       console.log('mtdDialogGetTableNameCancel cancelled');
@@ -1492,6 +1504,7 @@ export default {
       setTimeout(() => this.$store.commit('notification/MutToggleProgressBar', false), 200);
 
       this.$set(this.dialogGetTableName, 'dialogShow', false);
+      this.$tele.emit('table:create:submit')
     },
     mtdViewCreate(view) {
       // const tables = table.name.split(',');

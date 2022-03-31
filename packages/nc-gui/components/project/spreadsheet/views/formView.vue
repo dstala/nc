@@ -223,6 +223,7 @@
                             dense
                             inset
                             @change="updateColMeta(col,i)"
+                            v-t="['form-view:field:mark-required']"
                           />
                         </div>
                         <!--placeholder=" Enter form input label"-->
@@ -402,6 +403,7 @@
                   hide-details
                   class="nc-switch"
                   @change="updateView"
+                  v-t="[`form-view:option:submit-another-form`]"
                 >
                   <template #label>
                     <span class="font-weight-bold grey--text caption">
@@ -417,6 +419,7 @@
                   hide-details
                   class="nc-switch"
                   @change="updateView"
+                  v-t="[`form-view:option:show-blank-form`]"
                 >
                   <template #label>
                     <span class="font-weight-bold grey--text caption">
@@ -431,6 +434,7 @@
                   inset
                   hide-details
                   class="nc-switch"
+                  v-t="[`form-view:option:email-me`]"
                 >
                   <template #label>
                     <span class="caption font-weight-bold grey--text ">
@@ -645,6 +649,8 @@ export default {
         }
         this.saveOrUpdateOrderOrVisibility(element, newIndex)
       }
+
+      this.$tele.emit('form-view:drag')
     },
 
     async saveOrUpdateOrderOrVisibility(field, i) {
@@ -733,6 +739,7 @@ export default {
       }, i)
       this.$set(this.columns[i], 'show', false)
 
+      this.$tele.emit('form-view:hide-columns')
       // this.columns = this.columns.filter((_, j) => i !== j)
     },
     async addAllColumns() {
@@ -746,6 +753,7 @@ export default {
         ignoreIds: this.systemFieldsIds
       })
       // this.columns = [...this.allColumnsLoc]
+      this.$tele.emit('form-view:add-all')
     },
     async removeAllColumns() {
       for (const col of this.fields) {
@@ -758,6 +766,7 @@ export default {
         viewId: this.viewId,
         ignoreIds: this.fields.filter(this.isDbRequired).map(f => f.fk_column_id)
       })
+      this.$tele.emit('form-view:remove-all')
     },
     isDbRequired(column) {
       if (hiddenCols.includes(column.fk_column_id)) {
@@ -830,6 +839,8 @@ export default {
       })
 
       await this.loadView()
+
+      this.$tele.emit('form-view:add-new-field')
     },
     async save() {
       try {

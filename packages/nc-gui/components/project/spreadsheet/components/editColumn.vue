@@ -409,7 +409,6 @@
           <v-col cols="12" class="d-flex pt-0">
             <v-spacer />
             <v-btn
-              v-t="['column:edit:cancel']"
               small
               outlined
               @click="close"
@@ -418,7 +417,6 @@
               {{ $t('general.cancel') }}
             </v-btn>
             <v-btn
-              v-t="['column:edit:save']"
               small
               color="primary"
               :disabled="!valid"
@@ -646,6 +644,8 @@ export default {
       }
 
       this.$emit('close')
+
+      this.$tele.emit(`column:edit:save:${this.newColumn.uidt}`);
     },
     onDataTypeChange() {
       this.newColumn.rqd = false

@@ -7,6 +7,7 @@
     >
       <template #activator="{on}">-->
     <v-btn
+      v-t="['share-view:trigger']"
       v-if="_isUIAllowed('add-user')"
       outlined
       class="nc-btn-share-view caption px-2 nc-remove-border font-weight-medium"

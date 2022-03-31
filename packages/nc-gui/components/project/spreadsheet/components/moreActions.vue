@@ -7,6 +7,7 @@
     >
       <template #activator="{on}">
         <v-btn
+          v-t="['actions:trigger']"
           outlined
           class="nc-actions-menu-btn caption px-2 nc-remove-border font-weight-medium"
           small
@@ -29,6 +30,7 @@
         <v-list-item
           dense
           @click="exportCsv"
+          v-t="['actions:download-csv']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1">
@@ -44,6 +46,7 @@
           v-if="_isUIAllowed('csvImport') && !isView"
           dense
           @click="importModal = true"
+          v-t="['actions:upload-csv']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1" color="">
@@ -63,6 +66,7 @@
           v-if="_isUIAllowed('csvImport') && !isView"
           dense
           @click="$emit('showAdditionalFeatOverlay', 'shared-views')"
+          v-t="['actions:shared-view-list']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1" color="">
@@ -78,6 +82,7 @@
           v-if="_isUIAllowed('csvImport') && !isView"
           dense
           @click="$emit('webhook')"
+          v-t="['actions:webhook:trigger']"
         >
           <v-list-item-title>
             <v-icon small class="mr-1" color="">

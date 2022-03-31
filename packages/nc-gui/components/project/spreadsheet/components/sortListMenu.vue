@@ -8,6 +8,7 @@
         overlap
       >
         <v-btn
+          v-t="['sort:trigger']"
           class="nc-sort-menu-btn px-2 nc-remove-border"
           :disabled="isLocked"
           small
@@ -51,9 +52,8 @@
           >
             <template #item="{item}">
               <span
-                :class="`caption font-weight-regular nc-sort-fld-${item._cn}`"
-              >
-                {{ item._cn }}
+                :class="`caption font-weight-regular nc-sort-fld-${item._cn}`">
+                  {{ item._cn }}
               </span>
             </template>
           </v-select>
@@ -130,6 +130,7 @@ export default {
         direction: 'asc'
       })
       this.sortList = this.sortList.slice()
+      this.$tele.emit(`sort:add:${this.sortList.length}`)
     },
     async loadSortList() {
       if (!this.shared) { // && !this._isUIAllowed('sortSync')) {
@@ -154,6 +155,8 @@ export default {
         this.$emit('input', this.sortList)
       }
       this.$emit('updated')
+
+      this.$tele.emit(`sort:dir:${sort.direction}`)
     },
     async deleteSort(sort, i) {
       if (!this.shared && sort.id && this._isUIAllowed('sortSync')) {
@@ -164,6 +167,7 @@ export default {
         this.$emit('input', this.sortList)
       }
       this.$emit('updated')
+      this.$tele.emit(`sort:delete`)
     }
   }
 }

@@ -690,6 +690,8 @@ export default {
       }
       this.loading = false
       await this.loadHooksList()
+
+      this.$tele.emit(`webhooks:save:${this.hook.operation}:${this.hook.condition}:${this.hook.notification.type}`)
     },
     async loadMeta() {
       this.loadingMeta = true
@@ -733,6 +735,8 @@ export default {
       })
       this.onEventChange()
       this.$refs.form.resetValidation()
+
+      this.$tele.emit(`webhook:add:trigger:${this.hooks.length}`)
     },
     async deleteHook(item, i) {
       try {
@@ -757,6 +761,8 @@ export default {
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit('webhook:delete')
     }
   }
 }

@@ -14,7 +14,11 @@
       <v-toolbar-title>
         <v-tooltip bottom>
           <template #activator="{ on }">
-            <v-btn to="/projects" icon class="pa-1 brand-icon nc-noco-brand-icon" v-on="on">
+            <v-btn
+              to="/projects"
+              icon class="pa-1 brand-icon nc-noco-brand-icon"
+              v-on="on"
+            >
               <v-img :src="logo" max-height="30px" max-width="30px" />
             </v-btn>
           </template>
@@ -159,7 +163,7 @@
           <v-list dense class="nc-user-menu">
             <template>
 
-              <v-list-item v-ge="['Settings','']" dense to="/user/settings">
+              <v-list-item v-t="['toolbar:user:email']" v-ge="['Settings','']" dense to="/user/settings">
                 <v-list-item-title>
                   <v-icon small>
                     mdi-at
@@ -173,6 +177,7 @@
               <!-- "Auth token copied to clipboard" -->
               <v-list-item
                 v-if="isDashboard"
+                v-t="['toolbar:user:copy-auth-token']"
                 v-clipboard="$store.state.users.token"
                 dense
                 @click.stop="$toast.success($t('msg.toast.authToken')).goAway(3000)"
@@ -186,6 +191,7 @@
               </v-list-item>
             <v-list-item
               v-if="swaggerOrGraphiqlUrl"
+              v-t="['toolbar:user:swagger']"
               dense
               @click.stop="openUrl(`${$axios.defaults.baseURL}${swaggerOrGraphiqlUrl}`)"
             >
@@ -198,7 +204,13 @@
               </v-list-item-title>
             </v-list-item>
             <v-divider />
-            <v-list-item v-if="isDashboard" v-ge="['Sign Out','']" dense @click="copyProjectInfo">
+            <v-list-item
+              v-if="isDashboard"
+              v-t="['toolbar:user:copy-proj-info']"
+              v-ge="['Sign Out','']"
+              dense
+              @click="copyProjectInfo"
+            >
               <v-list-item-title>
                 <v-icon small>
                   mdi-content-copy
@@ -206,7 +218,11 @@
               </v-list-item-title>
             </v-list-item>
             <v-divider v-if="isDashboard" />
-            <v-list-item v-if="isDashboard" dense @click.stop="settingsTabAdd">
+            <v-list-item
+              v-if="isDashboard"
+              v-t="['toolbar:user:themes']"
+              dense @click.stop="settingsTabAdd"
+            >
               <v-list-item-title>
                 <v-icon key="terminal-dash" small>
                   mdi-palette
@@ -217,7 +233,12 @@
 
               <v-divider v-if="isDashboard" />
 
-              <v-list-item v-ge="['Sign Out','']" dense @click="MtdSignOut">
+              <v-list-item
+                v-t="['toolbar:user:sign-out']"
+                v-ge="['Sign Out','']"
+                dense
+                @click="MtdSignOut"
+              >
                 <v-list-item-title>
                   <v-icon small>
                     mdi-logout
@@ -802,6 +823,7 @@ export default {
     },
     changeTheme() {
       this.$store.dispatch('windows/ActToggleDarkMode', !this.$store.state.windows.darkTheme)
+      this.$tele.emit('toolbar:theme')
     },
     async copyProjectInfo() {
       try {

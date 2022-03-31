@@ -188,6 +188,8 @@ export default {
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit(`shared-base:enable:${roles}`)
     },
     async disableSharedBase() {
       try {
@@ -197,6 +199,8 @@ export default {
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit(`shared-base:disable`)
     },
     async recreate() {
       try {
@@ -207,13 +211,19 @@ export default {
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit(`shared-base:recreate`)
     },
     copyUrl() {
       copyTextToClipboard(this.url)
       this.$toast.success('Copied shareable base url to clipboard!').goAway(3000)
+
+      this.$tele.emit(`shared-base:copy-url`)
     },
     navigateToSharedBase() {
       window.open(this.url, '_blank')
+
+      this.$tele.emit(`shared-base:open-url`)
     },
     generateEmbeddableIframe() {
       copyTextToClipboard(`<iframe
@@ -224,6 +234,8 @@ width="100%"
 height="700"
 style="background: transparent; border: 1px solid #ddd"></iframe>`)
       this.$toast.success('Copied embeddable html code!').goAway(3000)
+
+      this.$tele.emit(`shared-base:copy-embed-frame`)
     }
   }
 

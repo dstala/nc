@@ -176,6 +176,8 @@ export default {
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit('proj-meta:ui-acl:update')
     }
   },
   computed: {
