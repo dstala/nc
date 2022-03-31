@@ -34,12 +34,25 @@ async function bulkDataUpdate(req: Request, res: Response) {
   res.json(await baseModel.bulkUpdate(req.body));
 }
 
+async function bulkDataUpdateAll(req: Request, res: Response) {
+  const { model, view } = await getViewAndModelFromRequest(req);
+  const base = await Base.get(model.base_id);
+
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  res.json(await baseModel.bulkUpdateAll(req.query, req.body));
+}
+
 async function bulkDataDelete(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequest(req);
   const base = await Base.get(model.base_id);
   const baseModel = await Model.getBaseModelSQL({
     id: model.id,
-    viewId: view.id,
+    viewId: view?.id,
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
@@ -51,7 +64,7 @@ async function getViewAndModelFromRequest(req) {
   const model = await Model.getByAliasOrId({
     project_id: project.id,
     base_id: project.bases?.[0]?.id,
-    aliasOrId: req.params.tableName
+    aliasOrId: req.params.tableAlias
   });
   const view =
     req.params.viewName &&
@@ -66,15 +79,19 @@ async function getViewAndModelFromRequest(req) {
 const router = Router({ mergeParams: true });
 
 router.post(
-  '/bulkData/:orgs/:projectName/:tableName',
+  '/bulkData/:orgs/:projectName/:tableAlias',
   ncMetaAclMw(bulkDataInsert)
 );
 router.put(
-  '/bulkData/:orgs/:projectName/:tableName',
+  '/bulkData/:orgs/:projectName/:tableAlias',
   ncMetaAclMw(bulkDataUpdate)
 );
+router.patch(
+  '/bulkData/:orgs/:projectName/:tableAlias/all',
+  ncMetaAclMw(bulkDataUpdateAll)
+);
 router.delete(
-  '/bulkData/:orgs/:projectName/:tableName',
+  '/bulkData/:orgs/:projectName/:tableAlias',
   ncMetaAclMw(bulkDataDelete)
 );
 

@@ -1547,7 +1547,7 @@ class BaseModelSqlv2 {
     try {
       const updateData = await this.model.mapAliasToColumn(data);
       await this.validate(updateData);
-      const wherePk = _wherePk(this.model.primaryKeys, updateData);
+      const wherePk = getCompositePk(this.model.primaryKeys, updateData);
       let res = null;
       if (wherePk) {
         // pk is specified - by pass
