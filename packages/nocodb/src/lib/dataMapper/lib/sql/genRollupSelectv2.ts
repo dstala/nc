@@ -2,7 +2,7 @@ import RollupColumn from '../../../noco-models/RollupColumn';
 import { XKnex } from '../..';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import { QueryBuilder } from 'knex';
-import { RelationTypes } from 'nc-common';
+import { RelationTypes } from 'nocodb-sdk';
 
 export default async function({
   knex,

@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { UITypes, substituteColumnIdWithAliasInFormula } from 'nc-common'
+import { UITypes, substituteColumnIdWithAliasInFormula } from 'nocodb-sdk'
 import FormulaOptions from '@/components/project/spreadsheet/components/editColumn/formulaOptions'
 import { validateColumnName } from '~/helpers'
 

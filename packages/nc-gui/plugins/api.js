@@ -1,4 +1,4 @@
-import { Api } from 'nc-common'
+import { Api } from 'nocodb-sdk'
 
 export function getApi($store, $axios) {
   const api = new Api({

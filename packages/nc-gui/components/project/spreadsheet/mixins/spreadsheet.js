@@ -1,4 +1,4 @@
-import { isVirtualCol, filterOutSystemColumns } from 'nc-common'
+import { isVirtualCol, filterOutSystemColumns } from 'nocodb-sdk'
 
 export default {
   data: () => ({

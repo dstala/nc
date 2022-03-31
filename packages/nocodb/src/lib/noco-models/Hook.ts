@@ -1,4 +1,4 @@
-import { HookType } from 'nc-common';
+import { HookType } from 'nocodb-sdk';
 import {
   CacheDelDirection,
   CacheGetType,

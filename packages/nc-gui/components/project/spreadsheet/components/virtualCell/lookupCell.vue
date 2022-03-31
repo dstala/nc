@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { isVirtualCol, RelationTypes, UITypes } from 'nc-common'
+import { isVirtualCol, RelationTypes, UITypes } from 'nocodb-sdk'
 import TableCell from '../cell'
 import ItemChip from '@/components/project/spreadsheet/components/virtualCell/components/itemChip'
 export default {

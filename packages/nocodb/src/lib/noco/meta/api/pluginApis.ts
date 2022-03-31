@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import Plugin from '../../../noco-models/Plugin';
-import { PluginTestPayloadType, PluginType } from 'nc-common';
+import { PluginTestPayloadType, PluginType } from 'nocodb-sdk';
 import NcPluginMgrv2 from '../helpers/NcPluginMgrv2';
 import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';

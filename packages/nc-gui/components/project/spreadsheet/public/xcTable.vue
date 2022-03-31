@@ -82,47 +82,46 @@
       }}) -> {{ relationType === 'hm' ? ' Has Many ' : ' Belongs To ' }} -> {{ table }}</span>
 -->
 
-      <div class="d-inline-flex">
-
-        <!--        <v-btn outlined small text @click="reload">
+        <div class="d-inline-flex">
+          <!--        <v-btn outlined small text @click="reload">
           <v-icon small class="mr-1" color="grey  darken-3">
             mdi-reload
           </v-icon>
           Reload
         </v-btn>-->
 
-        <fields-menu
-          v-model="showFields"
-          :field-list="fieldList"
-          :fields-order.sync="fieldsOrder"
-          is-public
-          :meta="meta"
-        />
+          <fields-menu
+            v-model="showFields"
+            :field-list="fieldList"
+            :fields-order.sync="fieldsOrder"
+            is-public
+            :meta="meta"
+          />
 
-        <sort-list-menu
-          v-model="sorts"
-          :meta="meta"
-          :shared="true"
-          :field-list="realFieldList"
-          @input="loadTableData"
-        />
+          <sort-list-menu
+            v-model="sorts"
+            :meta="meta"
+            :shared="true"
+            :field-list="realFieldList"
+            @input="loadTableData"
+          />
 
-        <column-filter-menu
-          v-model="filters"
-          :meta="meta"
-          :field-list="realFieldList"
-          :shared="true"
-          @input="loadTableData"
-        />
+          <column-filter-menu
+            v-model="filters"
+            :meta="meta"
+            :field-list="realFieldList"
+            :shared="true"
+            @input="loadTableData"
+          />
 
-        <csv-export-import
-          :is-view="isView"
-          :query-params="{...queryParams, showFields}"
-          :public-view-id="$route.params.id"
-          :meta="meta"
-          :req-payload="{filters, sorts, password}"
-        />
-      </div>
+          <csv-export-import
+            :is-view="isView"
+            :query-params="{...queryParams, showFields}"
+            :public-view-id="$route.params.id"
+            :meta="meta"
+            :req-payload="{filters, sorts, password}"
+          />
+        </div>
         <v-spacer class="h-100" @dblclick="debug=true" />
         <!--      <v-menu>
           <template #activator="{ on, attrs }">
@@ -221,7 +220,7 @@
 <script>
 /* eslint-disable camelcase */
 
-import { ErrorMessages } from 'nc-common'
+import { ErrorMessages } from 'nocodb-sdk'
 import spreadsheet from '../mixins/spreadsheet'
 import ApiFactory from '../apis/apiFactory'
 // import EditableCell from "../editableCell";

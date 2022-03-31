@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { isVirtualCol } from 'nc-common'
+import { isVirtualCol } from 'nocodb-sdk'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'

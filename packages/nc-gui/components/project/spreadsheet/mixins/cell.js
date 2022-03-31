@@ -1,4 +1,4 @@
-import { UITypes } from 'nc-common'
+import { UITypes } from 'nocodb-sdk'
 import { uiTypes } from '@/components/project/spreadsheet/helpers/uiTypes'
 
 export default {

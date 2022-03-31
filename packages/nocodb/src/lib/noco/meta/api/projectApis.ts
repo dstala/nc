@@ -5,7 +5,7 @@ import {
   ProjectCreatePayloadType,
   ProjectListParamsType,
   ProjectListType
-} from 'nc-common';
+} from 'nocodb-sdk';
 
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 // import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';

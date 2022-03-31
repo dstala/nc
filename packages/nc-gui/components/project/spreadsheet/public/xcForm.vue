@@ -229,7 +229,7 @@
 
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
-import { ErrorMessages, isVirtualCol, RelationTypes, UITypes } from 'nc-common'
+import { ErrorMessages, isVirtualCol, RelationTypes, UITypes } from 'nocodb-sdk'
 import form from '../mixins/form'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'

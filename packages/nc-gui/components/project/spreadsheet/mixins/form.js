@@ -1,4 +1,4 @@
-import { RelationTypes, UITypes } from 'nc-common'
+import { RelationTypes, UITypes } from 'nocodb-sdk'
 
 export default {
   props: {

@@ -1,4 +1,4 @@
-import { PaginatedType } from 'nc-common';
+import { PaginatedType } from 'nocodb-sdk';
 
 export class PagedResponseImpl<T> {
   constructor(

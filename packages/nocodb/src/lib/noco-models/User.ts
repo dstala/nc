@@ -1,4 +1,4 @@
-import { UserType } from 'nc-common';
+import { UserType } from 'nocodb-sdk';
 import { CacheGetType, CacheScope, MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
 import extractProps from '../noco/meta/helpers/extractProps';

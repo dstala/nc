@@ -62,7 +62,7 @@
 
 import debounce from 'debounce'
 import jsep from 'jsep'
-import { UITypes } from 'nc-common'
+import { UITypes } from 'nocodb-sdk'
 import formulaList, { validations } from '../../../../../helpers/formulaList'
 import { getWordUntilCaret, insertAtCursor } from '@/helpers'
 import NcAutocompleteTree from '@/helpers/NcAutocompleteTree'

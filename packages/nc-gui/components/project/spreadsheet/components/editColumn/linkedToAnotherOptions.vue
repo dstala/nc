@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import { UITypes } from 'nc-common'
+import { UITypes } from 'nocodb-sdk'
 
 export default {
   name: 'LinkedToAnotherOptions',

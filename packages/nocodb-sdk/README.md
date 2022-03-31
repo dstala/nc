@@ -1,3 +1,3 @@
-# nc-common
+# nocodb-sdk
 
 Xc common library

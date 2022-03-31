@@ -458,7 +458,7 @@
 import draggable from 'vuedraggable'
 import { validationMixin } from 'vuelidate'
 import { required, minLength } from 'vuelidate/lib/validators'
-import { UITypes, isVirtualCol, RelationTypes, getSystemColumns } from 'nc-common'
+import { UITypes, isVirtualCol, RelationTypes, getSystemColumns } from 'nocodb-sdk'
 import VirtualHeaderCell from '../components/virtualHeaderCell'
 import HeaderCell from '../components/headerCell'
 import VirtualCell from '../components/virtualCell'

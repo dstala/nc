@@ -440,7 +440,7 @@
 </template>
 
 <script>
-import { MssqlUi, SqliteUi } from 'nc-common'
+import { MssqlUi, SqliteUi } from 'nocodb-sdk'
 import { UITypes, uiTypes } from '../helpers/uiTypes'
 import RollupOptions from './editColumn/rollupOptions'
 import FormulaOptions from '@/components/project/spreadsheet/components/editColumn/formulaOptions'

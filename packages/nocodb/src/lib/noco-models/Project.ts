@@ -1,6 +1,6 @@
 import Base from '../noco-models/Base';
 import Noco from '../noco/Noco';
-import { ProjectListParamsType, ProjectType } from 'nc-common';
+import { ProjectListParamsType, ProjectType } from 'nocodb-sdk';
 import {
   CacheDelDirection,
   CacheGetType,

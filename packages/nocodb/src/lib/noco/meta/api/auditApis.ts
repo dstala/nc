@@ -8,7 +8,7 @@ import {
   CommentListParamsType,
   CommentRowPayloadType,
   ProjectAuditListParamsType
-} from 'nc-common';
+} from 'nocodb-sdk';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import ncMetaAclMw from '../helpers/ncMetaAclMw';

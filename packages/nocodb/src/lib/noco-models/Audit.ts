@@ -2,7 +2,7 @@ import {
   AuditOperationTypes,
   AuditType,
   CommentListParamsType
-} from 'nc-common';
+} from 'nocodb-sdk';
 import { MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
 import Model from './Model';

@@ -30,7 +30,7 @@ import SESPluginConfig from '../../../../plugins/ses';
 import Noco from '../../Noco';
 import Local from '../../plugins/adapters/storage/Local';
 import { MetaTable } from '../../../utils/globals';
-import { PluginCategory, PluginTestPayloadType } from 'nc-common';
+import { PluginCategory, PluginTestPayloadType } from 'nocodb-sdk';
 
 const defaultPlugins = [
   SlackPluginConfig,

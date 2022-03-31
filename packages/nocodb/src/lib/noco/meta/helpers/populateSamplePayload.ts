@@ -1,6 +1,6 @@
 import View from '../../../noco-models/View';
 import Column from '../../../noco-models/Column';
-import { RelationTypes, UITypes } from 'nc-common';
+import { RelationTypes, UITypes } from 'nocodb-sdk';
 import Model from '../../../noco-models/Model';
 import LinkToAnotherRecordColumn from '../../../noco-models/LinkToAnotherRecordColumn';
 import LookupColumn from '../../../noco-models/LookupColumn';
