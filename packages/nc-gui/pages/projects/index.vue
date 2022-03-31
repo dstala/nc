@@ -46,7 +46,7 @@
                   small
                   color="primary grey"
                   :tooltip="$t('activity.refreshProject')"
-                  @click="projectsLoad"
+                  @click="projectsRefresh"
                 >
                   mdi-refresh
                 </x-icon>&nbsp;
@@ -282,7 +282,7 @@
                     :class="[`nc-${props.item.projectType}-project-row`,{
                       'nc-meta-project-row': props.item.prefix
                     }]"
-                    @click="projectRouteHandler(props.item)"
+                    @click="projectRouteHandler(props.item, projects.length)"
                   >
                     <td data-v-step="2">
                       <div class="d-flex align-center">
@@ -1016,6 +1016,7 @@ export default {
       this.dialogShow = true
       this.confirmMessage =
         'Do you want to delete the project?'
+      this.$tele.emit('project:delete:trigger')
       this.confirmAction = async(act) => {
         if (act === 'hideDialog') {
           this.dialogShow = false
@@ -1043,22 +1044,27 @@ export default {
           this.projectStatusUpdating = false
 
           this.dialogShow = false
+          this.$tele.emit('project:delete:submit')
         }
       }
     },
     onCreateProject(xcdb) {
       if (xcdb === 'xcdb') {
         this.$router.push('/project/xcdb')
+        this.$tele.emit('project:create:xcdb:trigger')
       } else {
         this.$router.push('/project/0')
+        this.$tele.emit('project:create:extdb:trigger')
       }
     },
     onCreateProjectFromTemplate() {
       this.templatesModal = true
+      this.$tele.emit('project:create:template:trigger')
     },
     onCreateProjectFromExcel() {
       // this.$refs.excelImport.selectFile()
       this.excelImportModal = true
+      this.$tele.emit('project:create:excel:trigger')
     },
     async importProjectFromJSON() {
     },
@@ -1067,6 +1073,10 @@ export default {
     },
     getDir(filePath) {
       // return path.dirname(filePath);
+    },
+    async projectsRefresh() {
+      await this.projectsLoad()
+      this.$tele.emit('project:refresh')
     },
     async projectsLoad() {
       try {
@@ -1113,7 +1123,7 @@ export default {
       }
       this.loaded = true
     },
-    async projectRouteHandler(project) {
+    async projectRouteHandler(project, count) {
       /*      if (!project.allowed) {
         this.$toast.info(`Contact following owner email to get project access : ${project.owner}`).goAway(5000)
         return
@@ -1134,6 +1144,7 @@ export default {
         })
         // this.$set(project, 'loading', false)
       }
+      this.$tele.emit(`project:open:${count}`)
     },
     async projectEdit(project) {
       console.log('projectEdit')

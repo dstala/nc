@@ -73,7 +73,7 @@
           </span>
         </v-list-item>
         <v-list-item
-          v-t="['column:setAsPrimary']"
+          v-t="['column:set-as-primary']"
           dense
           @click="setAsPrimaryValue"
         >

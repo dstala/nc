@@ -122,7 +122,7 @@
               hide-details
               :disabled="filter.readOnly"
               @click.stop
-              @change="saveOrUpdate(filter, i)"
+              @change="saveOrUpdate(filter, i); teleFilter(filter)"
             >
               <template #item="{item}">
                 <span class="caption font-weight-regular">{{ item }}</span>
@@ -167,7 +167,7 @@
               hide-details
               item-value="value"
               @click.stop
-              @change="saveOrUpdate(filter, i)"
+              @change="saveOrUpdate(filter, i); teleFilter(filter)"
             >
               <template #item="{item}">
                 <span class="caption font-weight-regular">{{ item.text }}</span>
@@ -207,7 +207,10 @@
           </v-btn>
         </v-list-item>-->
 
-    <v-btn small class="elevation-0 grey--text my-3" @click.stop="addFilter">
+    <v-btn
+      small
+      class="elevation-0 grey--text my-3"
+      @click.stop="addFilter">
       <v-icon small color="grey">
         mdi-plus
       </v-icon>
@@ -437,6 +440,7 @@ export default {
         logical_op: 'and'
       })
       this.filters = this.filters.slice()
+      this.$tele.emit(`filter:add:trigger:${this.filters.length}`)
     },
     addFilterGroup() {
       this.filters.push({
@@ -447,6 +451,9 @@ export default {
       this.filters = this.filters.slice()
       const index = this.filters.length - 1
       this.saveOrUpdate(this.filters[index], index)
+    },
+    teleFilter(filter) {
+        this.$tele.emit(`filter:condition:${filter.logical_op}:${filter.comparison_op}`)
     },
     async saveOrUpdate(filter, i) {
       if (this.shared || !this._isUIAllowed('filterSync')) {
@@ -488,6 +495,7 @@ export default {
         this.$emit('updated')
       }
       // this.$emit('input', this.filters.filter(f => f.fk_column_id && f.comparison_op))
+      this.$tele.emit('filter:delete')
     }
   }
 }

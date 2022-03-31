@@ -244,7 +244,7 @@
           </td>
         </tr>
         <tr v-if="!isView && !isLocked && !isPublicView && isEditable && relationType !== 'bt'">
-          <td v-t="['row:add']" :colspan="visibleColLength + 1" class="text-left pointer nc-grid-add-new-cell" @click="insertNewRow(true)">
+          <td v-t="['record:add:trigger']" :colspan="visibleColLength + 1" class="text-left pointer nc-grid-add-new-cell" @click="insertNewRow(true)">
             <v-tooltip top>
               <template #activator="{on}">
                 <v-icon small color="pink" v-on="on">
@@ -641,6 +641,7 @@ export default {
     },
     expandRow(...args) {
       this.$emit('expandRow', ...args)
+      this.$tele.emit('record:expand-row')
     },
     showRowContextMenu($event, rowObj, rowMeta, row, ...rest) {
       this.$emit('showRowContextMenu', $event, rowObj, rowMeta, row, ...rest)

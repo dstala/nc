@@ -25,6 +25,7 @@
               >
                 <transition-group type="transition" :name="!drag ? 'flip-list' : null">
                   <v-list-item
+                    v-t="['view:open']"
                     v-for="(view, i) in viewsList"
                     :key="view.id"
                     dense
@@ -462,6 +463,7 @@
               :href="`${sharedViewUrl}`"
               style="text-decoration: none"
               target="_blank"
+              v-t="['share-view:open-url']"
             >
               <v-icon small class="mx-2">mdi-open-in-new</v-icon>
             </a>
@@ -683,6 +685,8 @@ export default {
         title: this.viewsList[event.moved.newIndex].title,
         order: this.viewsList[event.moved.newIndex].order
       })
+
+      this.$tele.emit('view:drag')
     },
     onViewIdChange(id) {
       const selectedView = this.views && this.views.find(v => v.id === id)
@@ -729,6 +733,7 @@ export default {
       }
       this.createViewType = type
       this.showCreateView = true
+      this.$tele.emit(`view:create:trigger:${type}`)
     },
     isCentrallyAligned(col) {
       return ![
@@ -768,6 +773,8 @@ export default {
       } catch (e) {
         this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
       }
+
+      this.$tele.emit('share-view:enable-pwd')
     },
     async loadViews() {
       // this.viewsList = await this.sqlOp(
@@ -857,6 +864,7 @@ export default {
         input.focus()
         input.setSelectionRange(0, input.value.length)
       })
+      this.$tele.emit(`view:rename:trigger:${view.type}`)
     },
     async deleteView(view) {
       try {
@@ -872,6 +880,7 @@ export default {
       } catch (e) {
         this.$toast.error(await this._extractSdkResponseErrorMsg(e)).goAway(3000)
       }
+      this.$tele.emit(`view:delete:submit:${view.type}`)
     },
     async genShareLink() {
       // const sharedViewUrl = await this.$store.dispatch('sqlMgr/ActSqlOp', [
@@ -908,12 +917,14 @@ export default {
       this.createViewType = view.type
       this.showCreateView = true
       this.copyViewRef = view
+      this.$tele.emit(`view:copy:trigger${view.type}`)
     },
     async onViewCreate(viewMeta) {
       this.copyViewRef = null
       await this.loadViews()
       this.selectedViewIdLocal = viewMeta.id
       // await this.onViewChange();
+      this.$tele.emit(`view:create:submit:${viewMeta.type}`)
     },
     clipboard(str) {
       const el = document.createElement('textarea')
@@ -930,6 +941,7 @@ export default {
     copyShareUrlToClipboard() {
       this.clipboard(this.sharedViewUrl)
       this.clipboardSuccessHandler()
+      this.$tele.emit('share-view:copy-url')
     }
   }
 }

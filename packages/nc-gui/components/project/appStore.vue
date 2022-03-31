@@ -233,14 +233,19 @@ export default {
       } catch (e) {
         this.$toast.error(e.message).goAway(3000)
       }
+
+      this.$tele.emit(`appstore:reset:${this.resetPluginRef.title}`)
     },
     async saved() {
       this.pluginInstallOverlay = false
       await this.loadPluginList()
+      this.$tele.emit(`appstore:install:submit:${this.installPlugin.title}`)
     },
     async installApp(app) {
       this.pluginInstallOverlay = true
       this.installPlugin = app
+
+      this.$tele.emit(`appstore:install:trigger:${app.title}`)
     },
     async resetApp(app) {
       this.pluginUninstallModal = true

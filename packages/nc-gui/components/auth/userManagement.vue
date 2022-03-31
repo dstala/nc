@@ -28,7 +28,7 @@
         color="primary"
         small
         :disabled="loading"
-        @click="loadUsers"
+        @click="clickReload"
         @click.prevent
       >
         <v-icon small left>
@@ -145,7 +145,7 @@
                             class="ml-2"
                             color="error"
                             small
-                            @click.prevent.stop="deleteId = item.id; deleteItem = item.id;showConfirmDlg = true;deleteUserType='DELETE_FROM_PROJECT'"
+                            @click.prevent.stop="clickDeleteUser(item.id)"
                           >
                             mdi-delete-outline
                           </x-icon>
@@ -338,7 +338,7 @@
                   small
                   outlined
                   btn.class="grey--text"
-                  @click="invite_token = null, selectedUser = {roles: 'editor'}"
+                  @click="clickInviteMore"
                 >
                   <v-icon small color="grey" class="mr-1">
                     mdi-account-multiple-plus-outline
@@ -544,6 +544,22 @@ export default {
     this.$eventBus.$off('show-add-user', this.addUser)
   },
   methods: {
+    clickReload() {
+      this.loadUsers()
+      this.$tele.emit('user-mgmt:reload')
+    },
+    clickDeleteUser(id) {
+      this.$tele.emit('user-mgmt:delete:trigger');
+      this.deleteId = id;
+      this.deleteItem = id;
+      this.showConfirmDlg = true;
+      this.deleteUserType='DELETE_FROM_PROJECT'
+    },
+    clickInviteMore() {
+      this.$tele.emit('user-mgmt:invite-more')
+      this.invite_token = null;
+      this.selectedUser = {roles: 'editor'};
+    },
     getRole(roles) {
       return (roles ? roles.split(',') : []).sort((a, b) => this.roleNames.indexOf(a) - this.roleNames.indexOf(a))[0]
     },
@@ -595,6 +611,8 @@ export default {
       el.select()
       document.execCommand('copy')
       document.body.removeChild(el)
+
+      this.$tele.emit(`user-mgmt:copy-url`)
     },
     async resendInvite(id) {
       try {
@@ -613,6 +631,9 @@ export default {
       } catch (e) {
         this.$toast.error(e.response.data.msg).goAway(3000)
       }
+
+      this.$tele.emit(`user-mgmt:resend-invite`)
+
     },
     async loadUsers() {
       try {
@@ -682,6 +703,9 @@ export default {
       }
       await this.deleteUser(this.deleteId, this.deleteUserType)
       this.showConfirmDlg = false
+
+      this.$tele.emit(`user-mgmt:delete:submit`)
+
     },
     addUser() {
       this.invite_token = null
@@ -689,6 +713,8 @@ export default {
         roles: 'editor'
       }
       this.userEditDialog = true
+
+      this.$tele.emit('user-mgmt:add-user:trigger')
     },
     async inviteUser(item) {
       try {
@@ -698,6 +724,8 @@ export default {
       } catch (e) {
         this.$toast.error(e.response.data.msg).goAway(3000)
       }
+
+      this.$tele.emit('user-mgmt:invite-user')
     },
     async saveUser() {
       this.validate = true
@@ -705,6 +733,7 @@ export default {
       if (this.loading || !this.$refs.form.validate() || !this.selectedUser) {
         return
       }
+      this.$tele.emit(`user-mgmt:add:${this.selectedUser.roles}`)
 
       if (!this.edited) {
         this.userEditDialog = false

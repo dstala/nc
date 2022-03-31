@@ -8,6 +8,7 @@
         overlap
       >
         <v-btn
+          v-t="['filter:trigger']"
           class="nc-filter-menu-btn px-2 nc-remove-border"
           :disabled="isLocked"
           outlined
@@ -78,6 +79,7 @@ export default {
     autosave: {
       set(v) {
         this.$store.commit('windows/MutAutoApplyFilter', v)
+        this.$tele.emit(`filter:auto-apply:${v}`)
       },
       get() {
         return this.$store.state.windows.autoApplyFilter
@@ -109,6 +111,7 @@ export default {
     applyChanges() {
       this.$emit('input', this.filters)
       if (this.$refs.filter) { this.$refs.filter.applyChanges() }
+      this.$tele.emit('filter:apply-explicit')
     }
   }
 }

@@ -267,7 +267,7 @@
         :tooltip="$t('tooltip.addTable')"
         icon-class="add-btn"
         :color="[ 'white','grey lighten-2']"
-        @click="dialogCreateTableShow = true"
+        @click="dialogCreateTableShowMethod"
       >
         mdi-plus-box
       </x-icon>
@@ -291,7 +291,7 @@
     <dlg-table-create
       v-if="dialogCreateTableShow"
       v-model="dialogCreateTableShow"
-      @create="$emit('tableCreate',$event); dialogCreateTableShow =false;"
+      @create="$emit('tableCreate',$event); dialogCreateTableShow =false; teleTblCreate()"
     />
 
     <!--    <screensaver v-if="showScreensaver && !($store.state.project.projectInfo && $store.state.project.projectInfo.ncMin)" class="screensaver" />-->
@@ -376,6 +376,13 @@ export default {
     }
   },
   methods: {
+    dialogCreateTableShowMethod(){
+      this.dialogCreateTableShow = true
+      this.$tele.emit('table:create:trigger:mdi-plus-box')
+    },
+    teleTblCreate(){
+      this.$tele.emit('table:create:submit')
+    },
     checkInactiveState() {
       let position = 0
       let idleTime = 0

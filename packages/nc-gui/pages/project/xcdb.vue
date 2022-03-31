@@ -87,6 +87,7 @@
 
           <div class="text-center">
             <v-btn
+              v-t="['project:create:xcdb:submit']"
               class="mt-3"
               large
               :loading="loading"

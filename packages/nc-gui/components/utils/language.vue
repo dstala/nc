@@ -117,6 +117,7 @@ export default {
         spread: 120,
         startVelocity: 45
       })
+      this.$tele.emit(`toolbar:lang:${lan}`)
     }
   }
 }

@@ -22,6 +22,7 @@
 
               <v-spacer />
               <x-btn
+                v-t="['proj-meta:metadata:reload']"
                 btn.class="nc-btn-metasync-reload"
                 outlined
                 :tooltip="$t('tooltip.reloadList')"
@@ -243,6 +244,7 @@
           <!--            v-if="isNewOrDeletedModelFound" -->
           <div class="d-flex justify-center">
             <v-btn
+              v-t="['proj-meta:metadata:metasync']"
               v-if="isChanged"
               x-large
               class="mx-auto primary nc-btn-metasync-sync-now"
