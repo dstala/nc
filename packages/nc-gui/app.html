@@ -2,39 +2,6 @@
 <html {{ HTML_ATTRS }}>
 <head {{ HEAD_ATTRS }}>
   {{ HEAD }}
-
-  <script>
-    rudderanalytics = window.rudderanalytics = [];
-
-    var  methods = [
-      "load",
-      "page",
-      "track",
-      "identify",
-      "alias",
-      "group",
-      "ready",
-      "reset",
-      "getAnonymousId",
-      "setAnonymousId"
-    ];
-
-    for (var i = 0; i < methods.length; i++) {
-      var method = methods[i];
-      rudderanalytics[method] = function (methodName) {
-        return function () {
-          rudderanalytics.push([methodName].concat(Array.prototype.slice.call(arguments)));
-        };
-      }(method);
-    }
-    rudderanalytics.load("2737fQ7nAZZx7wxHwbXZIWWLK9D", "https://hosted.rudderlabs.com");
-    //For example,
-    //rudderanalytics.load("write_key_from_source", "dataplane_from_rudderapp");
-    rudderanalytics.page();
-  </script>
-
-  <script src="https://cdn.rudderlabs.com/v1/rudder-analytics.min.js"></script>
-
 </head>
 <body {{ BODY_ATTRS }}>
 {{ APP }}
