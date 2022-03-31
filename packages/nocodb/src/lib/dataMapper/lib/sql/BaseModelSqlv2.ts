@@ -1669,11 +1669,15 @@ class BaseModelSqlv2 {
   }
 
   public async beforeUpdate(data: any, _trx: any, req): Promise<void> {
-    await this.handleHooks('Before.update', data, req);
+    if (req.body?._cellSaved) {
+      await this.handleHooks('Before.update', data, req);
+    }
   }
 
   public async afterUpdate(data: any, _trx: any, req): Promise<void> {
-    await this.handleHooks('After.update', data, req);
+    if (req.body?._cellSaved) {
+      await this.handleHooks('After.update', data, req);
+    }
   }
 
   public async beforeDelete(data: any, _trx: any, req): Promise<void> {
