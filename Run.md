@@ -26,7 +26,7 @@ npm install
 
 npm run watch:run
 
-# if you have mysql, then use
+# if you have mysql on localhost (set its password as password)
 # npm run watch:run:mysql
 ```
 
