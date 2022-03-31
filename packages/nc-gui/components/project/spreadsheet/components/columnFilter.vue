@@ -122,7 +122,7 @@
               hide-details
               :disabled="filter.readOnly"
               @click.stop
-              @change="saveOrUpdate(filter, i); teleFilter(filter)"
+              @change="filterUpdateCondition(filter, i)"
             >
               <template #item="{item}">
                 <span class="caption font-weight-regular">{{ item }}</span>
@@ -167,7 +167,7 @@
               hide-details
               item-value="value"
               @click.stop
-              @change="saveOrUpdate(filter, i); teleFilter(filter)"
+              @change="filterUpdateCondition(filter, i)"
             >
               <template #item="{item}">
                 <span class="caption font-weight-regular">{{ item.text }}</span>
@@ -452,8 +452,9 @@ export default {
       const index = this.filters.length - 1
       this.saveOrUpdate(this.filters[index], index)
     },
-    teleFilter(filter) {
-        this.$tele.emit(`filter:condition:${filter.logical_op}:${filter.comparison_op}`)
+    filterUpdateCondition(filter, i) {
+      this.saveOrUpdate(filter, i);
+      this.$tele.emit(`filter:condition:${filter.logical_op}:${filter.comparison_op}`)
     },
     async saveOrUpdate(filter, i) {
       if (this.shared || !this._isUIAllowed('filterSync')) {

@@ -92,7 +92,7 @@
         </tr>
         <tr>
           <td colspan="3" class="text-center">
-            <x-btn tooltip="Generate new api token" outlined x-small color="primary" @click="newTokenDialog = true; teleNewToken()">
+            <x-btn tooltip="Generate new api token" outlined x-small color="primary" @click="showNewTokenDlg">
               <v-icon>mdi-plus</v-icon>
               <!--Add New Token-->
               {{ $t('activity.newToken') }}
@@ -152,7 +152,8 @@ export default {
     this.loadApiTokens()
   },
   methods: {
-    teleNewToken(){
+    showNewTokenDlg(){
+      this.newTokenDialog = true;
       this.$tele.emit('api-mgmt:token:generate:trigger')
     },
     copyToken(token) {
