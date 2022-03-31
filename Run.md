@@ -1,10 +1,6 @@
-# Run
+# Setup
 
-If you are doing a git pull on same day - you will have to remove existing metadb as underlying metadb can differ
-
-### Steps to run locally
-
-#### Setting up running environment
+#### Setting up dev environment
 
 - Clone `nocodb/nocodb` GitHub repo and checkout to `feat/v2` branch
   ```sh
