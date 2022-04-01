@@ -527,74 +527,6 @@ export default {
 
         this.sorts = this.viewMeta.sorts
         this.viewName = this.viewMeta.title
-        //
-        //
-        //   // eslint-disable-next-line camelcase
-        //   const {
-        //     meta,
-        //     // model_name,
-        //     view_name,
-        //     view_type,
-        //     client,
-        //     query_params: qp = {},
-        //     db_alias: dbAlias = '_noco',
-        //     relatedTableMetas = {}
-        //   } = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewGet', {
-        //     view_id: this.$route.params.id,
-        //     password: this.password
-        //   }])
-        //
-        //   this.fieldsOrder = qp.fieldsOrder || []
-        //   this.viewName = view_name
-        //   this.viewType = view_type
-        //
-        //   this.columnsWidth = qp.columnsWidth || {}
-        //
-        //   this.client = client
-        //   this.meta = meta
-        //   this.query_params = qp
-        //   this.dbAlias = dbAlias
-        //   this.metas = relatedTableMetas
-        //   this.sorts = qp.sorts || []
-        //
-        //   this.showFields = this.query_params.showFields || {}
-        //
-        //   // this.fieldList = Object.keys(this.showFields)
-        //
-        //   let fields = this.query_params.fieldsOrder || []
-        //   if (!fields.length) { fields = Object.keys(this.showFields) }
-        //   // eslint-disable-next-line camelcase
-        //
-        //   let columns = this.meta.columns
-        //   if (this.meta && this.meta.v) {
-        //     columns = [...columns, ...this.meta.v.map(v => ({ ...v, virtual: 1 }))]
-        //   }
-        //
-        //   {
-        //     const _ref = {}
-        //     columns.forEach((c) => {
-        //       if (c.virtual && c.bt) {
-        //         c.prop = `${c.bt.rtn}Read`
-        //       }
-        //       if (c.virtual && c.mm) {
-        //         c.prop = `${c.mm.rtn}MMList`
-        //       }
-        //       if (c.virtual && c.hm) {
-        //         c.prop = `${c.hm.table_name}List`
-        //       }
-        //
-        //       // if (c.virtual && c.lk) {
-        //       //   c.alias = `${c.lk._lcn} (from ${c.lk._ltn})`
-        //       // } else {
-        //       c.alias = c.title
-        //       // }
-        //       if (c.alias in _ref) {
-        //         c.alias += _ref[c.alias]++
-        //       } else {
-        //         _ref[c.alias] = 1
-        //       }
-        //     })
-        //   }
       } catch (e) {
         if (e.response && e.response.status === 404) {
           this.notFound = true
@@ -611,14 +543,6 @@ export default {
     async loadTableData() {
       this.loadingData = true
       try {
-        // eslint-disable-next-line camelcase
-        // const { data: list, count, model_name, client } = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        //   query: this.queryParams
-        // }, 'getSharedViewData', {
-        //   view_id: this.$route.params.id,
-        //   password: this.password
-        // }])
-
         const {
           list,
           pageInfo: { totalRows: count }
