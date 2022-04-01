@@ -177,11 +177,13 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
 
   info.tablesCount = tables.length;
 
-  relations.forEach(r => {
-    r.title = getTableNameAlias(r.tn, project.prefix, base);
-  });
   tables.forEach(t => {
     t.title = getTableNameAlias(t.tn, project.prefix, base);
+  });
+
+  relations.forEach(r => {
+    r.title = getTableNameAlias(r.tn, project.prefix, base);
+    r.rtitle = getTableNameAlias(r.rtn, project.prefix, base);
   });
 
   // await this.syncRelations();
@@ -222,7 +224,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
           uidt: UITypes.LinkToAnotherRecord,
           type: 'bt',
           bt,
-          title: `${bt._rtn}Read`
+          title: `${bt.rtitle}Read`
         }))
       ];
 
