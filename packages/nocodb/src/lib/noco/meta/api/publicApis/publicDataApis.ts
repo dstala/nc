@@ -34,7 +34,7 @@ export async function dataList(req: Request, res: Response) {
       dbDriver: NcConnectionMgrv2.get(base)
     });
 
-    const key = `${model._tn}List`;
+    const key = `${model.title}List`;
     const requestObj = {
       [key]: await baseModel.defaultResolverReq(req.query)
     };
@@ -136,7 +136,7 @@ async function dataInsert(
   const fields = (view.model.columns = view.columns
     .filter(c => c.show)
     .reduce((o, c) => {
-      o[view.model.columnsById[c.fk_column_id]._cn] = new Column({
+      o[view.model.columnsById[c.fk_column_id].title] = new Column({
         ...c,
         ...view.model.columnsById[c.fk_column_id]
       } as any);
@@ -231,7 +231,7 @@ async function relDataList(req, res) {
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
-  const key = `${model._tn}List`;
+  const key = `${model.title}List`;
   const requestObj = {
     [key]: await baseModel.defaultResolverReq(req.query, true)
   };

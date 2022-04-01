@@ -287,7 +287,7 @@
                 <v-tab-item :transition="false">
                   <template v-if="loadRows">
                     <rows-j-excel
-                      ref="tabs3" :table="this.nodes.tn"
+                      ref="tabs3" :table="this.nodes.table_name"
                       :nodes="this.nodes"
                       :newTable="this.newTableCopy"
                       :mtdNewTableUpdate="this.mtdNewTableUpdate"
@@ -307,7 +307,7 @@
           <template v-if="loadRows">
             <rows-xc-data-table
               ref="tabs7"
-              :table="nodes.tn"
+              :table="nodes.table_name"
               :nodes="nodes"
               :new-table="newTableCopy"
               :mtd-new-table-update="mtdNewTableUpdate"
@@ -360,7 +360,7 @@
             <template v-if="loadRows">
               <rows-xc-data-table
                 ref="tabs7"
-                :table="nodes.tn"
+                :table="nodes.table_name"
                 :nodes="nodes"
                 :relation="relation"
                 :relation-type="relationType"
@@ -515,7 +515,7 @@ export default {
           dbAlias: this.nodes.dbAlias
         }, 'relationListAll'])
 
-        relationListAll = relationListAll.data.list.filter(rel => rel.rtn === this.nodes.tn).map(({ tn }) => tn)
+        relationListAll = relationListAll.data.list.filter(rel => rel.rtn === this.nodes.table_name).map(({ tn }) => tn)
 
         if (relationListAll.length) {
           this.$toast.info('Table can\'t be  deleted  since Table is being referred in following tables : ' + relationListAll.join(', ')).goAway(10000)
@@ -527,7 +527,7 @@ export default {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias
         }, 'triggerList', {
-          tn: this.nodes.tn
+          tn: this.nodes.table_name
         }])
 
         for (const trigger of triggerList.data.list) {
@@ -539,7 +539,7 @@ export default {
             'triggerDelete',
             {
               ...trigger,
-              tn: this.nodes.tn,
+              tn: this.nodes.table_name,
               oldStatement: trigger.statement
             }])
 
@@ -552,7 +552,7 @@ export default {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias
         }, 'columnList', {
-          tn: this.nodes.tn
+          tn: this.nodes.table_name
         }])
 
         columns = columns.data.list
@@ -562,12 +562,12 @@ export default {
           dbAlias: this.nodes.dbAlias
         },
         'tableDelete',
-        { tn: this.nodes.tn, columns }])
+        { tn: this.nodes.table_name, columns }])
 
         this.removeTableTab({
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          tn: this.nodes.tn
+          tn: this.nodes.table_name
         })
 
         await this.loadTablesFromParentTreeNode({
@@ -604,7 +604,7 @@ export default {
       return process.env.TS_ENABLED
     },
     isMetaTable() {
-      return isMetaTable(this.nodes.tn)
+      return isMetaTable(this.nodes.table_name)
     }
   },
   beforeCreated() {

@@ -27,8 +27,8 @@ export default class Column<T = any> implements ColumnType {
   public project_id: string;
   public base_id: string;
 
-  public cn: string;
-  public _cn: string;
+  public column_name: string;
+  public title: string;
 
   public uidt: UITypes;
   public dt: string;
@@ -82,8 +82,8 @@ export default class Column<T = any> implements ColumnType {
     const insertObj: any = {
       id: column?.id,
       fk_model_id: column.fk_model_id,
-      cn: column.cn,
-      _cn: column._cn || column.cn,
+      column_name: column.column_name || column.cn,
+      title: column.title || column._cn,
       uidt: column.uidt,
       dt: column.dt,
       np: column.np,

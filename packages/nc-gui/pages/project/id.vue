@@ -384,7 +384,7 @@
                                                     <v-row>
                                                       <v-col>
                                                         <v-select
-                                                          v-model="db.meta.inflection.tn"
+                                                          v-model="db.meta.inflection.table_name"
                                                           label="Inflection - Table name"
                                                           multiple
                                                           :items="['camelize','pluralize']"
@@ -392,7 +392,7 @@
                                                       </v-col>
                                                       <v-col>
                                                         <v-select
-                                                          v-model="db.meta.inflection.cn"
+                                                          v-model="db.meta.inflection.column_name"
                                                           label="Inflection - Column name"
                                                           multiple
                                                           :items="['camelize']"
@@ -981,15 +981,15 @@ export default {
           const inflectionObj = xcConfig.envs[env].db[i].meta.inflection
 
           if (inflectionObj) {
-            if (Array.isArray(inflectionObj.tn)) {
-              inflectionObj.tn = inflectionObj.tn.join(',')
+            if (Array.isArray(inflectionObj.table_name)) {
+              inflectionObj.table_name = inflectionObj.table_name.join(',')
             }
-            if (Array.isArray(inflectionObj.cn)) {
-              inflectionObj.cn = inflectionObj.cn.join(',')
+            if (Array.isArray(inflectionObj.column_name)) {
+              inflectionObj.column_name = inflectionObj.column_name.join(',')
             }
 
-            inflectionObj.tn = inflectionObj.tn || 'none'
-            inflectionObj.cn = inflectionObj.cn || 'none'
+            inflectionObj.table_name = inflectionObj.table_name || 'none'
+            inflectionObj.column_name = inflectionObj.column_name || 'none'
           }
         }
       }

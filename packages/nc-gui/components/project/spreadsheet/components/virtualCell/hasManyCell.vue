@@ -124,7 +124,7 @@
         :db-alias="nodes.dbAlias"
         :has-many="childMeta.hasMany"
         :belongs-to="childMeta.belongsTo"
-        :table="childMeta.tn"
+        :table="childMeta.table_name"
         :old-row="{...selectedChild}"
         :meta="childMeta"
         :primary-value-column="childPrimaryCol"
@@ -211,30 +211,30 @@ export default {
       // return this.childMeta && this.$ncApis.get({
       //   env: this.nodes.env,
       //   dbAlias: this.nodes.dbAlias,
-      //   table: this.childMeta.tn
+      //   table: this.childMeta.table_name
       // })
-      // return this.childMeta && this.childMeta._tn
+      // return this.childMeta && this.childMeta.title
       //   ? ApiFactory.create(this.$store.getters['project/GtrProjectType'],
-      //     this.childMeta && this.childMeta._tn, this.childMeta && this.childMeta.columns, this, this.childMeta)
+      //     this.childMeta && this.childMeta.title, this.childMeta && this.childMeta.columns, this, this.childMeta)
       //   : null
     },
     childPrimaryCol() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.pv) || {}).title
     },
     primaryCol() {
-      return this.meta && (this.meta.columns.find(c => c.pv) || {})._cn
+      return this.meta && (this.meta.columns.find(c => c.pv) || {}).title
     },
     childPrimaryKey() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.pk) || {}).title
     },
     childForeignKey() {
-      return this.childMeta && (this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id) || {})._cn
+      return this.childMeta && (this.childMeta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id) || {}).title
     },
     childForeignKeyVal() {
-      return this.meta && this.meta.columns ? this.meta.columns.filter(c => c._cn === this.childForeignKey).map(c => this.row[c._cn] || '').join('___') : ''
+      return this.meta && this.meta.columns ? this.meta.columns.filter(c => c.title === this.childForeignKey).map(c => this.row[c.title] || '').join('___') : ''
     },
     isVirtualRelation() {
-      return this.column && this.column.colOptions.virtual// (this.childMeta && (!!this.childMeta.columns.find(c => c.cn === this.hm.cn && this.hm.type === 'virtual'))) || false
+      return this.column && this.column.colOptions.virtual// (this.childMeta && (!!this.childMeta.columns.find(c => c.column_name === this.hm.column_name && this.hm.type === 'virtual'))) || false
     },
     isByPass() {
       if (this.isVirtualRelation) {
@@ -274,15 +274,15 @@ export default {
       if (!this.childMeta) { return {} }
       // todo: use reduce
       return {
-        hm: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.hm).map(({ hm }) => hm.tn).join()) || '',
+        hm: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.hm).map(({ hm }) => hm.table_name).join()) || '',
         bt: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.bt).map(({ bt }) => bt.rtn).join()) || '',
         mm: (this.childMeta && this.childMeta.v && this.childMeta.v.filter(v => v.mm).map(({ mm }) => mm.rtn).join()) || ''
       }
     },
     parentId() {
       return (this.meta && this.meta.columns &&
-        (this.meta.columns.filter(c => c._cn === this.childForeignKey).map(c => this.row[c._cn] || '').join('___') ||
-        this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___'))) || ''
+        (this.meta.columns.filter(c => c.title === this.childForeignKey).map(c => this.row[c.title] || '').join('___') ||
+        this.meta.columns.filter(c => c.pk).map(c => this.row[c.title]).join('___'))) || ''
     }
   },
   watch: {
@@ -322,7 +322,7 @@ export default {
         if (act === 'hideDialog') {
           this.dialogShow = false
         } else {
-          const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
+          const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
           try {
             // await this.childApi.delete(id)
             await this.$api.data.delete(this.childMeta.id, id)
@@ -351,11 +351,11 @@ export default {
         this.$toast.info('Unlink is not possible, instead add to another record.').goAway(3000)
         return
       }
-      const _cn = column._cn
-      const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-      // await this.childApi.update(id, { [_cn]: null }, child)
+      // const title = column.title
+      const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
+      // await this.childApi.update(id, { [title]: null }, child)
 
-      // await this.$api.data.update(this.childMeta.id, id, { [_cn]: null })
+      // await this.$api.data.update(this.childMeta.id, id, { [title]: null })
 
       await this.$api.data.nestedDelete(
         this.meta.id,
@@ -380,14 +380,6 @@ export default {
           dbAlias: this.nodes.dbAlias,
           id: this.column.colOptions.fk_related_model_id
         })
-        // const childTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        //   env: this.nodes.env,
-        //   dbAlias: this.nodes.dbAlias
-        // }, 'tableXcModelGet', {
-        //   tn: this.hm.tn
-        // }]);
-        // this.childMeta = JSON.parse(childTableData.meta);
-        // this.childQueryParams = JSON.parse(childTableData.query_params);
       }
     },
     async showNewRecordModal() {
@@ -403,17 +395,17 @@ export default {
         return
       }
 
-      const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-      // const _cn = this.childForeignKey
+      const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
+      // const title = this.childForeignKey
       this.newRecordModal = false
 
       // await this.childApi.update(id, {
-      //   [_cn]: parseIfInteger(this.parentId)
+      //   [title]: parseIfInteger(this.parentId)
       // }, {
-      //   [_cn]: child[this.childForeignKey]
+      //   [title]: child[this.childForeignKey]
       // })
 
-      // await this.$api.data.update(this.childMeta.id, id, { [_cn]: parseIfInteger(this.parentId) })
+      // await this.$api.data.update(this.childMeta.id, id, { [title]: parseIfInteger(this.parentId) })
 
       await this.$api.data.nestedAdd(
         this.meta.id,
@@ -449,7 +441,7 @@ export default {
       c.colOptions.fk_child_column_id === this.column.colOptions.fk_child_column_id &&
       c.colOptions.fk_parent_column_id === this.column.colOptions.fk_parent_column_id &&
       c.colOptions.type === RelationTypes.BELONGS_TO
-        ) || {})._cn]: this.row
+        ) || {}).title]: this.row
       }
       this.expandFormModal = true
       if (!this.isNew) {
@@ -472,13 +464,13 @@ export default {
       while (child = this.localState.pop()) {
         if (row) {
           // todo: use common method
-          const pid = this.meta.columns.filter(c => c.pk).map(c => row[c._cn]).join('___')
-          const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
-          const _cn = this.childForeignKey
+          const pid = this.meta.columns.filter(c => c.pk).map(c => row[c.title]).join('___')
+          const id = this.childMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
+          const title = this.childForeignKey
           await this.childApi.update(id, {
-            [_cn]: parseIfInteger(pid)
+            [title]: parseIfInteger(pid)
           }, {
-            [_cn]: child[this.childForeignKey]
+            [title]: child[this.childForeignKey]
           })
         } else {
           await this.addChildToParent(child)

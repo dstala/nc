@@ -1066,7 +1066,7 @@ export class PgUi {
       col.dt === 'bigint' ||
       col.dt === 'smallint') {
       for (let i = 0; i < columns.length; ++i) {
-        if (columns[i].cn !== col.cn && columns[i].ai) {
+        if (columns[i].column_name !== col.column_name && columns[i].ai) {
           return true
         }
       }
@@ -1131,14 +1131,14 @@ export class PgUi {
         columns[i].dt === 'smallint' ||
         columns[i].dt === 'mediumint'))) {
         columns[i].un = false
-        console.log('>> resetting unsigned value', columns[i].cn)
+        console.log('>> resetting unsigned value', columns[i].column_name)
       }
-      console.log(columns[i].cn)
+      console.log(columns[i].column_name)
     }
   }
 
   static columnEditable(colObj) {
-    return colObj.tn !== '_evolutions' || colObj.tn !== 'nc_evolutions'
+    return colObj.table_name !== '_evolutions' || colObj.table_name !== 'nc_evolutions'
   }
 
   static extractFunctionName(query) {
@@ -1753,7 +1753,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
-          'numeric',          
+          'numeric',
           'serial',
           'serial2',
           'serial8',
@@ -1781,7 +1781,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
-          'numeric',          
+          'numeric',
           'serial',
           'serial2',
           'serial8',
@@ -1799,7 +1799,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
-          'numeric',          
+          'numeric',
           'serial',
           'serial2',
           'serial8',
@@ -1819,7 +1819,7 @@ export class PgUi {
           'int2',
           'int4',
           'int8',
-          'numeric',          
+          'numeric',
           'serial',
           'serial2',
           'serial8',

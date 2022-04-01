@@ -42,7 +42,7 @@ export async function mmList(req: Request, res: Response, next) {
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
-  const key = `${model._tn}List`;
+  const key = `${model.title}List`;
   const requestObj: any = {
     [key]: 1
   };
@@ -271,7 +271,7 @@ export async function hmList(req: Request, res: Response, next) {
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
-  const key = `${model._tn}List`;
+  const key = `${model.title}List`;
   const requestObj: any = {
     [key]: 1
   };
@@ -320,7 +320,7 @@ async function dataRead(req: Request, res: Response, next) {
       id: model.id,
       dbDriver: NcConnectionMgrv2.get(base)
     });
-    const key = `${model._tn}Read`;
+    const key = `${model.title}Read`;
 
     res.json(
       (

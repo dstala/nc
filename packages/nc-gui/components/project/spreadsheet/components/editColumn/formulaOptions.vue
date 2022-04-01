@@ -91,7 +91,7 @@ export default {
           type: 'function'
         })),
         ...this.meta.columns.map(c => ({
-          text: c._cn,
+          text: c.title,
           type: 'column',
           c
         })),
@@ -131,10 +131,10 @@ export default {
         // await this.$store.dispatch('meta/ActLoadMeta', {
         //   dbAlias: this.nodes.dbAlias,
         //   env: this.nodes.env,
-        //   tn: this.meta.tn,
+        //   tn: this.meta.table_name,
         //   force: true
         // })
-        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
         //
         // meta.v.push({
         //   _cn: this.alias,
@@ -148,7 +148,7 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'xcModelSet', {
-        //   tn: this.nodes.tn,
+        //   tn: this.nodes.table_name,
         //   meta
         // }])
 
@@ -170,9 +170,9 @@ export default {
     },
     async update() {
       try {
-        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
 
-        const col = meta.v.find(c => c._cn === this.column._cn && c.formula)
+        const col = meta.v.find(c => c.title === this.column.title && c.formula)
 
         Object.assign(col, {
           _cn: this.alias,
@@ -187,7 +187,7 @@ export default {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias
         }, 'xcModelSet', {
-          tn: this.nodes.tn,
+          tn: this.nodes.table_name,
           meta
         }])
         this.$toast.success('Formula column updated successfully').goAway(3000)
@@ -225,7 +225,7 @@ export default {
         }
         pt.arguments.map(arg => this.validateAgainstMeta(arg, arr))
       } else if (pt.type === 'Identifier') {
-        if (this.meta.columns.every(c => c._cn !== pt.name)) {
+        if (this.meta.columns.every(c => c.title !== pt.name)) {
           arr.push(`Column with name '${pt.name}' is not available`)
         }
       } else if (pt.type === 'BinaryExpression') {

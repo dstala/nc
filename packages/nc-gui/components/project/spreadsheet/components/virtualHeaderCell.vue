@@ -37,7 +37,7 @@
           </v-icon>
         </template>
         <span v-on="on">
-          <span class="name  flex-grow-1" style="white-space: nowrap" :title="column._cn" v-html="alias" />
+          <span class="name  flex-grow-1" style="white-space: nowrap" :title="column.title" v-html="alias" />
           <span v-if="column.rqd || required" class="error--text text--lighten-1">&nbsp;*</span>
         </span>
       </template>
@@ -104,7 +104,7 @@
         <v-divider />
         <v-card-text class="mt-4 title">
           Do you want to delete <span class="font-weight-bold">'{{
-            column._cn
+            column.title
           }}'</span> column ?
         </v-card-text>
         <v-divider />
@@ -158,8 +158,8 @@ export default {
   }),
   computed: {
     alias() {
-      // return this.column.lk ? `${this.column.lk._lcn} <small class="grey--text text--darken-1">(from ${this.column.lk._ltn})</small>` : this.column._cn
-      return this.column._cn
+      // return this.column.lk ? `${this.column.lk._lcn} <small class="grey--text text--darken-1">(from ${this.column.lk._ltn})</small>` : this.column.title
+      return this.column.title
     },
     type() {
       if (this.column.bt) {
@@ -175,10 +175,10 @@ export default {
     },
     childColumn() {
       if (this.column.bt) {
-        return this.column.bt.cn
+        return this.column.bt.column_name
       }
       if (this.column.hm) {
-        return this.column.hm.cn
+        return this.column.hm.column_name
       }
       if (this.column.mm) {
         return this.column.mm.rcn
@@ -187,10 +187,10 @@ export default {
     },
     childTable() {
       if (this.column.bt) {
-        return this.column.bt.tn
+        return this.column.bt.table_name
       }
       if (this.column.hm) {
-        return this.column.hm.tn
+        return this.column.hm.table_name
       }
       if (this.column.mm) {
         return this.column.mm.rtn
@@ -205,7 +205,7 @@ export default {
         return this.column.hm.rtn
       }
       if (this.column.mm) {
-        return this.column.mm.tn
+        return this.column.mm.table_name
       }
       return ''
     },
@@ -217,7 +217,7 @@ export default {
         return this.column.hm.rcn
       }
       if (this.column.mm) {
-        return this.column.mm.cn
+        return this.column.mm.column_name
       }
       return ''
     },
@@ -226,11 +226,11 @@ export default {
         return ''
       }
       if (this.column.hm) {
-        return `'${this.column.hm._rtn}' has many '${this.column.hm._tn}'`
+        return `'${this.column.hm._rtn}' has many '${this.column.hm.title}'`
       } else if (this.column.mm) {
-        return `'${this.column.mm._tn}' & '${this.column.mm._rtn}' have <br>many to many relation`
+        return `'${this.column.mm.title}' & '${this.column.mm._rtn}' have <br>many to many relation`
       } else if (this.column.bt) {
-        return `'${this.column.bt._tn}' belongs to '${this.column.bt._rtn}'`
+        return `'${this.column.bt.title}' belongs to '${this.column.bt._rtn}'`
       } else if (this.column.lk) {
         return `'${this.column.lk._lcn}' from '${this.column.lk._ltn}' (${this.column.lk.type})`
       } else if (this.column.formula) {
@@ -266,22 +266,22 @@ export default {
     //     await this.$store.dispatch('meta/ActLoadMeta', {
     //       dbAlias: this.nodes.dbAlias,
     //       env: this.nodes.env,
-    //       tn: this.meta.tn,
+    //       table_name: this.meta.table_name,
     //       force: true
     //     })
-    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
     //
     //     // remove lookup from virtual columns
-    //     meta.v = meta.v.filter(cl => cl.cn !== this.column.cn ||
+    //     meta.v = meta.v.filter(cl => cl.column_name !== this.column.column_name ||
     //       cl.type !== this.column.type ||
-    //       cl._cn !== this.column._cn ||
-    //       cl.tn !== this.column.tn)
+    //       cl.title !== this.column.title ||
+    //       cl.table_name !== this.column.table_name)
     //
     //     await this.$store.dispatch('sqlMgr/ActSqlOp', [{
     //       env: this.nodes.env,
     //       dbAlias: this.nodes.dbAlias
     //     }, 'xcModelSet', {
-    //       tn: this.nodes.tn,
+    //       table_name: this.nodes.table_name,
     //       meta
     //     }])
     //     this.$emit('saved')
@@ -295,18 +295,18 @@ export default {
     //     await this.$store.dispatch('meta/ActLoadMeta', {
     //       dbAlias: this.nodes.dbAlias,
     //       env: this.nodes.env,
-    //       tn: this.meta.tn,
+    //       table_name: this.meta.table_name,
     //       force: true
     //     })
-    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
     //     // remove formula from virtual columns
-    //     meta.v = meta.v.filter(cl => !cl.formula || cl._cn !== this.column._cn)
+    //     meta.v = meta.v.filter(cl => !cl.formula || cl.title !== this.column.title)
     //
     //     await this.$store.dispatch('sqlMgr/ActSqlOp', [{
     //       env: this.nodes.env,
     //       dbAlias: this.nodes.dbAlias
     //     }, 'xcModelSet', {
-    //       tn: this.nodes.tn,
+    //       table_name: this.nodes.table_name,
     //       meta
     //     }])
     //     this.$emit('saved')
@@ -320,19 +320,19 @@ export default {
     //     await this.$store.dispatch('meta/ActLoadMeta', {
     //       dbAlias: this.nodes.dbAlias,
     //       env: this.nodes.env,
-    //       tn: this.meta.tn,
+    //       table_name: this.meta.table_name,
     //       force: true
     //     })
-    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+    //     const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
     //
     //     // remove rollup from virtual columns
-    //     meta.v = meta.v.filter(cl => !cl.rl || cl._cn !== this.column._cn)
+    //     meta.v = meta.v.filter(cl => !cl.rl || cl.title !== this.column.title)
     //
     //     await this.$store.dispatch('sqlMgr/ActSqlOp', [{
     //       env: this.nodes.env,
     //       dbAlias: this.nodes.dbAlias
     //     }, 'xcModelSet', {
-    //       tn: this.nodes.tn,
+    //       table_name: this.nodes.table_name,
     //       meta
     //     }])
     //     this.$emit('saved')

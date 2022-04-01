@@ -12,14 +12,14 @@
           <v-col cols="12">
             <v-text-field
               ref="column"
-              v-model="newColumn._cn"
+              v-model="newColumn.title"
               hide-details="auto"
               color="primary"
               class="caption nc-column-name-input"
               :label="$t('labels.columnName')"
               :rules="[
                 v => !!v || 'Required',
-                v => !meta || !meta.columns || !column ||meta.columns.every(c => column === c || (v !== c._cn)) || 'Duplicate column name',
+                v => !meta || !meta.columns || !column ||meta.columns.every(c => column === c || (v !== c.title)) || 'Duplicate column name',
                 validateColumnName
               ]"
               dense
@@ -34,7 +34,7 @@
               :new-column="newColumn"
               :nodes="nodes"
               :meta="meta"
-              :alias="newColumn._cn"
+              :alias="newColumn.title"
               :sql-ui="sqlUi"
             />
           </v-col>
@@ -120,9 +120,9 @@ export default {
         //     env: this.nodes.env,
         //     dbAlias: this.nodes.dbAlias
         //   }, 'xcUpdateVirtualKeyAlias', {
-        //     tn: this.nodes.tn,
-        //     oldAlias: this.column._cn,
-        //     newAlias: this.newColumn._cn
+        //     table_name: this.nodes.table_name,
+        //     oldAlias: this.column.title,
+        //     newAlias: this.newColumn.title
         //   }])
         //
         //   this.$toast.success('Successfully updated alias').goAway(3000)
@@ -132,7 +132,7 @@ export default {
         console.log(this._extractSdkResponseErrorMsg(e))
         this.$toast.error('Failed to update column alias').goAway(3000)
       }
-      this.$emit('saved', this.newColumn._cn, this.column._cn)
+      this.$emit('saved', this.newColumn.title, this.column.title)
       this.$emit('input', false)
     },
 

@@ -25,18 +25,20 @@ export default async function({
 
   switch (relationColumnOption.type) {
     case RelationTypes.HAS_MANY:
-      // if (!rollup.tn || !rollup.rtn) {
-      //   rollup = { ...rollup, ...hasMany.find(hm => hm.tn === rollup.rltn) };
+      // if (!rollup.table_name || !rollup.rtn) {
+      //   rollup = { ...rollup, ...hasMany.find(hm => hm.table_name === rollup.rltn) };
       // }
       return {
-        builder: knex(childModel?.tn)
+        builder: knex(childModel?.table_name)
           [columnOptions.rollup_function]?.(
-            knex.ref(`${childModel?.tn}.${rollupColumn.cn}`)
+            knex.ref(`${childModel?.table_name}.${rollupColumn.column_name}`)
           )
           .where(
-            knex.ref(`${alias || parentModel.tn}.${parentCol.cn}`),
+            knex.ref(
+              `${alias || parentModel.table_name}.${parentCol.column_name}`
+            ),
             '=',
-            knex.ref(`${childModel.tn}.${childCol.cn}`)
+            knex.ref(`${childModel.table_name}.${childCol.column_name}`)
           )
       };
     case RelationTypes.MANY_TO_MANY: {
@@ -45,20 +47,22 @@ export default async function({
       const mmParentCol = await relationColumnOption.getMMParentColumn();
 
       return {
-        builder: knex(parentModel.tn)
+        builder: knex(parentModel.table_name)
           [columnOptions.rollup_function]?.(
-            knex.ref(`${parentModel.tn}.${rollupColumn.cn}`)
+            knex.ref(`${parentModel.table_name}.${rollupColumn.column_name}`)
           )
           .innerJoin(
-            mmModel.tn,
-            knex.ref(`${mmModel.tn}.${mmParentCol.cn}`),
+            mmModel.table_name,
+            knex.ref(`${mmModel.table_name}.${mmParentCol.column_name}`),
             '=',
-            knex.ref(`${parentModel.tn}.${parentCol.cn}`)
+            knex.ref(`${parentModel.table_name}.${parentCol.column_name}`)
           )
           .where(
-            knex.ref(`${mmModel.tn}.${mmChildCol.cn}`),
+            knex.ref(`${mmModel.table_name}.${mmChildCol.column_name}`),
             '=',
-            knex.ref(`${alias || childModel.tn}.${childCol.cn}`)
+            knex.ref(
+              `${alias || childModel.table_name}.${childCol.column_name}`
+            )
           )
       };
     }

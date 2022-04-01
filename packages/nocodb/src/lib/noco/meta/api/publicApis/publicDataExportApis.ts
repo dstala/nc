@@ -41,7 +41,7 @@ async function exportCsv(req: Request, res: Response) {
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
-  const key = `${model._tn}List`;
+  const key = `${model.title}List`;
   const requestObj = {
     [key]: await baseModel.defaultResolverReq(req.query, false, false)
   };
@@ -93,8 +93,8 @@ async function exportCsv(req: Request, res: Response) {
       const csvRow = { ...row };
 
       for (const column of view.model.columns) {
-        csvRow[column._cn] = await serializeCellValue({
-          value: row[column._cn],
+        csvRow[column.title] = await serializeCellValue({
+          value: row[column.title],
           column
         });
       }
@@ -104,7 +104,7 @@ async function exportCsv(req: Request, res: Response) {
 
   const data = papaparse.unparse(
     {
-      fields: model.columns.map(c => c._cn),
+      fields: model.columns.map(c => c.title),
       data: csvRows
     },
     {
@@ -173,7 +173,7 @@ async function serializeCellValue({
         await relatedModel.getColumns();
         return [...(Array.isArray(value) ? value : [value])]
           .map(v => {
-            return v[relatedModel.primaryValue?._cn];
+            return v[relatedModel.primaryValue?.title];
           })
           .join(', ');
       }

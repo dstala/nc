@@ -51,7 +51,7 @@ async function createHmAndBtColumn(
   {
     const _cn = getUniqueColumnAliasName(
       await child.getColumns(),
-      type === 'bt' ? alias : `${parent._tn}Read`
+      type === 'bt' ? alias : `${parent.title}Read`
     );
     await Column.insert<LinkToAnotherRecordColumn>({
       _cn,
@@ -72,7 +72,7 @@ async function createHmAndBtColumn(
   {
     const _cn = getUniqueColumnAliasName(
       await parent.getColumns(),
-      type === 'hm' ? alias : `${child._tn}List`
+      type === 'hm' ? alias : `${child.title}List`
     );
     await Column.insert({
       _cn,
@@ -97,7 +97,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
   if (
     !isVirtualCol(req.body) &&
     !(await Column.checkTitleAvailable({
-      cn: req.body.cn,
+      cn: req.body.column_name,
       fk_model_id: req.params.tableId
     }))
   ) {
@@ -105,7 +105,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
   }
   if (
     !(await Column.checkAliasAvailable({
-      _cn: req.body._cn || req.body.cn,
+      _cn: req.body._cn || req.body.column_name,
       fk_model_id: req.params.tableId
     }))
   ) {
@@ -229,7 +229,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           // populate fk column name
           const fkColName = getUniqueColumnName(
             await child.getColumns(),
-            `${parent.tn}_id`
+            `${parent.table_name}_id`
           );
 
           {
@@ -266,12 +266,12 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             // create relation
             await sqlMgr.sqlOpPlus(base, 'relationCreate', {
               childColumn: fkColName,
-              childTable: child.tn,
-              parentTable: parent.tn,
+              childTable: child.table_name,
+              parentTable: parent.table_name,
               onDelete: 'NO ACTION',
               onUpdate: 'NO ACTION',
               type: 'real',
-              parentColumn: parent.primaryKey.cn
+              parentColumn: parent.primaryKey.column_name
             });
           }
           await createHmAndBtColumn(
@@ -331,8 +331,8 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           });
 
           const assocModel = await Model.insert(project.id, base.id, {
-            tn: aTn,
-            _tn: aTnAlias,
+            table_name: aTn,
+            title: aTnAlias,
             // todo: sanitize
             mm: true,
             columns: associateTableCols
@@ -342,16 +342,16 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             ...req.body,
             childTable: aTn,
             childColumn: parentCn,
-            parentTable: parent.tn,
-            parentColumn: parentPK.cn,
+            parentTable: parent.table_name,
+            parentColumn: parentPK.column_name,
             type: 'real'
           };
           const rel2Args = {
             ...req.body,
             childTable: aTn,
             childColumn: childCn,
-            parentTable: child.tn,
-            parentColumn: childPK.cn,
+            parentTable: child.table_name,
+            parentColumn: childPK.column_name,
             type: 'real'
           };
 
@@ -359,10 +359,10 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           await sqlMgr.sqlOpPlus(base, 'relationCreate', rel2Args);
 
           const parentCol = (await assocModel.getColumns())?.find(
-            c => c.cn === parentCn
+            c => c.column_name === parentCn
           );
           const childCol = (await assocModel.getColumns())?.find(
-            c => c.cn === childCn
+            c => c.column_name === childCn
           );
 
           await createHmAndBtColumn(
@@ -385,7 +385,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           await Column.insert({
             _cn: getUniqueColumnAliasName(
               await child.getColumns(),
-              `${child._tn}MMList`
+              `${child.title}MMList`
             ),
             uidt: UITypes.LinkToAnotherRecord,
             type: 'mm',
@@ -405,7 +405,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           await Column.insert({
             _cn: getUniqueColumnAliasName(
               await parent.getColumns(),
-              req.body._cn ?? `${parent._tn}MMList`
+              req.body._cn ?? `${parent.title}MMList`
             ),
 
             uidt: UITypes.LinkToAnotherRecord,
@@ -469,7 +469,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
     op_type: AuditOperationTypes.TABLE_COLUMN,
     op_sub_type: AuditOperationSubTypes.CREATED,
     user: (req as any)?.user?.email,
-    description: `created column ${colBody.cn} with alias ${colBody._cn} from table ${table.tn}`,
+    description: `created column ${colBody.column_name} with alias ${colBody._cn} from table ${table.table_name}`,
     ip: (req as any).clientIp
   }).then(() => {});
 
@@ -493,7 +493,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   if (
     !isVirtualCol(req.body) &&
     !(await Column.checkTitleAvailable({
-      cn: req.body.cn,
+      cn: req.body.column_name,
       fk_model_id: req.params.tableId,
       exclude_id: req.params.columnId
     }))
@@ -532,7 +532,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
           ...column,
           ...colBody
         });
-      } else if (colBody._cn !== column._cn) {
+      } else if (colBody._cn !== column.title) {
         await Column.updateAlias(req.params.columnId, {
           _cn: colBody._cn
         });
@@ -558,13 +558,13 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
     colBody = getColumnPropsFromUIDT(colBody, base);
     const tableUpdateBody = {
       ...table,
-      originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),
+      originalColumns: table.columns.map(c => ({ ...c, cno: c.column_name })),
       columns: table.columns.map(c => {
         if (c.id === req.params.columnId) {
           return {
             ...c,
             ...colBody,
-            cno: c.cn,
+            cno: c.column_name,
             altered: Altered.UPDATE_COLUMN
           };
         }
@@ -584,7 +584,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
     op_type: AuditOperationTypes.TABLE_COLUMN,
     op_sub_type: AuditOperationSubTypes.UPDATED,
     user: (req as any)?.user?.email,
-    description: `updated column ${column.cn} with alias ${column._cn} from table ${table.tn}`,
+    description: `updated column ${column.column_name} with alias ${column.title} from table ${table.table_name}`,
     ip: (req as any).clientIp
   }).then(() => {});
 
@@ -717,10 +717,10 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
     default: {
       const tableUpdateBody = {
         ...table,
-        originalColumns: table.columns.map(c => ({ ...c, cno: c.cn })),
+        originalColumns: table.columns.map(c => ({ ...c, cno: c.column_name })),
         columns: table.columns.map(c => {
           if (c.id === req.params.columnId) {
-            return { ...c, cno: c.cn, altered: Altered.DELETE_COLUMN };
+            return { ...c, cno: c.column_name, altered: Altered.DELETE_COLUMN };
           }
           return c;
         })
@@ -737,7 +737,7 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
     op_type: AuditOperationTypes.TABLE_COLUMN,
     op_sub_type: AuditOperationSubTypes.DELETED,
     user: (req as any)?.user?.email,
-    description: `deleted column ${column.cn} with alias ${column._cn} from table ${table.tn}`,
+    description: `deleted column ${column.column_name} with alias ${column.title} from table ${table.table_name}`,
     ip: (req as any).clientIp
   }).then(() => {});
 
@@ -785,10 +785,10 @@ const deleteHmOrBtRelation = async ({
   // todo: handle relation delete exception
   try {
     await sqlMgr.sqlOpPlus(base, 'relationDelete', {
-      childColumn: childColumn.cn,
-      childTable: childTable.tn,
-      parentTable: parentTable.tn,
-      parentColumn: parentColumn.cn
+      childColumn: childColumn.column_name,
+      childTable: childTable.table_name,
+      parentTable: parentTable.table_name,
+      parentColumn: parentColumn.column_name
       // foreignKeyName: relation.fkn
     });
   } catch (e) {

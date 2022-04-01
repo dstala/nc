@@ -334,8 +334,8 @@ export default {
         const groupedData = {}
 
         for (const item of data) {
-          groupedData[item.tn] = groupedData[item.tn] || []
-          groupedData[item.tn].push(item)
+          groupedData[item.table_name] = groupedData[item.table_name] || []
+          groupedData[item.table_name].push(item)
         }
 
         this.groupedData = groupedData

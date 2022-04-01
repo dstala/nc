@@ -352,8 +352,8 @@ async function migrateProjectModels(
         baseId,
         {
           order: modelData.order,
-          tn: modelData.title,
-          _tn: modelData.alias,
+          table_name: modelData.title,
+          title: modelData.alias,
           // todo: sanitize
           type: modelData.type === 'table' ? ModelTypes.TABLE : ModelTypes.VIEW,
           created_at: modelData.created_at,
@@ -366,19 +366,19 @@ async function migrateProjectModels(
 
       const projectModelRefs = (objModelRef[project.id] =
         objModelRef[project.id] || {});
-      objModelRef[project.id][model.tn] = model;
+      objModelRef[project.id][model.table_name] = model;
 
       objModelAliasRef[project.id] = objModelAliasRef[project.id] || {};
-      objModelAliasRef[project.id][model._tn] = model;
+      objModelAliasRef[project.id][model.title] = model;
 
       const projectModelColumnRefs = (objModelColumnRef[project.id] =
         objModelColumnRef[project.id] || {});
-      objModelColumnRef[project.id][model.tn] =
-        objModelColumnRef[project.id][model.tn] || {};
+      objModelColumnRef[project.id][model.table_name] =
+        objModelColumnRef[project.id][model.table_name] || {};
       const projectModelColumnAliasRefs = (objModelColumnAliasRef[project.id] =
         objModelColumnAliasRef[project.id] || {});
-      objModelColumnAliasRef[project.id][model.tn] =
-        objModelColumnAliasRef[project.id][model.tn] || {};
+      objModelColumnAliasRef[project.id][model.table_name] =
+        objModelColumnAliasRef[project.id][model.table_name] || {};
 
       objViewRef[project.id] = objViewRef[project.id] || {};
       objViewRef[project.id][modelData.title] =
@@ -400,15 +400,19 @@ async function migrateProjectModels(
         const column = await Column.insert(
           {
             ...columnMeta,
+            title: columnMeta._cn,
+            column_name: columnMeta.cn,
             system,
             fk_model_id: model.id
           },
           ncMeta
         );
 
-        projectModelColumnRefs[model.tn][
-          column.cn
-        ] = projectModelColumnAliasRefs[model.tn][column._cn] = column;
+        projectModelColumnRefs[model.table_name][
+          column.column_name
+        ] = projectModelColumnAliasRefs[model.table_name][
+          column.title
+        ] = column;
       }
 
       // migrate table virtual columns
@@ -461,7 +465,9 @@ async function migrateProjectModels(
               ncMeta
             );
 
-            projectModelColumnAliasRefs[model.tn][column._cn] = column;
+            projectModelColumnAliasRefs[model.table_name][
+              column.title
+            ] = column;
           });
         } else {
           // other virtual columns insert
@@ -478,7 +484,7 @@ async function migrateProjectModels(
                 projectModelColumnRefs[columnMeta.lk.ltn][columnMeta.lk.lcn].id;
 
               const columns = Object.values(
-                projectModelColumnAliasRefs[model.tn]
+                projectModelColumnAliasRefs[model.table_name]
               );
 
               // extract related(virtual relation) column id
@@ -518,13 +524,15 @@ async function migrateProjectModels(
                 },
                 ncMeta
               );
-              projectModelColumnAliasRefs[model.tn][column._cn] = column;
+              projectModelColumnAliasRefs[model.table_name][
+                column.title
+              ] = column;
             } else if (_columnMeta.rl) {
               //  migrate rollup column
               const columnMeta: Rollupv1 = _columnMeta;
 
               const colBody: Partial<RollupColumn & Column> = {
-                _cn: columnMeta._cn,
+                title: columnMeta._cn,
                 rollup_function: columnMeta.rl.fn
               };
 
@@ -534,7 +542,7 @@ async function migrateProjectModels(
                 ].id;
 
               const columns = Object.values(
-                projectModelColumnAliasRefs[model.tn]
+                projectModelColumnAliasRefs[model.table_name]
               );
 
               // extract related(virtual relation) column id
@@ -573,7 +581,9 @@ async function migrateProjectModels(
                 },
                 ncMeta
               );
-              projectModelColumnAliasRefs[model.tn][column._cn] = column;
+              projectModelColumnAliasRefs[model.table_name][
+                column.title
+              ] = column;
             } else if (_columnMeta.formula) {
               const columnMeta: Formulav1 = _columnMeta;
               //  migrate formula column
@@ -594,7 +604,9 @@ async function migrateProjectModels(
                 ncMeta
               );
 
-              projectModelColumnAliasRefs[model.tn][column._cn] = column;
+              projectModelColumnAliasRefs[model.table_name][
+                column.title
+              ] = column;
             }
           });
         }
@@ -644,7 +656,7 @@ async function migrateProjectModels(
             ncMeta
           );
 
-          projectModelColumnAliasRefs[model.tn][column._cn] = column;
+          projectModelColumnAliasRefs[model.table_name][column.title] = column;
         });
       }
 
@@ -665,7 +677,7 @@ async function migrateProjectModels(
         const viewColumns = await View.getColumns(defaultView.id, ncMeta);
 
         const aliasColArr = Object.entries(
-          projectModelColumnAliasRefs[model.tn]
+          projectModelColumnAliasRefs[model.table_name]
         ).sort(([a], [b]) => {
           return (
             ((queryParams?.fieldsOrder || [])?.indexOf(a) + 1 || Infinity) -
@@ -971,7 +983,7 @@ async function migrateUIAcl(ctx: MigrateCtxV1, ncMeta: any) {
     } else {
       fk_view_id =
         ctx.objViewRef[acl.project_id][acl.title][
-          ctx.objModelRef[acl.project_id][acl.title]._tn
+          ctx.objModelRef[acl.project_id][acl.title].title
         ].id || ctx.objViewRef[acl.project_id][acl.title][acl.title].id;
     }
 
@@ -1008,7 +1020,7 @@ async function migrateSharedViews(ctx: MigrateCtxV1, ncMeta: any) {
     } else {
       fk_view_id =
         ctx.objViewRef[sharedView.project_id][sharedView.model_name][
-          ctx.objModelRef[sharedView.project_id][sharedView.model_name]._tn
+          ctx.objModelRef[sharedView.project_id][sharedView.model_name].title
         ].id ||
         ctx.objViewRef[sharedView.project_id][sharedView.model_name][
           sharedView.model_name

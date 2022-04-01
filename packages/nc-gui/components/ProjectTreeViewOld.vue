@@ -922,21 +922,21 @@ export default {
 
         if (item._nodes.type === "table") {
           // const columns = await client.columnList({
-          //   tn: item._nodes.tn
+          //   tn: item._nodes.table_name
           // });
 
           // const result = await this.sqlMgr.sqlOp({
           //   env: item._nodes.env,
           //   dbAlias: item._nodes.dbAlias,
           // }, 'columnList', {
-          //   tn: item._nodes.tn
+          //   tn: item._nodes.table_name
           // });
 
           const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
             env: item._nodes.env,
             dbAlias: item._nodes.dbAlias,
           }, 'columnList', {
-            tn: item._nodes.tn
+            tn: item._nodes.table_name
           }]);
 
           await this.sqlMgr.sqlOpPlus(
@@ -945,7 +945,7 @@ export default {
               dbAlias: item._nodes.dbAlias
             },
             "tableDelete",
-            {tn: item._nodes.tn, columns: columns.data.list}
+            {tn: item._nodes.table_name, columns: columns.data.list}
           );
           await this.loadTablesFromParentTreeNode({
             _nodes: {

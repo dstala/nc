@@ -15,7 +15,7 @@
                        href: '#'
                      },
                      {
-                       text: nodes.tn + ' (ACL)',
+                       text: nodes.table_name + ' (ACL)',
                        disabled: true,
                        href: '#'
                      }]"
@@ -77,7 +77,7 @@
         dense
         hide-details
         class="ma-2"
-        :placeholder="`Search ${nodes.tn} resolvers`"
+        :placeholder="`Search ${nodes.table_name} resolvers`"
         prepend-inner-icon="search"
         outlined
       />
@@ -98,9 +98,9 @@
                       v-on="on"
                     />
                   </template>
-                  <span>{{ allToggle ? 'Disable' : 'Enable' }} all {{ nodes.tn }} resolvers for all roles</span>
+                  <span>{{ allToggle ? 'Disable' : 'Enable' }} all {{ nodes.table_name }} resolvers for all roles</span>
                 </v-tooltip>
-                <span class="title">{{ nodes.tn }} RPC Services</span>
+                <span class="title">{{ nodes.table_name }} RPC Services</span>
               </div>
             </th>
             <th
@@ -271,12 +271,12 @@ export default {
         // this.policies = (await this.sqlMgr.projectGetGrpcPolicyFromDb({
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias,
-        //   tn: this.nodes.tn
+        //   table_name: this.nodes.table_name
         // })).data.list;
         this.policies = (await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'projectGetGrpcPolicyFromDb', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          tn: this.nodes.tn
+          table_name: this.nodes.table_name
         }])).data.list
 
         // .data.list;
@@ -298,14 +298,14 @@ export default {
         // await this.sqlMgr.xcRpcPolicyUpdate({
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias,
-        //   tn: this.nodes.tn,
+        //   table_name: this.nodes.table_name,
         //   data: this.data
         // })
 
         await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcRpcPolicyUpdate', {
           env: this.nodes.env,
           dbAlias: this.nodes.dbAlias,
-          tn: this.nodes.tn,
+          table_name: this.nodes.table_name,
           data: this.data
         }])
 

@@ -204,7 +204,7 @@ export default {
         return 0
       }
       if (this.tables && this.models) {
-        const tables = this.tables.filter(t => !isMetaTable(t.tn)).map(t => t.tn)
+        const tables = this.tables.filter(t => !isMetaTable(t.table_name)).map(t => t.table_name)
         res.push(...this.models.map((m) => {
           const i = tables.indexOf(m.title)
           if (i === -1) {

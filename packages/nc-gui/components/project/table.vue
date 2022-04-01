@@ -310,7 +310,7 @@
               mdi-table-edit
             </v-icon>&nbsp;<span
               class="caption text-capitalize  font-weight-bold"
-            > {{ nodes._tn }}</span>
+            > {{ nodes.title }}</span>
           </v-tab>
           <v-tab-item
             style="height:100%"
@@ -321,7 +321,7 @@
               :is-active="isActive"
               :tab-id="tabId"
               :show-tabs="relationTabs && relationTabs.length"
-              :table="nodes.tn"
+              :table="nodes.table_name"
               :nodes="nodes"
               :new-table="newTableCopy"
               :mtd-new-table-update="mtdNewTableUpdate"
@@ -388,7 +388,7 @@
                 ref="tabs7"
                 :is-active="isActive"
                 :show-tabs="relationTabs && relationTabs.length"
-                :table="nodes.tn"
+                :table="nodes.table_name"
                 :nodes="nodes"
                 :relation="relation"
                 :relation-type="relationType"
@@ -533,7 +533,7 @@ export default {
         //   dbAlias: this.nodes.dbAlias
         // }, 'relationListAll'])
         //
-        // relationListAll = relationListAll.data.list.filter(rel => rel.rtn === this.nodes.tn).map(({ tn }) => tn)
+        // relationListAll = relationListAll.data.list.filter(rel => rel.rtn === this.nodes.table_name).map(({ tn }) => tn)
         //
         // if (relationListAll.length) {
         //   this.$toast.info('Table can\'t be  deleted  since Table is being referred in following tables : ' + relationListAll.join(', ')).goAway(10000)
@@ -545,7 +545,7 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'triggerList', {
-        //   tn: this.nodes.tn
+        //   tn: this.nodes.table_name
         // }])
         //
         // for (const trigger of triggerList.data.list) {
@@ -557,7 +557,7 @@ export default {
         //     'triggerDelete',
         //     {
         //       ...trigger,
-        //       tn: this.nodes.tn,
+        //       tn: this.nodes.table_name,
         //       oldStatement: trigger.statement
         //     }])
         //
@@ -570,7 +570,7 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'columnList', {
-        //   tn: this.nodes.tn
+        //   tn: this.nodes.table_name
         // }])
         //
         // columns = columns.data.list
@@ -580,14 +580,14 @@ export default {
         //   dbAlias: this.nodes.dbAlias
         // },
         // 'tableDelete',
-        // { tn: this.nodes.tn, columns }])
+        // { tn: this.nodes.table_name, columns }])
         try {
           await this.$api.meta.tableDelete(this.deleteId)
 
           this.removeTableTab({
             env: this.nodes.env,
             dbAlias: this.nodes.dbAlias,
-            tn: this.nodes.tn
+            table_name: this.nodes.table_name
           })
 
           await this.loadTablesFromParentTreeNode({
@@ -597,7 +597,7 @@ export default {
           })
 
           this.$store.commit('meta/MutMeta', {
-            key: this.nodes.tn,
+            key: this.nodes.table_name,
             value: null
           })
           this.$store.commit('meta/MutMeta', {
@@ -641,7 +641,7 @@ export default {
       return process.env.TS_ENABLED
     },
     isMetaTable() {
-      return isMetaTable(this.nodes.tn)
+      return isMetaTable(this.nodes.table_name)
     }
   },
   beforeCreated() {

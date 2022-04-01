@@ -18,7 +18,7 @@ function translateUiToLibCall(args, op, opArgs) {
       break
     case 'tableCreate':
       data.type = 'Create'
-      data.title = opArgs._tn || opArgs.tn
+      data.title = opArgs.title || opArgs.table_name
       data.module = 'table'
       break
     case 'tableList':
@@ -35,23 +35,23 @@ function translateUiToLibCall(args, op, opArgs) {
       break
     case 'tableUpdate':
       data.type = 'Update'
-      data.title = opArgs._tn || opArgs.tn
+      data.title = opArgs.title || opArgs.table_name
       data.module = 'table'
       break
     case 'tableDelete':
       data.type = 'Delete'
-      data.title = opArgs._tn || opArgs.tn
+      data.title = opArgs.title || opArgs.table_name
       data.module = 'table'
       break
 
     case 'viewCreate':
       data.type = 'Create'
-      data.title = opArgs._tn || opArgs.view_name
+      data.title = opArgs.title || opArgs.view_name
       data.module = 'View'
       break
     case 'viewList':
       data.type = 'List'
-      data.title = opArgs._tn || opArgs.view_name
+      data.title = opArgs.title || opArgs.view_name
       data.module = 'View'
       break
     case 'viewUpdate':
@@ -61,7 +61,7 @@ function translateUiToLibCall(args, op, opArgs) {
       break
     case 'viewDelete':
       data.type = 'Delete'
-      data.title = opArgs._tn || opArgs.view_name
+      data.title = opArgs.title || opArgs.view_name
       data.module = 'View'
       break
 
@@ -130,7 +130,7 @@ function translateUiToLibCall(args, op, opArgs) {
 
     case 'triggerCreate':
       data.type = 'Create '
-      data.title = opArgs._tn || opArgs.tn
+      data.title = opArgs.title || opArgs.table_name
       data.module = 'trigger'
       break
     case 'triggerList':
@@ -151,22 +151,22 @@ function translateUiToLibCall(args, op, opArgs) {
 
     case 'indexCreate':
       data.type = 'Create Index on '
-      data.title = opArgs._tn || opArgs.tn
+      data.title = opArgs.title || opArgs.table_name
       data.module = 'table'
       break
     case 'indexList':
       data.type = 'List'
-      // data.title = opArgs.tn;
+      // data.title = opArgs.table_name;
       data.module = 'table'
       break
     case 'indexUpdate':
       data.type = 'Update Index on '
-      data.title = opArgs._tn || opArgs.tn
+      data.title = opArgs.title || opArgs.table_name
       data.module = 'table'
       break
     case 'indexDelete':
       data.type = 'Delete Index on '
-      data.title = opArgs._tn || opArgs.tn
+      data.title = opArgs.title || opArgs.table_name
       data.module = 'table'
       break
 
@@ -345,10 +345,10 @@ export const actions = {
         'xcRelationColumnDelete'
       ].includes(op)) {
         if (opArgs.parentTable) {
-          dispatch('meta/ActLoadMeta', { ...args, ...params, tn: opArgs.parentTable, force: true }, { root: true })
+          dispatch('meta/ActLoadMeta', { ...args, ...params, table_name: opArgs.parentTable, force: true }, { root: true })
         }
         if (opArgs.childTable) {
-          dispatch('meta/ActLoadMeta', { ...args, ...params, tn: opArgs.childTable, force: true }, { root: true })
+          dispatch('meta/ActLoadMeta', { ...args, ...params, table_name: opArgs.childTable, force: true }, { root: true })
         }
       }
 
@@ -413,10 +413,10 @@ export const actions = {
         'xcRelationColumnDelete'
       ].includes(op)) {
         if (opArgs.parentTable) {
-          dispatch('meta/ActLoadMeta', { ...args, ...params, tn: opArgs.parentTable, force: true }, { root: true })
+          dispatch('meta/ActLoadMeta', { ...args, ...params, table_name: opArgs.parentTable, force: true }, { root: true })
         }
         if (opArgs.childTable) {
-          dispatch('meta/ActLoadMeta', { ...args, ...params, tn: opArgs.childTable, force: true }, { root: true })
+          dispatch('meta/ActLoadMeta', { ...args, ...params, table_name: opArgs.childTable, force: true }, { root: true })
         }
       }
 

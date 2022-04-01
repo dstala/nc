@@ -93,16 +93,20 @@ export default async function formulaQueryBuilderv2(
             await parentModel.getColumns();
             switch (relation.type) {
               case 'bt':
-                selectQb = knex(`${parentModel.tn} as ${alias}`).where(
-                  `${alias}.${parentColumn.cn}`,
-                  knex.raw(`??`, [`${childModel.tn}.${childColumn.cn}`])
+                selectQb = knex(`${parentModel.table_name} as ${alias}`).where(
+                  `${alias}.${parentColumn.column_name}`,
+                  knex.raw(`??`, [
+                    `${childModel.table_name}.${childColumn.column_name}`
+                  ])
                 );
                 break;
               case 'hm':
                 isMany = true;
-                selectQb = knex(`${childModel.tn} as ${alias}`).where(
-                  `${alias}.${childColumn.cn}`,
-                  knex.raw(`??`, [`${parentModel.tn}.${parentColumn.cn}`])
+                selectQb = knex(`${childModel.table_name} as ${alias}`).where(
+                  `${alias}.${childColumn.column_name}`,
+                  knex.raw(`??`, [
+                    `${parentModel.table_name}.${parentColumn.column_name}`
+                  ])
                 );
                 break;
               case 'mm':
@@ -113,15 +117,17 @@ export default async function formulaQueryBuilderv2(
                   const mmChildColumn = await relation.getMMChildColumn();
 
                   const assocAlias = `__nc${aliasCount++}`;
-                  selectQb = knex(`${parentModel.tn} as ${alias}`)
+                  selectQb = knex(`${parentModel.table_name} as ${alias}`)
                     .join(
-                      `${mmModel.tn} as ${assocAlias}`,
-                      `${assocAlias}.${mmParentColumn.cn}`,
-                      `${alias}.${parentColumn.cn}`
+                      `${mmModel.table_name} as ${assocAlias}`,
+                      `${assocAlias}.${mmParentColumn.column_name}`,
+                      `${alias}.${parentColumn.column_name}`
                     )
                     .where(
-                      `${assocAlias}.${mmChildColumn.cn}`,
-                      knex.raw(`??`, [`${childModel.tn}.${childColumn.cn}`])
+                      `${assocAlias}.${mmChildColumn.column_name}`,
+                      knex.raw(`??`, [
+                        `${childModel.table_name}.${childColumn.column_name}`
+                      ])
                     );
                 }
                 break;
@@ -153,9 +159,9 @@ export default async function formulaQueryBuilderv2(
                 case 'bt':
                   {
                     selectQb.join(
-                      `${parentModel.tn} as ${nestedAlias}`,
-                      `${prevAlias}.${childColumn.cn}`,
-                      `${nestedAlias}.${parentColumn.cn}`
+                      `${parentModel.table_name} as ${nestedAlias}`,
+                      `${prevAlias}.${childColumn.column_name}`,
+                      `${nestedAlias}.${parentColumn.column_name}`
                     );
                   }
                   break;
@@ -163,9 +169,9 @@ export default async function formulaQueryBuilderv2(
                   {
                     isMany = true;
                     selectQb.join(
-                      `${childModel.tn} as ${nestedAlias}`,
-                      `${prevAlias}.${parentColumn.cn}`,
-                      `${nestedAlias}.${childColumn.cn}`
+                      `${childModel.table_name} as ${nestedAlias}`,
+                      `${prevAlias}.${parentColumn.column_name}`,
+                      `${nestedAlias}.${childColumn.column_name}`
                     );
                   }
                   break;
@@ -179,14 +185,14 @@ export default async function formulaQueryBuilderv2(
 
                   selectQb
                     .join(
-                      `${mmModel.tn} as ${assocAlias}`,
-                      `${assocAlias}.${mmChildColumn.cn}`,
-                      `${prevAlias}.${childColumn.cn}`
+                      `${mmModel.table_name} as ${assocAlias}`,
+                      `${assocAlias}.${mmChildColumn.column_name}`,
+                      `${prevAlias}.${childColumn.column_name}`
                     )
                     .join(
-                      `${parentModel.tn} as ${nestedAlias}`,
-                      `${nestedAlias}.${parentColumn.cn}`,
-                      `${assocAlias}.${mmParentColumn.cn}`
+                      `${parentModel.table_name} as ${nestedAlias}`,
+                      `${nestedAlias}.${parentColumn.column_name}`,
+                      `${assocAlias}.${mmParentColumn.column_name}`
                     );
                 }
               }
@@ -250,13 +256,13 @@ export default async function formulaQueryBuilderv2(
                     case 'bt':
                       {
                         selectQb.join(
-                          `${parentModel.tn} as ${nestedAlias}`,
-                          `${alias}.${childColumn.cn}`,
-                          `${nestedAlias}.${parentColumn.cn}`
+                          `${parentModel.table_name} as ${nestedAlias}`,
+                          `${alias}.${childColumn.column_name}`,
+                          `${nestedAlias}.${parentColumn.column_name}`
                         );
                         cn = knex.raw('??.??', [
                           nestedAlias,
-                          parentModel?.primaryValue?.cn
+                          parentModel?.primaryValue?.column_name
                         ]);
                       }
                       break;
@@ -264,13 +270,13 @@ export default async function formulaQueryBuilderv2(
                       {
                         isMany = true;
                         selectQb.join(
-                          `${childModel.tn} as ${nestedAlias}`,
-                          `${alias}.${parentColumn.cn}`,
-                          `${nestedAlias}.${childColumn.cn}`
+                          `${childModel.table_name} as ${nestedAlias}`,
+                          `${alias}.${parentColumn.column_name}`,
+                          `${nestedAlias}.${childColumn.column_name}`
                         );
                         cn = knex.raw('??.??', [
                           nestedAlias,
-                          childModel?.primaryValue?.cn
+                          childModel?.primaryValue?.column_name
                         ]);
                       }
                       break;
@@ -285,26 +291,26 @@ export default async function formulaQueryBuilderv2(
 
                         selectQb
                           .join(
-                            `${mmModel.tn} as ${assocAlias}`,
-                            `${assocAlias}.${mmChildColumn.cn}`,
-                            `${alias}.${childColumn.cn}`
+                            `${mmModel.table_name} as ${assocAlias}`,
+                            `${assocAlias}.${mmChildColumn.column_name}`,
+                            `${alias}.${childColumn.column_name}`
                           )
                           .join(
-                            `${parentModel.tn} as ${nestedAlias}`,
-                            `${nestedAlias}.${parentColumn.cn}`,
-                            `${assocAlias}.${mmParentColumn.cn}`
+                            `${parentModel.table_name} as ${nestedAlias}`,
+                            `${nestedAlias}.${parentColumn.column_name}`,
+                            `${assocAlias}.${mmParentColumn.column_name}`
                           );
                       }
                       cn = knex.raw('??.??', [
                         nestedAlias,
-                        parentModel?.primaryValue?.cn
+                        parentModel?.primaryValue?.column_name
                       ]);
                   }
 
                   selectQb.join(
-                    `${parentModel.tn} as ${nestedAlias}`,
-                    `${nestedAlias}.${parentColumn.cn}`,
-                    `${prevAlias}.${childColumn.cn}`
+                    `${parentModel.table_name} as ${nestedAlias}`,
+                    `${nestedAlias}.${parentColumn.column_name}`,
+                    `${prevAlias}.${childColumn.column_name}`
                   );
 
                   if (isMany) {
@@ -315,7 +321,7 @@ export default async function formulaQueryBuilderv2(
                           getAggregateFn(fn)({
                             qb,
                             knex,
-                            cn: lookupColumn.cn
+                            cn: lookupColumn.column_name
                           })
                         )
                         .wrap('(', ')');
@@ -364,12 +370,12 @@ export default async function formulaQueryBuilderv2(
                           getAggregateFn(fn)({
                             qb,
                             knex,
-                            cn: `${prevAlias}.${lookupColumn.cn}`
+                            cn: `${prevAlias}.${lookupColumn.column_name}`
                           })
                         )
                         .wrap('(', ')');
                   } else {
-                    selectQb.select(`${prevAlias}.${lookupColumn.cn}`);
+                    selectQb.select(`${prevAlias}.${lookupColumn.column_name}`);
                   }
                 }
 
@@ -413,18 +419,22 @@ export default async function formulaQueryBuilderv2(
 
           let selectQb;
           if (relation.type === 'bt') {
-            selectQb = knex(parentModel.tn)
-              .select(parentModel?.primaryValue?.cn)
+            selectQb = knex(parentModel.table_name)
+              .select(parentModel?.primaryValue?.column_name)
               .where(
-                `${parentModel.tn}.${parentColumn.cn}`,
-                knex.raw(`??`, [`${childModel.tn}.${childColumn.cn}`])
+                `${parentModel.table_name}.${parentColumn.column_name}`,
+                knex.raw(`??`, [
+                  `${childModel.table_name}.${childColumn.column_name}`
+                ])
               );
           } else if (relation.type == 'hm') {
-            const qb = knex(childModel.tn)
+            const qb = knex(childModel.table_name)
               // .select(knex.raw(`GROUP_CONCAT(??)`, [childModel?.pv?.title]))
               .where(
-                `${childModel.tn}.${childColumn.cn}`,
-                knex.raw(`??`, [`${parentModel.tn}.${parentColumn.cn}`])
+                `${childModel.table_name}.${childColumn.column_name}`,
+                knex.raw(`??`, [
+                  `${parentModel.table_name}.${parentColumn.column_name}`
+                ])
               );
 
             selectQb = fn =>
@@ -433,7 +443,7 @@ export default async function formulaQueryBuilderv2(
                   getAggregateFn(fn)({
                     qb,
                     knex,
-                    cn: childModel?.primaryValue?.cn
+                    cn: childModel?.primaryValue?.column_name
                   })
                 )
                 .wrap('(', ')');
@@ -467,15 +477,17 @@ export default async function formulaQueryBuilderv2(
             const mmParentColumn = await relation.getMMParentColumn();
             const mmChildColumn = await relation.getMMChildColumn();
 
-            const qb = knex(`${parentModel.tn} as ${alias}`)
+            const qb = knex(`${parentModel.table_name} as ${alias}`)
               .join(
-                `${mmModel.tn}`,
-                `${mmModel.tn}.${mmParentColumn.cn}`,
-                `${alias}.${parentColumn.cn}`
+                `${mmModel.table_name}`,
+                `${mmModel.table_name}.${mmParentColumn.column_name}`,
+                `${alias}.${parentColumn.column_name}`
               )
               .where(
-                `${mmModel.tn}.${mmChildColumn.cn}`,
-                knex.raw(`??`, [`${childModel.tn}.${childColumn.cn}`])
+                `${mmModel.table_name}.${mmChildColumn.column_name}`,
+                knex.raw(`??`, [
+                  `${childModel.table_name}.${childColumn.column_name}`
+                ])
               );
             selectQb = fn =>
               knex
@@ -483,7 +495,7 @@ export default async function formulaQueryBuilderv2(
                   getAggregateFn(fn)({
                     qb,
                     knex,
-                    cn: parentModel?.primaryValue?.cn
+                    cn: parentModel?.primaryValue?.column_name
                   })
                 )
                 .wrap('(', ')');
@@ -496,7 +508,7 @@ export default async function formulaQueryBuilderv2(
         }
         break;
       default:
-        aliasToColumn[col.id] = col.cn;
+        aliasToColumn[col.id] = col.column_name;
         break;
     }
   }

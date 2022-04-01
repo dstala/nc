@@ -303,7 +303,7 @@ export const actions = {
       el =>
         el._nodes.env === nodes.env &&
         el._nodes.dbAlias === nodes.dbAlias &&
-        el._nodes.tn === nodes.tn
+        el._nodes.table_name === nodes.table_name
     )
     tabs.splice(tabIndex, 1)
     commit('list', tabs)

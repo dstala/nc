@@ -16,6 +16,7 @@ import getTableNameAlias, { getColumnNameAlias } from '../helpers/getTableName';
 import UITypes from '../../../sqlUi/UITypes';
 import mapDefaultPrimaryValue from '../helpers/mapDefaultPrimaryValue';
 import { Tele } from 'nc-help';
+import getColumnUiType from '../helpers/getColumnUiType';
 export enum MetaDiffType {
   TABLE_NEW = 'TABLE_NEW',
   TABLE_REMOVE = 'TABLE_REMOVE',
@@ -35,8 +36,8 @@ export enum MetaDiffType {
 }
 
 type MetaDiff = {
-  _tn?: string;
-  tn: string;
+  title?: string;
+  table_name: string;
   type: ModelTypes;
   detectedChanges: Array<MetaDiffChange>;
 };
@@ -112,7 +113,9 @@ async function getMetaDiff(
   const virtualRelationColumns: Column<LinkToAnotherRecordColumn>[] = [];
 
   // @ts-ignore
-  const tableList = (await sqlClient.tableList())?.data?.list?.filter(t => {
+  const tableList: Array<{ tn: string }> = (
+    await sqlClient.tableList()
+  )?.data?.list?.filter(t => {
     if (project?.prefix) {
       return t.tn?.startsWith(project?.prefix);
     }
@@ -131,17 +134,23 @@ async function getMetaDiff(
   }
 
   // @ts-ignore
-  const relationList = (await sqlClient.relationListAll())?.data?.list;
+  const relationList: Array<{
+    tn: string;
+    rtn: string;
+    cn: string;
+    rcn: string;
+    found?: any;
+  }> = (await sqlClient.relationListAll())?.data?.list;
 
   for (const table of tableList) {
     if (table.tn === 'nc_evolutions') continue;
 
-    const oldMetaIdx = oldTableMetas.findIndex(m => m.tn === table.tn);
+    const oldMetaIdx = oldTableMetas.findIndex(m => m.table_name === table.tn);
 
     // new table
     if (oldMetaIdx === -1) {
       changes.push({
-        tn: table.tn,
+        table_name: table.tn,
         type: ModelTypes.TABLE,
         detectedChanges: [
           {
@@ -158,8 +167,8 @@ async function getMetaDiff(
     oldTableMetas.splice(oldMetaIdx, 1);
 
     const tableProp: MetaDiff = {
-      _tn: oldMeta._tn,
-      tn: table.tn,
+      title: oldMeta.title,
+      table_name: table.tn,
       type: ModelTypes.TABLE,
       detectedChanges: []
     };
@@ -173,7 +182,9 @@ async function getMetaDiff(
     await oldMeta.getColumns();
 
     for (const column of colListRef[table.tn]) {
-      const oldColIdx = oldMeta.columns.findIndex(c => c.cn === column.cn);
+      const oldColIdx = oldMeta.columns.findIndex(
+        c => c.column_name === column.cn
+      );
 
       // new table
       if (oldColIdx === -1) {
@@ -192,7 +203,7 @@ async function getMetaDiff(
         tableProp.detectedChanges.push({
           type: MetaDiffType.TABLE_COLUMN_TYPE_CHANGE,
           msg: `Column type changed(${column.cn})`,
-          cn: oldCol.cn,
+          cn: oldCol.column_name,
           id: oldMeta.id,
           column: oldCol
         });
@@ -216,8 +227,8 @@ async function getMetaDiff(
 
       tableProp.detectedChanges.push({
         type: MetaDiffType.TABLE_COLUMN_REMOVE,
-        msg: `Column removed(${column.cn})`,
-        cn: column.cn,
+        msg: `Column removed(${column.column_name})`,
+        cn: column.column_name,
         id: oldMeta.id,
         column: column,
         colId: column.id
@@ -227,13 +238,13 @@ async function getMetaDiff(
 
   for (const model of oldTableMetas) {
     changes.push({
-      tn: model.tn,
+      table_name: model.table_name,
       type: ModelTypes.TABLE,
       detectedChanges: [
         {
           type: MetaDiffType.TABLE_REMOVE,
           msg: `Table removed`,
-          tn: model.tn,
+          tn: model.table_name,
           id: model.id,
           model
         }
@@ -252,12 +263,12 @@ async function getMetaDiff(
     if (colOpt.type === RelationTypes.MANY_TO_MANY) {
       const m2mModel = await colOpt.getMMModel();
 
-      const relatedTable = tableList.find(t => t.tn === parentModel.tn);
-      const m2mTable = tableList.find(t => t.tn === m2mModel.tn);
+      const relatedTable = tableList.find(t => t.tn === parentModel.table_name);
+      const m2mTable = tableList.find(t => t.tn === m2mModel.table_name);
 
       if (!relatedTable) {
         changes
-          .find(t => t.tn === childModel.tn)
+          .find(t => t.table_name === childModel.table_name)
           .detectedChanges.push({
             type: MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE,
             msg: `Many to many removed(${relatedTable.tn} removed)`,
@@ -268,10 +279,10 @@ async function getMetaDiff(
       }
       if (!m2mTable) {
         changes
-          .find(t => t.tn === childModel.tn)
+          .find(t => t.table_name === childModel.table_name)
           .detectedChanges.push({
             type: MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE,
-            msg: `Many to many removed(${m2mModel.tn} removed)`,
+            msg: `Many to many removed(${m2mModel.table_name} removed)`,
             colId: relationCol.id,
             column: relationCol
           });
@@ -280,13 +291,15 @@ async function getMetaDiff(
 
       // verify columns
 
-      const cColumns = (colListRef[childModel.tn] =
-        colListRef[childModel.tn] ||
-        (await sqlClient.columnList({ tn: childModel.tn }))?.data?.list);
+      const cColumns = (colListRef[childModel.table_name] =
+        colListRef[childModel.table_name] ||
+        (await sqlClient.columnList({ tn: childModel.table_name }))?.data
+          ?.list);
 
-      const pColumns = (colListRef[parentModel.tn] =
-        colListRef[parentModel.tn] ||
-        (await sqlClient.columnList({ tn: parentModel.tn }))?.data?.list);
+      const pColumns = (colListRef[parentModel.table_name] =
+        colListRef[parentModel.table_name] ||
+        (await sqlClient.columnList({ tn: parentModel.table_name }))?.data
+          ?.list);
 
       const vColumns = (colListRef[m2mTable.tn] =
         colListRef[m2mTable.tn] ||
@@ -296,13 +309,13 @@ async function getMetaDiff(
       const m2mParentCol = await colOpt.getMMParentColumn();
 
       if (
-        pColumns.every(c => c.cn !== parentCol.cn) ||
-        cColumns.every(c => c.cn !== childCol.cn) ||
-        vColumns.every(c => c.cn !== m2mChildCol.cn) ||
-        vColumns.every(c => c.cn !== m2mParentCol.cn)
+        pColumns.every(c => c.cn !== parentCol.column_name) ||
+        cColumns.every(c => c.cn !== childCol.column_name) ||
+        vColumns.every(c => c.cn !== m2mChildCol.column_name) ||
+        vColumns.every(c => c.cn !== m2mParentCol.column_name)
       ) {
         changes
-          .find(t => t.tn === childModel.tn)
+          .find(t => t.table_name === childModel.table_name)
           .detectedChanges.push({
             type: MetaDiffType.TABLE_VIRTUAL_M2M_REMOVE,
             msg: `Many to many removed(One of the relation column removed)`,
@@ -318,10 +331,10 @@ async function getMetaDiff(
 
     const dbRelation = relationList.find(
       r =>
-        r.cn === childCol.cn &&
-        r.tn === childModel.tn &&
-        r.rcn === parentCol.cn &&
-        r.rtn === parentModel.tn
+        r.cn === childCol.column_name &&
+        r.tn === childModel.table_name &&
+        r.rcn === parentCol.column_name &&
+        r.rtn === parentModel.table_name
     );
 
     if (dbRelation) {
@@ -336,17 +349,17 @@ async function getMetaDiff(
       changes
         .find(
           t =>
-            t.tn ===
+            t.table_name ===
             (colOpt.type === RelationTypes.BELONGS_TO
-              ? childModel.tn
-              : parentModel.tn)
+              ? childModel.table_name
+              : parentModel.table_name)
         )
         .detectedChanges.push({
           type: MetaDiffType.TABLE_RELATION_REMOVE,
-          tn: childModel.tn,
-          rtn: parentModel.tn,
-          cn: childCol.cn,
-          rcn: parentCol.cn,
+          tn: childModel.table_name,
+          rtn: parentModel.table_name,
+          cn: childCol.column_name,
+          rcn: parentCol.column_name,
           msg: `Relation removed`,
           colId: relationCol.id,
           column: relationCol
@@ -357,7 +370,7 @@ async function getMetaDiff(
   for (const relation of relationList) {
     if (!relation?.found?.[RelationTypes.BELONGS_TO]) {
       changes
-        .find(t => t.tn === relation.tn)
+        .find(t => t.table_name === relation.tn)
         ?.detectedChanges.push({
           type: MetaDiffType.TABLE_RELATION_ADD,
           tn: relation.tn,
@@ -370,7 +383,7 @@ async function getMetaDiff(
     }
     if (!relation?.found?.[RelationTypes.HAS_MANY]) {
       changes
-        .find(t => t.tn === relation.rtn)
+        .find(t => t.table_name === relation.rtn)
         ?.detectedChanges.push({
           type: MetaDiffType.TABLE_RELATION_ADD,
           tn: relation.tn,
@@ -385,7 +398,11 @@ async function getMetaDiff(
 
   // views
   // @ts-ignore
-  const viewList = (await sqlClient.viewList())?.data?.list
+  const viewList: Array<{
+    view_name: string;
+    tn: string;
+    type: 'view';
+  }> = (await sqlClient.viewList())?.data?.list
     ?.map(v => {
       v.type = 'view';
       v.tn = v.view_name;
@@ -399,12 +416,12 @@ async function getMetaDiff(
     }); // @ts-ignore
 
   for (const view of viewList) {
-    const oldMetaIdx = oldViewMetas.findIndex(m => m.tn === view.tn);
+    const oldMetaIdx = oldViewMetas.findIndex(m => m.table_name === view.tn);
 
     // new table
     if (oldMetaIdx === -1) {
       changes.push({
-        tn: view.tn,
+        table_name: view.tn,
         type: ModelTypes.VIEW,
         detectedChanges: [
           {
@@ -421,8 +438,8 @@ async function getMetaDiff(
     oldViewMetas.splice(oldMetaIdx, 1);
 
     const tableProp: MetaDiff = {
-      _tn: oldMeta._tn,
-      tn: view.tn,
+      title: oldMeta.title,
+      table_name: view.tn,
       type: ModelTypes.VIEW,
       detectedChanges: []
     };
@@ -436,7 +453,9 @@ async function getMetaDiff(
     await oldMeta.getColumns();
 
     for (const column of colListRef[view.tn]) {
-      const oldColIdx = oldMeta.columns.findIndex(c => c.cn === column.cn);
+      const oldColIdx = oldMeta.columns.findIndex(
+        c => c.column_name === column.cn
+      );
 
       // new table
       if (oldColIdx === -1) {
@@ -455,7 +474,7 @@ async function getMetaDiff(
         tableProp.detectedChanges.push({
           type: MetaDiffType.TABLE_COLUMN_TYPE_CHANGE,
           msg: `Column type changed(${column.cn})`,
-          cn: oldCol.cn,
+          cn: oldCol.column_name,
           id: oldMeta.id,
           column: oldCol
         });
@@ -475,8 +494,8 @@ async function getMetaDiff(
 
       tableProp.detectedChanges.push({
         type: MetaDiffType.VIEW_COLUMN_REMOVE,
-        msg: `Column removed(${column.cn})`,
-        cn: column.cn,
+        msg: `Column removed(${column.column_name})`,
+        cn: column.column_name,
         id: oldMeta.id,
         column: column,
         colId: column.id
@@ -486,13 +505,13 @@ async function getMetaDiff(
 
   for (const model of oldViewMetas) {
     changes.push({
-      tn: model.tn,
+      table_name: model.table_name,
       type: ModelTypes.TABLE,
       detectedChanges: [
         {
           type: MetaDiffType.VIEW_REMOVE,
           msg: `Table removed`,
-          tn: model.tn,
+          tn: model.table_name,
           id: model.id,
           model
         }
@@ -524,99 +543,130 @@ export async function metaDiffSync(req, res) {
   const changes = await getMetaDiff(sqlClient, project, base);
 
   /* Get all relations */
-  const relations = (await sqlClient.relationListAll())?.data?.list;
+  // const relations = (await sqlClient.relationListAll())?.data?.list;
 
-  for (const { tn, detectedChanges } of changes) {
+  for (const { table_name, detectedChanges } of changes) {
     for (const change of detectedChanges) {
       switch (change.type) {
         case MetaDiffType.TABLE_NEW:
           {
-            const tableRelations = relations.filter(
-              r => r.tn === tn || r.rtn === tn
-            );
-            const columns = (await sqlClient.columnList({ tn }))?.data?.list;
+            // const tableRelations = relations.filter(
+            //   r => r.tn === table_name || r.rtn === table_name
+            // );
+            const columns = (await sqlClient.columnList({ tn: table_name }))
+              ?.data?.list;
 
-            const hasMany = JSON.parse(
-              JSON.stringify(tableRelations.filter(r => r.rtn === tn))
-            );
-            const belongsTo = JSON.parse(
-              JSON.stringify(tableRelations.filter(r => r.tn === tn))
-            );
+            // const hasMany = tableRelations.filter(r => r.rtn === table_name);
+            // const belongsTo = tableRelations.filter(r => r.tn === table_name);
 
-            const ctx = {
-              dbType: base.type,
-              tn,
-              _tn: getTableNameAlias(tn, project.prefix, base),
-              columns: columns.map(c => ({
-                ...c,
-                _cn: getColumnNameAlias(c.cn, base)
-              })),
-              relations,
-              hasMany,
-              belongsTo,
-              project_id: project.id
-            };
+            // const ctx = {
+            //   dbType: base.type,
+            //   tn,
+            //   _tn: getTableNameAlias(tn, project.prefix, base),
+            //   columns: columns.map(c => ({
+            //     ...c,
+            //     _cn: getColumnNameAlias(c.cn, base)
+            //   })),
+            //   relations,
+            //   hasMany,
+            //   belongsTo,
+            //   project_id: project.id
+            // };
+            //
+            // /* create models from table metadata */
+            // const meta = ModelXcMetaFactory.create(
+            //   { client: base.type },
+            //   {
+            //     dir: '',
+            //     ctx,
+            //     filename: ''
+            //   }
+            // ).getObject();
 
-            /* create models from table metadata */
-            const meta = ModelXcMetaFactory.create(
-              { client: base.type },
-              {
-                dir: '',
-                ctx,
-                filename: ''
-              }
-            ).getObject();
+            // todo: handle duplicate relation
+            // const virtualColumns = [
+            //   ...hasMany.map(hm => {
+            //     return {
+            //       uidt: UITypes.LinkToAnotherRecord,
+            //       type: 'hm',
+            //       hm,
+            //       _cn: `${hm._tn}List`
+            //     };
+            //   }),
+            //   ...belongsTo.map(bt => ({
+            //     uidt: UITypes.LinkToAnotherRecord,
+            //     type: 'bt',
+            //     bt,
+            //     _cn: `${bt._rtn}Read`
+            //   }))
+            // ];
 
-            mapDefaultPrimaryValue(meta.columns);
+            mapDefaultPrimaryValue(columns);
 
-            // const model =
-            await Model.insert(project.id, base.id, {
-              ...meta,
-              // todo: sanitize
+            const model = await Model.insert(project.id, base.id, {
+              table_name: table_name,
+              title: getTableNameAlias(table_name, project.prefix, base),
               type: ModelTypes.TABLE
             });
 
-            // for (const col of meta.columns) {
-            //   // await Column.insert({ fk_model_id: model.id, ...col });
-            // }
-            for (const v of meta.v) {
-              // todo
-              console.log(v);
-              // await Column.insert(col);
+            for (const column of columns) {
+              await Column.insert({
+                uidt: getColumnUiType(base, column),
+                fk_model_id: model.id,
+                ...column,
+                title: getColumnNameAlias(column.column_name, base)
+              });
             }
           }
           break;
         case MetaDiffType.VIEW_NEW:
           {
-            const columns = (await sqlClient.columnList({ tn }))?.data?.list;
-            const ctx = {
-              dbType: base.type,
-              tn,
-              _tn: getTableNameAlias(tn, project.prefix, base),
-              columns: columns.map(c => ({
-                ...c,
-                _cn: getColumnNameAlias(c.cn, base)
-              })),
-              relations: [],
-              hasMany: [],
-              belongsTo: [],
-              project_id: project.id
-            };
+            const columns = (await sqlClient.columnList({ tn: table_name }))
+              ?.data?.list;
+            // const ctx = {
+            //   dbType: base.type,
+            //   tn: table_name,
+            //   _tn: getTableNameAlias(table_name, project.prefix, base),
+            //   columns: columns.map(c => ({
+            //     ...c,
+            //     _cn: getColumnNameAlias(c.cn, base)
+            //   })),
+            //   relations: [],
+            //   hasMany: [],
+            //   belongsTo: [],
+            //   project_id: project.id
+            // };
 
             /* create models from table metadata */
-            const meta = ModelXcMetaFactory.create(
-              { client: base.type },
-              {
-                dir: '',
-                ctx,
-                filename: ''
-              }
-            ).getObject();
-            await Model.insert(project.id, base.id, {
-              ...meta,
-              // todo: sanitize
+            // const meta = ModelXcMetaFactory.create(
+            //   { client: base.type },
+            //   {
+            //     dir: '',
+            //     ctx,
+            //     filename: ''
+            //   }
+            // ).getObject();
+            // await Model.insert(project.id, base.id, {
+            //   ...meta,
+            //   // todo: sanitize
+            //   type: ModelTypes.VIEW
+            // });
+            mapDefaultPrimaryValue(columns);
+
+            const model = await Model.insert(project.id, base.id, {
+              table_name: table_name,
+              title: getTableNameAlias(table_name, project.prefix, base),
               type: ModelTypes.VIEW
             });
+
+            for (const column of columns) {
+              await Column.insert({
+                uidt: getColumnUiType(base, column),
+                fk_model_id: model.id,
+                ...column,
+                title: getColumnNameAlias(column.column_name, base)
+              });
+            }
           }
           break;
         case MetaDiffType.TABLE_REMOVE:
@@ -628,13 +678,10 @@ export async function metaDiffSync(req, res) {
         case MetaDiffType.TABLE_COLUMN_ADD:
         case MetaDiffType.VIEW_COLUMN_ADD:
           {
-            const columns = (await sqlClient.columnList({ tn }))?.data?.list;
+            const columns = (await sqlClient.columnList({ tn: table_name }))
+              ?.data?.list;
             const column = columns.find(c => c.cn === change.cn);
-            const metaFact = ModelXcMetaFactory.create(
-              { client: base.type },
-              {}
-            );
-            column.uidt = metaFact.getUIDataType(column);
+            column.uidt = getColumnUiType(base, column);
             //todo: inflection
             column._cn = getColumnNameAlias(column.cn, base);
             await Column.insert({ fk_model_id: change.id, ...column });
@@ -647,14 +694,15 @@ export async function metaDiffSync(req, res) {
         case MetaDiffType.TABLE_COLUMN_TYPE_CHANGE:
         case MetaDiffType.VIEW_COLUMN_TYPE_CHANGE:
           {
-            const columns = (await sqlClient.columnList({ tn }))?.data?.list;
+            const columns = (await sqlClient.columnList({ tn: table_name }))
+              ?.data?.list;
             const column = columns.find(c => c.cn === change.cn);
             const metaFact = ModelXcMetaFactory.create(
               { client: base.type },
               {}
             );
             column.uidt = metaFact.getUIDataType(column);
-            column._cn = change.column._cn;
+            column._cn = change.column.title;
             await Column.update(change.column.id, column);
           }
           break;
@@ -672,24 +720,24 @@ export async function metaDiffSync(req, res) {
               const parentModel = await Model.getByIdOrName({
                 project_id: base.project_id,
                 base_id: base.id,
-                tn: change.rtn
+                table_name: change.rtn
               });
               const childModel = await Model.getByIdOrName({
                 project_id: base.project_id,
                 base_id: base.id,
-                tn: change.tn
+                table_name: change.tn
               });
               const parentCol = await parentModel
                 .getColumns()
-                .then(cols => cols.find(c => c.cn === change.rcn));
+                .then(cols => cols.find(c => c.column_name === change.rcn));
               const childCol = await childModel
                 .getColumns()
-                .then(cols => cols.find(c => c.cn === change.cn));
+                .then(cols => cols.find(c => c.column_name === change.cn));
 
               if (change.relationType === RelationTypes.BELONGS_TO) {
                 const _cn = getUniqueColumnAliasName(
                   childModel.columns,
-                  `${parentModel._tn || parentModel.tn}Read`
+                  `${parentModel.title || parentModel.table_name}Read`
                 );
                 await Column.insert<LinkToAnotherRecordColumn>({
                   uidt: UITypes.LinkToAnotherRecord,
@@ -704,7 +752,7 @@ export async function metaDiffSync(req, res) {
               } else if (change.relationType === RelationTypes.HAS_MANY) {
                 const _cn = getUniqueColumnAliasName(
                   childModel.columns,
-                  `${childModel._tn || childModel.tn}List`
+                  `${childModel.title || childModel.table_name}List`
                 );
                 await Column.insert<LinkToAnotherRecordColumn>({
                   uidt: UITypes.LinkToAnotherRecord,
@@ -761,8 +809,10 @@ async function isMMRelationAvailable(
 }
 
 // @ts-ignore
-async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
-  for (const assocModel of metasArr) {
+export async function extractAndGenerateManyToManyRelations(
+  modelsArr: Array<Model>
+) {
+  for (const assocModel of modelsArr) {
     await assocModel.getColumns();
     // check if table is a Bridge table(or Associative Table) by checking
     // number of foreign keys and columns
@@ -798,7 +848,10 @@ async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
 
       if (!isRelationAvailInA) {
         await Column.insert<LinkToAnotherRecordColumn>({
-          _cn: getUniqueColumnAliasName(modelA.columns, `${modelB._tn}MMList`),
+          _cn: getUniqueColumnAliasName(
+            modelA.columns,
+            `${modelB.title}MMList`
+          ),
           fk_model_id: modelA.id,
           fk_related_model_id: modelB.id,
           fk_mm_model_id: assocModel.id,
@@ -813,7 +866,10 @@ async function extractAndGenerateManyToManyRelations(metasArr: Array<Model>) {
       }
       if (!isRelationAvailInB) {
         await Column.insert<LinkToAnotherRecordColumn>({
-          _cn: getUniqueColumnAliasName(modelB.columns, `${modelA._tn}MMList`),
+          _cn: getUniqueColumnAliasName(
+            modelB.columns,
+            `${modelA.title}MMList`
+          ),
           fk_model_id: modelB.id,
           fk_related_model_id: modelA.id,
           fk_mm_model_id: assocModel.id,

@@ -52,8 +52,9 @@
           >
             <template #item="{item}">
               <span
-                :class="`caption font-weight-regular nc-sort-fld-${item._cn}`">
-                  {{ item._cn }}
+                :class="`caption font-weight-regular nc-sort-fld-${item.title}`"
+              >
+                {{ item.title }}
               </span>
             </template>
           </v-select>
@@ -167,7 +168,7 @@ export default {
         this.$emit('input', this.sortList)
       }
       this.$emit('updated')
-      this.$tele.emit(`sort:delete`)
+      this.$tele.emit('sort:delete')
     }
   }
 }

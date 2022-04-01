@@ -37,7 +37,7 @@ export async function auditRowUpdate(
       row_id: req.body.row_id,
       op_type: AuditOperationTypes.DATA,
       op_sub_type: AuditOperationSubTypes.UPDATE,
-      description: `Table ${model.tn} : field ${req.body.column_name} got changed from  ${req.body.prev_value} to ${req.body.value}`,
+      description: `Table ${model.table_name} : field ${req.body.column_name} got changed from  ${req.body.prev_value} to ${req.body.value}`,
       details: `<span class="">${req.body.column_name}</span>
   : <span class="text-decoration-line-through red px-2 lighten-4 black--text">${req.body.prev_value}</span>
   <span class="black--text green lighten-4 px-2">${req.body.value}</span>`,

@@ -27,7 +27,7 @@
             :label="$t('labels.childTable')"
             :full-width="false"
             :items="refTables"
-            item-text="_tn"
+            item-text="title"
             item-value="id"
             required
             dense
@@ -154,12 +154,12 @@ export default {
         // (v) => {
         //   if (this.type === 'mm') {
         //     return !(this.meta.manyToMany || [])
-        //       .some(mm => (mm.tn === v && mm.rtn === this.meta.tn) || (mm.rtn === v && mm.tn === this.meta.tn)) ||
+        //       .some(mm => (mm.table_name === v && mm.rtn === this.meta.table_name) || (mm.rtn === v && mm.table_name === this.meta.table_name)) ||
         //       'Duplicate many to many relation is not allowed at the moment'
         //   }
         //   if (this.type === 'hm') {
         //     return !(this.meta.hasMany || [])
-        //       .some(hm => hm.tn === v) ||
+        //       .some(hm => hm.table_name === v) ||
         //       'Duplicate has many relation is not allowed at the moment'
         //   }
         // }
@@ -171,8 +171,8 @@ export default {
     this.relation = {
       parentId: null,
       childID: null,
-      childColumn: `${this.meta.tn}_id`,
-      childTable: this.nodes.tn,
+      childColumn: `${this.meta.table_name}_id`,
+      childTable: this.nodes.table_name,
       parentTable: this.column.rtn || '',
       parentColumn: this.column.rcn || '',
       onDelete: 'NO ACTION',
@@ -187,7 +187,7 @@ export default {
       const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         env: this.nodes.env,
         dbAlias: this.nodes.dbAlias
-      }, 'columnList', { tn: this.meta.tn }])
+      }, 'columnList', { table_name: this.meta.table_name }])
 
       const columns = result.data.list
       this.refColumns = JSON.parse(JSON.stringify(columns))
@@ -199,7 +199,7 @@ export default {
       } else {
         // find pk column and assign to parentColumn
         const pkKeyColumns = this.refColumns.filter(el => el.pk)
-        this.relation.parentColumn = (pkKeyColumns[0] || {}).cn || ''
+        this.relation.parentColumn = (pkKeyColumns[0] || {}).column_name || ''
       }
       this.onColumnSelect()
 
@@ -213,7 +213,7 @@ export default {
         baseId: this.$store.state.project.project.bases[0].id
       })).data.list
 
-      this.refTables = result // .data.list.map(({ tn, _tn }) => ({ tn, _tn }))
+      this.refTables = result // .data.list.map(({ table_name, title }) => ({ table_name, title }))
       this.isRefTablesLoading = false
     },
     async saveManyToMany() {
@@ -229,7 +229,7 @@ export default {
           _cn: this.alias,
           ...this.relation,
           type: this.isSQLite || this.relation.type === 'virtual' ? 'virtual' : 'real',
-          parentTable: this.meta.tn,
+          parentTable: this.meta.table_name,
           updateRelation: !!this.column.rtn,
           alias: this.alias
         }
@@ -243,7 +243,7 @@ export default {
         ...this.relation,
         parentId: this.meta.id,
         uidt: UITypes.LinkToAnotherRecord,
-        _cn: this.alias,
+        title: this.alias,
         type: this.type
       })
 
@@ -260,7 +260,7 @@ export default {
       //   env: this.nodes.env,
       //   dbAlias: this.nodes.dbAlias
       // }, 'tableXcModelGet', {
-      //   tn: this.relation.childTable
+      //   table_name: this.relation.childTable
       // }])
       //
       // const childMeta = JSON.parse(childTableData.meta)
@@ -287,8 +287,8 @@ export default {
       //   env: this.nodes.env,
       //   dbAlias: this.nodes.dbAlias
       // }, 'tableUpdate', {
-      //   tn: childMeta.tn,
-      //   _tn: childMeta._tn,
+      //   table_name: childMeta.table_name,
+      //   title: childMeta.title,
       //   originalColumns: childMeta.columns,
       //   columns
       // }])
@@ -301,8 +301,8 @@ export default {
       //   this.relation.type === 'real' && !this.isSQLite ? 'relationCreate' : 'xcVirtualRelationCreate',
       //   {
       //     ...this.relation,
-      //     parentTable: this.meta.tn,
-      //     parentColumn: parentPK.cn,
+      //     parentTable: this.meta.table_name,
+      //     parentColumn: parentPK.column_name,
       //     updateRelation: !!this.column.rtn,
       //     type: 'real',
       //     alias: this.alias
@@ -313,7 +313,7 @@ export default {
       // // }
     },
     onColumnSelect() {
-      const col = this.refColumns.find(c => this.relation.parentColumn === c.cn)
+      const col = this.refColumns.find(c => this.relation.parentColumn === c.column_name)
       this.$emit('onColumnSelect', col)
     }
   }

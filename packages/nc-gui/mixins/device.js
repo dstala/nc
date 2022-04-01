@@ -88,7 +88,7 @@ export default {
   // },
   methods: {
     _extractRowId(row, meta) {
-      return meta.columns.filter(c => c.pk).map(c => row[c._cn]).join('___')
+      return meta.columns.filter(c => c.pk).map(c => row[c.title]).join('___')
     },
     upgradeToEE() {
       this.$toast.info('Upgrade to Enterprise Edition').goAway(3000)

@@ -20,7 +20,7 @@ export default {
         columnObj = this.meta.columns.find(c => c.id === columnObj.colOptions.fk_child_column_id)
       }
       return ((required || columnObj.rqd) &&
-        (rowObj[columnObj._cn] === undefined || rowObj[columnObj._cn] === null) &&
+        (rowObj[columnObj.title] === undefined || rowObj[columnObj.title] === null) &&
         !columnObj.cdf)
     },
     isRequired(_columnObj, rowObj, required = false) {

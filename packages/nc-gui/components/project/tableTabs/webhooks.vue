@@ -13,7 +13,7 @@
                      href: '#'
                    },
                    {
-                     text: nodes._tn + ' (Webhooks)',
+                     text: nodes.title + ' (Webhooks)',
                      disabled: true,
                      href: '#'
                    }]"
@@ -646,7 +646,7 @@ export default {
         //     env: this.nodes.env,
         //     dbAlias: this.nodes.dbAlias
         //   }, 'tableXcHooksSet', {
-        //     tn: this.nodes.tn,
+        //     tn: this.nodes.table_name,
         //     data: {
         //       ...this.hook,
         //       notification: {
@@ -699,10 +699,10 @@ export default {
       //   env: this.nodes.env,
       //   dbAlias: this.nodes.dbAlias
       // }, 'tableXcModelGet', {
-      //   tn: this.nodes.tn
+      //   tn: this.nodes.table_name
       // }] )
-      this.meta = await this.$store.dispatch('meta/ActLoadMeta', { tn: this.nodes.tn })// JSON.parse(tableMeta.meta)
-      this.fieldList = this.meta.columns.map(c => c.cn)
+      this.meta = await this.$store.dispatch('meta/ActLoadMeta', { tn: this.nodes.table_name })// JSON.parse(tableMeta.meta)
+      this.fieldList = this.meta.columns.map(c => c.column_name)
       this.loadingMeta = false
     },
     async loadHooksList() {
@@ -712,7 +712,7 @@ export default {
       //   env: this.nodes.env,
       //   dbAlias: this.nodes.dbAlias
       // }, 'tableXcHooksList', {
-      //   tn: this.nodes.tn
+      //   tn: this.nodes.table_name
       // }])
 
       const hooks = await this.$api.meta.hookList(this.meta.id)
@@ -747,7 +747,7 @@ export default {
           // }, 'tableXcHooksDelete', {
           //   id: item.id,
           //   title: item.title,
-          //   tn: this.nodes.tn
+          //   tn: this.nodes.table_name
           // }])
           await this.$api.meta.hookDelete(item.id)
           this.hooks.splice(i, 1)

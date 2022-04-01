@@ -137,7 +137,7 @@
         <v-divider />
         <v-card-text class="mt-4 title">
           Do you want to delete <span class="font-weight-bold">'{{
-            column._cn
+            column.title
           }}'</span> column ?
         </v-card-text>
         <v-divider />
@@ -181,7 +181,7 @@ export default {
   methods: {
     async deleteColumn() {
       try {
-        const column = { ...this.column, cno: this.column.cn }
+        const column = { ...this.column, cno: this.column.column_name }
         column.altered = 4
         const columns = this.meta.columns.slice()
         columns[this.columnIndex] = column
@@ -189,8 +189,8 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'tableUpdate', {
-        //   tn: this.nodes.tn,
-        //   _tn: this.meta._tn,
+        //   table_name: this.nodes.table_name,
+        //   title: this.meta.title,
         //   originalColumns: this.meta.columns,
         //   columns
         // }])
@@ -212,7 +212,7 @@ export default {
         //   if (col.pv) {
         //     delete col.pv
         //   }
-        //   if (col.cn === this.column.cn) {
+        //   if (col.column_name === this.column.column_name) {
         //     col.pv = true
         //   }
         // }
@@ -221,7 +221,7 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'xcModelSet', {
-        //   tn: this.nodes.tn,
+        //   table_name: this.nodes.table_name,
         //   meta
         // }])
 

@@ -25,9 +25,9 @@
               >
                 <transition-group type="transition" :name="!drag ? 'flip-list' : null">
                   <v-list-item
-                    v-t="['view:open']"
                     v-for="(view, i) in viewsList"
                     :key="view.id"
+                    v-t="['view:open']"
                     dense
                     :value="view.id"
                     active-class="x-active--text"
@@ -440,7 +440,7 @@
       :primary-value-column="primaryValueColumn"
       :meta="meta"
       :copy-view="copyViewRef"
-      :alias="meta._tn"
+      :alias="meta.title"
       :views-list="views"
       :selected-view-id="selectedViewId"
       @created="onViewCreate"
@@ -460,10 +460,10 @@
             {{ sharedViewUrl }}
             <v-spacer />
             <a
+              v-t="['share-view:open-url']"
               :href="`${sharedViewUrl}`"
               style="text-decoration: none"
               target="_blank"
-              v-t="['share-view:open-url']"
             >
               <v-icon small class="mx-2">mdi-open-in-new</v-icon>
             </a>
@@ -845,7 +845,7 @@ export default {
         //   old_title: oldTitle,
         //   title: view.title_temp,
         //   alias: view.alias,
-        //   parent_model_title: this.meta.tn
+        //   parent_model_title: this.meta.table_name
         // })
         await this.$api.meta.viewUpdate(view.id, {
           title: view.title,

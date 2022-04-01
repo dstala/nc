@@ -135,7 +135,7 @@ function migrationsParser(data = [], dbKey, env, dbAlias, dbConnection) {
     const tableKey = `${tableDirKey}.${i}`;
     const json = {
       type: "table",
-      name: table._tn,
+      name: table.title,
       key: tableDirKey + "." + i,
       children: [],
       _nodes: {
@@ -144,8 +144,8 @@ function migrationsParser(data = [], dbKey, env, dbAlias, dbConnection) {
         env,
         dbAlias,
         tableDirKey: tableDirKey,
-        tn: table.tn,
-        _tn: table._tn,
+        table_name: table.table_name,
+        title: table.title,
         dbConnection
       }
     };
@@ -186,8 +186,8 @@ function apisParser(data = [], dbKey, env, dbAlias, dbConnection) {
         env,
         dbAlias,
         tableDirKey: tableDirKey,
-        tn: table.tn,
-        _tn: table._tn,
+        table_name: table.table_name,
+        title: table.title,
         dbConnection
       }
     };
@@ -219,7 +219,7 @@ function sqlClientParser(data = [], dbKey, env, dbAlias, dbConnection) {
     const tableKey = `${tableDirKey}.${i}`;
     const json = {
       type: "table",
-      name: table._tn,
+      name: table.title,
       key: tableDirKey + "." + i,
       children: [],
       _nodes: {
@@ -228,8 +228,8 @@ function sqlClientParser(data = [], dbKey, env, dbAlias, dbConnection) {
         env,
         dbAlias,
         tableDirKey: tableDirKey,
-        tn: table.tn,
-        _tn: table._tn,
+        table_name: table.table_name,
+        title: table.title,
         dbConnection
       }
     };
@@ -261,7 +261,7 @@ function apiClientParser(data = [], dbKey, env, dbAlias, dbConnection) {
     const tableKey = `${tableDirKey}.${i}`;
     const json = {
       type: "table",
-      name: table._tn,
+      name: table.title,
       key: tableDirKey + "." + i,
       children: [],
       _nodes: {
@@ -270,7 +270,7 @@ function apiClientParser(data = [], dbKey, env, dbAlias, dbConnection) {
         env,
         dbAlias,
         tableDirKey: tableDirKey,
-        _tn: table._tn,
+        title: table.title,
         dbConnection
       }
     };
@@ -302,7 +302,7 @@ function seedParser(data = [], dbKey, env, dbAlias, dbConnection) {
   //   const tableKey = `${tableDirKey}.${i}`;
   //   const json = {
   //     type: "table",
-  //     name: table.tn,
+  //     name: table.table_name,
   //     key: tableDirKey + "." + i,
   //     children: [],
   //     _nodes: {
@@ -311,7 +311,7 @@ function seedParser(data = [], dbKey, env, dbAlias, dbConnection) {
   //       env,
   //       dbAlias,
   //       tableDirKey: tableDirKey,
-  //       tn: table.tn
+  //       table_name: table.table_name
   //     }
   //   };
   //   tables.children.push(json);
@@ -344,10 +344,10 @@ function tableParser(data = [], dbKey, env, dbAlias, dbConnection) {
     let json;
     json= {
       type: table.type || 'table',
-      name: table._tn,
-      tn: table.tn,
+      name: table.title,
+      table_name: table.table_name,
       id: table.id,
-      _tn: table._tn || table.tn,
+      title: table.title || table.table_name,
       order: table.order,
       key: tableDirKey + "." + i,
       children: [],
@@ -357,8 +357,8 @@ function tableParser(data = [], dbKey, env, dbAlias, dbConnection) {
         env,
         dbAlias,
         tableDirKey: tableDirKey,
-        tn: table.tn,
-        _tn: table._tn,
+        table_name: table.table_name,
+        title: table.title,
         dbConnection
       }
     };
@@ -392,10 +392,10 @@ function viewsParser(data = [], dbKey, env, dbAlias, dbConnection) {
     const viewKey = `${viewDirKey}.${i}`;
     const json = {
       type: "view",
-      tn: view.tn || view.view_name,
-      _tn: view._tn,
+      table_name: view.table_name || view.view_name,
+      title: view.title,
       id: view.id,
-      name: view._tn || view.view_name,
+      name: view.title || view.view_name,
       key: viewDirKey + "." + i,
       children: [],
       _nodes: {
@@ -404,7 +404,7 @@ function viewsParser(data = [], dbKey, env, dbAlias, dbConnection) {
         dbAlias,
         env,
         view_name: view.view_name,
-        _tn: view._tn,
+        title: view.title,
         viewDirKey: viewDirKey,
         dbConnection
       },

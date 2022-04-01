@@ -651,7 +651,7 @@
                                                       <v-col>
                                                         <!-- Inflection - Table name -->
                                                         <v-select
-                                                          v-model="db.meta.inflection.tn"
+                                                          v-model="db.meta.inflection.table_name"
                                                           :disabled="edit"
                                                           class="caption"
                                                           :label="
@@ -669,7 +669,7 @@
                                                       <v-col>
                                                         <!-- Inflection - Column name -->
                                                         <v-select
-                                                          v-model="db.meta.inflection.cn"
+                                                          v-model="db.meta.inflection.column_name"
                                                           :disabled="edit"
                                                           class="caption"
                                                           :label="
@@ -1118,8 +1118,8 @@ export default {
                     graphqlDepthLimit: 10
                   },
                   inflection: {
-                    tn: 'camelize',
-                    cn: 'camelize'
+                    table_name: 'camelize',
+                    column_name: 'camelize'
                   }
                 },
                 ui: {
@@ -1498,15 +1498,15 @@ export default {
           const inflectionObj = xcConfig.envs[env].db[i].meta.inflection
 
           if (inflectionObj) {
-            if (Array.isArray(inflectionObj.tn)) {
-              inflectionObj.tn = inflectionObj.tn.join(',')
+            if (Array.isArray(inflectionObj.table_name)) {
+              inflectionObj.table_name = inflectionObj.table_name.join(',')
             }
-            if (Array.isArray(inflectionObj.cn)) {
-              inflectionObj.cn = inflectionObj.cn.join(',')
+            if (Array.isArray(inflectionObj.column_name)) {
+              inflectionObj.column_name = inflectionObj.column_name.join(',')
             }
 
-            inflectionObj.tn = inflectionObj.tn || 'none'
-            inflectionObj.cn = inflectionObj.cn || 'none'
+            inflectionObj.table_name = inflectionObj.table_name || 'none'
+            inflectionObj.column_name = inflectionObj.column_name || 'none'
           }
 
           if (this.allSchemas) {
@@ -1681,8 +1681,8 @@ export default {
           bases: [{
             type: con.client,
             config: con,
-            inflection_column: inflection.cn,
-            inflection_table: inflection.tn
+            inflection_column: inflection.column_name,
+            inflection_table: inflection.table_name
           }],
           external: true
         })).data
@@ -1734,8 +1734,8 @@ export default {
                 tn: 'nc_evolutions',
                 dbAlias: 'db',
                 inflection: {
-                  tn: 'camelize',
-                  cn: 'camelize'
+                  table_name: 'camelize',
+                  column_name: 'camelize'
                 },
                 api: {
                   type: ''
@@ -1784,8 +1784,8 @@ export default {
           tn: 'nc_evolutions',
           dbAlias,
           inflection: {
-            tn: 'camelize',
-            cn: 'camelize'
+            table_name: 'camelize',
+            column_name: 'camelize'
           },
           api: {
             type: ''

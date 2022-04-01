@@ -70,9 +70,9 @@
                 v-for="table in tables"
               >
                 <tr
-                  v-if="table._tn.toLowerCase().indexOf(filter.toLowerCase()) > -1"
-                  :key="table.tn"
-                  :class="`nc-acl-table-row nc-acl-table-row-${table._tn}`"
+                  v-if="table.title.toLowerCase().indexOf(filter.toLowerCase()) > -1"
+                  :key="table.table_name"
+                  :class="`nc-acl-table-row nc-acl-table-row-${table.title}`"
                 >
                   <td>
                     <v-tooltip bottom>
@@ -89,11 +89,11 @@
                     <v-icon small :color="viewIcons[table.type].color" v-on="on">
                       {{ viewIcons[table.type].icon }}
                     </v-icon>
-                    <span v-if="table.ptn" class="caption">{{ table._tn }}</span>
+                    <span v-if="table.ptn" class="caption">{{ table.title }}</span>
                     <span v-else class="caption">{{ $t('general.default') }}</span>
                     <!--                    {{ table.show_as || table.type }}-->
                   </td>
-                  <td v-for="role in roles" :key="`${table.tn}-${role}`">
+                  <td v-for="role in roles" :key="`${table.table_name}-${role}`">
                     <v-tooltip bottom>
                       <template #activator="{on}">
                         <div
@@ -101,7 +101,7 @@
                         >
                           <v-checkbox
                             v-model="table.disabled[role]"
-                            :class="`pt-0 mt-0 nc-acl-${table._tn.toLowerCase().replace('_','')}-${role}-chkbox`"
+                            :class="`pt-0 mt-0 nc-acl-${table.title.toLowerCase().replace('_','')}-${role}-chkbox`"
                             dense
                             hide-details
                             :true-value="false"
@@ -111,10 +111,10 @@
                         </div>
                       </template>
 
-                      <span v-if="table.disabled[role]">Click to make '{{ table.tn }}' visible for Role:{{
+                      <span v-if="table.disabled[role]">Click to make '{{ table.table_name }}' visible for Role:{{
                         role
                       }} in UI dashboard</span>
-                      <span v-else>Click to hide '{{ table.tn }}' for Role:{{ role }} in UI dashboard</span>
+                      <span v-else>Click to hide '{{ table.table_name }}' for Role:{{ role }} in UI dashboard</span>
                     </v-tooltip>
                   </td>
                 </tr>

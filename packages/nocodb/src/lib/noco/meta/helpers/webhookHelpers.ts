@@ -34,7 +34,7 @@ export async function validateCondition(filters: Filter[], data: any) {
   for (const _filter of filters) {
     const filter = _filter instanceof Filter ? _filter : new Filter(_filter);
     let res;
-    const field = await filter.getColumn().then(c => c._cn);
+    const field = await filter.getColumn().then(c => c.title);
     let val = data[field];
     switch (typeof filter.value) {
       case 'boolean':
@@ -199,8 +199,8 @@ export async function invokeWebhook(
         ? JSON.parse(hook.notification)
         : hook.notification;
 
-    console.log('Hook handler ::::' + model.tn + ':: Hook ::', hook);
-    console.log('Hook handler ::::' + model.tn + ':: Data ::', data);
+    console.log('Hook handler ::::' + model.table_name + ':: Hook ::', hook);
+    console.log('Hook handler ::::' + model.table_name + ':: Data ::', data);
 
     if (
       !(await validateCondition(testFilters || (await hook.getFilters()), data))
@@ -309,16 +309,16 @@ export function _transformSubmittedFormDataForEmail(
   const transformedData = { ...data };
 
   for (const col of columns) {
-    if (!formView.query_params?.showFields?.[col._cn]) {
-      delete transformedData[col._cn];
+    if (!formView.query_params?.showFields?.[col.title]) {
+      delete transformedData[col.title];
       continue;
     }
 
     if (col.uidt === 'Attachment') {
-      if (typeof transformedData[col._cn] === 'string') {
-        transformedData[col._cn] = JSON.parse(transformedData[col._cn]);
+      if (typeof transformedData[col.title] === 'string') {
+        transformedData[col.title] = JSON.parse(transformedData[col.title]);
       }
-      transformedData[col._cn] = (transformedData[col._cn] || [])
+      transformedData[col.title] = (transformedData[col.title] || [])
         .map(attachment => {
           if (
             ['jpeg', 'gif', 'png', 'apng', 'svg', 'bmp', 'ico', 'jpg'].includes(
@@ -331,10 +331,10 @@ export function _transformSubmittedFormDataForEmail(
         })
         .join('&nbsp;');
     } else if (
-      transformedData[col._cn] &&
-      typeof transformedData[col._cn] === 'object'
+      transformedData[col.title] &&
+      typeof transformedData[col.title] === 'object'
     ) {
-      transformedData[col._cn] = JSON.stringify(transformedData[col._cn]);
+      transformedData[col.title] = JSON.stringify(transformedData[col.title]);
     }
   }
 }

@@ -12,14 +12,14 @@
             :label="$t('labels.childTable')"
             :full-width="false"
             :items="refTables"
-            item-text="_tn"
+            item-text="title"
             :item-value="v => v"
             :rules="[v => !!v || 'Required']"
             dense
           >
             <template #item="{item}">
               <span class="caption"><span class="font-weight-bold"> {{
-                item._tn || item.tn
+                item.title || item.table_name
               }}</span> <small>({{ relationNames[item.col.type] }})
               </small></span>
             </template>
@@ -117,19 +117,19 @@ export default {
       //     // })),
       //       ...(this.meta.hasMany || []).map(({
       //         tn,
-      //         _tn,
+      //         title,
       //         cn,
       //         rcn,
       //         rtn
       //       }) => ({
       //         type: 'hm',
       //         tn,
-      //         _tn,
+      //         title,
       //         cn,
       //         rcn,
       //         rtn,
       //         rltn: tn,
-      //         _rltn: _tn
+      //         _rltn: title
       //       })),
       //       ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, tn, cn }) => ({
       //         type: 'mm',
@@ -153,8 +153,8 @@ export default {
         this.rollup &&
         this.rollup.table &&
         this.$store.state.meta.metas &&
-        this.$store.state.meta.metas[this.rollup.table.tn] &&
-        this.$store.state.meta.metas[this.rollup.table.tn].columns
+        this.$store.state.meta.metas[this.rollup.table.table_name] &&
+        this.$store.state.meta.metas[this.rollup.table.table_name].columns
       ) || []).filter(col => ![UITypes.Lookup, UITypes.Rollup, UITypes.LinkToAnotherRecord].includes(col.uidt) && !isSystemColumn(col))
     }
   },
@@ -196,10 +196,10 @@ export default {
         // await this.$store.dispatch('meta/ActLoadMeta', {
         //   dbAlias: this.nodes.dbAlias,
         //   env: this.nodes.env,
-        //   tn: this.meta.tn,
+        //   tn: this.meta.table_name,
         //   force: true
         // })
-        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.tn]))
+        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
         //
         // meta.v.push({
         //   _cn: this.alias,
@@ -214,7 +214,7 @@ export default {
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias
         // }, 'xcModelSet', {
-        //   tn: this.nodes.tn,
+        //   tn: this.nodes.table_name,
         //   meta
         // }])
 

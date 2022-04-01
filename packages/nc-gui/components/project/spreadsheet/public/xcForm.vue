@@ -69,19 +69,19 @@
                   <div>
                     <div
                       :class="{
-                        'active-row' : active === col._cn,
+                        'active-row' : active === col.title,
                         required: isRequired(col, localState, col.required)
                       }"
                     >
                       <div class="nc-field-editables">
                         <label
-                          :for="`data-table-form-${col._cn}`"
+                          :for="`data-table-form-${col.title}`"
                           class="body-2 text-capitalize nc-field-labels"
                         >
                           <virtual-header-cell
                             v-if="isVirtualCol(col)"
                             class="caption"
-                            :column="{...col, _cn: col.label || col._cn}"
+                            :column="{...col, _cn: col.label || col.title}"
                             :nodes="{}"
                             :is-form="true"
                             :meta="meta"
@@ -91,7 +91,7 @@
                             v-else
                             class="caption"
                             :is-form="true"
-                            :value="col.label || col._cn"
+                            :value="col.label || col.title"
                             :column="col"
                             :sql-ui="sqlUiLoc"
                             :required="isRequired(col, localState,col.required)"
@@ -119,11 +119,11 @@
                             :required="col.description"
                             :metas="metas"
                             :password="password"
-                            @update:localState="state => $set(virtual,col._cn, state)"
+                            @update:localState="state => $set(virtual,col.title, state)"
                             @updateCol="updateCol"
                           />
                           <div
-                            v-if="$v.virtual && $v.virtual.$dirty && $v.virtual[col._cn] && (!$v.virtual[col._cn].required || !$v.virtual[col._cn].minLength)"
+                            v-if="$v.virtual && $v.virtual.$dirty && $v.virtual[col.title] && (!$v.virtual[col.title].required || !$v.virtual[col.title].minLength)"
                             class="error--text caption"
                           >
                             Field is required.
@@ -131,10 +131,10 @@
 
                           <!-- todo: optimize -->
                           <template
-                            v-if="col.bt && $v.localState && $v.localState.$dirty && $v.localState[meta.columns.find(c => c.cn === col.bt.cn)._cn]"
+                            v-if="col.bt && $v.localState && $v.localState.$dirty && $v.localState[meta.columns.find(c => c.column_name === col.bt.column_name).title]"
                           >
                             <div
-                              v-if="!$v.localState[meta.columns.find(c => c.cn === col.bt.cn)._cn].required"
+                              v-if="!$v.localState[meta.columns.find(c => c.column_name === col.bt.column_name).title].required"
                               class="error--text caption"
                             >
                               Field is required.
@@ -143,7 +143,7 @@
                         </div>
                         <template v-else>
                           <div
-                            v-if="col.ai || disabledColumns[col._cn]"
+                            v-if="col.ai || disabledColumns[col.title]"
                             style="height:100%; width:100%"
                             class="caption xc-input"
                             @click.stop
@@ -153,7 +153,7 @@
                               style="height:100%; width: 100%"
                               readonly
                               disabled
-                              :value="localState[col._cn]"
+                              :value="localState[col.title]"
                             >
                           </div>
 
@@ -162,8 +162,8 @@
                             @click.stop
                           >
                             <editable-cell
-                              :id="`data-table-form-${col._cn}`"
-                              v-model="localState[col._cn]"
+                              :id="`data-table-form-${col.title}`"
+                              v-model="localState[col.title]"
                               :db-alias="dbAlias"
                               :column="col"
                               class="xc-input body-2"
@@ -172,12 +172,12 @@
                               is-form
                               is-public
                               :hint="col.description"
-                              @focus="active = col._cn"
+                              @focus="active = col.title"
                               @blur="active = ''"
                             />
                           </div>
-                          <template v-if="$v.localState&& $v.localState.$dirty && $v.localState[col._cn] ">
-                            <div v-if="!$v.localState[col._cn].required" class="error--text caption">
+                          <template v-if="$v.localState&& $v.localState.$dirty && $v.localState[col.title] ">
+                            <div v-if="!$v.localState[col.title].required" class="error--text caption">
                               Field is required.
                             </div>
                           </template>
@@ -347,13 +347,13 @@ export default {
       //         c.prop = `${c.mm.rtn}MMList`
       //       }
       //       if (c.virtual && c.hm) {
-      //         c.prop = `${c.hm.tn}List`
+      //         c.prop = `${c.hm.table_name}List`
       //       }
       //
       //       // if (c.virtual && c.lk) {
       //       //   c.alias = `${c.lk._lcn} (from ${c.lk._ltn})`
       //       // } else {
-      //       c.alias = c._cn
+      //       c.alias = c.title
       //       // }
       //       if (c.alias in _ref) {
       //         c.alias += _ref[c.alias]++
@@ -385,7 +385,7 @@ export default {
         }
 
         this.submitting = true
-        // const id = this.meta.columns.filter(c => c.pk).map(c => this.localState[c._cn]).join('___')
+        // const id = this.meta.columns.filter(c => c.pk).map(c => this.localState[c.title]).join('___')
 
         // const updatedObj = Object.keys(this.changedColumns).reduce((obj, col) => {
         //   obj[col] = this.localState[col]
@@ -399,12 +399,12 @@ export default {
 
         for (const col of this.meta.columns) {
           if (col.uidt === UITypes.Attachment) {
-            const files = data[col._cn]
-            delete data[col._cn]
+            const files = data[col.title]
+            delete data[col.title]
             let i = 0
             for (const file of (files || [])) {
-              // formData.append(`${col._cn}`, file)
-              data[`${col._cn}[${i++}]`] = file
+              // formData.append(`${col.title}`, file)
+              data[`${col.title}[${i++}]`] = file
             }
           }
         }
@@ -451,20 +451,19 @@ export default {
       virtual: {}
     }
     for (const column of this.columns) {
-      // debugger
       // if (!this.localParams || !this.localParams.fields || !this.localParams.fields[column.alias]) {
       //   continue
       // }
       if (!isVirtualCol(column) && (((column.rqd || column.notnull) && !column.cdf) || (column.pk && !(column.ai || column.cdf)) || column.required)) {
-        obj.localState[column._cn] = { required }
+        obj.localState[column.title] = { required }
       } else if (column.uidt === UITypes.LinkToAnotherRecord && column.colOptions && column.colOptions.type === RelationTypes.BELONGS_TO) {
         const col = this.meta.columns.find(c => c.id === column.colOptions.fk_child_column_id)
 
         if ((col && col.rqd && !col.cdf) || column.required) {
-          obj.localState[col._cn] = { required }
+          obj.localState[col.title] = { required }
         }
       } else if (isVirtualCol(column) && column.required) {
-        obj.virtual[column._cn] = {
+        obj.virtual[column.title] = {
           minLength: minLength(1),
           required
         }

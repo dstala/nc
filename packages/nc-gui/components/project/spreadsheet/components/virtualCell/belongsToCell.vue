@@ -87,7 +87,7 @@
         :db-alias="nodes.dbAlias"
         :has-many="parentMeta.hasMany"
         :belongs-to="parentMeta.belongsTo"
-        :table="parentMeta.tn"
+        :table="parentMeta.table_name"
         :old-row="{...selectedParent}"
         :meta="parentMeta"
         :sql-ui="sqlUi"
@@ -165,37 +165,37 @@ export default {
       // return this.parentMeta && this.$ncApis.get({
       //   env: this.nodes.env,
       //   dbAlias: this.nodes.dbAlias,
-      //   table: this.parentMeta.tn
+      //   table: this.parentMeta.table_name
       // })
-      // return this.parentMeta && this.parentMeta._tn
+      // return this.parentMeta && this.parentMeta.title
       //   ? ApiFactory.create(this.$store.getters['project/GtrProjectType'],
-      //     this.parentMeta && this.parentMeta._tn, this.parentMeta && this.parentMeta.columns, this, this.parentMeta)
+      //     this.parentMeta && this.parentMeta.title, this.parentMeta && this.parentMeta.columns, this, this.parentMeta)
       //   : null
     },
     parentId() {
-      return this.pid ?? (this.value && this.parentMeta && this.parentMeta.columns.filter(c => c.pk).map(c => this.value[c._cn]).join('___'))
+      return this.pid ?? (this.value && this.parentMeta && this.parentMeta.columns.filter(c => c.pk).map(c => this.value[c.title]).join('___'))
     },
     rowId() {
-      return (this.row && this.meta && this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___'))
+      return (this.row && this.meta && this.meta.columns.filter(c => c.pk).map(c => this.row[c.title]).join('___'))
     },
     parentPrimaryCol() {
-      return this.parentMeta && (this.parentMeta.columns.find(c => c.pv) || {})._cn
+      return this.parentMeta && (this.parentMeta.columns.find(c => c.pv) || {}).title
     },
     parentPrimaryKey() {
-      return this.parentMeta && (this.parentMeta.columns.find(c => c.pk) || {})._cn
+      return this.parentMeta && (this.parentMeta.columns.find(c => c.pk) || {}).title
     },
     parentReferenceKey() {
-      // return this.parentMeta && (this.parentMeta.columns.find(c => c.cn === this.bt.rcn) || {})._cn
-      return this.parentMeta && (this.parentMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id) || {})._cn
+      // return this.parentMeta && (this.parentMeta.columns.find(c => c.column_name === this.bt.rcn) || {}).title
+      return this.parentMeta && (this.parentMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id) || {}).title
     },
     btWhereClause() {
       // if parent reference key is pk, then filter out the selected value
       // else, filter out the selected value + empty values (as we can't set an empty value)
       const prk = this.parentReferenceKey
-      // const isPk = !!(this.parentMeta && (this.parentMeta.columns.find(c => c.pk && c._cn === prk))) || false
-      // let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.cn === this.bt.cn).map(c => this.row[c._cn] || '').join('___') : ''
-      const selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.id === this.column.colOptions.fk_child_column_id).map(c => this.row[c._cn] || '').join('___') : ''
-      // if (this.parentMeta && (this.parentMeta.columns.find(c => c._cn === prk)).type !== 'string') {
+      // const isPk = !!(this.parentMeta && (this.parentMeta.columns.find(c => c.pk && c.title === prk))) || false
+      // let selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.column_name === this.bt.column_name).map(c => this.row[c.title] || '').join('___') : ''
+      const selectedValue = this.meta && this.meta.columns ? this.meta.columns.filter(c => c.id === this.column.colOptions.fk_child_column_id).map(c => this.row[c.title] || '').join('___') : ''
+      // if (this.parentMeta && (this.parentMeta.columns.find(c => c.title === prk)).type !== 'string') {
       //   selectedValue = selectedValue || 0
       // }
       return `(${prk},not,${selectedValue})~or(${prk},is,null)`
@@ -206,7 +206,7 @@ export default {
       }
       // todo: use reduce
       return {
-        // hm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.hm).map(({ hm }) => hm.tn).join()) || '',
+        // hm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.hm).map(({ hm }) => hm.table_name).join()) || '',
         // bt: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.bt).map(({ bt }) => bt.rtn).join()) || '',
         // mm: (this.parentMeta && this.parentMeta.v && this.parentMeta.v.filter(v => v.mm).map(({ mm }) => mm.rtn).join()) || ''
       }
@@ -219,7 +219,7 @@ export default {
 
       const columns = []
       if (this.parentMeta.columns) {
-        columns.push(...this.parentMeta.columns.filter(c => !(c.pk && c.ai) && !hideCols.includes(c.cn) && !((this.parentMeta.v || []).some(v => v.bt && v.bt.cn === c.cn))))
+        columns.push(...this.parentMeta.columns.filter(c => !(c.pk && c.ai) && !hideCols.includes(c.column_name) && !((this.parentMeta.v || []).some(v => v.bt && v.bt.column_name === c.column_name))))
       }
       if (this.parentMeta.v) {
         columns.push(...this.parentMeta.v.map(v => ({ ...v, virtual: 1 })))
@@ -278,14 +278,14 @@ export default {
           c.colOptions.fk_child_column_id === this.column.colOptions.fk_child_column_id &&
           c.colOptions.fk_parent_column_id === this.column.colOptions.fk_parent_column_id &&
           c.colOptions.type === RelationTypes.HAS_MANY
-        ) || {})._cn]: [this.row]
+        ) || {}).title]: [this.row]
       }
       this.expandFormModal = true
     },
 
     async unlink(parent) {
       const column = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)
-      const _cn = column._cn
+      const _cn = column.title
       if (this.isNew) {
         this.$emit('updateCol', this.row, _cn, null)
         this.localState = null
@@ -296,7 +296,7 @@ export default {
         this.$toast.info('Unlink is not possible, instead map to another parent.').goAway(3000)
         return
       }
-      const id = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
+      const id = this.meta.columns.filter(c => c.pk).map(c => this.row[c.title]).join('___')
       // await this.api.update(id, { [_cn]: null }, this.row)
       // todo: audit
       // await this.$api.data.update(this.meta.id, id, { [_cn]: null })
@@ -315,8 +315,8 @@ export default {
     async showParentListModal() {
       this.parentListModal = true
       await this.loadParentMeta()
-      const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c._cn]).join('___')
-      const _cn = this.parentMeta.columns.find(c => c.cn === this.hm.cn)._cn
+      const pid = this.meta.columns.filter(c => c.pk).map(c => this.row[c.title]).join('___')
+      const _cn = this.parentMeta.columns.find(c => c.column_name === this.hm.column_name).title
       this.childList = await this.parentApi.paginatedList({
         where: `(${_cn},eq,${pid})`
       })
@@ -329,7 +329,7 @@ export default {
         if (act === 'hideDialog') {
           this.dialogShow = false
         } else {
-          const id = this.parentMeta.columns.filter(c => c.pk).map(c => child[c._cn]).join('___')
+          const id = this.parentMeta.columns.filter(c => c.pk).map(c => child[c.title]).join('___')
           await this.parentApi.delete(id)
           this.pid = null
           this.dialogShow = false
@@ -365,7 +365,7 @@ export default {
       // const pkColumns = this.parentMeta.columns.filter(c => c.pk)
       const pid = this._extractRowId(parent, this.parentMeta)
       const id = this._extractRowId(this.row, this.meta)
-      const _cn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id)._cn
+      const _cn = this.meta.columns.find(c => c.id === this.column.colOptions.fk_child_column_id).title
       // const isNum = false
 
       // if (pkColumns.length === 1) {
@@ -373,7 +373,7 @@ export default {
       // }
 
       if (this.isNew) {
-        const _rcn = this.parentMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id)._cn
+        const _rcn = this.parentMeta.columns.find(c => c.id === this.column.colOptions.fk_parent_column_id).title
         this.localState = parent
         this.$emit('update:localState', this.localState)
         this.$emit('updateCol', this.row, _cn, parent[_rcn])

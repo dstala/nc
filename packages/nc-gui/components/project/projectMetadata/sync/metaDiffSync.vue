@@ -77,9 +77,9 @@
                 <tbody>
                   <tr
                     v-for="model in diff"
-                    v-show="!filter.trim() || (model.tn || model.title || '').toLowerCase().includes(filter.toLowerCase())"
-                    :key="model.tn"
-                    :class="`nc-metasync-row nc-metasync-row-${model.tn}`"
+                    v-show="!filter.trim() || (model.table_name || model.title || '').toLowerCase().includes(filter.toLowerCase())"
+                    :key="model.table_name"
+                    :class="`nc-metasync-row nc-metasync-row-${model.table_name}`"
                   >
                     <!--                    v-if="model.alias.toLowerCase().indexOf(filter.toLowerCase()) > -1">-->
                     <td>
@@ -88,7 +88,7 @@
                       </v-icon>-->
                       <v-tooltip bottom>
                         <template #activator="{on}">
-                          <span v-on="on">{{ model.tn && model.tn.slice(prefix.length) }}</span>
+                          <span v-on="on">{{ model.table_name && model.table_name.slice(prefix.length) }}</span>
                         </template>
                         <span class="caption">{{ model.title }}</span>
                       </v-tooltip>
@@ -244,8 +244,8 @@
           <!--            v-if="isNewOrDeletedModelFound" -->
           <div class="d-flex justify-center">
             <v-btn
-              v-t="['proj-meta:metadata:metasync']"
               v-if="isChanged"
+              v-t="['proj-meta:metadata:metasync']"
               x-large
               class="mx-auto primary nc-btn-metasync-sync-now"
               @click="syncMetaDiff"
@@ -451,7 +451,7 @@ export default {
         return 0
       }
       if (this.tables && this.models) {
-        const tables = this.tables.filter(t => !isMetaTable(t.tn)).map(t => t.tn)
+        const tables = this.tables.filter(t => !isMetaTable(t.table_name)).map(t => t.table_name)
         res.push(...this.models.map((m) => {
           const i = tables.indexOf(m.title)
           if (i === -1) {

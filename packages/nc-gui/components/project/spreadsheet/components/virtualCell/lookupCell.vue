@@ -58,7 +58,7 @@
             :metas="metas"
             :is-locked="true"
             :column="lookupColumnMeta"
-            :row="{[lookupColumnMeta._cn]:v}"
+            :row="{[lookupColumnMeta.title]:v}"
             :nodes="nodes"
             :meta="lookupTableMeta"
             :sql-ui="sqlUi"
@@ -71,7 +71,7 @@
           :metas="metas"
           :is-locked="true"
           :column="lookupColumnMeta"
-          :row="{[lookupColumnMeta._cn]:value}"
+          :row="{[lookupColumnMeta.title]:value}"
           :nodes="nodes"
           :meta="lookupTableMeta"
           :sql-ui="sqlUi"
@@ -158,13 +158,13 @@ export default {
       if (!this.lookUpMeta || !this.column.lk.lcn) {
         return
       }
-      return (this.lookUpMeta.columns.find(cl => cl.cn === this.column.lk.lcn) || {})._cn
+      return (this.lookUpMeta.columns.find(cl => cl.column_name === this.column.lk.lcn) || {}).title
     },
     lookUpColumn() {
       if (!this.lookUpMeta || !this.column.lk.lcn) {
         return
       }
-      return (this.lookUpMeta.columns.find(cl => cl.cn === this.column.lk.lcn) || {})
+      return (this.lookUpMeta.columns.find(cl => cl.column_name === this.column.lk.lcn) || {})
     },
     localValueObj() {
       // if (!this.column || !this.row) {
@@ -194,17 +194,17 @@ export default {
     queryParams() {
       // switch (this.column.lk.type) {
       //   case 'bt':
-      //     return { where: `(${this.lookUpMeta.columns.find(c => c.cn === this.column.lk.rcn)._cn},eq,${this.row[this.meta.columns.find(c => c.cn === this.column.lk.cn)._cn]})` }
+      //     return { where: `(${this.lookUpMeta.columns.find(c => c.column_name === this.column.lk.rcn).title},eq,${this.row[this.meta.columns.find(c => c.column_name === this.column.lk.column_name).title]})` }
       //   case 'hm':
-      //     return { where: `(${this.lookUpMeta.columns.find(c => c.cn === this.column.lk.cn)._cn},eq,${this.row[this.meta.columns.find(c => c.cn === this.column.lk.rcn)._cn]})` }
+      //     return { where: `(${this.lookUpMeta.columns.find(c => c.column_name === this.column.lk.column_name).title},eq,${this.row[this.meta.columns.find(c => c.column_name === this.column.lk.rcn).title]})` }
       //   case 'mm':
       //     return this.assocMeta
       //       ? {
       //           conditionGraph: {
-      //             [this.assocMeta.tn]: {
+      //             [this.assocMeta.table_name]: {
       //               relationType: 'hm',
-      //               [this.assocMeta.columns.find(c => c.cn === this.column.lk.vcn).cn]: {
-      //                 eq: this.row[this.meta.columns.find(c => c.cn === this.column.lk.cn)._cn]
+      //               [this.assocMeta.columns.find(c => c.column_name === this.column.lk.vcn).column_name]: {
+      //                 eq: this.row[this.meta.columns.find(c => c.column_name === this.column.lk.column_name).title]
       //               }
       //             }
       //           }

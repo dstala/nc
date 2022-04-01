@@ -11,7 +11,7 @@
   </v-tooltip>
   <div v-else-if="urls" v-html="urls" />
   <div v-else>
-    {{ row[column._cn] }}
+    {{ row[column.title] }}
   </div>
 </template>
 
@@ -21,12 +21,12 @@ export default {
   props: { column: Object, row: Object },
   computed: {
     urls() {
-      if (!this.row[this.column._cn]) { return }
+      if (!this.row[this.column.title]) { return }
 
-      const rawText = this.row[this.column._cn].toString()
+      const rawText = this.row[this.column.title].toString()
       let found = false
       const out = rawText.match(/URI::\((.*?)\)/g, (_, url) => {
-        found = true;
+        found = true
         const a = document.createElement('a')
         a.textContent = url
         a.setAttribute('href', url)

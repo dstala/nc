@@ -45,7 +45,8 @@
         ],
         "requestBody": {
           "$ref": "#/components/requestBodies/Signup"
-        }
+        },
+        "description": "App user registration"
       }
     },
     "/auth/user/signin": {
@@ -739,7 +740,8 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "description": "USer registration apis"
       },
       "delete": {
         "summary": "",
@@ -1287,7 +1289,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "_tn": {
+                  "title": {
                     "type": "string"
                   }
                 }
@@ -5755,10 +5757,10 @@
           "fk_base_id": {
             "type": "string"
           },
-          "tn": {
+          "table_name": {
             "type": "string"
           },
-          "_tn": {
+          "title": {
             "type": "string"
           },
           "type": {
@@ -5799,8 +5801,8 @@
           }
         },
         "required": [
-          "tn",
-          "_tn"
+          "table_name",
+          "title"
         ]
       },
       "View": {
@@ -5896,69 +5898,6 @@
       "TableInfo": {
         "title": "Table",
         "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "fk_project_id": {
-            "type": "string"
-          },
-          "fk_base_id": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "string"
-          },
-          "parent_id": {
-            "type": "string"
-          },
-          "show_as": {
-            "type": "string"
-          },
-          "tags": {
-            "type": "string"
-          },
-          "pinned": {
-            "type": "boolean"
-          },
-          "deleted": {
-            "type": "boolean"
-          },
-          "order": {
-            "type": "number"
-          },
-          "column": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Column"
-            }
-          },
-          "filters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Filter"
-            }
-          },
-          "sort": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Sort"
-            }
-          }
-        },
-        "required": [
-          "title",
-          "alias"
-        ],
         "examples": [
           {
             "id": "string",
@@ -6046,6 +5985,69 @@
               }
             ]
           }
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fk_project_id": {
+            "type": "string"
+          },
+          "fk_base_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "table_nameme": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "string"
+          },
+          "show_as": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "pinned": {
+            "type": "boolean"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "order": {
+            "type": "number"
+          },
+          "column": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Column"
+            }
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            }
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "table_nameme"
         ]
       },
       "TableReq": {
@@ -6061,10 +6063,10 @@
           "fk_base_id": {
             "type": "string"
           },
-          "tn": {
+          "table_name": {
             "type": "string"
           },
-          "_tn": {
+          "title": {
             "type": "string"
           },
           "type": {
@@ -6099,8 +6101,8 @@
           }
         },
         "required": [
-          "tn",
-          "_tn"
+          "table_name",
+          "title"
         ]
       },
       "TableList": {
@@ -6362,9 +6364,6 @@
           "title": {
             "type": "string"
           },
-          "alias": {
-            "type": "string"
-          },
           "uidt": {
             "type": "string"
           },
@@ -6394,6 +6393,9 @@
           },
           "rqd": {
             "type": "boolean"
+          },
+          "column_name": {
+            "type": "string"
           },
           "un": {
             "type": "boolean"
@@ -6456,14 +6458,11 @@
                 "items": {
                   "$ref": "#/components/schemas/SelectOptions"
                 }
+              },
+              {
+                "type": "object"
               }
             ]
-          },
-          "cn": {
-            "type": "string"
-          },
-          "_cn": {
-            "type": "string"
           }
         },
         "required": [

@@ -126,11 +126,11 @@
                     :key="i"
                   >
                     <v-expansion-panel-header
-                      :id="`tn_${table.tn}`"
+                      :id="`tn_${table.table_name}`"
                     >
                       <v-text-field
                         v-if="editableTn[i]"
-                        :value="table.tn"
+                        :value="table.table_name"
                         class="font-weight-bold"
                         style="max-width: 300px"
                         outlinedk
@@ -148,7 +148,7 @@
                         @click="e => viewMode || (e.stopPropagation() , $set(editableTn,i, true))"
                       >
                         <v-icon color="primary lighten-1">mdi-table</v-icon>
-                        {{ table.tn }}
+                        {{ table.table_name }}
                       </span>
 
                       <v-spacer />
@@ -184,14 +184,14 @@
                             <tr v-for="(col,j) in table.columns" :key="j" :data-exp="i">
                               <td class="pa-1 text-left" :style="{width:viewMode ? '33%' : '15%'}">
                                 <span v-if="viewMode" class="body-1 ">
-                                  {{ col.cn }}
+                                  {{ col.column_name }}
                                 </span>
 
                                 <v-text-field
                                   v-else
 
-                                  :ref="`cn_${table.tn}_${j}`"
-                                  :value="col.cn"
+                                  :ref="`cn_${table.table_name}_${j}`"
+                                  :value="col.column_name"
                                   outlined
                                   dense
                                   class="caption"
@@ -199,9 +199,9 @@
                                   hide-details="auto"
                                   :rules="[
                                     v => !!v || 'Column name required',
-                                    v =>!table.columns.some(c=>c !== col && c.cn === v) || 'Duplicate column not allowed'
+                                    v =>!table.columns.some(c=>c !== col && c.column_name === v) || 'Duplicate column not allowed'
                                   ]"
-                                  @input="e => onColumnNameUpdate(col,e,table.tn)"
+                                  @input="e => onColumnNameUpdate(col,e,table.table_name)"
                                 />
                               </td>
 
@@ -229,9 +229,9 @@
                                   >
                                     <span
                                       class="caption pointer primary--text"
-                                      @click="navigateToTable(col.rtn && col.rtn.tn)"
+                                      @click="navigateToTable(col.rtn && col.rtn.table_name)"
                                     >
-                                      {{ col.rtn && col.rtn.tn }}
+                                      {{ col.rtn && col.rtn.table_name }}
                                     </span> <span class="caption">({{ col.rcn }})</span>
                                   </template>
 
@@ -240,9 +240,9 @@
                                   >
                                     <span
                                       class="caption pointer primary--text"
-                                      @click="navigateToTable(col.rtn && col.rtn.tn)"
+                                      @click="navigateToTable(col.rtn && col.rtn.table_name)"
                                     >
-                                      {{ col.rtn && col.rtn.tn }}
+                                      {{ col.rtn && col.rtn.table_name }}
                                     </span> <span class="caption">({{ col.fn }})</span>
                                   </template>
                                 </td>
@@ -254,7 +254,7 @@
                                   style="width:200px;max-width:200px"
                                 >
                                   <v-autocomplete
-                                    :ref="`uidt_${table.tn}_${j}`"
+                                    :ref="`uidt_${table.table_name}_${j}`"
                                     style="max-width: 200px"
                                     :value="col.uidt"
                                     placeholder="Column Datatype"
@@ -299,9 +299,9 @@
                                       dense
                                       hide-details="auto"
                                       :rules="[v => !!v || 'Related table name required', ...getRules(col, table)]"
-                                      :items="isLookupOrRollup(col) ? getRelatedTables(table.tn, isRollup(col)) : project.tables"
-                                      :item-text="t => isLookupOrRollup(col) ? `${t.tn} (${t.type})` : t.tn"
-                                      :item-value="t => isLookupOrRollup(col) ? t : t.tn"
+                                      :items="isLookupOrRollup(col) ? getRelatedTables(table.table_name, isRollup(col)) : project.tables"
+                                      :item-text="t => isLookupOrRollup(col) ? `${t.table_name} (${t.type})` : t.table_name"
+                                      :item-value="t => isLookupOrRollup(col) ? t : t.table_name"
                                       :value-comparator="compareRel"
                                       @input="v => onRtnChange(col.rtn,v, col, table)"
                                     />
@@ -346,7 +346,7 @@
                                       class="caption"
                                       hide-details="auto"
                                       :rules="[v => !!v || 'Related column name required']"
-                                      :items="(project.tables.find(t => t.tn === (col.rtn && col.rtn.tn || col.rtn)) || {columns:[]}).columns.filter(v=> !isVirtual(v))"
+                                      :items="(project.tables.find(t => t.table_name === (col.rtn && col.rtn.table_name || col.rtn)) || {columns:[]}).columns.filter(v=> !isVirtual(v))"
                                       item-text="cn"
                                       item-value="cn"
                                     />
@@ -678,25 +678,25 @@ export default {
                 if (column.type === 'hm') {
                   table.hasMany.push({
                     tn: column.rtn,
-                    _cn: column.cn
+                    _cn: column.column_name
                   })
                 } else if (column.type === 'mm') {
                   table.manyToMany.push({
                     rtn: column.rtn,
-                    _cn: column.cn
+                    _cn: column.column_name
                   })
                 } else if (column.uidt === UITypes.ForeignKey) {
                   table.belongsTo.push({
                     tn: column.rtn,
-                    _cn: column.cn
+                    _cn: column.column_name
                   })
                 }
               } else if (this.isLookup(column)) {
                 if (column.rtn) {
                   table.v.push({
-                    _cn: column.cn,
+                    _cn: column.column_name,
                     lk: {
-                      ltn: column.rtn.tn,
+                      ltn: column.rtn.table_name,
                       type: column.rtn.type,
                       lcn: column.rcn
                     }
@@ -705,9 +705,9 @@ export default {
               } else if (this.isRollup(column)) {
                 if (column.rtn) {
                   table.v.push({
-                    _cn: column.cn,
+                    _cn: column.column_name,
                     rl: {
-                      rltn: column.rtn.tn,
+                      rltn: column.rtn.table_name,
                       rlcn: column.rcn,
                       type: column.rtn.type,
                       fn: column.fn
@@ -742,7 +742,7 @@ export default {
   },
   methods: {
     createTableClick() {
-      this.createTablesDialog = true;
+      this.createTablesDialog = true
       this.$tele.emit('table:create:mdi-plus-circle')
     },
     parseAndLoadTemplate() {
@@ -757,16 +757,16 @@ export default {
     getRelatedTables(tableName, rollup = false) {
       const tables = []
       for (const t of this.projectTemplate.tables) {
-        if (tableName === t.tn) {
+        if (tableName === t.table_name) {
           for (const hm of t.hasMany) {
-            const rTable = this.project.tables.find(t1 => t1.tn === hm.tn)
+            const rTable = this.project.tables.find(t1 => t1.table_name === hm.table_name)
             tables.push({
               ...rTable,
               type: 'hm'
             })
           }
           for (const mm of t.manyToMany) {
-            const rTable = this.project.tables.find(t1 => t1.tn === mm.rtn)
+            const rTable = this.project.tables.find(t1 => t1.table_name === mm.rtn)
             tables.push({
               ...rTable,
               type: 'mm'
@@ -774,7 +774,7 @@ export default {
           }
         } else {
           for (const hm of t.hasMany) {
-            if (hm.tn === tableName && !rollup) {
+            if (hm.table_name === tableName && !rollup) {
               tables.push({
                 ...t,
                 type: 'bt'
@@ -811,7 +811,7 @@ export default {
         if (table === deleteTable) {
           continue
         }
-        table.columns = table.columns.filter(c => c.rtn !== deleteTable.tn)
+        table.columns = table.columns.filter(c => c.rtn !== deleteTable.table_name)
       }
       this.project.tables.splice(i, 1)
     },
@@ -823,15 +823,15 @@ export default {
       // if relation column, delete the corresponding relation from other table
       if (col.uidt === UITypes.LinkToAnotherRecord) {
         if (col.type === 'hm') {
-          rTable = this.project.tables.find(t => t.tn === col.rtn)
-          index = rTable && rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.tn)
+          rTable = this.project.tables.find(t => t.table_name === col.rtn)
+          index = rTable && rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.table_name)
         } else if (col.type === 'mm') {
-          rTable = this.project.tables.find(t => t.tn === col.rtn)
-          index = rTable && rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'mm')
+          rTable = this.project.tables.find(t => t.table_name === col.rtn)
+          index = rTable && rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'mm')
         }
       } else if (col.uidt === UITypes.ForeignKey) {
-        rTable = this.project.tables.find(t => t.tn === col.rtn)
-        index = rTable && rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'hm')
+        rTable = this.project.tables.find(t => t.table_name === col.rtn)
+        index = rTable && rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'hm')
       }
 
       if (rTable && index > -1) {
@@ -842,7 +842,7 @@ export default {
         if (table === deleteTable) {
           continue
         }
-        table.columns = table.columns.filter(c => c.rtn !== deleteTable.tn || c.rcn !== deleteColumn.cn)
+        table.columns = table.columns.filter(c => c.rtn !== deleteTable.table_name || c.rcn !== deleteColumn.column_name)
       }
       deleteTable.columns.splice(j, 1)
     },
@@ -855,7 +855,7 @@ export default {
       let m
       // eslint-disable-next-line no-cond-assign
       while (m = re.exec(this.tableNamesInput)) {
-        if (this.project.tables.some(t => t.tn === m[1])) {
+        if (this.project.tables.some(t => t.table_name === m[1])) {
           this.$toast.info(`Table '${m[1]}' is already exist`).goAway(1000)
           continue
         }
@@ -865,14 +865,14 @@ export default {
           columns: (m[2] ? m[2].split(/\s*,\s*/) : []).map(col => ({
             cn: col,
             ...defaultColProp
-          })).filter((v, i, arr) => i === arr.findIndex(c => c.cn === v.cn))
+          })).filter((v, i, arr) => i === arr.findIndex(c => c.column_name === v.column_name))
         })
       }
       this.createTablesDialog = false
       this.tableNamesInput = ''
     },
     compareRel(a, b) {
-      return ((a && a.tn) || a) === ((b && b.tn) || b) && (a && a.type) === (b && b.type)
+      return ((a && a.table_name) || a) === ((b && b.table_name) || b) && (a && a.type) === (b && b.type)
     },
     addColumns() {
       if (!this.columnNamesInput) {
@@ -880,7 +880,7 @@ export default {
       }
       const table = this.project.tables[this.expansionPanel]
       for (const col of this.columnNamesInput.split(/\s*,\s*/)) {
-        if (table.columns.some(c => c.cn === col)) {
+        if (table.columns.some(c => c.column_name === col)) {
           this.$toast.info(`Column '${col}' is already exist`).goAway(1000)
           continue
         }
@@ -894,7 +894,7 @@ export default {
       this.createTableColumnsDialog = false
 
       this.$nextTick(() => {
-        const input = this.$refs[`uidt_${table.tn}_${table.columns.length - 1}`][0].$el.querySelector('input')
+        const input = this.$refs[`uidt_${table.table_name}_${table.columns.length - 1}`][0].$el.querySelector('input')
         input.focus()
         this.$nextTick(() => {
           input.select()
@@ -939,7 +939,7 @@ export default {
           : {})
       })
       this.$nextTick(() => {
-        const input = this.$refs[`cn_${table.tn}_${table.columns.length - 1}`][0].$el.querySelector('input')
+        const input = this.$refs[`cn_${table.table_name}_${table.columns.length - 1}`][0].$el.querySelector('input')
         input.focus()
         input.select()
       })
@@ -1034,39 +1034,39 @@ export default {
           columns: [
             ...columns,
             ...manyToMany.map(mm => ({
-              cn: mm._cn || `${rest.tn} <=> ${mm.rtn}`,
+              cn: mm.title || `${rest.table_name} <=> ${mm.rtn}`,
               uidt: LinkToAnotherRecord,
               type: 'mm',
               ...mm
             })),
             ...hasMany.map(hm => ({
-              cn: hm._cn || `${rest.tn} => ${hm.tn}`,
+              cn: hm.title || `${rest.table_name} => ${hm.table_name}`,
               uidt: LinkToAnotherRecord,
               type: 'hm',
-              rtn: hm.tn,
+              rtn: hm.table_name,
               ...hm
             })),
             ...belongsTo.map(bt => ({
-              cn: bt._cn || `${rest.tn} => ${bt.rtn}`,
+              cn: bt.title || `${rest.table_name} => ${bt.rtn}`,
               uidt: UITypes.ForeignKey,
-              rtn: bt.tn,
+              rtn: bt.table_name,
               ...bt
             })),
             ...v.map((v) => {
               const res = {
-                cn: v._cn,
+                cn: v.title,
                 rtn: {
                   ...v
                 }
               }
               if (v.lk) {
                 res.uidt = Lookup
-                res.rtn.tn = v.lk.ltn
+                res.rtn.table_name = v.lk.ltn
                 res.rcn = v.lk.lcn
                 res.rtn.type = v.lk.type
               } else if (v.rl) {
                 res.uidt = Rollup
-                res.rtn.tn = v.rl.rltn
+                res.rtn.table_name = v.rl.rltn
                 res.rcn = v.rl.rlcn
                 res.rtn.type = v.rl.type
                 res.fn = v.rl.fn
@@ -1138,7 +1138,7 @@ export default {
       }
     },
     navigateToTable(tn) {
-      const index = this.projectTemplate.tables.findIndex(t => t.tn === tn)
+      const index = this.projectTemplate.tables.findIndex(t => t.table_name === tn)
       if (Array.isArray(this.expansionPanel)) {
         this.expansionPanel.push(index)
       } else {
@@ -1193,7 +1193,7 @@ export default {
       return v => col.uidt !== UITypes.LinkToAnotherRecord || !table.columns.some(c => c !== col && c.uidt === UITypes.LinkToAnotherRecord && c.type === col.type && c.rtn === col.rtn) || 'Duplicate relation is not allowed'
     },
     onTableNameUpdate(oldTable, newVal) {
-      const oldVal = oldTable.tn
+      const oldVal = oldTable.table_name
       this.$set(oldTable, 'tn', newVal)
 
       for (const table of this.project.tables) {
@@ -1203,7 +1203,7 @@ export default {
               this.$set(col, 'rtn', newVal)
             }
           } else if (col.uidt === UITypes.Rollup || col.uidt === UITypes.Lookup) {
-            if (col.rtn && col.rtn.tn === oldVal) {
+            if (col.rtn && col.rtn.table_name === oldVal) {
               this.$set(col.rtn, 'tn', newVal)
             }
           }
@@ -1211,13 +1211,13 @@ export default {
       }
     },
     onColumnNameUpdate(oldCol, newVal, tn) {
-      const oldVal = oldCol.cn
+      const oldVal = oldCol.column_name
       this.$set(oldCol, 'cn', newVal)
 
       for (const table of this.project.tables) {
         for (const col of table.columns) {
           if (col.uidt === UITypes.Rollup || col.uidt === UITypes.Lookup) {
-            if (col.rtn && col.rcn === oldVal && col.rtn.tn === tn) {
+            if (col.rtn && col.rcn === oldVal && col.rtn.table_name === tn) {
               this.$set(col, 'rcn', newVal)
             }
           }
@@ -1234,16 +1234,16 @@ export default {
       }
 
       if (oldVal) {
-        const rTable = this.project.tables.find(t => t.tn === oldVal)
+        const rTable = this.project.tables.find(t => t.table_name === oldVal)
         // delete relation from other table if exist
 
         let index = -1
         if (col.uidt === UITypes.LinkToAnotherRecord && col.type === 'mm') {
-          index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'mm')
+          index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'mm')
         } else if (col.uidt === UITypes.LinkToAnotherRecord && col.type === 'hm') {
-          index = rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.tn)
+          index = rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.table_name)
         } else if (col.uidt === UITypes.ForeignKey) {
-          index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'hm')
+          index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'hm')
         }
 
         if (index > -1) {
@@ -1251,34 +1251,34 @@ export default {
         }
       }
       if (newVal) {
-        const rTable = this.project.tables.find(t => t.tn === newVal)
+        const rTable = this.project.tables.find(t => t.table_name === newVal)
 
         // check relation relation exist in other table
         // if not create a relation
         if (col.uidt === UITypes.LinkToAnotherRecord && col.type === 'mm') {
-          if (!rTable.columns.find(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'mm')) {
+          if (!rTable.columns.find(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'mm')) {
             rTable.columns.push({
               cn: `title${rTable.columns.length + 1}`,
               uidt: UITypes.LinkToAnotherRecord,
               type: 'mm',
-              rtn: table.tn
+              rtn: table.table_name
             })
           }
         } else if (col.uidt === UITypes.LinkToAnotherRecord && col.type === 'hm') {
-          if (!rTable.columns.find(c => c.uidt === UITypes.ForeignKey && c.rtn === table.tn)) {
+          if (!rTable.columns.find(c => c.uidt === UITypes.ForeignKey && c.rtn === table.table_name)) {
             rTable.columns.push({
               cn: `title${rTable.columns.length + 1}`,
               uidt: UITypes.ForeignKey,
-              rtn: table.tn
+              rtn: table.table_name
             })
           }
         } else if (col.uidt === UITypes.ForeignKey) {
-          if (!rTable.columns.find(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'hm')) {
+          if (!rTable.columns.find(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'hm')) {
             rTable.columns.push({
               cn: `title${rTable.columns.length + 1}`,
               uidt: UITypes.LinkToAnotherRecord,
               type: 'hm',
-              rtn: table.tn
+              rtn: table.table_name
             })
           }
         }
@@ -1287,7 +1287,7 @@ export default {
     onRTypeChange(oldType, newType, col, table) {
       this.$set(col, 'type', newType)
 
-      const rTable = this.project.tables.find(t => t.tn === col.rtn)
+      const rTable = this.project.tables.find(t => t.table_name === col.rtn)
 
       let index = -1
 
@@ -1295,9 +1295,9 @@ export default {
       // or create a new column
 
       if (oldType === 'hm') {
-        index = rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.tn)
+        index = rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.table_name)
       } else if (oldType === 'mm') {
-        index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'mm')
+        index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'mm')
       }
 
       const rCol = index === -1 ? { cn: `title${rTable.columns.length + 1}` } : { ...rTable.columns[index] }
@@ -1310,7 +1310,7 @@ export default {
         rCol.type = 'bt'
         rCol.uidt = UITypes.ForeignKey
       }
-      rCol.rtn = table.tn
+      rCol.rtn = table.table_name
 
       this.$set(rTable.columns, index, rCol)
     },
@@ -1325,17 +1325,17 @@ export default {
       let rTable
 
       if (oldVal === UITypes.LinkToAnotherRecord) {
-        rTable = this.project.tables.find(t => t.tn === col.rtn)
+        rTable = this.project.tables.find(t => t.table_name === col.rtn)
         if (rTable) {
           if (col.type === 'hm') {
-            index = rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.tn)
+            index = rTable.columns.findIndex(c => c.uidt === UITypes.ForeignKey && c.rtn === table.table_name)
           } else if (col.type === 'mm') {
-            index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'mm')
+            index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'mm')
           }
         }
       } else if (oldVal === UITypes.ForeignKey) {
-        rTable = this.project.tables.find(t => t.tn === col.rtn)
-        if (rTable) { index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.tn && c.type === 'hm') }
+        rTable = this.project.tables.find(t => t.table_name === col.rtn)
+        if (rTable) { index = rTable.columns.findIndex(c => c.uidt === UITypes.LinkToAnotherRecord && c.rtn === table.table_name && c.type === 'hm') }
       }
       if (rTable && index > -1) {
         rTable.columns.splice(index, 1)

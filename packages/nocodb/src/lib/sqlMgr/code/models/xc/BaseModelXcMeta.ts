@@ -20,8 +20,8 @@ abstract class BaseModelXcMeta extends BaseRender {
           args: [],
           msg: []
         },
-        cn: column.cn,
-        _cn: column._cn || column.cn,
+        column_name: column.cn || column.column_name,
+        title: column._cn || column.cn || column.column_name || column.title,
         type: this._getAbstractType(column),
         dt: column.dt,
 
