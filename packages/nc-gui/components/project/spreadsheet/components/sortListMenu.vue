@@ -139,7 +139,7 @@ export default {
 
         if (this.viewId) {
           const data = await this.$api.meta.sortList(this.viewId)
-          sortList = data.data.sorts.list
+          sortList = data.sorts.list
         }
 
         this.sortList = sortList
@@ -150,7 +150,7 @@ export default {
         if (sort.id) {
           await this.$api.meta.sortUpdate(this.viewId, sort.id, sort)
         } else {
-          this.$set(this.sortList, i, (await this.$api.meta.sortCreate(this.viewId, sort)).data)
+          this.$set(this.sortList, i, (await this.$api.meta.sortCreate(this.viewId, sort)))
         }
       } else {
         this.$emit('input', this.sortList)

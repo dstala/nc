@@ -5,7 +5,7 @@
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
  * ##                                                           ##
  * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##O
  * ---------------------------------------------------------------
  */
 
@@ -795,12 +795,7 @@ export interface BulkDeleteAllParamsType {
   tableAlias: string;
 }
 
-import axios, {
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-  ResponseType,
-} from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, ResponseType } from 'axios';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -905,7 +900,7 @@ export class HttpClient<SecurityDataType = unknown> {
     format,
     body,
     ...params
-  }: FullRequestParams): Promise<AxiosResponse<T>> => {
+  }: FullRequestParams): Promise<T> => {
     const secureParams =
       ((typeof secure === 'boolean' ? secure : this.secure) &&
         this.securityWorker &&
@@ -927,19 +922,21 @@ export class HttpClient<SecurityDataType = unknown> {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    return this.instance.request({
-      ...requestParams,
-      headers: {
-        ...(type && type !== ContentType.FormData
-          ? { 'Content-Type': type }
-          : {}),
-        ...(requestParams.headers || {}),
-      },
-      params: query,
-      responseType: responseFormat,
-      data: body,
-      url: path,
-    });
+    return this.instance
+      .request({
+        ...requestParams,
+        headers: {
+          ...(type && type !== ContentType.FormData
+            ? { 'Content-Type': type }
+            : {}),
+          ...(requestParams.headers || {}),
+        },
+        params: query,
+        responseType: responseFormat,
+        data: body,
+        url: path,
+      })
+      .then((response) => response.data);
   };
 }
 

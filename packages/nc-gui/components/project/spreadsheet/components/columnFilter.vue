@@ -398,12 +398,12 @@ export default {
             this.$set(this.filters, i, (await this.$api.meta.hookFilterCreate(this.hookId || hookId, {
               ...filter,
               fk_parent_id: this.parentId
-            })).data)
+            })))
           } else {
             this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
               ...filter,
               fk_parent_id: this.parentId
-            })).data)
+            })))
           }
         }
       }
@@ -418,16 +418,14 @@ export default {
     async loadFilter() {
       let filters = []
       if (this.viewId && this._isUIAllowed('filterSync')) {
-        const data = this.parentId
+        filters = this.parentId
           ? (await this.$api.meta.filterChildrenRead(this.viewId, this.parentId))
           : (await this.$api.meta.filterRead(this.viewId))
-        filters = data.data
       }
       if (this.hookId && this._isUIAllowed('filterSync')) {
-        const data = this.parentId
+        filters = this.parentId
           ? (await this.$api.meta.hookFilterChildrenRead(this.hookId, this.parentId))
           : (await this.$api.meta.hookFilterRead(this.hookId))
-        filters = data.data
       }
 
       this.filters = filters

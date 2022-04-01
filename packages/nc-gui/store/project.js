@@ -312,7 +312,7 @@ export const actions = {
         await dispatch('users/ActGetProjectUserDetails', this.$router.currentRoute.params.project_id, {root: true});
         // data = await this.dispatch('sqlMgr/ActSqlOp', [null, 'PROJECT_READ_BY_WEB']); // unsearialized data
       } else if (this.$router.currentRoute && this.$router.currentRoute.params && this.$router.currentRoute.params.shared_base_id) {
-        const baseData = (await this.$api.public.sharedBaseGet(this.$router.currentRoute.params.shared_base_id)).data// await this.dispatch('sqlMgr/ActSqlOp', [null, 'sharedBaseGet', {shared_base_id: this.$router.currentRoute.params.shared_base_id}]); // unsearialized data
+        const baseData = (await this.$api.public.sharedBaseGet(this.$router.currentRoute.params.shared_base_id))// await this.dispatch('sqlMgr/ActSqlOp', [null, 'sharedBaseGet', {shared_base_id: this.$router.currentRoute.params.shared_base_id}]); // unsearialized data
         commit('MutProjectId', projectId = baseData.project_id)
         // data = await this.dispatch('sqlMgr/ActSqlOp', [{project_id: baseData.project_id}, 'PROJECT_READ_BY_WEB']); // unsearialized data
         await dispatch('users/ActGetBaseUserDetails', this.$router.currentRoute.params.shared_base_id, {root: true});
@@ -320,7 +320,7 @@ export const actions = {
         commit('MutProjectId', null)
         return
       }
-      data = (await this.$api.meta.projectRead(projectId)).data
+      data = (await this.$api.meta.projectRead(projectId))
       commit("project", data);
       commit("meta/MutClear", null, {root: true});
       commit("tabs/MutClearTabState", null, {root: true});
@@ -362,7 +362,7 @@ export const actions = {
         projectId: state.projectId,
         baseId: state.project.bases[0].id,
         includeM2M: rootState.windows.includeM2M || ''
-      })).data.list
+      })).list
 
       commit('tables', tables)
       // if (!result.data.list.length) {
@@ -649,7 +649,7 @@ export const actions = {
 
 
   async ActLoadProjectInfo({commit}) {
-    const projectInfo = (await this.$api.meta.appInfo()).data
+    const projectInfo = (await this.$api.meta.appInfo())
     //   (await this.$axios({
     //   url: '/auth/type',
     //   baseURL: `${this.$axios.defaults.baseURL}/dashboard`,

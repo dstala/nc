@@ -1684,7 +1684,7 @@ export default {
             inflection_table: inflection.table_name
           }],
           external: true
-        })).data
+        }))
 
         clearInterval(interv)
         toast.goAway(100)
@@ -2019,7 +2019,7 @@ export default {
             //   c1
             // ])
 
-            const result = (await this.$api.meta.testConnection(c1)).data
+            const result = (await this.$api.meta.testConnection(c1))
 
             console.log('test connection result', result)
             if (result.code === 0) {

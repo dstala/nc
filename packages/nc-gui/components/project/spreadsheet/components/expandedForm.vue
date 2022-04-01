@@ -444,7 +444,7 @@ export default {
         }, {})
 
         if (this.isNew) {
-          const data = (await this.$api.data.create(this.viewId || this.meta.id, updatedObj))?.data
+          const data = (await this.$api.data.create(this.viewId || this.meta.id, updatedObj))
           this.localState = { ...this.localState, ...data }
 
           // save hasmany and manytomany relations from local state
@@ -495,7 +495,7 @@ export default {
       const id = this.meta.columns.filter(c => c.pk).map(c => this.localState[c.title]).join('___')
       // const where = this.meta.columns.filter(c => c.pk).map(c => `(${c.title},eq,${this.localState[c.title]})`).join('~and')
       this.$set(this, 'changedColumns', {})
-      this.localState = (await this.$api.data.read(this.viewId || this.meta.id, id, { query: this.queryParams || {} })).data
+      this.localState = (await this.$api.data.read(this.viewId || this.meta.id, id, { query: this.queryParams || {} }))
       // const data = await this.api.list({ ...(this.queryParams || {}), where }) || [{}]
       // this.localState = data[0] || this.localState
       // if (!this.isNew && this.toggleDrawer) {

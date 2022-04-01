@@ -542,7 +542,7 @@ export default {
     async loadPluginList() {
       try {
         // const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
-        const plugins = (await this.$api.meta.pluginList()).data.list
+        const plugins = (await this.$api.meta.pluginList()).list
         // plugins.push(...plugins.splice(0, 3))
         this.apps = plugins.reduce((o, p) => {
           p.tags = p.tags ? p.tags.split(',') : []
@@ -676,7 +676,7 @@ export default {
         }
 
         if (!this.hook.id && res) {
-          this.hook.id = res.data.id
+          this.hook.id = res.id
         }
         if (this.$refs.filter) {
           await this.$refs.filter.applyChanges(false, {
@@ -717,7 +717,7 @@ export default {
 
       const hooks = await this.$api.meta.hookList(this.meta.id)
 
-      this.hooks = hooks.data.list.map((h) => {
+      this.hooks = hooks.list.map((h) => {
         h.notification = h.notification && JSON.parse(h.notification)
         // h.condition = h.condition && JSON.parse(h.condition)
 

@@ -161,7 +161,7 @@ export default {
   methods: {
     isVirtualCol,
     async loadView() {
-      this.galleryView = (await this.$api.meta.galleryRead(this.viewId)).data
+      this.galleryView = (await this.$api.meta.galleryRead(this.viewId))
       this.$emit('update:coverImageField', this.galleryView.fk_cover_image_col_id)
     },
     getCovers(row) {

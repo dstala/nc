@@ -40,9 +40,7 @@ export async function viewList(
     );
   });
 
-  res.json({
-    views: new PagedResponseImpl(filteredViewList)
-  } as any);
+  res.json(new PagedResponseImpl(filteredViewList));
 }
 
 // @ts-ignore

@@ -452,7 +452,6 @@
           />
         </template>
       </div>
-
       <spreadsheet-nav-drawer
         v-if="meta"
         ref="drawer"
@@ -895,45 +894,15 @@ export default {
         if (this.tabsState[this.uniqueId].page) {
           this.page = this.tabsState[this.uniqueId].page
         }
-        // if (this.tabsState[this.tabId].selectedViewId) {
-        //   this.selectedViewId = this.tabsState[this.tabId].selectedViewId
-        // }
       }
-
       await this.createTableIfNewTable()
       this.loadingMeta = true
       await this.loadMeta(false)
       this.loadingMeta = false
-      // if (this.relationType === 'hm') {
-      //   this.filters.push({
-      //     field: this.meta.columns.find(c => c.column_name === this.relation.column_name).title,
-      //     op: 'is equal',
-      //     value: this.relationIdValue,
-      //     readOnly: true
-      //   })
-      // } else if (this.relationType === 'bt') {
-      //   this.filters.push({
-      //     // field: this.relation.rcn,
-      //     field: this.meta.columns.find(c => c.column_name === this.relation.rcn).title,
-      //     op: 'is equal',
-      //     value: this.relationIdValue,
-      //     readOnly: true
-      //   })
-      // } else {
-      // await this.$refs.drawer.loadViews();
-      // if (this.selectedView && this.selectedView.show_as === 'kanban') {
-      //   await this.loadKanbanData()
-      // } else {
-      // await this.loadTableData()
-      // }
-      // }
-      // this.mapFieldsAndShowFields()
     } catch (e) {
       console.log(e)
     }
     this.searchField = this.primaryValueColumn
-    // this.dataLoaded = true
-    // await this.loadViews();
   },
   methods: {
     clickAddNewIcon() {
@@ -1129,7 +1098,7 @@ export default {
             }, {})
 
             // const insertedData = await this.api.insert(insertObj)
-            const insertedData = (await this.$api.data.create(this.meta.id, insertObj)).data
+            const insertedData = (await this.$api.data.create(this.meta.id, insertObj))
 
             this.data.splice(row, 1, {
               row: insertedData,
@@ -1407,7 +1376,7 @@ export default {
               // sort: ['-FirstName'],
               // where: '(FirstName,like,%ro)~or((FirstName,like,%a)~and(FirstName,like,%e%))'
             }
-          })).data
+          }))
 
         this.count = pageInfo.totalRows// count
         this.data = list.map(row => ({
@@ -1605,7 +1574,7 @@ export default {
     },
     async exportCache() {
       try {
-        const data = (await this.$api.meta.cacheGet()).data
+        const data = (await this.$api.meta.cacheGet())
         if (!data.length) {
           this.$toast.info('Cache is empty').goAway(3000)
           return

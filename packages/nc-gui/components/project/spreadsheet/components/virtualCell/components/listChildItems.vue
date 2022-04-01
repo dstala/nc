@@ -203,7 +203,7 @@ export default {
             offset: this.size * (this.page - 1),
             // query: this.query,
             columnId: this.column.fk_column_id || this.column.id
-          }, {})).data
+          }, {}))
         }
 
         return

@@ -314,7 +314,7 @@ export default {
       let order = 1
       if (this.viewId) {
         const data = await this.$api.meta.viewColumnList(this.viewId)
-        const fieldById = data.data.reduce((o, f) => ({
+        const fieldById = data.reduce((o, f) => ({
           ...o,
           [f.fk_column_id]: f
         }), {})
@@ -342,7 +342,7 @@ export default {
         if (field.id) {
           await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
         } else {
-          this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field)).data
+          this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field))
         }
       }
       this.$emit('updated')

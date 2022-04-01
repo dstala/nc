@@ -172,7 +172,7 @@ export default {
       try {
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [
         //   { dbAlias: 'db' }, 'getSharedBaseLink'])
-        const sharedBase = (await this.$api.meta.sharedBaseGet(this.$store.state.project.projectId)).data
+        const sharedBase = (await this.$api.meta.sharedBaseGet(this.$store.state.project.projectId))
 
         this.base = sharedBase || {}
       } catch (e) {
@@ -182,7 +182,7 @@ export default {
     async createSharedBase(roles = 'viewer') {
       try {
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink', { roles }])
-        const sharedBase = (await this.$api.meta.sharedBaseUpdate(this.$store.state.project.projectId, { roles })).data
+        const sharedBase = (await this.$api.meta.sharedBaseUpdate(this.$store.state.project.projectId, { roles }))
 
         this.base = sharedBase || {}
       } catch (e) {
@@ -200,11 +200,11 @@ export default {
         this.$toast.error(e.message).goAway(3000)
       }
 
-      this.$tele.emit(`shared-base:disable`)
+      this.$tele.emit('shared-base:disable')
     },
     async recreate() {
       try {
-        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles: this.base.roles || 'viewer' })).data
+        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles: this.base.roles || 'viewer' }))
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink'])
         this.base = sharedBase || {}
@@ -212,18 +212,18 @@ export default {
         this.$toast.error(e.message).goAway(3000)
       }
 
-      this.$tele.emit(`shared-base:recreate`)
+      this.$tele.emit('shared-base:recreate')
     },
     copyUrl() {
       copyTextToClipboard(this.url)
       this.$toast.success('Copied shareable base url to clipboard!').goAway(3000)
 
-      this.$tele.emit(`shared-base:copy-url`)
+      this.$tele.emit('shared-base:copy-url')
     },
     navigateToSharedBase() {
       window.open(this.url, '_blank')
 
-      this.$tele.emit(`shared-base:open-url`)
+      this.$tele.emit('shared-base:open-url')
     },
     generateEmbeddableIframe() {
       copyTextToClipboard(`<iframe
@@ -235,7 +235,7 @@ height="700"
 style="background: transparent; border: 1px solid #ddd"></iframe>`)
       this.$toast.success('Copied embeddable html code!').goAway(3000)
 
-      this.$tele.emit(`shared-base:copy-embed-frame`)
+      this.$tele.emit('shared-base:copy-embed-frame')
     }
   }
 

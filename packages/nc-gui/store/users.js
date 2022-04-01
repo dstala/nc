@@ -162,11 +162,11 @@ export const actions = {
       if (getters.GtrUser) {
         try {
           const res = await this.$api.auth.me() // this.$axios.get('/user/me')
-          if (res.data === null || !res.data.email) {
+          if (res === null || !res.email) {
             console.log('Setting user to null : no session available')
             commit('MutSetUser', null)
           } else {
-            commit('MutSetUser', res.data)
+            commit('MutSetUser', res)
           }
           commit('windows/MutPollingSet', 0, { root: true })
         } catch (e) {
@@ -362,7 +362,7 @@ export const actions = {
           'xc-auth': state.token
         }
       })
-      commit('MutSetUser', user && user.data)
+      commit('MutSetUser', user)
     } catch (e) {
       console.log('ignoring user/me error')
     }
@@ -376,7 +376,7 @@ export const actions = {
         },
         query: { project_id: projectId }
       })
-      commit('MutProjectRole', user && user.data && user.data.roles)
+      commit('MutProjectRole', user && user.roles)
     } catch (e) {
       console.log('ignoring user/me error')
     }
@@ -389,7 +389,7 @@ export const actions = {
             'xc-shared-base-id': sharedBaseId
           }
         })
-        commit('MutProjectRole', user && user.data && user.data.roles)
+        commit('MutProjectRole', user && user.roles)
       } catch (e) {
         console.log('ignoring user/me error')
       }
@@ -474,7 +474,7 @@ export const actions = {
     // console.log('in action signout');
   },
   async ActGetAuthType({ commit }) {
-    const { type, firstUser } = (await this.$api.meta.appInfo()).data// (await this.$axios.get('/auth/type')).data
+    const { type, firstUser } = (await this.$api.meta.appInfo())// (await this.$axios.get('/auth/type'))
     commit('MutAuthType', type)
     return { type, firstUser }
   },

@@ -16,7 +16,8 @@
           <template #activator="{ on }">
             <v-btn
               to="/projects"
-              icon class="pa-1 brand-icon nc-noco-brand-icon"
+              icon
+              class="pa-1 brand-icon nc-noco-brand-icon"
               v-on="on"
             >
               <v-img :src="logo" max-height="30px" max-width="30px" />
@@ -35,9 +36,8 @@
         </template>
       </v-toolbar-title>
 
-      <v-toolbar-items class="ml-0">
-      </v-toolbar-items>
-            <!-- loading -->
+      <v-toolbar-items class="ml-0" />
+      <!-- loading -->
       <span v-show="$nuxt.$loading.show" class="caption grey--text ml-3">{{ $t('general.loading') }} <v-icon small color="grey">mdi-spin mdi-loading</v-icon></span>
 
       <span
@@ -110,7 +110,6 @@
             v-shortkey="[ 'ctrl','shift', 'l']"
             @shortkey="toggleLogWindow"
           />
-
         </template>
         <template v-else>
           <span
@@ -123,7 +122,6 @@
             @shortkey="changeTheme"
           />
 
-
           <v-tooltip bottom>
             <template #activator="{ on }">
               <v-icon size="23" :style="$vuetify.theme.dark ? {}:{color:'lightgrey'}" @click="changeTheme" v-on="on">
@@ -133,7 +131,7 @@
             <h3 class="pa-3">
               <!-- "dark": "It does come in Black (^⇧B)",
               "light": "Does it come in Black ? (^⇧B)" -->
-              {{ $vuetify.theme.dark ? $t('tooltip.theme.dark') :  $t('tooltip.theme.light')  }}
+              {{ $vuetify.theme.dark ? $t('tooltip.theme.dark') : $t('tooltip.theme.light') }}
               <i />
             </h3>
           </v-tooltip>
@@ -162,7 +160,6 @@
           </template>
           <v-list dense class="nc-user-menu">
             <template>
-
               <v-list-item v-t="['toolbar:user:email']" v-ge="['Settings','']" dense to="/user/settings">
                 <v-list-item-title>
                   <v-icon small>
@@ -189,47 +186,48 @@
                   <span class="font-weight-regular caption">{{ $t('activity.account.authToken') }}</span>
                 </v-list-item-title>
               </v-list-item>
-            <v-list-item
-              v-if="swaggerOrGraphiqlUrl"
-              v-t="['toolbar:user:swagger']"
-              dense
-              @click.stop="openUrl(`${$axios.defaults.baseURL}${swaggerOrGraphiqlUrl}`)"
-            >
-              <v-list-item-title>
-                <v-icon key="terminal-dash" small>
-                  {{ isGql ? 'mdi-graphql' : 'mdi-code-json' }}
-                </v-icon>&nbsp;
-                <span class="font-weight-regular caption">
-                  {{ isGql ? 'GraphQL APIs' : 'Swagger APIs Doc' }}</span>
-              </v-list-item-title>
-            </v-list-item>
-            <v-divider />
-            <v-list-item
-              v-if="isDashboard"
-              v-t="['toolbar:user:copy-proj-info']"
-              v-ge="['Sign Out','']"
-              dense
-              @click="copyProjectInfo"
-            >
-              <v-list-item-title>
-                <v-icon small>
-                  mdi-content-copy
-                </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('activity.account.projInfo') }}</span>
-              </v-list-item-title>
-            </v-list-item>
-            <v-divider v-if="isDashboard" />
-            <v-list-item
-              v-if="isDashboard"
-              v-t="['toolbar:user:themes']"
-              dense @click.stop="settingsTabAdd"
-            >
-              <v-list-item-title>
-                <v-icon key="terminal-dash" small>
-                  mdi-palette
-                </v-icon>&nbsp;
-                <span class="font-weight-regular caption">{{ $t('activity.account.themes') }}</span>
-              </v-list-item-title>
-            </v-list-item>
+              <v-list-item
+                v-if="swaggerOrGraphiqlUrl"
+                v-t="['toolbar:user:swagger']"
+                dense
+                @click.stop="openUrl(`${$axios.defaults.baseURL}${swaggerOrGraphiqlUrl}`)"
+              >
+                <v-list-item-title>
+                  <v-icon key="terminal-dash" small>
+                    {{ isGql ? 'mdi-graphql' : 'mdi-code-json' }}
+                  </v-icon>&nbsp;
+                  <span class="font-weight-regular caption">
+                    {{ isGql ? 'GraphQL APIs' : 'Swagger APIs Doc' }}</span>
+                </v-list-item-title>
+              </v-list-item>
+              <v-divider />
+              <v-list-item
+                v-if="isDashboard"
+                v-t="['toolbar:user:copy-proj-info']"
+                v-ge="['Sign Out','']"
+                dense
+                @click="copyProjectInfo"
+              >
+                <v-list-item-title>
+                  <v-icon small>
+                    mdi-content-copy
+                  </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('activity.account.projInfo') }}</span>
+                </v-list-item-title>
+              </v-list-item>
+              <v-divider v-if="isDashboard" />
+              <v-list-item
+                v-if="isDashboard"
+                v-t="['toolbar:user:themes']"
+                dense
+                @click.stop="settingsTabAdd"
+              >
+                <v-list-item-title>
+                  <v-icon key="terminal-dash" small>
+                    mdi-palette
+                  </v-icon>&nbsp;
+                  <span class="font-weight-regular caption">{{ $t('activity.account.themes') }}</span>
+                </v-list-item-title>
+              </v-list-item>
 
               <v-divider v-if="isDashboard" />
 
@@ -279,7 +277,6 @@
     </v-app-bar>
 
     <v-main class="pb-0 mb-0">
-
       <v-container class="ma-0 pa-0" fluid style="">
         <v-progress-linear
           v-show="GetPendingStatus"
@@ -827,14 +824,14 @@ export default {
     },
     async copyProjectInfo() {
       try {
-        const data = (await this.$api.meta.projectMetaGet(this.$store.state.project.projectId)).data// await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'ncProjectInfo'])
+        const data = (await this.$api.meta.projectMetaGet(this.$store.state.project.projectId))// await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'ncProjectInfo'])
         copyTextToClipboard(Object.entries(data).map(([k, v]) => `${k}: **${v}**`).join('\n'))
         this.$toast.info('Copied project info to clipboard').goAway(3000)
       } catch (e) {
         console.log(e)
         this.$toast.error(e.message).goAway(3000)
       }
-    },
+    }
   }
 
 }

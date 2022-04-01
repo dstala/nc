@@ -65,12 +65,12 @@ export const actions = {
     // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tableName }], { root: true })
     // const meta = JSON.parse(model.meta)
     commit('MutMeta', {
-      key: model.data.table_name,
-      value: model.data
+      key: model.table_name,
+      value: model
     })
     commit('MutMeta', {
-      key: model.data.id,
-      value: model.data
+      key: model.id,
+      value: model
     })
     commit('MutLoading', {
       key: tableName || id,

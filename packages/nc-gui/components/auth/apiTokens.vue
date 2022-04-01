@@ -152,8 +152,8 @@ export default {
     this.loadApiTokens()
   },
   methods: {
-    showNewTokenDlg(){
-      this.newTokenDialog = true;
+    showNewTokenDlg() {
+      this.newTokenDialog = true
       this.$tele.emit('api-mgmt:token:generate:trigger')
     },
     copyToken(token) {
@@ -163,7 +163,7 @@ export default {
       this.$tele.emit('api-mgmt:token:copy')
     },
     async loadApiTokens() {
-      this.tokens = (await this.$api.meta.apiTokenList(this.$store.state.project.projectId)).data// await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenList'])
+      this.tokens = (await this.$api.meta.apiTokenList(this.$store.state.project.projectId))// await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcApiTokenList'])
     },
     async generateToken() {
       try {

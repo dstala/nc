@@ -140,7 +140,7 @@ export default {
       const result = (await this.$api.meta.tableList({
         projectId: this.$store.state.project.projectId,
         baseId: this.$store.state.project.project.bases[0].id
-      })).data
+      }))
 
       //   await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   env: this.nodes.env,

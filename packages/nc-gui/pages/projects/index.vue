@@ -1092,7 +1092,7 @@ export default {
         //   'projectList'
         // ])
 
-        this.projects = (await this.$api.meta.projectList()).data.list
+        this.projects = (await this.$api.meta.projectList({})).list
 
         // todo: multiplex
         const user = this.$store.state.users.user

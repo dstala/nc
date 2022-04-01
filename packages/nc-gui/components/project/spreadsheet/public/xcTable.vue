@@ -620,10 +620,8 @@ export default {
         // }])
 
         const {
-          data: {
-            list,
-            pageInfo: { totalRows: count }
-          }
+          list,
+          pageInfo: { totalRows: count }
         } = (await this.$api.public.dataList({
           ...this.queryParams,
           uuid: this.$route.params.id
@@ -638,7 +636,7 @@ export default {
           })),
           filters: this.filters
         }
-        )).data
+        ))
 
         // this.client = client
 

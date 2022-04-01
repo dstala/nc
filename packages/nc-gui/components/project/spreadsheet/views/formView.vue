@@ -691,7 +691,7 @@ export default {
       const {
         columns,
         ...view
-      } = (await this.$api.meta.formRead(this.viewId)).data
+      } = (await this.$api.meta.formRead(this.viewId))
       this.view = view
       this.formColumns = columns
       let order = 1
@@ -713,7 +713,7 @@ export default {
       ).sort((a, b) => a.order - b.order)
     },
     // async loadFormColumns() {
-    //   this.formColumns = (await this.$api.meta.viewColumnList(this.viewId)).data
+    //   this.formColumns = (await this.$api.meta.viewColumnList(this.viewId))
     //   let order = 1
     //   const fieldById = this.formColumns.reduce((o, f) => ({ ...o, [f.fk_column_id]: f }), {})
     //   this.fields = this.meta.columns.map(c => ({
@@ -800,7 +800,7 @@ export default {
     },
     async checkSMTPStatus() {
       if (this.emailMe) {
-        const emailPluginActive = (await this.$api.meta.pluginStatus('SMTP')).data
+        const emailPluginActive = (await this.$api.meta.pluginStatus('SMTP'))
         if (!emailPluginActive) {
           this.emailMe = false
           this.$toast.info('Please activate SMTP plugin in App store for enabling email notification').goAway(5000)

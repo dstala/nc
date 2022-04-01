@@ -214,7 +214,7 @@ export default {
         // this.plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
         //   title: this.title
         // }])
-        this.plugin = (await this.$api.meta.pluginRead(this.id)).data
+        this.plugin = (await this.$api.meta.pluginRead(this.id))
         this.formDetails = JSON.parse(this.plugin.input_schema)
         this.pluginId = this.plugin.id
         this.settings = JSON.parse(this.plugin.input) || (this.formDetails.array ? [{}] : {})

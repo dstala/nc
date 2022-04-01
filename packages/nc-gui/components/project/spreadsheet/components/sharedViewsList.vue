@@ -148,7 +148,7 @@ export default {
       //   model_name: this.modelName
       // }])
 
-      const viewList = (await this.$api.meta.sharedViewList(this.meta.id))?.data
+      const viewList = (await this.$api.meta.sharedViewList(this.meta.id))
 
       const index = viewList.findIndex((v) => {
         return this.selectedView && this.selectedView.id === v.id

@@ -1,5 +1,4 @@
 import { mapGetters } from 'vuex'
-import { getApi } from '~/plugins/api'
 
 export default {
   data() {
@@ -10,9 +9,6 @@ export default {
     }
   },
   computed: {
-    $api() {
-      return getApi(this.$store, this.$axios)
-    },
     dashboardUrl() {
       return `${location.origin}${location.pathname || ''}`
     },

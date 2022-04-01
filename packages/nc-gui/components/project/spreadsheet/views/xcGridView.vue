@@ -428,7 +428,7 @@ export default {
       if (!this.viewId) {
         return
       }
-      const colsData = (await this.$api.meta.gridColumnsList(this.viewId))?.data
+      const colsData = (await this.$api.meta.gridColumnsList(this.viewId))
       this.gridViewCols = colsData.reduce((o, col) => ({
         ...o,
         [col.fk_column_id]: col

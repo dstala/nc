@@ -32,7 +32,7 @@ export default {
   methods: {
     async   loadSampleData() {
       this.sampleData = {
-        data: (await this.$api.meta.hooksSamplePayloadGet(this.modelId, this.hook.operation)).data,
+        data: (await this.$api.meta.hooksSamplePayloadGet(this.modelId, this.hook.operation)),
         user: this.$store.state.users.user
       }
     },

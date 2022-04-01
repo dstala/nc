@@ -790,7 +790,7 @@ export default {
 
       // this.viewsList = []
 
-      const views = (await this.$api.meta.viewsList(this.meta.id)).data.views.list
+      const views = (await this.$api.meta.viewsList(this.meta.id)).list
       this.$emit('update:views', views)
     },
     // async onViewChange() {
@@ -819,7 +819,6 @@ export default {
         return
       }
 
-      this.$te
       // const oldTitle = view.title
 
       this.$set(view, 'edit', false)
@@ -907,7 +906,7 @@ export default {
       //     password: this.sharedViewPassword
       //   }
       // ])
-      const shared = (await this.$api.meta.shareViewCreate(this.selectedViewId)).data
+      const shared = (await this.$api.meta.shareViewCreate(this.selectedViewId))
 
       // todo: url
       this.shareLink = shared

@@ -290,12 +290,11 @@ export default {
   }),
   async mounted() {
     await this.loadXcDiff()
-    // await this.loadModels()
-    // await this.loadTableList()
+    // await this.loadMode// await this.loadTableList()
   },
   methods: {
     async loadXcDiff() {
-      this.diff = (await this.$api.meta.metaDiffGet(this.$store.state.project.projectId, this.db.id)).data
+      this.diff = (await this.$api.meta.metaDiffGet(this.$store.state.project.projectId, this.db.id))
 
       // this.diff = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   dbAlias: this.db.meta.dbAlias,
