@@ -102,51 +102,6 @@ export default {
       }))
 
       return refTables
-
-      // return (this.meta
-      //   ? [
-      //     // ...(this.meta.belongsTo || []).map(({ rtn, _rtn, rcn, tn, cn }) => ({
-      //     //   type: 'bt',
-      //     //   rtn,
-      //     //   _rtn,
-      //     //   rcn,
-      //     //   tn,
-      //     //   cn,
-      //     //   ltn: rtn,
-      //     //   _ltn: _rtn
-      //     // })),
-      //       ...(this.meta.hasMany || []).map(({
-      //         tn,
-      //         title,
-      //         cn,
-      //         rcn,
-      //         rtn
-      //       }) => ({
-      //         type: 'hm',
-      //         tn,
-      //         title,
-      //         cn,
-      //         rcn,
-      //         rtn,
-      //         rltn: tn,
-      //         _rltn: title
-      //       })),
-      //       ...(this.meta.manyToMany || []).map(({ vtn, _vtn, vrcn, vcn, rtn, _rtn, rcn, tn, cn }) => ({
-      //         type: 'mm',
-      //         tn,
-      //         cn,
-      //         vtn,
-      //         _vtn,
-      //         vrcn,
-      //         rcn,
-      //         rtn,
-      //         vcn,
-      //         _rtn,
-      //         rltn: rtn,
-      //         _rltn: _rtn
-      //       }))
-      //     ]
-      //   : []).filter(t => this.tables.includes(t.rltn))
     },
     columnList() {
       return ((
@@ -168,11 +123,6 @@ export default {
         baseId: this.$store.state.project.project.bases[0].id
       }))
 
-      //   await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-      //   env: this.nodes.env,
-      //   dbAlias: this.nodes.dbAlias
-      // }, 'tableList'])
-
       this.tables = result.list
     },
     async onTableChange() {
@@ -193,35 +143,8 @@ export default {
     },
     async save() {
       try {
-        // await this.$store.dispatch('meta/ActLoadMeta', {
-        //   dbAlias: this.nodes.dbAlias,
-        //   env: this.nodes.env,
-        //   tn: this.meta.table_name,
-        //   force: true
-        // })
-        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
-        //
-        // meta.v.push({
-        //   _cn: this.alias,
-        //   rl: {
-        //     ...this.rollup.table,
-        //     ...this.rollup.column,
-        //     fn: this.rollup.fn
-        //   }
-        // })
-        //
-        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        //   env: this.nodes.env,
-        //   dbAlias: this.nodes.dbAlias
-        // }, 'xcModelSet', {
-        //   tn: this.nodes.table_name,
-        //   meta
-        // }])
-
-        console.log(this.rollup)
-
         const rollupCol = {
-          _cn: this.alias,
+          title: this.alias,
           fk_relation_column_id: this.rollup.table.col.fk_column_id,
           fk_rollup_column_id: this.rollup.column.id,
           uidt: UITypes.Rollup,

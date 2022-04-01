@@ -220,8 +220,6 @@ export default class NcMetaIOImpl extends NcMetaIO {
       query.where(idOrCondition);
     }
 
-    console.log(query.toQuery());
-
     return query.first();
   }
 
