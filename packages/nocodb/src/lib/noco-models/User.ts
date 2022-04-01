@@ -71,12 +71,22 @@ export default class User implements UserType {
       'roles'
     ]);
     // get existing cache
-    const key = `${CacheScope.USER}:${id}`;
+    let key = `${CacheScope.USER}:${id}`;
     let o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
       o = { ...o, ...updateObj };
       // set cache
       await NocoCache.set(key, o);
+      {
+        // update user:<email>
+        key = `${CacheScope.USER}:${o.email}`;
+        o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
+        if (o) {
+          o = { ...o, ...updateObj };
+          // set cache
+          await NocoCache.set(key, o);
+        }
+      }
     }
     // set meta
     return await ncMeta.metaUpdate(null, null, MetaTable.USERS, updateObj, id);
