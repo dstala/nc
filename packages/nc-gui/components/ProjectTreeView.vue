@@ -1487,7 +1487,7 @@ export default {
             _nodes: {
               env: this.menuItem._nodes.env,
               dbAlias: this.menuItem._nodes.dbAlias,
-              tn: table.name,
+              table_name: table.name,
               title: table.alias,
               type: 'table',
               dbKey: this.menuItem._nodes.dbKey,
