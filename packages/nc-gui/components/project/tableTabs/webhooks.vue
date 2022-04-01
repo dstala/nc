@@ -701,7 +701,7 @@ export default {
       // }, 'tableXcModelGet', {
       //   tn: this.nodes.table_name
       // }] )
-      this.meta = await this.$store.dispatch('meta/ActLoadMeta', { tn: this.nodes.table_name })// JSON.parse(tableMeta.meta)
+      this.meta = await this.$store.dispatch('meta/ActLoadMeta', { table_name: this.nodes.table_name })// JSON.parse(tableMeta.meta)
       this.fieldList = this.meta.columns.map(c => c.column_name)
       this.loadingMeta = false
     },
