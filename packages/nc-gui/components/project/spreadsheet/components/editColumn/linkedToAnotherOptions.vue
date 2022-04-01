@@ -182,29 +182,6 @@ export default {
     }
   },
   methods: {
-    async loadColumnList() {
-      this.isRefColumnsLoading = true
-      const result = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        env: this.nodes.env,
-        dbAlias: this.nodes.dbAlias
-      }, 'columnList', { table_name: this.meta.table_name }])
-
-      const columns = result.data.list
-      this.refColumns = JSON.parse(JSON.stringify(columns))
-
-      if (this.relation.updateRelation && !this.relationColumnChanged) {
-        // only first time when editing add defaault value to this field
-        this.relation.parentColumn = this.column.rcn
-        this.relationColumnChanged = true
-      } else {
-        // find pk column and assign to parentColumn
-        const pkKeyColumns = this.refColumns.filter(el => el.pk)
-        this.relation.parentColumn = (pkKeyColumns[0] || {}).column_name || ''
-      }
-      this.onColumnSelect()
-
-      this.isRefColumnsLoading = false
-    },
     async loadTablesList() {
       this.isRefTablesLoading = true
 
@@ -215,28 +192,6 @@ export default {
 
       this.refTables = result // .data.list.map(({ table_name, title }) => ({ table_name, title }))
       this.isRefTablesLoading = false
-    },
-    async saveManyToMany() {
-      // try {
-      // todo: toast
-      await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
-        {
-          env: this.nodes.env,
-          dbAlias: this.nodes.dbAlias
-        },
-        'xcM2MRelationCreate',
-        {
-          _cn: this.alias,
-          ...this.relation,
-          type: this.isSQLite || this.relation.type === 'virtual' ? 'virtual' : 'real',
-          parentTable: this.meta.table_name,
-          updateRelation: !!this.column.rtn,
-          alias: this.alias
-        }
-      ])
-      // } catch (e) {
-      //   throw e
-      // }
     },
     async saveRelation() {
       await this.$api.meta.columnCreate(this.meta.id, {

@@ -251,6 +251,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             };
             const tableUpdateBody = {
               ...child,
+              tn: child.table_name,
               originalColumns: child.columns.map(c => ({
                 ...c,
                 cn: c.column_name
