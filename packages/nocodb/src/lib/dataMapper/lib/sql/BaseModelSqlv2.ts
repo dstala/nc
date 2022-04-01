@@ -1518,7 +1518,8 @@ class BaseModelSqlv2 {
       const res = [];
       for (const d of updateDatas) {
         await this.validate(d);
-        const wherePk = _wherePk(this.model.primaryKeys, d);
+        const pkValues = await this._extractPksValues(d);
+        const wherePk = await this._wherePk(pkValues);
         if (!wherePk) {
           // pk not specified - bypass
           continue;
@@ -1547,7 +1548,7 @@ class BaseModelSqlv2 {
     try {
       const updateData = await this.model.mapAliasToColumn(data);
       await this.validate(updateData);
-      const wherePk = getCompositePk(this.model.primaryKeys, updateData);
+      const wherePk = this._extractPksValues(updateData);
       let res = null;
       if (wherePk) {
         // pk is specified - by pass
@@ -1761,7 +1762,7 @@ class BaseModelSqlv2 {
     // data can be still inserted without PK
     // TODO: return a meaningful value
     if (!this.model.primaryKey) return 'N/A';
-    return data[this.model.primaryKey._cn];
+    return data[this.model.primaryKey.cn];
   }
 
   // @ts-ignore
