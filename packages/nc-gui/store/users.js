@@ -237,7 +237,7 @@ export const actions = {
       // const userRes = await this.$axios.post('/auth/signup?tool=1', data)
       const userRes = await this.$api.auth.signup(data)
       // console.log(userRes);
-      commit('MutSetToken', userRes.data.token)
+      commit('MutSetToken', userRes.token)
       // await dispatch('ActGetUserUiAbility')
       await dispatch('ActGetUserDetails')
     } catch (e) {
@@ -255,7 +255,7 @@ export const actions = {
       // const userPromise = await this.$axios.post('/auth/signin?tool=1', data)
       const userPromise = await this.$api.auth.signin(data)
       // console.log(userPromise);
-      commit('MutSetToken', userPromise.data.token)
+      commit('MutSetToken', userPromise.token)
       // await dispatch('ActGetUserUiAbility')
       await dispatch('ActGetUserDetails')
 
