@@ -1056,7 +1056,7 @@ export default {
           this.$store.state.project.projectId,
           this.$store.state.project.project.bases[0].id,
           {
-            tn: this.nodes.table_name,
+            table_name: this.nodes.table_name,
             title: this.nodes.title,
             columns
           }
