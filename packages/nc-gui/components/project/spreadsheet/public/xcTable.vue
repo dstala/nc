@@ -521,7 +521,7 @@ export default {
       try {
         this.viewMeta = (await this.$api.public.sharedViewMetaGet(this.$route.params.id, {
           password: this.password
-        })).data
+        }))
         this.meta = this.viewMeta.model
         this.metas = this.viewMeta.relatedMetas
 

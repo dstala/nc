@@ -58,7 +58,6 @@
 
     <v-card style="height:calc(100% - 38px)">
       <v-container style="height: 100%" fluid>
-
         <v-row style="height:100%">
           <v-col cols="12" class="h-100">
             <v-card class="h-100 elevation-0">
@@ -115,7 +114,6 @@
                           >
                             {{ getRole(item.roles) }}
                           </v-chip>
-
                         </td>
                         <td>
                           <!-- tooltip="Edit User" -->
@@ -471,8 +469,8 @@ export default {
       }
     ],
     roleRules: [
-       v => !!v || 'User Role is required',
-      (v) => ['creator', 'editor', 'commenter', 'viewer'].includes(v) || `invalid user role`
+      v => !!v || 'User Role is required',
+      v => ['creator', 'editor', 'commenter', 'viewer'].includes(v) || 'invalid user role'
     ],
     userList: [],
     roleDescriptions: {},
@@ -549,16 +547,16 @@ export default {
       this.$tele.emit('user-mgmt:reload')
     },
     clickDeleteUser(id) {
-      this.$tele.emit('user-mgmt:delete:trigger');
-      this.deleteId = id;
-      this.deleteItem = id;
-      this.showConfirmDlg = true;
-      this.deleteUserType='DELETE_FROM_PROJECT'
+      this.$tele.emit('user-mgmt:delete:trigger')
+      this.deleteId = id
+      this.deleteItem = id
+      this.showConfirmDlg = true
+      this.deleteUserType = 'DELETE_FROM_PROJECT'
     },
     clickInviteMore() {
       this.$tele.emit('user-mgmt:invite-more')
-      this.invite_token = null;
-      this.selectedUser = {roles: 'editor'};
+      this.invite_token = null
+      this.selectedUser = { roles: 'editor' }
     },
     getRole(roles) {
       return (roles ? roles.split(',') : []).sort((a, b) => this.roleNames.indexOf(a) - this.roleNames.indexOf(a))[0]
@@ -612,7 +610,7 @@ export default {
       document.execCommand('copy')
       document.body.removeChild(el)
 
-      this.$tele.emit(`user-mgmt:copy-url`)
+      this.$tele.emit('user-mgmt:copy-url')
     },
     async resendInvite(id) {
       try {
@@ -632,8 +630,7 @@ export default {
         this.$toast.error(e.response.data.msg).goAway(3000)
       }
 
-      this.$tele.emit(`user-mgmt:resend-invite`)
-
+      this.$tele.emit('user-mgmt:resend-invite')
     },
     async loadUsers() {
       try {
@@ -656,7 +653,7 @@ export default {
             offset: (page - 1) * itemsPerPage,
             query: this.query
           }
-        })).data
+        }))
 
         this.count = userData.users.pageInfo.totalRows
         this.users = userData.users.list
@@ -704,8 +701,7 @@ export default {
       await this.deleteUser(this.deleteId, this.deleteUserType)
       this.showConfirmDlg = false
 
-      this.$tele.emit(`user-mgmt:delete:submit`)
-
+      this.$tele.emit('user-mgmt:delete:submit')
     },
     addUser() {
       this.invite_token = null
@@ -742,7 +738,6 @@ export default {
       try {
         let data
         if (this.selectedUser.id) {
-
           await this.$api.auth.projectUserUpdate(this.$route.params.project_id, this.selectedUser.id, {
             roles: this.selectedUser.roles,
             email: this.selectedUser.email,
@@ -758,8 +753,8 @@ export default {
         }
         this.$toast.success('Successfully updated the user details').goAway(3000)
         await this.loadUsers()
-        if (data && data.data && data.data.invite_token) {
-          this.invite_token = data.data
+        if (data && data.invite_token) {
+          this.invite_token = data
           this.simpleAnim()
           return
         }

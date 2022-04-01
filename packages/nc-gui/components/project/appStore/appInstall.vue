@@ -185,7 +185,7 @@ export default {
           id: this.pluginId,
           category: this.plugin.category,
           title: this.plugin.title
-        })).data
+        }))
         if (res) {
           this.$toast.success('Successfully tested plugin settings').goAway(3000)
         } else {

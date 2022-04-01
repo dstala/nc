@@ -502,7 +502,7 @@ export default {
           return this.meta.columns.filter(c => c.pk).map(c => r[c.title]).join('___')
         }),
         fk_model_id: this.meta.id
-      })).data
+      }))
     },
 
     async onKeyDown(e) {

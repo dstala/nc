@@ -416,7 +416,7 @@ export default {
         row_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c.title]).join('___'),
         fk_model_id: this.meta.id,
         comments_only: this.commentsOnly
-      })).data
+      }))
 
       this.logs = data.reverse()
       this.loadingLogs = false

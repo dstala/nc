@@ -472,7 +472,7 @@ export default {
         this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
           ...filter,
           fk_parent_id: this.parentId
-        })).data)
+        })))
 
         this.$emit('updated')
       }

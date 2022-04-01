@@ -675,7 +675,7 @@ export default {
           fk_column_id,
           order,
           show
-        })).data.id
+        })).id
       }
       this.$emit('update:fieldsOrder', this.fields.map(c => c.title))
     },

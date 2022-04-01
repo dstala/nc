@@ -1163,7 +1163,7 @@ export default {
           const newData = (await this.$api.data.update(this.meta.id, id, {
             [column.title]: rowObj[column.title],
             _cellSaved: saved
-          })).data// { [column.title]: oldRow[column.title] })
+          }))// { [column.title]: oldRow[column.title] })
 
           // audit
           this.$api.meta.auditRowUpdate({

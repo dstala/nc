@@ -178,7 +178,7 @@ export default {
                 offset: this.size * (this.page - 1),
                 where: this.query && `(${this.primaryCol},like,${this.query})`
               }
-            })).data
+            }))
         } else {
           // let where = this.queryParams.where || ''
           // if (this.query) {

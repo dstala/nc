@@ -111,7 +111,7 @@ export default {
         }
       } = (await this.$api.meta.projectAuditList({
         projectId: this.$store.state.project.projectId
-      })).data
+      }))
 
       this.audits = list
       this.count = pageInfo.totalRows

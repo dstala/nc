@@ -155,7 +155,7 @@ export default {
 
           const result = (await this.$api.meta.projectCreate({
             title: this.name
-          })).data
+          }))
 
           await this.$store.dispatch('project/ActLoadProjectInfo')
 

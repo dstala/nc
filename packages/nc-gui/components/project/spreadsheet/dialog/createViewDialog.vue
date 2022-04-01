@@ -125,19 +125,19 @@ export default {
             data = (await this.$api.meta.gridCreate(this.meta.id, {
               title: this.view_name,
               copy_from_id: this.selectedViewId
-            })).data
+            }))
             break
           case ViewTypes.GALLERY:
             data = (await this.$api.meta.galleryCreate(this.meta.id, {
               title: this.view_name,
               copy_from_id: this.selectedViewId
-            })).data
+            }))
             break
           case ViewTypes.FORM:
             data = (await this.$api.meta.formCreate(this.meta.id, {
               title: this.view_name,
               copy_from_id: this.selectedViewId
-            })).data
+            }))
             break
         }
 

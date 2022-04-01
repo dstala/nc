@@ -166,7 +166,7 @@ export default {
       const result = (await this.$api.meta.tableList({
         projectId: this.$store.state.project.projectId,
         baseId: this.$store.state.project.project.bases[0].id
-      })).data
+      }))
 
       //   await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   env: this.nodes.env,
@@ -230,7 +230,7 @@ export default {
 
         const col = await this.$api.meta.columnCreate(this.meta.id, rollupCol)
 
-        console.log(col.data)
+        console.log(col)
 
         return this.$emit('saved', this.alias)
       } catch (e) {

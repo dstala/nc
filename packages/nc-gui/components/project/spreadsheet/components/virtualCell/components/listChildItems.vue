@@ -224,7 +224,7 @@ export default {
               offset: this.size * (this.page - 1)
               // ...this.queryParams
             }
-          })).data
+          }))
       } else {
         this.data = (await this.$api.data.list(
           this.meta.id, {
@@ -233,7 +233,7 @@ export default {
               offset: this.size * (this.page - 1),
               ...this.queryParams
             }
-          })).data
+          }))
       }
     }
   }

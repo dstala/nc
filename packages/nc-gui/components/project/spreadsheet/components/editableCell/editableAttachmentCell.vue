@@ -355,8 +355,8 @@ export default {
             json: '{}'
           })
 
-          console.log(data.data)
-          this.localState.push(...data.data)
+          console.log(data)
+          this.localState.push(...data)
         } catch (e) {
           this.$toast.error((e.message) || 'Some internal error occurred').goAway(3000)
           this.uploading = false
