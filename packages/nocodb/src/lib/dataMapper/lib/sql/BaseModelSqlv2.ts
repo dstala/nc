@@ -1554,9 +1554,8 @@ class BaseModelSqlv2 {
       const updateData = await this.model.mapAliasToColumn(data);
       await this.validate(updateData);
       const pkValues = await this._extractPksValues(updateData);
-      const wherePk = await this._wherePk(pkValues);
       let res = null;
-      if (wherePk) {
+      if (pkValues) {
         // pk is specified - by pass
       } else {
         await this.model.getColumns();
