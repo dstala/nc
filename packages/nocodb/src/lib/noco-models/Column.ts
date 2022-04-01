@@ -805,7 +805,7 @@ export default class Column<T = any> implements ColumnType {
 
   static async updateAlias(
     colId: string,
-    { _cn }: { _cn: string },
+    { title }: { title: string },
     ncMeta = Noco.ncMeta
   ) {
     // get existing cache
@@ -813,7 +813,7 @@ export default class Column<T = any> implements ColumnType {
     const o = await NocoCache.get(key, CacheGetType.TYPE_OBJECT);
     if (o) {
       // update data
-      o._cn = _cn;
+      o.title = title;
       // set cache
       await NocoCache.set(key, o);
     }
@@ -823,7 +823,7 @@ export default class Column<T = any> implements ColumnType {
       null, //column.db_alias,
       MetaTable.COLUMNS,
       {
-        _cn
+        title
       },
       colId
     );
@@ -842,7 +842,11 @@ export default class Column<T = any> implements ColumnType {
   }
 
   static async checkTitleAvailable(
-    { cn, fk_model_id, exclude_id }: { cn; fk_model_id; exclude_id? },
+    {
+      column_name,
+      fk_model_id,
+      exclude_id
+    }: { column_name; fk_model_id; exclude_id? },
     ncMeta = Noco.ncMeta
   ) {
     return !(await ncMeta.metaGet2(
@@ -850,7 +854,7 @@ export default class Column<T = any> implements ColumnType {
       null,
       MetaTable.COLUMNS,
       {
-        cn,
+        column_name,
         fk_model_id
       },
       null,
@@ -859,7 +863,7 @@ export default class Column<T = any> implements ColumnType {
   }
 
   static async checkAliasAvailable(
-    { _cn, fk_model_id, exclude_id }: { _cn; fk_model_id; exclude_id? },
+    { title, fk_model_id, exclude_id }: { title; fk_model_id; exclude_id? },
     ncMeta = Noco.ncMeta
   ) {
     return !(await ncMeta.metaGet2(
@@ -867,7 +871,7 @@ export default class Column<T = any> implements ColumnType {
       null,
       MetaTable.COLUMNS,
       {
-        _cn,
+        title,
         fk_model_id
       },
       null,

@@ -49,12 +49,12 @@ async function createHmAndBtColumn(
 ) {
   // save bt column
   {
-    const _cn = getUniqueColumnAliasName(
+    const title = getUniqueColumnAliasName(
       await child.getColumns(),
       type === 'bt' ? alias : `${parent.title}Read`
     );
     await Column.insert<LinkToAnotherRecordColumn>({
-      _cn,
+      title,
 
       fk_model_id: child.id,
       // ref_db_alias
@@ -70,12 +70,12 @@ async function createHmAndBtColumn(
   }
   // save hm column
   {
-    const _cn = getUniqueColumnAliasName(
+    const title = getUniqueColumnAliasName(
       await parent.getColumns(),
       type === 'hm' ? alias : `${child.title}List`
     );
     await Column.insert({
-      _cn,
+      title,
       fk_model_id: parent.id,
       uidt: UITypes.LinkToAnotherRecord,
       type: 'hm',
@@ -97,7 +97,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
   if (
     !isVirtualCol(req.body) &&
     !(await Column.checkTitleAvailable({
-      cn: req.body.column_name,
+      column_name: req.body.column_name,
       fk_model_id: req.params.tableId
     }))
   ) {
@@ -105,7 +105,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
   }
   if (
     !(await Column.checkAliasAvailable({
-      _cn: req.body._cn || req.body.column_name,
+      title: req.body.title || req.body.column_name,
       fk_model_id: req.params.tableId
     }))
   ) {
@@ -118,7 +118,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
       {
         validateParams(
           [
-            '_cn',
+            'title',
             'fk_relation_column_id',
             'fk_rollup_column_id',
             'rollup_function'
@@ -168,7 +168,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
     case UITypes.Lookup:
       {
         validateParams(
-          ['_cn', 'fk_relation_column_id', 'fk_lookup_column_id'],
+          ['title', 'fk_relation_column_id', 'fk_lookup_column_id'],
           req.body
         );
 
@@ -236,7 +236,9 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             // create foreign key
             const newColumn = {
               cn: fkColName,
-              _cn: fkColName,
+
+              title: fkColName,
+              column_name: fkColName,
               rqd: false,
               pk: false,
               ai: false,
@@ -249,8 +251,17 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             };
             const tableUpdateBody = {
               ...child,
-              originalColumns: child.columns,
-              columns: [...child.columns, newColumn]
+              originalColumns: child.columns.map(c => ({
+                ...c,
+                cn: c.column_name
+              })),
+              columns: [
+                ...child.columns.map(c => ({
+                  ...c,
+                  cn: c.column_name
+                })),
+                newColumn
+              ]
             };
 
             await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
@@ -279,7 +290,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             parent,
             childColumn,
             req.body.type,
-            req.body._cn
+            req.body.title
           );
         } else if (req.body.type === 'mm') {
           const aTn = `${project?.prefix ?? ''}_nc_m2m_${randomID()}`;
@@ -296,7 +307,8 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           associateTableCols.push(
             {
               cn: childCn,
-              _cn: childCn,
+              column_name: childCn,
+              title: childCn,
               rqd: true,
               pk: true,
               ai: false,
@@ -310,7 +322,8 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             },
             {
               cn: parentCn,
-              _cn: parentCn,
+              column_name: parentCn,
+              title: parentCn,
               rqd: true,
               pk: true,
               ai: false,
@@ -383,7 +396,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
           );
 
           await Column.insert({
-            _cn: getUniqueColumnAliasName(
+            title: getUniqueColumnAliasName(
               await child.getColumns(),
               `${child.title}MMList`
             ),
@@ -403,9 +416,9 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
             fk_related_model_id: parent.id
           });
           await Column.insert({
-            _cn: getUniqueColumnAliasName(
+            title: getUniqueColumnAliasName(
               await parent.getColumns(),
-              req.body._cn ?? `${parent.title}MMList`
+              req.body.title ?? `${parent.title}MMList`
             ),
 
             uidt: UITypes.LinkToAnotherRecord,
@@ -442,11 +455,16 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
         colBody = getColumnPropsFromUIDT(colBody, base);
         const tableUpdateBody = {
           ...table,
-          originalColumns: table.columns,
+          tn: table.table_name,
+          originalColumns: table.columns.map(c => ({
+            ...c,
+            cn: c.column_name
+          })),
           columns: [
-            ...table.columns,
+            ...table.columns.map(c => ({ ...c, cn: c.column_name })),
             {
               ...colBody,
+              cn: colBody.column_name,
               altered: Altered.NEW_COLUMN
             }
           ]
@@ -469,7 +487,7 @@ export async function columnAdd(req: Request, res: Response<TableType>) {
     op_type: AuditOperationTypes.TABLE_COLUMN,
     op_sub_type: AuditOperationSubTypes.CREATED,
     user: (req as any)?.user?.email,
-    description: `created column ${colBody.column_name} with alias ${colBody._cn} from table ${table.table_name}`,
+    description: `created column ${colBody.column_name} with alias ${colBody.title} from table ${table.table_name}`,
     ip: (req as any).clientIp
   }).then(() => {});
 
@@ -493,7 +511,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   if (
     !isVirtualCol(req.body) &&
     !(await Column.checkTitleAvailable({
-      cn: req.body.column_name,
+      column_name: req.body.column_name,
       fk_model_id: req.params.tableId,
       exclude_id: req.params.columnId
     }))
@@ -502,7 +520,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
   }
   if (
     !(await Column.checkAliasAvailable({
-      _cn: req.body._cn,
+      title: req.body.title,
       fk_model_id: req.params.tableId,
       exclude_id: req.params.columnId
     }))
@@ -528,13 +546,13 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
           table.columns
         );
         await Column.update(column.id, {
-          // _cn: colBody._cn,
+          // title: colBody.title,
           ...column,
           ...colBody
         });
-      } else if (colBody._cn !== column.title) {
+      } else if (colBody.title !== column.title) {
         await Column.updateAlias(req.params.columnId, {
-          _cn: colBody._cn
+          title: colBody.title
         });
       }
     } else {
@@ -558,6 +576,7 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
     colBody = getColumnPropsFromUIDT(colBody, base);
     const tableUpdateBody = {
       ...table,
+      tn: table.table_name,
       originalColumns: table.columns.map(c => ({ ...c, cno: c.column_name })),
       columns: table.columns.map(c => {
         if (c.id === req.params.columnId) {
@@ -717,6 +736,7 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
     default: {
       const tableUpdateBody = {
         ...table,
+        tn: table.table_name,
         originalColumns: table.columns.map(c => ({ ...c, cno: c.column_name })),
         columns: table.columns.map(c => {
           if (c.id === req.params.columnId) {
