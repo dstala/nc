@@ -60,7 +60,7 @@
                     dense
                     hide-details="auto"
                     :items="meta.columns"
-                    item-text="_cn"
+                    item-text="title"
                     :item-value="v => v && v.title"
                     :rules="[
                       v => validateField(v,r)

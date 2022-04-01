@@ -31,8 +31,8 @@
           label="Reference Column"
           :full-width="false"
           :items="refColumns"
-          item-text="_cn"
-          item-value="cn"
+          item-text="title"
+          item-value="column_name"
           required
           dense
           @change="onColumnSelect"
@@ -174,7 +174,7 @@ export default {
         dbAlias: this.nodes.dbAlias
       }, 'tableList'])
 
-      this.refTables = result.data.list.map(({ table_name, title }) => ({ tn, title }))
+      this.refTables = result.data.list.map(({ table_name, title }) => ({ table_name, title }))
       this.isRefTablesLoading = false
     },
     async saveRelation() {

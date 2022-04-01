@@ -43,7 +43,7 @@
                   label="Select Reference Column"
                   :full-width="false"
                   :items="refColumns"
-                  item-text="cn"
+                  item-text="column_name"
                   required
                   dense
                 />

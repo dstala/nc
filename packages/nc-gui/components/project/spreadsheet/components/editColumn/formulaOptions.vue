@@ -128,32 +128,8 @@ export default {
   methods: {
     async save() {
       try {
-        // await this.$store.dispatch('meta/ActLoadMeta', {
-        //   dbAlias: this.nodes.dbAlias,
-        //   env: this.nodes.env,
-        //   tn: this.meta.table_name,
-        //   force: true
-        // })
-        // const meta = JSON.parse(JSON.stringify(this.$store.state.meta.metas[this.meta.table_name]))
-        //
-        // meta.v.push({
-        //   _cn: this.alias,
-        //   formula: {
-        //     ...this.formula,
-        //     tree: jsep(this.formula.value)
-        //   }
-        // })
-        //
-        // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-        //   env: this.nodes.env,
-        //   dbAlias: this.nodes.dbAlias
-        // }, 'xcModelSet', {
-        //   tn: this.nodes.table_name,
-        //   meta
-        // }])
-
         const formulaCol = {
-          _cn: this.alias,
+          title: this.alias,
           uidt: UITypes.Formula,
           formula_raw: this.formula.value
         }

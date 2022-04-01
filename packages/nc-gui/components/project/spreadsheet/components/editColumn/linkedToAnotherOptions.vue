@@ -239,7 +239,7 @@ export default {
       // }
     },
     async saveRelation() {
-      const col = await this.$api.meta.columnCreate(this.meta.id, {
+      await this.$api.meta.columnCreate(this.meta.id, {
         ...this.relation,
         parentId: this.meta.id,
         uidt: UITypes.LinkToAnotherRecord,
@@ -248,69 +248,6 @@ export default {
       })
 
       await this.$store.dispatch('meta/ActLoadMeta', { id: this.relation.childId, force: true })
-
-      // if (this.type === 'mm') {
-      //   await this.saveManyToMany()
-      //   return
-      // }
-      // // try {
-      // const parentPK = this.meta.columns.find(c => c.pk)
-      //
-      // const childTableData = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
-      //   env: this.nodes.env,
-      //   dbAlias: this.nodes.dbAlias
-      // }, 'tableXcModelGet', {
-      //   table_name: this.relation.childTable
-      // }])
-      //
-      // const childMeta = JSON.parse(childTableData.meta)
-      //
-      // const newChildColumn = {}
-      //
-      // Object.assign(newChildColumn, {
-      //   cn: this.relation.childColumn,
-      //   _cn: this.relation.childColumn,
-      //   rqd: false,
-      //   pk: false,
-      //   ai: false,
-      //   cdf: null,
-      //   dt: parentPK.dt,
-      //   dtxp: parentPK.dtxp,
-      //   dtxs: parentPK.dtxs,
-      //   un: parentPK.un,
-      //   altered: 1
-      // })
-      //
-      // const columns = [...childMeta.columns, newChildColumn]
-      //
-      // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [{
-      //   env: this.nodes.env,
-      //   dbAlias: this.nodes.dbAlias
-      // }, 'tableUpdate', {
-      //   table_name: childMeta.table_name,
-      //   title: childMeta.title,
-      //   originalColumns: childMeta.columns,
-      //   columns
-      // }])
-      //
-      // await this.$store.dispatch('sqlMgr/ActSqlOpPlus', [
-      //   {
-      //     env: this.nodes.env,
-      //     dbAlias: this.nodes.dbAlias
-      //   },
-      //   this.relation.type === 'real' && !this.isSQLite ? 'relationCreate' : 'xcVirtualRelationCreate',
-      //   {
-      //     ...this.relation,
-      //     parentTable: this.meta.table_name,
-      //     parentColumn: parentPK.column_name,
-      //     updateRelation: !!this.column.rtn,
-      //     type: 'real',
-      //     alias: this.alias
-      //   }
-      // ])
-      // // } catch (e) {
-      // //   throw e
-      // // }
     },
     onColumnSelect() {
       const col = this.refColumns.find(c => this.relation.parentColumn === c.column_name)

@@ -141,7 +141,7 @@
               :disabled="filter.readOnly"
               hide-details
               item-value="id"
-              item-text="_cn"
+              item-text="title"
               @click.stop
               @change="saveOrUpdate(filter, i)"
             >

@@ -347,8 +347,8 @@
                                       hide-details="auto"
                                       :rules="[v => !!v || 'Related column name required']"
                                       :items="(project.tables.find(t => t.table_name === (col.rtn && col.rtn.table_name || col.rtn)) || {columns:[]}).columns.filter(v=> !isVirtual(v))"
-                                      item-text="cn"
-                                      item-value="cn"
+                                      item-text="column_name"
+                                      item-value="column_name"
                                     />
                                   </td>
                                   <td v-if="isRollup(col)" class="pa-1">

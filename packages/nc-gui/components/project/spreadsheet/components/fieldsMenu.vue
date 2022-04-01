@@ -64,7 +64,7 @@
             outlined
             :items="singleSelectFields"
             item-text="alias"
-            item-value="_cn"
+            item-value="title"
             hide-details
             @click.stop
           >

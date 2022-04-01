@@ -35,7 +35,7 @@
             :label="$t('labels.childColumn')"
             :full-width="false"
             :items="columnList"
-            item-text="_cn"
+            item-text="title"
             dense
             :loading="loadingColumns"
             :item-value="v => v"
@@ -194,15 +194,14 @@ export default {
         console.log(this.lookup)
 
         const lookupCol = {
-          _cn: this.alias,
+          title: this.alias,
           fk_relation_column_id: this.lookup.table.col.fk_column_id,
           fk_lookup_column_id: this.lookup.column.id,
           uidt: UITypes.Lookup
         }
 
-        const col = await this.$api.meta.columnCreate(this.meta.id, lookupCol)
+        await this.$api.meta.columnCreate(this.meta.id, lookupCol)
 
-        console.log(col.data)
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,
         //   dbAlias: this.nodes.dbAlias

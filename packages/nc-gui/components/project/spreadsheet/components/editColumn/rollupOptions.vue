@@ -35,7 +35,7 @@
             :label="$t('labels.childColumn')"
             :full-width="false"
             :items="columnList"
-            item-text="_cn"
+            item-text="title"
             dense
             :loading="loadingColumns"
             :item-value="v => v"

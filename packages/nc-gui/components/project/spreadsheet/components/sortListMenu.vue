@@ -41,7 +41,7 @@
             class="caption nc-sort-field-select"
             :items="columns"
             item-value="id"
-            item-text="_cn"
+            item-text="title"
             :label="$t('objects.field')"
             solo
             flat
