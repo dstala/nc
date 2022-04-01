@@ -544,8 +544,10 @@ export default {
       this.loadingData = true
       try {
         const {
-          list,
-          pageInfo: { totalRows: count }
+          data: {
+            list,
+            pageInfo: { totalRows: count }
+          }
         } = (await this.$api.public.dataList({
           ...this.queryParams,
           uuid: this.$route.params.id
