@@ -211,7 +211,7 @@ export default {
       const result = (await this.$api.meta.tableList({
         projectId: this.$store.state.project.projectId,
         baseId: this.$store.state.project.project.bases[0].id
-      })).data.list
+      })).list
 
       this.refTables = result // .data.list.map(({ table_name, title }) => ({ table_name, title }))
       this.isRefTablesLoading = false
