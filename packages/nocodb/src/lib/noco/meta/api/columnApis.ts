@@ -577,15 +577,22 @@ export async function columnUpdate(req: Request, res: Response<TableType>) {
     const tableUpdateBody = {
       ...table,
       tn: table.table_name,
-      originalColumns: table.columns.map(c => ({ ...c, cno: c.column_name })),
+      originalColumns: table.columns.map(c => ({
+        ...c,
+        cn: c.column_name,
+        cno: c.column_name
+      })),
       columns: table.columns.map(c => {
         if (c.id === req.params.columnId) {
           return {
             ...c,
             ...colBody,
+            cn: colBody.column_name,
             cno: c.column_name,
             altered: Altered.UPDATE_COLUMN
           };
+        } else {
+          (c as any).cn = c.column_name;
         }
         return c;
       })

@@ -758,8 +758,8 @@ export default class Column<T = any> implements ColumnType {
       }
     }
     const updateObj = {
-      cn: column.cn,
-      _cn: column._cn,
+      column_name: column.column_name,
+      title: column.title,
       uidt: column.uidt,
       dt: column.dt,
       np: column.np,
