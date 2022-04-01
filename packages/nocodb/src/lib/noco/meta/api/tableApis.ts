@@ -219,14 +219,19 @@ export async function tableDelete(req: Request, res: Response, next) {
     const project = await Project.getWithInfo(table.project_id);
     const base = project.bases.find(b => b.id === table.base_id);
     const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
+    (table as any).tn = table.table_name;
+    table.columns.forEach(c => {
+      (c as any).cn = c.column_name;
+    });
 
-    if (table.type === ModelTypes.TABLE)
+    if (table.type === ModelTypes.TABLE) {
       await sqlMgr.sqlOpPlus(base, 'tableDelete', table);
-    else if (table.type === ModelTypes.VIEW)
+    } else if (table.type === ModelTypes.VIEW) {
       await sqlMgr.sqlOpPlus(base, 'viewDelete', {
         ...table,
         view_name: table.table_name
       });
+    }
 
     Audit.insert({
       project_id: project.id,
