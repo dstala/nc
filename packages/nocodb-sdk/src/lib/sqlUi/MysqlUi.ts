@@ -46,8 +46,8 @@ export class MysqlUi {
   static getNewTableColumns(): readonly any[] {
     return [
       {
-        cn: 'id',
-        _cn: 'Id',
+       column_name: 'id',
+       title: 'Id',
         dt: 'int',
         dtx: 'integer',
         ct: 'int(11)',
@@ -69,8 +69,8 @@ export class MysqlUi {
         uicn: ''
       },
       {
-        cn: 'title',
-        _cn: 'Title',
+       column_name: 'title',
+       title: 'Title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -92,8 +92,8 @@ export class MysqlUi {
         uicn: ''
       },
       {
-        cn: 'created_at',
-        _cn: 'CreatedAt',
+       column_name: 'created_at',
+       title: 'CreatedAt',
         dt: 'timestamp',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -115,8 +115,8 @@ export class MysqlUi {
         uicn: ''
       },
       {
-        cn: 'updated_at',
-        _cn: 'UpdatedAt',
+       column_name: 'updated_at',
+       title: 'UpdatedAt',
         dt: 'timestamp',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -142,7 +142,7 @@ export class MysqlUi {
 
   static getNewColumn(suffix) {
     return {
-      cn: 'title' + suffix,
+     column_name: 'title' + suffix,
       dt: 'int',
       dtx: 'specificType',
       ct: 'integer(11)',
@@ -732,7 +732,7 @@ export class MysqlUi {
           const column = {
             dp: null,
             tn,
-            cn: keys[i],
+           column_name: keys[i],
             cno: keys[i],
             np: 10,
             ns: 0,

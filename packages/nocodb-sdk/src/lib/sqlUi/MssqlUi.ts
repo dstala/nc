@@ -42,8 +42,8 @@ export class MssqlUi {
   static getNewTableColumns() {
     return [
       {
-        cn: 'id',
-        _cn: 'Id',
+       column_name: 'id',
+       title: 'Id',
         dt: 'int',
         dtx: 'integer',
         ct: 'int(11)',
@@ -65,8 +65,8 @@ export class MssqlUi {
         uicn: ''
       },
       {
-        cn: 'title',
-        _cn: 'Title',
+       column_name: 'title',
+       title: 'Title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -88,8 +88,8 @@ export class MssqlUi {
         uicn: ''
       },
       {
-        cn: 'created_at',
-        _cn: 'CreatedAt',
+       column_name: 'created_at',
+       title: 'CreatedAt',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -111,8 +111,8 @@ export class MssqlUi {
         uicn: ''
       },
       {
-        cn: 'updated_at',
-        _cn: 'UpdatedAt',
+       column_name: 'updated_at',
+       title: 'UpdatedAt',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -138,7 +138,7 @@ export class MssqlUi {
 
   static getNewColumn(suffix) {
     return {
-      cn: 'title' + suffix,
+     column_name: 'title' + suffix,
       dt: 'int',
       dtx: 'specificType',
       ct: 'integer(11)',
@@ -806,7 +806,7 @@ export class MssqlUi {
           const column = {
             dp: null,
             tn,
-            cn: keys[i],
+           column_name: keys[i],
             cno: keys[i],
             np: 10,
             ns: 0,

@@ -150,10 +150,14 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
   }
 
   const sqlMgr = await ProjectMgrv2.getSqlMgr(project);
-  req.body.columns = req.body.columns?.map(c =>
-    getColumnPropsFromUIDT(c as any, base)
-  );
-  await sqlMgr.sqlOpPlus(base, 'tableCreate', req.body);
+  req.body.columns = req.body.columns?.map(c => ({
+    ...getColumnPropsFromUIDT(c as any, base),
+    cn: c.column_name
+  }));
+  await sqlMgr.sqlOpPlus(base, 'tableCreate', {
+    ...req.body,
+    tn: req.body.table_name
+  });
 
   const tables = await Model.list({
     project_id: project.id,

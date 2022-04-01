@@ -17,8 +17,8 @@ const getSystemColumns = (columns) =>
 
 const isSystemColumn = (col) =>
   col.uidt === UITypes.ForeignKey ||
-  col.cn === 'created_at' ||
-  col.cn === 'updated_at' ||
+  col.column_name === 'created_at' ||
+  col.column_name === 'updated_at' ||
   (col.pk && (col.ai || col.cdf)
     || col.system
   )

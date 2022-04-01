@@ -37,7 +37,7 @@ dbConfig.meta = {
   },
   inflection: {
     tn: 'camelize',
-    cn: 'camelize'
+    column_name: 'camelize'
   }
 } as any;
 

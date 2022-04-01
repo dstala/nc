@@ -121,7 +121,7 @@
 //           _tn: 'Abc',
 //           columns: [
 //             {
-//               cn: 'id',
+//              column_name:'id',
 //               _cn: 'Id',
 //               dt: 'int',
 //               dtx: 'integer',
@@ -144,7 +144,7 @@
 //               uicn: ''
 //             },
 //             {
-//               cn: 'title',
+//              column_name:'title',
 //               _cn: 'Title',
 //               dt: 'varchar',
 //               dtx: 'specificType',
@@ -238,7 +238,7 @@
 //         _tn: 'Abc',
 //         columns: [
 //           {
-//             cn: 'id',
+//            column_name:'id',
 //             _cn: 'Id',
 //             dt: 'int',
 //             dtx: 'integer',
@@ -264,7 +264,7 @@
 //       });
 //
 //       const { data: tableMeta }: any = await api.meta.columnCreate(table.id, {
-//         cn: 'title1',
+//        column_name:'title1',
 //         _cn: 'Title1',
 //         dt: 'varchar',
 //         dtxp: '45',
@@ -299,7 +299,7 @@
 //         table.id,
 //         tableMeta.columns.find(c => c.cn === 'title1')?.id,
 //         {
-//           cn: 'title1',
+//          column_name:'title1',
 //           _cn: 'Title1',
 //           dt: 'text',
 //           dtxp: '',
@@ -344,7 +344,7 @@
 //       _tn: 'Abc',
 //       columns: [
 //         {
-//           cn: 'id',
+//          column_name:'id',
 //           _cn: 'Id',
 //           dt: 'int',
 //           dtx: 'integer',
@@ -373,7 +373,7 @@
 //       _tn: 'Def',
 //       columns: [
 //         {
-//           cn: 'id',
+//          column_name:'id',
 //           _cn: 'Id',
 //           dt: 'int',
 //           dtx: 'integer',
@@ -433,7 +433,7 @@
 //       _tn: 'Abc',
 //       columns: [
 //         {
-//           cn: 'id',
+//          column_name:'id',
 //           _cn: 'Id',
 //           dt: 'int',
 //           dtx: 'integer',
@@ -462,7 +462,7 @@
 //       _tn: 'Def',
 //       columns: [
 //         {
-//           cn: 'id',
+//          column_name:'id',
 //           _cn: 'Id',
 //           dt: 'int',
 //           dtx: 'integer',

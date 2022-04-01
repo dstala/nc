@@ -1,6 +1,5 @@
 import Noco from '../../lib/noco/Noco';
 import Column from './Column';
-import NcModel from '../../types/NcModel';
 import NocoCache from '../noco-cache/NocoCache';
 import { XKnex } from '../dataMapper';
 import { BaseModelSqlv2 } from '../dataMapper/lib/sql/BaseModelSqlv2';
@@ -60,7 +59,7 @@ export default class Model implements TableType {
   //   };
   // } = {};
 
-  constructor(data: NcModel) {
+  constructor(data: Partial<TableType | Model>) {
     Object.assign(this, data);
   }
 

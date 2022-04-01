@@ -607,7 +607,7 @@ export default {
         } else {
           const col = await this.$api.meta.columnCreate(this.meta.id, this.newColumn)
           // const col = await this.$api.meta.columnCreate(this.meta.id, {
-          //   cn: this
+          //  column_name:this
           //     .newColumn.column_name,
           //   _cn: this.newColumn.column_name,
           //   uidt: this.newColumn.uidt

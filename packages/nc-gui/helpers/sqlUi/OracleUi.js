@@ -2,7 +2,7 @@ export class OracleUi {
   static getNewTableColumns() {
     return [
       {
-        cn: 'id',
+        column_name: 'id',
         dt: 'integer',
         dtx: 'integer',
         ct: 'int(11)',
@@ -24,7 +24,7 @@ export class OracleUi {
         uicn: ''
       },
       {
-        cn: 'title',
+        column_name: 'title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -46,7 +46,7 @@ export class OracleUi {
         uicn: ''
       }
       // {
-      //   cn: "created_at",
+      //  column_name:"created_at",
       //   dt: "timestamp",
       //   dtx: "specificType",
       //   ct: "varchar(45)",
@@ -64,7 +64,7 @@ export class OracleUi {
       //   dtxs: ''
       // },
       // {
-      //   cn: "updated_at",
+      //  column_name:"updated_at",
       //   dt: "timestamp",
       //   dtx: "specificType",
       //   ct: "varchar(45)",
@@ -86,7 +86,7 @@ export class OracleUi {
 
   static getNewColumn(suffix) {
     return {
-      cn: 'title' + suffix,
+      column_name: 'title' + suffix,
       dt: 'integer',
       dtx: 'specificType',
       ct: 'integer(11)',
@@ -489,7 +489,7 @@ export class OracleUi {
                 columns.push({
                   dp: null,
                   tn,
-                  cn: keys[i],
+                  column_name: keys[i],
                   cno: keys[i],
                   dt: 'int',
                   np: 10,
@@ -515,7 +515,7 @@ export class OracleUi {
                 columns.push({
                   dp: null,
                   tn,
-                  cn: keys[i],
+                  column_name: keys[i],
                   cno: keys[i],
                   dt: 'float',
                   np: 10,
@@ -547,7 +547,7 @@ export class OracleUi {
                 columns.push({
                   dp: null,
                   tn,
-                  cn: keys[i],
+                  column_name: keys[i],
                   cno: keys[i],
                   dt: 'varchar',
                   np: 45,
@@ -573,7 +573,7 @@ export class OracleUi {
                 columns.push({
                   dp: null,
                   tn,
-                  cn: keys[i],
+                  column_name: keys[i],
                   cno: keys[i],
                   dt: 'text',
                   np: null,
@@ -603,7 +603,7 @@ export class OracleUi {
               columns.push({
                 dp: null,
                 tn,
-                cn: keys[i],
+                column_name: keys[i],
                 cno: keys[i],
                 dt: 'boolean',
                 np: 3,
@@ -631,7 +631,7 @@ export class OracleUi {
               columns.push({
                 dp: null,
                 tn,
-                cn: keys[i],
+                column_name: keys[i],
                 cno: keys[i],
                 dt: 'json',
                 np: 3,

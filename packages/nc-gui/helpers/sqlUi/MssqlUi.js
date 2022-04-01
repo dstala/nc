@@ -40,7 +40,7 @@ export class MssqlUi {
   static getNewTableColumns() {
     return [
       {
-        cn: 'id',
+        column_name: 'id',
         dt: 'int',
         dtx: 'integer',
         ct: 'int(11)',
@@ -62,7 +62,7 @@ export class MssqlUi {
         uicn: ''
       },
       {
-        cn: 'title',
+        column_name: 'title',
         dt: 'varchar',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -84,7 +84,7 @@ export class MssqlUi {
         uicn: ''
       },
       {
-        cn: 'created_at',
+        column_name: 'created_at',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar(45)',
@@ -106,7 +106,7 @@ export class MssqlUi {
         uicn: ''
       },
       {
-        cn: 'updated_at',
+        column_name: 'updated_at',
         dt: 'datetime',
         dtx: 'specificType',
         ct: 'varchar(45)',

@@ -992,7 +992,6 @@ import Vue from 'vue'
 
 import { v4 as uuidv4 } from 'uuid'
 
-import inflection from 'inflection'
 import XBtn from './global/xBtn'
 import dlgOk from './utils/dlgOk.vue'
 import textDlgSubmitCancel from './utils/dlgTextSubmitCancel'

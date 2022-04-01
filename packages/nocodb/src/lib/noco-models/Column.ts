@@ -1,4 +1,3 @@
-import NcColumn from '../../types/NcColumn';
 import UITypes from '../sqlUi/UITypes';
 import FormulaColumn from './FormulaColumn';
 import LinkToAnotherRecordColumn from './LinkToAnotherRecordColumn';
@@ -58,7 +57,7 @@ export default class Column<T = any> implements ColumnType {
 
   public validate: any;
 
-  constructor(data: NcColumn) {
+  constructor(data: Partial<ColumnType | Column>) {
     Object.assign(this, data);
   }
 
