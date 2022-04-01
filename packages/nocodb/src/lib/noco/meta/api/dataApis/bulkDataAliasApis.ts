@@ -59,6 +59,18 @@ async function bulkDataDelete(req: Request, res: Response) {
   res.json(await baseModel.bulkDelete(req.body));
 }
 
+async function bulkDataDeleteAll(req: Request, res: Response) {
+  const { model, view } = await getViewAndModelFromRequest(req);
+  const base = await Base.get(model.base_id);
+  const baseModel = await Model.getBaseModelSQL({
+    id: model.id,
+    viewId: view?.id,
+    dbDriver: NcConnectionMgrv2.get(base)
+  });
+
+  res.json(await baseModel.bulkDeleteAll(req.body));
+}
+
 async function getViewAndModelFromRequest(req) {
   const project = await Project.getWithInfoByTitle(req.params.projectName);
   const model = await Model.getByAliasOrId({
@@ -91,8 +103,12 @@ router.patch(
   ncMetaAclMw(bulkDataUpdateAll)
 );
 router.delete(
-  '/bulkData/:orgs/:projectName/:tableAlias',
-  ncMetaAclMw(bulkDataDelete)
+    '/bulkData/:orgs/:projectName/:tableAlias',
+    ncMetaAclMw(bulkDataDelete)
+);
+router.delete(
+    '/bulkData/:orgs/:projectName/:tableAlias/all',
+    ncMetaAclMw(bulkDataDeleteAll)
 );
 
 export default router;
