@@ -1524,11 +1524,11 @@ class BaseModelSqlv2 {
       for (const d of updateDatas) {
         await this.validate(d);
         const pkValues = await this._extractPksValues(d);
-        const wherePk = await this._wherePk(pkValues);
-        if (!wherePk) {
+        if (!pkValues) {
           // pk not specified - bypass
           continue;
         }
+        const wherePk = await this._wherePk(pkValues);
         const response = await transaction(this.model.table_name)
           .update(d)
           .where(wherePk);
@@ -1767,7 +1767,10 @@ class BaseModelSqlv2 {
     // data can be still inserted without PK
     // TODO: return a meaningful value
     if (!this.model.primaryKey) return 'N/A';
-    return data[this.model.primaryKey.title];
+    return (
+      data[this.model.primaryKey.title] ||
+      data[this.model.primaryKey.column_name]
+    );
   }
 
   // @ts-ignore
