@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import { UITypes } from 'nocodb-sdk'
+import { ModelTypes, UITypes } from 'nocodb-sdk'
 
 export default {
   name: 'LinkedToAnotherOptions',
@@ -188,7 +188,7 @@ export default {
       const result = (await this.$api.meta.tableList({
         projectId: this.$store.state.project.projectId,
         baseId: this.$store.state.project.project.bases[0].id
-      })).list
+      })).list.filter(t => t.type === ModelTypes.TABLE)
 
       this.refTables = result // .data.list.map(({ table_name, title }) => ({ table_name, title }))
       this.isRefTablesLoading = false
