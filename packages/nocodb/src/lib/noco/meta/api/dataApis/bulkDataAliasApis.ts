@@ -27,7 +27,7 @@ async function bulkDataUpdate(req: Request, res: Response) {
 
   const baseModel = await Model.getBaseModelSQL({
     id: model.id,
-    viewId: view.id,
+    viewId: view?.id,
     dbDriver: NcConnectionMgrv2.get(base)
   });
 
@@ -103,12 +103,12 @@ router.patch(
   ncMetaAclMw(bulkDataUpdateAll)
 );
 router.delete(
-    '/bulkData/:orgs/:projectName/:tableAlias',
-    ncMetaAclMw(bulkDataDelete)
+  '/bulkData/:orgs/:projectName/:tableAlias',
+  ncMetaAclMw(bulkDataDelete)
 );
 router.delete(
-    '/bulkData/:orgs/:projectName/:tableAlias/all',
-    ncMetaAclMw(bulkDataDeleteAll)
+  '/bulkData/:orgs/:projectName/:tableAlias/all',
+  ncMetaAclMw(bulkDataDeleteAll)
 );
 
 export default router;
