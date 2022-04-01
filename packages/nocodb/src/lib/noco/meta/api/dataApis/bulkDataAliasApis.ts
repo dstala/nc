@@ -94,7 +94,7 @@ router.post(
   '/bulkData/:orgs/:projectName/:tableAlias',
   ncMetaAclMw(bulkDataInsert)
 );
-router.put(
+router.patch(
   '/bulkData/:orgs/:projectName/:tableAlias',
   ncMetaAclMw(bulkDataUpdate)
 );
