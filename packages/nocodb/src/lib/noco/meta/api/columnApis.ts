@@ -857,6 +857,34 @@ const deleteHmOrBtRelation = async ({
   await Column.delete(relationColOpt.fk_column_id, ncMeta);
   await Column.delete(columnInRelatedTable.id, ncMeta);
 
+  const cTable = await Model.getWithInfo({
+    id: childTable.id
+  });
+  const tableUpdateBody = {
+    ...cTable,
+    tn: cTable.table_name,
+    originalColumns: cTable.columns.map(c => ({
+      ...c,
+      cn: c.column_name,
+      cno: c.column_name
+    })),
+    columns: cTable.columns.map(c => {
+      if (c.id === childColumn.id) {
+        return {
+          ...c,
+          cn: c.column_name,
+          cno: c.column_name,
+          altered: Altered.DELETE_COLUMN
+        };
+      } else {
+        (c as any).cn = c.column_name;
+      }
+      return c;
+    })
+  };
+  
+  await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+  
   // delete foreign key column
   await Column.delete(childColumn.id, ncMeta);
 };
