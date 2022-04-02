@@ -5,7 +5,7 @@
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
  * ##                                                           ##
  * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##O
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
 
@@ -813,6 +813,8 @@ export interface FullRequestParams
   format?: ResponseType;
   /** request body */
   body?: unknown;
+  /** return raw response */
+  raw?: boolean;
 }
 
 export type RequestParams = Omit<
@@ -899,6 +901,7 @@ export class HttpClient<SecurityDataType = unknown> {
     query,
     format,
     body,
+    raw,
     ...params
   }: FullRequestParams): Promise<T> => {
     const secureParams =
@@ -936,8 +939,12 @@ export class HttpClient<SecurityDataType = unknown> {
         data: body,
         url: path,
       })
-      .then((response) => response.data);
+      .then((response) => {
+        if(raw) return response;
+        return response.data
+      });
   };
+
 }
 
 /**
@@ -3303,6 +3310,7 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        raw: true,
         ...params,
       }),
 
@@ -3514,6 +3522,7 @@ export class Api<
       this.request<any, any>({
         path: `/data/${tableId}/export/${type}`,
         method: 'GET',
+        raw: true,
         ...params,
       }),
 
