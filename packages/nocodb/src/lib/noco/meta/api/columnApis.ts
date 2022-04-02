@@ -678,27 +678,33 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
               const mmParentCol = await relationColOpt.getMMParentColumn();
               const mmChildCol = await relationColOpt.getMMChildColumn();
 
-              await deleteHmOrBtRelation({
-                relationColOpt: null,
-                parentColumn: parentColumn,
-                childTable: mmTable,
-                sqlMgr,
-                parentTable: parentTable,
-                childColumn: mmParentCol,
-                base
-                // ncMeta
-              });
+              await deleteHmOrBtRelation(
+                {
+                  relationColOpt: null,
+                  parentColumn: parentColumn,
+                  childTable: mmTable,
+                  sqlMgr,
+                  parentTable: parentTable,
+                  childColumn: mmParentCol,
+                  base
+                  // ncMeta
+                },
+                true
+              );
 
-              await deleteHmOrBtRelation({
-                relationColOpt: null,
-                parentColumn: childColumn,
-                childTable: mmTable,
-                sqlMgr,
-                parentTable: childTable,
-                childColumn: mmChildCol,
-                base
-                // ncMeta
-              });
+              await deleteHmOrBtRelation(
+                {
+                  relationColOpt: null,
+                  parentColumn: childColumn,
+                  childTable: mmTable,
+                  sqlMgr,
+                  parentTable: childTable,
+                  childColumn: mmChildCol,
+                  base
+                  // ncMeta
+                },
+                true
+              );
 
               const columnsInRelatedTable: Column[] = await relationColOpt
                 .getRelatedTable()
@@ -802,25 +808,28 @@ export async function columnDelete(req: Request, res: Response<TableType>) {
   // }
 }
 
-const deleteHmOrBtRelation = async ({
-  relationColOpt,
-  base,
-  childColumn,
-  childTable,
-  parentColumn,
-  parentTable,
-  sqlMgr,
-  ncMeta = Noco.ncMeta
-}: {
-  relationColOpt: LinkToAnotherRecordColumn;
-  base: Base;
-  childColumn: Column;
-  childTable: Model;
-  parentColumn: Column;
-  parentTable: Model;
-  sqlMgr: SqlMgrv2;
-  ncMeta?: NcMetaIO;
-}) => {
+const deleteHmOrBtRelation = async (
+  {
+    relationColOpt,
+    base,
+    childColumn,
+    childTable,
+    parentColumn,
+    parentTable,
+    sqlMgr,
+    ncMeta = Noco.ncMeta
+  }: {
+    relationColOpt: LinkToAnotherRecordColumn;
+    base: Base;
+    childColumn: Column;
+    childTable: Model;
+    parentColumn: Column;
+    parentTable: Model;
+    sqlMgr: SqlMgrv2;
+    ncMeta?: NcMetaIO;
+  },
+  ignoreFkDelete = false
+) => {
   // todo: handle relation delete exception
   try {
     await sqlMgr.sqlOpPlus(base, 'relationDelete', {
@@ -857,34 +866,35 @@ const deleteHmOrBtRelation = async ({
   await Column.delete(relationColOpt.fk_column_id, ncMeta);
   await Column.delete(columnInRelatedTable.id, ncMeta);
 
-  const cTable = await Model.getWithInfo({
-    id: childTable.id
-  });
-  const tableUpdateBody = {
-    ...cTable,
-    tn: cTable.table_name,
-    originalColumns: cTable.columns.map(c => ({
-      ...c,
-      cn: c.column_name,
-      cno: c.column_name
-    })),
-    columns: cTable.columns.map(c => {
-      if (c.id === childColumn.id) {
-        return {
-          ...c,
-          cn: c.column_name,
-          cno: c.column_name,
-          altered: Altered.DELETE_COLUMN
-        };
-      } else {
-        (c as any).cn = c.column_name;
-      }
-      return c;
-    })
-  };
-  
-  await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
-  
+  if (!ignoreFkDelete) {
+    const cTable = await Model.getWithInfo({
+      id: childTable.id
+    });
+    const tableUpdateBody = {
+      ...cTable,
+      tn: cTable.table_name,
+      originalColumns: cTable.columns.map(c => ({
+        ...c,
+        cn: c.column_name,
+        cno: c.column_name
+      })),
+      columns: cTable.columns.map(c => {
+        if (c.id === childColumn.id) {
+          return {
+            ...c,
+            cn: c.column_name,
+            cno: c.column_name,
+            altered: Altered.DELETE_COLUMN
+          };
+        } else {
+          (c as any).cn = c.column_name;
+        }
+        return c;
+      })
+    };
+
+    await sqlMgr.sqlOpPlus(base, 'tableUpdate', tableUpdateBody);
+  }
   // delete foreign key column
   await Column.delete(childColumn.id, ncMeta);
 };
