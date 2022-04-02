@@ -5999,7 +5999,7 @@
           "title": {
             "type": "string"
           },
-          "table_nameme": {
+          "table_name": {
             "type": "string"
           },
           "type": {
@@ -6047,7 +6047,7 @@
         },
         "required": [
           "title",
-          "table_nameme"
+          "table_name"
         ]
       },
       "TableReq": {
