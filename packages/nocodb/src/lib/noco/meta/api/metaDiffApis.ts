@@ -550,56 +550,9 @@ export async function metaDiffSync(req, res) {
       switch (change.type) {
         case MetaDiffType.TABLE_NEW:
           {
-            // const tableRelations = relations.filter(
-            //   r => r.tn === table_name || r.rtn === table_name
-            // );
-            const columns = (await sqlClient.columnList({ tn: table_name }))
-              ?.data?.list;
-
-            // const hasMany = tableRelations.filter(r => r.rtn === table_name);
-            // const belongsTo = tableRelations.filter(r => r.tn === table_name);
-
-            // const ctx = {
-            //   dbType: base.type,
-            //   tn,
-            //   _tn: getTableNameAlias(tn, project.prefix, base),
-            //   columns: columns.map(c => ({
-            //     ...c,
-            //     _cn: getColumnNameAlias(c.cn, base)
-            //   })),
-            //   relations,
-            //   hasMany,
-            //   belongsTo,
-            //   project_id: project.id
-            // };
-            //
-            // /* create models from table metadata */
-            // const meta = ModelXcMetaFactory.create(
-            //   { client: base.type },
-            //   {
-            //     dir: '',
-            //     ctx,
-            //     filename: ''
-            //   }
-            // ).getObject();
-
-            // todo: handle duplicate relation
-            // const virtualColumns = [
-            //   ...hasMany.map(hm => {
-            //     return {
-            //       uidt: UITypes.LinkToAnotherRecord,
-            //       type: 'hm',
-            //       hm,
-            //       _cn: `${hm._tn}List`
-            //     };
-            //   }),
-            //   ...belongsTo.map(bt => ({
-            //     uidt: UITypes.LinkToAnotherRecord,
-            //     type: 'bt',
-            //     bt,
-            //     _cn: `${bt._rtn}Read`
-            //   }))
-            // ];
+            const columns = (
+              await sqlClient.columnList({ tn: table_name })
+            )?.data?.list?.map(c => ({ ...c, column_name: c.cn }));
 
             mapDefaultPrimaryValue(columns);
 
@@ -621,36 +574,10 @@ export async function metaDiffSync(req, res) {
           break;
         case MetaDiffType.VIEW_NEW:
           {
-            const columns = (await sqlClient.columnList({ tn: table_name }))
-              ?.data?.list;
-            // const ctx = {
-            //   dbType: base.type,
-            //   tn: table_name,
-            //   _tn: getTableNameAlias(table_name, project.prefix, base),
-            //   columns: columns.map(c => ({
-            //     ...c,
-            //     _cn: getColumnNameAlias(c.cn, base)
-            //   })),
-            //   relations: [],
-            //   hasMany: [],
-            //   belongsTo: [],
-            //   project_id: project.id
-            // };
+            const columns = (
+              await sqlClient.columnList({ tn: table_name })
+            )?.data?.list?.map(c => ({ ...c, column_name: c.cn }));
 
-            /* create models from table metadata */
-            // const meta = ModelXcMetaFactory.create(
-            //   { client: base.type },
-            //   {
-            //     dir: '',
-            //     ctx,
-            //     filename: ''
-            //   }
-            // ).getObject();
-            // await Model.insert(project.id, base.id, {
-            //   ...meta,
-            //   // todo: sanitize
-            //   type: ModelTypes.VIEW
-            // });
             mapDefaultPrimaryValue(columns);
 
             const model = await Model.insert(project.id, base.id, {
@@ -678,12 +605,13 @@ export async function metaDiffSync(req, res) {
         case MetaDiffType.TABLE_COLUMN_ADD:
         case MetaDiffType.VIEW_COLUMN_ADD:
           {
-            const columns = (await sqlClient.columnList({ tn: table_name }))
-              ?.data?.list;
+            const columns = (
+              await sqlClient.columnList({ tn: table_name })
+            )?.data?.list?.map(c => ({ ...c, column_name: c.cn }));
             const column = columns.find(c => c.cn === change.cn);
             column.uidt = getColumnUiType(base, column);
             //todo: inflection
-            column._cn = getColumnNameAlias(column.cn, base);
+            column.title = getColumnNameAlias(column.cn, base);
             await Column.insert({ fk_model_id: change.id, ...column });
           }
           // update old
@@ -694,15 +622,16 @@ export async function metaDiffSync(req, res) {
         case MetaDiffType.TABLE_COLUMN_TYPE_CHANGE:
         case MetaDiffType.VIEW_COLUMN_TYPE_CHANGE:
           {
-            const columns = (await sqlClient.columnList({ tn: table_name }))
-              ?.data?.list;
+            const columns = (
+              await sqlClient.columnList({ tn: table_name })
+            )?.data?.list?.map(c => ({ ...c, column_name: c.cn }));
             const column = columns.find(c => c.cn === change.cn);
             const metaFact = ModelXcMetaFactory.create(
               { client: base.type },
               {}
             );
             column.uidt = metaFact.getUIDataType(column);
-            column._cn = change.column.title;
+            column.title = change.column.title;
             await Column.update(change.column.id, column);
           }
           break;
@@ -735,13 +664,13 @@ export async function metaDiffSync(req, res) {
                 .then(cols => cols.find(c => c.column_name === change.cn));
 
               if (change.relationType === RelationTypes.BELONGS_TO) {
-                const _cn = getUniqueColumnAliasName(
+                const title = getUniqueColumnAliasName(
                   childModel.columns,
                   `${parentModel.title || parentModel.table_name}Read`
                 );
                 await Column.insert<LinkToAnotherRecordColumn>({
                   uidt: UITypes.LinkToAnotherRecord,
-                  _cn,
+                  title,
                   fk_model_id: childModel.id,
                   fk_related_model_id: parentModel.id,
                   type: RelationTypes.BELONGS_TO,
@@ -750,13 +679,13 @@ export async function metaDiffSync(req, res) {
                   virtual: false
                 });
               } else if (change.relationType === RelationTypes.HAS_MANY) {
-                const _cn = getUniqueColumnAliasName(
+                const title = getUniqueColumnAliasName(
                   childModel.columns,
                   `${childModel.title || childModel.table_name}List`
                 );
                 await Column.insert<LinkToAnotherRecordColumn>({
                   uidt: UITypes.LinkToAnotherRecord,
-                  _cn,
+                  title,
                   fk_model_id: parentModel.id,
                   fk_related_model_id: childModel.id,
                   type: RelationTypes.HAS_MANY,
@@ -848,7 +777,7 @@ export async function extractAndGenerateManyToManyRelations(
 
       if (!isRelationAvailInA) {
         await Column.insert<LinkToAnotherRecordColumn>({
-          _cn: getUniqueColumnAliasName(
+          title: getUniqueColumnAliasName(
             modelA.columns,
             `${modelB.title}MMList`
           ),
@@ -866,7 +795,7 @@ export async function extractAndGenerateManyToManyRelations(
       }
       if (!isRelationAvailInB) {
         await Column.insert<LinkToAnotherRecordColumn>({
-          _cn: getUniqueColumnAliasName(
+          title: getUniqueColumnAliasName(
             modelB.columns,
             `${modelA.title}MMList`
           ),
