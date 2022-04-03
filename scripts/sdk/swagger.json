@@ -3255,7 +3255,7 @@
         "tags": [
           "Data"
         ],
-        "unwrapped": true,
+        "wrapped": true,
         "responses": {
           "200": {
             "description": "OK",
@@ -3587,7 +3587,7 @@
         "summary": "",
         "operationId": "csv-export",
         "description": "",
-        "unwrapped": true,
+        "wrapped": true,
         "responses": {
           "200": {
             "description": "OK",
