@@ -220,12 +220,18 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
             title: `${hm.title}List`
           };
         }),
-        ...belongsTo.map(bt => ({
-          uidt: UITypes.LinkToAnotherRecord,
-          type: 'bt',
-          bt,
-          title: `${bt.rtitle}Read`
-        }))
+        ...belongsTo.map(bt => {
+          // find and mark foreign key column
+          const fkColumn = columns.find(c => c.cn === bt.cn);
+          if (fkColumn) fkColumn.uidt = UITypes.ForeignKey;
+
+          return {
+            uidt: UITypes.LinkToAnotherRecord,
+            type: 'bt',
+            bt,
+            title: `${bt.rtitle}Read`
+          };
+        })
       ];
 
       // await Model.insert(project.id, base.id, meta);
