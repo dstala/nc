@@ -57,7 +57,7 @@
       :close-on-content-click="false"
     >
       <div class="floating-reset-btn white py-1 px-3 caption x-active white--text font-weight-bold">
-        <v-icon ref="movable" color="white" @mousedown="mouseDown">
+        <v-icon style="cursor: move" color="white" @mousedown="mouseDown">
           mdi-drag
         </v-icon>
 
@@ -82,7 +82,7 @@ export default {
     },
     rolesList: [{ title: 'editor' }, { title: 'commenter' }, { title: 'viewer' }],
     position: {
-      x: 0, y: 0
+      x: 9999, y: 9999
     }
   }),
   computed: {
@@ -97,6 +97,10 @@ export default {
   },
   mounted() {
     window.addEventListener('mouseup', this.mouseUp, false)
+  },
+  beforeDestroy() {
+    window.removeEventListener('mousemove', this.divMove, true)
+    window.removeEventListener('mouseup', this.mouseUp, false)
   },
   methods: {
     setPreviewUser(previewAs) {
@@ -116,7 +120,7 @@ export default {
     },
 
     divMove(e) {
-      this.position = { y: e.clientY, x: e.clientX }
+      this.position = { y: e.clientY - 10, x: e.clientX - 18 }
     }
   }
 }
