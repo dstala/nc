@@ -1,19 +1,19 @@
 <template>
   <div class="h-100">
-    <v-toolbar flat height="38" class="toolbar-border-bottom">
+    <v-toolbar flat height="38" class="mt-5">
       <v-text-field
         v-model="query"
         style="max-width: 300px"
         dense
-        solo
         flat
+        solo
         class="search-field caption"
         hide-details
         placeholder="Filter by email"
         @keypress.enter="loadUsers"
       >
         <template #prepend-inner>
-          <v-icon class="mt-1" small>
+          <v-icon small class="mt-1">
             search
           </v-icon>
         </template>
@@ -56,7 +56,7 @@
       </x-btn>
     </v-toolbar>
 
-    <v-card style="height:calc(100% - 38px)">
+    <v-card style="height:calc(100% - 38px)" class="elevation-0">
       <v-container style="height: 100%" fluid>
         <v-row style="height:100%">
           <v-col cols="12" class="h-100">
@@ -176,7 +176,7 @@
                     </template>
                   </v-data-table>
                   <!-- tooltip="Add new user" -->
-                  <div class="mt-10 text-center">
+                  <!--                  <div class="mt-10 text-center">
                     <x-btn
                       v-if="_isUIAllowed('newUser')"
                       v-ge="['roles','add new']"
@@ -190,10 +190,10 @@
                       <v-icon small left>
                         mdi-plus
                       </v-icon>
-                      <!-- New User -->
+                      &lt;!&ndash; New User &ndash;&gt;
                       {{ $t('activity.newUser') }}
                     </x-btn>
-                  </div>
+                  </div>-->
 
                   <feedback-form class="mx-auto mt-6" />
                 </v-col>
@@ -278,7 +278,7 @@
 
     <!-- todo: move to a separate component-->
     <v-dialog v-model="userEditDialog" :width="invite_token ? 700 :700" @close="invite_token = null">
-      <v-card v-if="selectedUser" style="min-height: 100%">
+      <v-card v-if="selectedUser" style="min-height: 100%" class="elevation-0">
         <v-card-title>
           {{ $t('activity.share') }} : {{ $store.getters['project/GtrProjectName'] }}
 

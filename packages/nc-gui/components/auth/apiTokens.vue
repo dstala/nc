@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar flat height="38" class="toolbar-border-bottom">
+    <v-toolbar flat height="38" class="mt-5">
       <v-spacer />
 
       <x-btn
@@ -55,6 +55,17 @@
             </th>
           </tr>
         </thead>
+
+        <tr v-if="!tokens.length">
+          <td colspan="3">
+            <div
+              class="text-center caption grey--text"
+            >
+              No tokens available
+            </div>
+          </td>
+        </tr>
+
         <tr v-for="(token,i) in tokens" :key="i">
           <td class="caption text-center">
             {{ token.description }}
@@ -90,15 +101,15 @@
             </x-icon>
           </td>
         </tr>
-        <tr>
+        <!--        <tr>
           <td colspan="3" class="text-center">
             <x-btn tooltip="Generate new api token" outlined x-small color="primary" @click="showNewTokenDlg">
               <v-icon>mdi-plus</v-icon>
-              <!--Add New Token-->
+              &lt;!&ndash;Add New Token&ndash;&gt;
               {{ $t('activity.newToken') }}
             </x-btn>
           </td>
-        </tr>
+        </tr>-->
       </v-simple-table>
     </v-container>
 

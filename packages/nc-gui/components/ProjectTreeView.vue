@@ -4,7 +4,16 @@
     <div
       class="primary nc-project-title theme--dark"
     >
-      <div>{{ $store.getters['project/GtrProjectName'] }}</div>
+      <!--      <div>{{ $store.getters['project/GtrProjectName'] }}</div>-->
+
+      <gh-btns-star
+        icon="mark-github"
+        slug="nocodb/nocodb"
+        show-count
+        :class="{'dark' : isDark}"
+      >
+        {{ ghStarText }}
+      </gh-btns-star>
     </div>
     <v-navigation-drawer
       ref="drawer"
@@ -399,7 +408,7 @@
             @click="handleCTXMenuClick($event.value)"
           />
         </div>
-        <div class="pr-3 advance-menu" :class="{ 'pl-3': !mini }">
+        <div class="pr-3 advance-menu d-none" :class="{ 'pl-3': !mini }">
           <v-divider v-if="_isUIAllowed('treeViewProjectSettings')" />
 
           <v-list
@@ -771,6 +780,7 @@ export default {
       viewer: 'mdi-eye-outline',
       commenter: 'mdi-comment-account-outline',
     },
+    rolesList: [{title:'editor'}, {title:'commenter'},{title: 'viewer'}],
     showSqlClient: false,
     nestedMenu: {},
     overShieldIcon: false,
@@ -835,7 +845,6 @@ export default {
       cookie: null,
       defaultValue: null,
     },
-    rolesList: [{title:'editor'}, {title:'commenter'},{title: 'viewer'}],
     selectedNodeForDelete: {
       dialog: false,
       item: null,
@@ -931,7 +940,7 @@ export default {
           },
         })
       }, 100)
-    },
+    },/*
     setPreviewUSer(previewAs) {
       this.$tele.emit(`preview-as:${previewAs}`)
       if (!process.env.EE) {
@@ -940,7 +949,7 @@ export default {
         this.previewAs = previewAs;
         window.location.reload();
       }
-    },
+    },*/
     async loadRoles() {
       // if (this.$store.getters['users/GtrIsAdmin']) {
       //   const roles = (
@@ -1942,13 +1951,13 @@ export default {
 
 .nc-project-title {
   height: 30px;
-  width: 100%;
+  /*width: 100%;*/
   display: flex;
   justify-content: center;
 }
 
 .nc-project-title > div {
-  display: block;
+/*  display: block;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -1957,7 +1966,7 @@ export default {
   padding: 0 10px 10px 10px;
   text-transform: capitalize;
   line-height: 20px;
-  min-width: calc(100% - 30px);
+  min-width: calc(100% - 30px);*/
 }
 
 </style>

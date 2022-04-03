@@ -1,6 +1,6 @@
 <template>
   <div class="h-100" style="overflow: auto">
-    <v-toolbar height="30">
+    <v-toolbar height="30" class="elevation-0">
       <v-spacer />
       <v-btn x-small outlined @click="loadAudits">
         <v-icon small class="mr-2">

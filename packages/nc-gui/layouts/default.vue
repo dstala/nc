@@ -32,7 +32,8 @@
           }})</span>
         </v-tooltip>
         <template>
-          <span class="title"> {{ brandName }}</span>
+          <span v-if="isDashboard" class="title text-capitalize"> {{ $store.getters['project/GtrProjectName'] }}</span>
+          <span v-else class="title"> {{ brandName }}</span>
         </template>
       </v-toolbar-title>
 
@@ -50,32 +51,25 @@
       <v-spacer />
 
       <v-toolbar-items class="hidden-sm-and-down nc-topright-menu">
-        <gh-btns-star
-          icon="mark-github"
-          slug="nocodb/nocodb"
-          show-count
-          class="mr-3 align-self-center"
-          :class="{'dark' : isDark}"
-        >
-          {{ ghStarText }}
-        </gh-btns-star>
-
         <release-info />
 
+        <language class="mr-3" />
         <template v-if="isDashboard">
           <div>
-            <x-btn
-              v-if="_isUIAllowed('add-user')"
-              small
-              btn-class="primary--text nc-menu-share white"
-              @click="rolesTabAdd"
-            >
-              <v-icon small class="mr-1">
-                mdi-account-supervisor-outline
-              </v-icon>
-              <!-- Share -->
-              {{ $t('activity.share') }}
-            </x-btn>
+            <settings-modal v-slot="{click}">
+              <x-btn
+                v-if="_isUIAllowed('add-user')"
+                small
+                btn-class="primary--text nc-menu-share white"
+                @click="click"
+              >
+                <v-icon small class="mr-1">
+                  mdi-account-supervisor-outline
+                </v-icon>
+                <!-- Share -->
+                {{ $t('activity.share') }}
+              </x-btn>
+            </settings-modal>
           </div>
 
           <span
@@ -122,24 +116,23 @@
             @shortkey="changeTheme"
           />
 
-          <v-tooltip bottom>
+          <!--          <v-tooltip bottom>
             <template #activator="{ on }">
               <v-icon size="23" :style="$vuetify.theme.dark ? {}:{color:'lightgrey'}" @click="changeTheme" v-on="on">
                 mdi-bat
               </v-icon>
             </template>
             <h3 class="pa-3">
-              <!-- "dark": "It does come in Black (^⇧B)",
-              "light": "Does it come in Black ? (^⇧B)" -->
+              &lt;!&ndash; "dark": "It does come in Black (^⇧B)",
+              "light": "Does it come in Black ? (^⇧B)" &ndash;&gt;
               {{ $vuetify.theme.dark ? $t('tooltip.theme.dark') : $t('tooltip.theme.light') }}
               <i />
             </h3>
-          </v-tooltip>
-          <!--          <notification></notification>-->
+          </v-tooltip>-->
         </template>
-        <notification class="mx-2" />
 
-        <language class="ml-3" />
+        <preview-as />
+
         <v-menu
           v-if="isAuthenticated"
           offset-y
@@ -147,7 +140,7 @@
         >
           <template #activator="{ on }">
             <v-btn v-ge="['Profile','']" text class="font-weight-bold nc-menu-account" v-on="on">
-              <v-icon v-if="role && roleIcon[role]" size="20">
+              <!--              <v-icon v-if="role && roleIcon[role]" size="20">
                 {{ roleIcon[role] }}
               </v-icon>
               <v-icon v-else size="20">
@@ -155,7 +148,8 @@
               </v-icon>
               <v-icon small>
                 arrow_drop_down
-              </v-icon>
+              </v-icon>-->
+              <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
           <v-list dense class="nc-user-menu">
@@ -350,7 +344,6 @@ import 'splitpanes/dist/splitpanes.css'
 import ChangeEnv from '../components/changeEnv'
 import XBtn from '../components/global/xBtn'
 import dlgUnexpectedError from '../components/utils/dlgUnexpectedError'
-import notification from '../components/notification.vue'
 import settings from '../components/settings'
 import xTerm from '../components/xTerm'
 import { copyTextToClipboard } from '@/helpers/xutils'
@@ -359,9 +352,13 @@ import Language from '~/components/utils/language'
 import Loader from '~/components/loader'
 import TemplatesModal from '~/components/templates/templatesModal'
 import BetterUX from '~/components/utils/betterUX'
+import SettingsModal from '~/components/settings/settingsModal'
+import PreviewAs from '~/components/previewAs'
 
 export default {
   components: {
+    PreviewAs,
+    SettingsModal,
     BetterUX,
     TemplatesModal,
     Loader,
@@ -371,7 +368,7 @@ export default {
     XBtn,
     Snackbar,
     dlgUnexpectedError,
-    notification,
+    // notification,
     settings,
     xTerm
   },
