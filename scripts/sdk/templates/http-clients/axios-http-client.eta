@@ -17,6 +17,8 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   query?: QueryParamsType;
   /** format of response (i.e. response.json() -> format: "json") */
   format?: ResponseType;
+  /** unwrapped response */
+  unwrapped?: boolean;
   /** request body */
   body?: unknown;
 }
@@ -87,6 +89,7 @@ export class HttpClient<SecurityDataType = unknown> {
         type,
         query,
         format,
+        unwrapped,
         body,
         ...params
 <% if (config.unwrapResponseData) { %>
@@ -117,7 +120,10 @@ export class HttpClient<SecurityDataType = unknown> {
             data: body,
             url: path,
 <% if (config.unwrapResponseData) { %>
-        }).then(response => response.data);
+        }).then(response => {
+          if(unwrapped) return response;
+          return response.data;
+        });
 <% } else { %>
         });
 <% } %>

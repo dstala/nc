@@ -63,6 +63,7 @@ const queryTmpl = (query != null && queryName) || null;
 const bodyContentKindTmpl = requestContentKind[requestBodyInfo.contentKind] || null;
 const responseFormatTmpl = responseContentKind[responseBodyInfo.success && responseBodyInfo.success.schema && responseBodyInfo.success.schema.contentKind] || null;
 const securityTmpl = security ? 'true' : null;
+const unwrappedTmpl = route.raw?.unwrapped;
 
 const describeReturnType = () => {
     if (!config.toJS) return "";
@@ -95,5 +96,6 @@ const describeReturnType = () => {
         <%~ securityTmpl ? `secure: ${securityTmpl},` : '' %>
         <%~ bodyContentKindTmpl ? `type: ${bodyContentKindTmpl},` : '' %>
         <%~ responseFormatTmpl ? `format: ${responseFormatTmpl},` : '' %>
+        <%~ unwrappedTmpl ? `unwrapped: ${unwrappedTmpl},` : '' %>
         ...<%~ _.get(requestConfigParam, "name") %>,
     })<%~ route.namespace ? ',' : '' %>
