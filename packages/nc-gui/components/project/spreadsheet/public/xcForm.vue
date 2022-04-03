@@ -396,33 +396,19 @@ export default {
 
         // const formData = new FormData()
         const data = { ...this.localState, ...this.virtual }
+        const attachment = {}
 
         for (const col of this.meta.columns) {
           if (col.uidt === UITypes.Attachment) {
-            const files = data[col.title]
+            attachment[`_${col.title}`] = data[col.title]
             delete data[col.title]
-            let i = 0
-            for (const file of (files || [])) {
-              // formData.append(`${col.title}`, file)
-              data[`${col.title}[${i++}]`] = file
-            }
           }
         }
 
-        // await this.$store.dispatch('sqlMgr/ActUpload', {
-        //   op: 'sharedViewInsert',
-        //   opArgs: {
-        //     view_id: this.$route.params.id,
-        //     password: this.password,
-        //     data,
-        //     nested: this.virtual
-        //   },
-        //   formData
-        // })
-
         await this.$api.public.dataCreate(this.$route.params.id, {
           data,
-          password: this.password
+          password: this.password,
+          ...attachment
         })
 
         this.virtual = {}

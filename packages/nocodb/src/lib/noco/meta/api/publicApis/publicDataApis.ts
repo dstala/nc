@@ -10,6 +10,11 @@ import multer from 'multer';
 import { ErrorMessages, UITypes, ViewTypes } from 'nocodb-sdk';
 import Column from '../../../../noco-models/Column';
 import LinkToAnotherRecordColumn from '../../../../noco-models/LinkToAnotherRecordColumn';
+import NcPluginMgrv2 from '../../helpers/NcPluginMgrv2';
+import path from 'path';
+import { nanoid } from 'nanoid';
+import { mimeIcons } from '../../../../utils/mimeTypes';
+import slash from 'slash';
 
 export async function dataList(req: Request, res: Response) {
   try {
@@ -80,27 +85,6 @@ async function dataInsert(
   res: Response,
   next
 ) {
-  // try {
-  //   const model = await Model.get({
-  //     id: req.params.viewId
-  //   });
-  //   if (!model) return next(new Error('Table not found'));
-  //
-  //
-  //   const base = await Base.get(model.base_id);
-  //
-  //   const baseModel = await Model.getBaseModelSQL({
-  //     id: model.id,
-  //     dbDriver: NcConnectionMgrv2.get(base)
-  //   });
-  //
-  //
-  //   res.json(await baseModel.insert(req.body));
-  // } catch (e) {
-  //   console.log(e);
-  //   res.status(500).json({ msg: e.message });
-  // }
-
   const view = await View.getByUUID(req.params.publicDataUuid);
 
   if (!view) return next(new Error('Not found'));
@@ -120,13 +104,6 @@ async function dataInsert(
     viewId: view?.id,
     dbDriver: NcConnectionMgrv2.get(base)
   });
-  // if (
-  //   sharedViewMeta &&
-  //   sharedViewMeta.password &&
-  //   sharedViewMeta.password !== args.args.password
-  // ) {
-  //   throw new Error(this.INVALID_PASSWORD_ERROR);
-  // }
 
   await view.getViewWithInfo();
   await view.getColumns();
@@ -153,27 +130,34 @@ async function dataInsert(
     }
     return obj;
   }, {});
-  //
-  // for (const [key, obj] of Object.entries(args.args.nested)) {
-  //   if (fields.includes(key)) {
-  //     insertObject[key] = obj;
-  //   }
-  // }
 
   const attachments = {};
+  const storageAdapter = await NcPluginMgrv2.storageAdapter();
+
   for (const file of req.files || []) {
-    if (
-      file?.fieldname in fields &&
-      fields[file.fieldname].uidt === UITypes.Attachment
-    ) {
-      attachments[file.fieldname] = attachments[file.fieldname] || [];
-      attachments[file.fieldname].push(
-        await this._uploadFile({
-          file,
-          storeInPublicFolder: true,
-          req
-        })
+    // remove `_` prefix and `[]` suffix
+    const fieldName = file?.fieldname?.replace(/^_|\[\d*]$/g, '');
+    if (fieldName in fields && fields[fieldName].uidt === UITypes.Attachment) {
+      attachments[fieldName] = attachments[fieldName] || [];
+      const fileName = `${nanoid(6)}_${file.originalname}`;
+      let url = await storageAdapter.fileCreate(
+        slash(path.join('nc', 'uploads', base.project_id, view.id, fileName)),
+        file
       );
+
+      if (!url) {
+        url = `${(req as any).ncSiteUrl}/download/${base.project_id}/${
+          view.id
+        }/${fileName}`;
+      }
+
+      attachments[fieldName].push({
+        url,
+        title: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+        icon: mimeIcons[path.extname(file.originalname).slice(1)] || undefined
+      });
     }
   }
 
@@ -198,30 +182,6 @@ async function relDataList(req, res) {
   const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
 
   const model = await colOptions.getRelatedTable();
-
-  // todo: add password support
-  // if (
-  //   sharedViewMeta &&
-  //   sharedViewMeta.password &&
-  //   sharedViewMeta.password !== args.args.password
-  // ) {
-  //   throw new Error(this.INVALID_PASSWORD_ERROR);
-  // }
-
-  // const model = apiBuilder.xcModels?.[tn];
-  //
-  // const primaryCol = apiBuilder?.getMeta(tn)?.columns?.find(c => c.pv)?.cn;
-
-  // const commonParams =
-  //   primaryCol && args.args.query
-  //     ? {
-  //         condition: {
-  //           [primaryCol]: {
-  //             like: `%${args.args.query}%`
-  //           }
-  //         }
-  //       }
-  //     : {};
 
   const base = await Base.get(model.base_id);
 
@@ -253,138 +213,6 @@ async function relDataList(req, res) {
 
   res.json(new PagedResponseImpl(data, { ...req.query, count }));
 }
-
-/*
-export async function mmList(req: Request, res: Response): Promise<any> {
-  const view = await View.getByUUID(req.params.publicDataUuid);
-
-  if (!view) NcError.notFound('Not found');
-  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
-
-  if (view.password && view.password !== req.body?.password) {
-    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
-  }
-
-  const column = await Column.get({ colId: req.params.columnId });
-
-  if (column.fk_model_id !== view.fk_model_id)
-    NcError.badRequest("Column doesn't belongs to the model");
-
-  // const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
-
-  const base = await Base.get(view.base_id);
-  const baseModel = await Model.getBaseModelSQL({
-    viewId: view?.id,
-    id: view?.fk_model_id,
-    dbDriver: NcConnectionMgrv2.get(base)
-  });
-
-  const key = column._cn;
-  const requestObj: any = {
-    [key]: 1
-  };
-
-  const data = (
-    await nocoExecute(
-      requestObj,
-      {
-        [key]: async _args => {
-          return (
-            await baseModel.mmList({
-              colId: req.params.columnId,
-              parentIds: [req.params.rowId]
-            })
-          )?.[0];
-        }
-      },
-      {},
-      { nested: { [key]: req.query } }
-    )
-  )?.[key];
-
-  const count = (
-    await baseModel.mmListCount({
-      colId: req.params.columnId,
-      parentIds: [req.params.rowId]
-    })
-  )?.[0]?.count;
-
-  res.json({
-    data: new PagedResponseImpl(data, {
-      // todo:
-      totalRows: count,
-      pageSize: 25,
-      page: 1
-    })
-  });
-}
-
-export async function hmList(req: Request, res: Response): Promise<any> {
-  const view = await View.getByUUID(req.params.publicDataUuid);
-
-  if (!view) NcError.notFound('Not found');
-  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
-
-  if (view.password && view.password !== req.body?.password) {
-    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
-  }
-
-  const column = await Column.get({ colId: req.params.columnId });
-
-  if (column.fk_model_id !== view.fk_model_id)
-    NcError.badRequest("Column doesn't belongs to the model");
-
-  // const colOptions = await column.getColOptions<LinkToAnotherRecordColumn>();
-
-  const base = await Base.get(view.base_id);
-  const baseModel = await Model.getBaseModelSQL({
-    viewId: view?.id,
-    id: view?.fk_model_id,
-    dbDriver: NcConnectionMgrv2.get(base)
-  });
-
-  const key = column._cn;
-  const requestObj: any = {
-    [key]: 1
-  };
-
-  const data = (
-    await nocoExecute(
-      requestObj,
-      {
-        [key]: async _args => {
-          return (
-            await baseModel.hmList({
-              colId: req.params.columnId,
-              ids: [req.params.rowId]
-            })
-          )?.[req.params.rowId];
-        }
-      },
-      {},
-      { nested: { [key]: req.query } }
-    )
-  )?.[key];
-
-  const count = (
-    await baseModel.hmListCount({
-      colId: req.params.columnId,
-      ids: [req.params.rowId]
-    })
-  )?.[0]?.count;
-
-  res.json({
-    data: new PagedResponseImpl(data, {
-      // todo:
-      totalRows: count,
-      pageSize: 25,
-      page: 1
-    })
-  });
-}
-
-
-*/
 
 export async function publicMmList(req: Request, res: Response) {
   const view = await View.getByUUID(req.params.publicDataUuid);
@@ -500,196 +328,6 @@ export async function publicHmList(req: Request, res: Response) {
     } as any)
   );
 }
-/*
-
-export async function mmExcludedList(req: Request, res: Response) {
-  const view = await View.getByUUID(req.params.publicDataUuid);
-
-  if (!view) NcError.notFound('Not found');
-  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
-
-  if (view.password && view.password !== req.body?.password) {
-    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
-  }
-
-  const column = await Column.get({ colId: req.params.colId });
-
-  if (column.fk_model_id !== view.fk_model_id)
-    NcError.badRequest("Column doesn't belongs to the model");
-
-  const base = await Base.get(view.base_id);
-
-  const baseModel = await Model.getBaseModelSQL({
-    id: view.fk_model_id,
-    viewId: view?.id,
-    dbDriver: NcConnectionMgrv2.get(base)
-  });
-
-  const key = 'List';
-  const requestObj: any = {
-    [key]: 1
-  };
-
-  const data = (
-    await nocoExecute(
-      requestObj,
-      {
-        [key]: async args => {
-          return await baseModel.getMmChildrenExcludedList(
-            {
-              colId: req.params.colId,
-              pid: req.params.rowId
-            },
-            args
-          );
-        }
-      },
-      {},
-
-      { nested: { [key]: req.query } }
-    )
-  )?.[key];
-
-  const count = await baseModel.getMmChildrenExcludedListCount(
-    {
-      colId: req.params.colId,
-      pid: req.params.rowId
-    },
-    req.query
-  );
-
-  res.json(
-    new PagedResponseImpl(data, {
-      totalRows: count
-    })
-  );
-}
-
-export async function hmExcludedList(req: Request, res: Response) {
-  const view = await View.getByUUID(req.params.publicDataUuid);
-
-  if (!view) NcError.notFound('Not found');
-  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
-
-  if (view.password && view.password !== req.body?.password) {
-    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
-  }
-
-  const column = await Column.get({ colId: req.params.colId });
-
-  if (column.fk_model_id !== view.fk_model_id)
-    NcError.badRequest("Column doesn't belongs to the model");
-
-  const base = await Base.get(view.base_id);
-
-  const baseModel = await Model.getBaseModelSQL({
-    id: view.fk_model_id,
-    viewId: view?.id,
-    dbDriver: NcConnectionMgrv2.get(base)
-  });
-
-  const key = 'List';
-  const requestObj: any = {
-    [key]: 1
-  };
-
-  const data = (
-    await nocoExecute(
-      requestObj,
-      {
-        [key]: async args => {
-          return await baseModel.getHmChildrenExcludedList(
-            {
-              colId: req.params.colId,
-              pid: req.params.rowId
-            },
-            args
-          );
-        }
-      },
-      {},
-
-      { nested: { [key]: req.query } }
-    )
-  )?.[key];
-
-  const count = await baseModel.getHmChildrenExcludedListCount(
-    {
-      colId: req.params.colId,
-      pid: req.params.rowId
-    },
-    req.query
-  );
-
-  res.json(
-    new PagedResponseImpl(data, {
-      totalRows: count
-    })
-  );
-}
-export async function btExcludedList(req: Request, res: Response) {
-  const view = await View.getByUUID(req.params.publicDataUuid);
-
-  if (!view) NcError.notFound('Not found');
-  if (view.type !== ViewTypes.GRID) NcError.notFound('Not found');
-
-  if (view.password && view.password !== req.body?.password) {
-    NcError.forbidden(ErrorMessages.INVALID_SHARED_VIEW_PASSWORD);
-  }
-
-  const column = await Column.get({ colId: req.params.colId });
-
-  if (column.fk_model_id !== view.fk_model_id)
-    NcError.badRequest("Column doesn't belongs to the model");
-
-  const base = await Base.get(view.base_id);
-
-  const baseModel = await Model.getBaseModelSQL({
-    id: view.fk_model_id,
-    viewId: view?.id,
-    dbDriver: NcConnectionMgrv2.get(base)
-  });
-
-  const key = 'List';
-  const requestObj: any = {
-    [key]: 1
-  };
-
-  const data = (
-    await nocoExecute(
-      requestObj,
-      {
-        [key]: async args => {
-          return await baseModel.getBtChildrenExcludedList(
-            {
-              colId: req.params.colId,
-              cid: req.params.rowId
-            },
-            args
-          );
-        }
-      },
-      {},
-
-      { nested: { [key]: req.query } }
-    )
-  )?.[key];
-
-  const count = await baseModel.getBtChildrenExcludedListCount(
-    {
-      colId: req.params.colId,
-      cid: req.params.rowId
-    },
-    req.query
-  );
-
-  res.json(
-    new PagedResponseImpl(data, {
-      totalRows: count
-    })
-  );
-}
-*/
 
 const router = Router({ mergeParams: true });
 router.post('/public/data/:publicDataUuid/list', catchError(dataList));
@@ -713,18 +351,5 @@ router.get(
   '/public/data/:publicDataUuid/:rowId/hm/:colId',
   catchError(publicHmList)
 );
-
-// router.get(
-//   '/public/data/:publicDataUuid/:rowId/mm/:columnId/exclude',
-//   catchError(mmExcludedList)
-// );
-// router.get(
-//   '/public/data/:publicDataUuid/:rowId/hm/:columnId/exclude',
-//   catchError(hmExcludedList)
-// );
-// router.get(
-//   '/public/data/:publicDataUuid/:rowId/bt/:columnId/exclude',
-//   catchError(btExcludedList)
-// );
 
 export default router;

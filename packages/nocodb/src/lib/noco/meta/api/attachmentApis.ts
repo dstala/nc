@@ -24,14 +24,19 @@ export async function upload(req: Request, res: Response) {
     (req as any).files?.map(async file => {
       const fileName = `${nanoid(6)}${path.extname(file.originalname)}`;
 
-      await storageAdapter.fileCreate(
+      let url = await storageAdapter.fileCreate(
         slash(path.join(destPath, fileName)),
         file
       );
 
-      // todo: update base url
+      if (!url) {
+        url = `${(req as any).ncSiteUrl}/download/${req.params.projectId}/${
+          req.params.viewId
+        }/${fileName}`;
+      }
+
       return {
-        url: `http://localhost:8080/download/${req.params.projectId}/${req.params.viewId}/${fileName}`,
+        url,
         title: file.originalname,
         mimetype: file.mimetype,
         size: file.size,

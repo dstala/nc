@@ -271,20 +271,15 @@ export default {
   watch: {
     value(val, prev) {
       try {
-        this.localState = (typeof val === 'string' && val !== prev ? JSON.parse(val) : val) || []
+        this.localState = ((typeof val === 'string' && val !== prev ? JSON.parse(val) : val) || []).filter(Boolean)
       } catch (e) {
         this.localState = []
       }
     }
-    // localState(val) {
-    //   if (this.isForm) {
-    //     this.$emit('input', JSON.stringify(val))
-    //   }
-    // }
   },
   created() {
     try {
-      this.localState = (typeof this.value === 'string' ? JSON.parse(this.value) : this.value) || []
+      this.localState = ((typeof this.value === 'string' ? JSON.parse(this.value) : this.value) || []).filter(Boolean)
     } catch (e) {
       this.localState = []
     }

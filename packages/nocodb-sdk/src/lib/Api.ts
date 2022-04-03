@@ -879,17 +879,27 @@ export class HttpClient<SecurityDataType = unknown> {
     };
   }
 
-  private createFormData(input: Record<string, unknown>): FormData {
+  protected createFormData(input: Record<string, unknown>): FormData {
+    if (input instanceof FormData) {
+      return input;
+    }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      formData.append(
-        key,
-        property instanceof Blob
-          ? property
-          : typeof property === 'object' && property !== null
-          ? JSON.stringify(property)
-          : `${property}`
-      );
+
+      if (property instanceof Blob) {
+        formData.append(key, property);
+      } else if (typeof property === 'object' && property !== null) {
+        if (Array.isArray(property)) {
+          // eslint-disable-next-line functional/no-loop-statement
+          for (const prop of property) {
+            formData.append(`${key}[]`, prop);
+          }
+        } else {
+          formData.append(key, JSON.stringify(property));
+        }
+      } else {
+        formData.append(key, `${property}`);
+      }
       return formData;
     }, new FormData());
   }

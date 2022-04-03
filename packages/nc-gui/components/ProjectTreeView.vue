@@ -1425,20 +1425,6 @@ export default {
 
     async mtdDialogRenameTableSubmit(title, cookie) {
       let item = cookie
-      // await this.$store.dispatch(
-      //   // 'sqlMgr/ActSqlOpPlus',[
-      //   'sqlMgr/ActSqlOp', [
-      //     {
-      //       env: item._nodes.env,
-      //       dbAlias: item._nodes.dbAlias,
-      //     },
-      //     // 'tableRename',
-      //     'ncTableAliasRename',
-      //     {
-      //       tn: title,
-      //       tn_old: item.name,
-      //     },
-      //   ]);
       await this.$api.meta.tableUpdate(item.id, {
         title
       })
