@@ -811,6 +811,8 @@ export interface FullRequestParams
   query?: QueryParamsType;
   /** format of response (i.e. response.json() -> format: "json") */
   format?: ResponseType;
+  /** wrapped response */
+  wrapped?: boolean;
   /** request body */
   body?: unknown;
 }
@@ -898,6 +900,7 @@ export class HttpClient<SecurityDataType = unknown> {
     type,
     query,
     format,
+    wrapped,
     body,
     ...params
   }: FullRequestParams): Promise<T> => {
@@ -936,7 +939,10 @@ export class HttpClient<SecurityDataType = unknown> {
         data: body,
         url: path,
       })
-      .then((response) => response.data);
+      .then((response) => {
+        if (wrapped) return response;
+        return response.data;
+      });
   };
 }
 
@@ -3303,6 +3309,7 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        wrapped: true,
         ...params,
       }),
 
@@ -3514,6 +3521,7 @@ export class Api<
       this.request<any, any>({
         path: `/data/${tableId}/export/${type}`,
         method: 'GET',
+        wrapped: true,
         ...params,
       }),
 
