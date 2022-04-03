@@ -1455,10 +1455,10 @@ export default {
           table_name: this.menuItem._nodes.table_name,
           title: title,
           dbConnection: this.menuItem._nodes.dbConnection,
-
           type: 'table',
           dbKey: this.menuItem._nodes.dbKey,
           key: this.menuItem._nodes.key,
+          tableDirKey: this.menuItem._nodes.tableDirKey,
         },
         name: title,
       });
