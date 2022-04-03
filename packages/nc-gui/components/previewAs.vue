@@ -4,7 +4,7 @@
       <template #activator="{on}">
         <v-btn small light color="#fff3" class="white--text" v-on="on">
           <v-icon small class="mr-1">
-            mdi-drama-masks
+            mdi-play-circle
           </v-icon>
           Preview
           <v-icon small>

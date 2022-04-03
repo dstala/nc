@@ -131,26 +131,18 @@
           </v-tooltip>-->
         </template>
 
-        <preview-as />
+        <preview-as v-if="isDashboard" class="mx-1"/>
 
         <v-menu
           v-if="isAuthenticated"
           offset-y
-          open-on-hover
+
         >
           <template #activator="{ on }">
-            <v-btn v-ge="['Profile','']" text class="font-weight-bold nc-menu-account" v-on="on">
-              <!--              <v-icon v-if="role && roleIcon[role]" size="20">
-                {{ roleIcon[role] }}
-              </v-icon>
-              <v-icon v-else size="20">
-                mdi-account-circle
-              </v-icon>
-              <v-icon small>
-                arrow_drop_down
-              </v-icon>-->
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
+            <v-icon v-ge="['Profile','']" text class="font-weight-bold nc-menu-account icon" v-on="on">
+<!--              <v-icon></v-icon>-->
+              mdi-dots-vertical
+            </v-icon>
           </template>
           <v-list dense class="nc-user-menu">
             <template>
