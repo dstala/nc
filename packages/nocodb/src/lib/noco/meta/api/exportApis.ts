@@ -12,13 +12,6 @@ import LookupColumn from '../../../noco-models/LookupColumn';
 import ncMetaAclMw from '../helpers/ncMetaAclMw';
 
 async function exportCsv(req: Request, res: Response, next) {
-  // // get all nested props by default
-  // for (const key of Object.keys(defaultNestedQueryParams)) {
-  //   if (key.indexOf('fields') > -1) {
-  //     defaultNestedQueryParams[key] = '*';
-  //   }
-  // }
-
   const view = await View.get(req.params.viewId);
 
   const model = await view.getModelWithInfo();

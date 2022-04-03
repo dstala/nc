@@ -230,49 +230,25 @@ export default {
       }))
     },
     async exportCsv() {
-      // const fields = this.availableColumns.map(c => c.title)
-      // const blob = new Blob([Papaparse.unparse(await this.extractCsvData())], { type: 'text/plain;charset=utf-8' })
-
       let offset = 0
       let c = 1
 
       try {
         while (!isNaN(offset) && offset > -1) {
-          // const res = await this.$store.dispatch('sqlMgr/ActSqlOp', [
-          //   this.publicViewId
-          //     ? null
-          //     : {
-          //         dbAlias: this.nodes.dbAlias,
-          //         env: '_noco'
-          //       },
-          //   this.publicViewId ? 'sharedViewExportAsCsv' : 'xcExportAsCsv',
-          //   {
-          //     query: { offset },
-          //     localQuery: this.queryParams || {},
-          //     ...(this.publicViewId
-          //       ? {
-          //           view_id: this.publicViewId
-          //         }
-          //       : {
-          //           view_name: this.selectedView.title,
-          //           model_name: this.meta.table_name
-          //         })
-          //   },
-          //   null,
-          //   {
-          //     responseType: 'blob'
-          //   },
-          //   null,
-          //   true
-          // ])
           let res
           if (this.publicViewId) {
             res = await this.$api.public.csvExport(this.publicViewId, ExportTypes.CSV, this.reqPayload, {
-              responseType: 'blob'
+              responseType: 'blob',
+              query: {
+                offset
+              }
             })
           } else {
             res = await this.$api.data.csvExport(this.selectedView.id, ExportTypes.CSV, {
-              responseType: 'blob'
+              responseType: 'blob',
+              query: {
+                offset
+              }
             })
           }
           const { data } = res
