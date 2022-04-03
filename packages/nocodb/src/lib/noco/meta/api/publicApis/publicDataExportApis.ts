@@ -100,6 +100,7 @@ async function exportCsv(req: Request, res: Response) {
       }
       csvRows.push(csvRow);
     }
+    console.timeEnd('nocoExecute');
   }
 
   const data = papaparse.unparse(
