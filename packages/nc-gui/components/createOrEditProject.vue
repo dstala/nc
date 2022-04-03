@@ -1,4 +1,3 @@
-
 <template>
   <v-container fluid>
     <v-col
@@ -170,8 +169,9 @@
                     </v-text-field>
 
                     <!-- Access Project via -->
-                    <label class="caption"> {{ $t('msg.info.apiOptions') }}</label>
-                    <v-radio-group
+                    <!--
+                      <label class="caption"> {{ $t('msg.info.apiOptions') }}</label>
+                                      <v-radio-group
                       v-model="project.projectType"
                       row
                       hide-details
@@ -193,7 +193,7 @@
                           </v-chip>
                         </template>
                       </v-radio>
-                    </v-radio-group>
+                    </v-radio-group>-->
                   </div>
 
                   <!--            <v-select
@@ -1001,7 +1001,12 @@ import colors from '@/mixins/colors'
 import DlgOkNew from '@/components/utils/dlgOkNew'
 import readFile from '@/helpers/fileReader'
 
-const { uniqueNamesGenerator, starWars, adjectives, animals } = require('unique-names-generator')
+const {
+  uniqueNamesGenerator,
+  starWars,
+  adjectives,
+  animals
+} = require('unique-names-generator')
 
 const homeDir = ''
 
@@ -1054,14 +1059,36 @@ export default {
       projectReloading: false,
       enableDbEdit: 0,
       authTypes: [
-        { text: 'JWT', value: 'jwt' },
-        { text: 'Master Key', value: 'masterKey' },
-        { text: 'Middleware', value: 'middleware' },
-        { text: 'Disabled', value: 'none' }
+        {
+          text: 'JWT',
+          value: 'jwt'
+        },
+        {
+          text: 'Master Key',
+          value: 'masterKey'
+        },
+        {
+          text: 'Middleware',
+          value: 'middleware'
+        },
+        {
+          text: 'Disabled',
+          value: 'none'
+        }
       ],
       projectTypes: [
-        { text: 'REST APIs', value: 'rest', icon: 'mdi-code-json', iconColor: 'green' },
-        { text: 'GRAPHQL APIs', value: 'graphql', icon: 'mdi-graphql', iconColor: 'pink' }
+        {
+          text: 'REST APIs',
+          value: 'rest',
+          icon: 'mdi-code-json',
+          iconColor: 'green'
+        },
+        {
+          text: 'GRAPHQL APIs',
+          value: 'graphql',
+          icon: 'mdi-graphql',
+          iconColor: 'pink'
+        }
       ],
 
       showPass: {},
@@ -1376,7 +1403,10 @@ export default {
       if (this.project.projectType) {
         return this.projectTypes.find(({ value }) => value === this.project.projectType)
       } else {
-        return { icon: 'mdi-server', iconColor: 'primary' }
+        return {
+          icon: 'mdi-server',
+          iconColor: 'primary'
+        }
       }
     },
     databaseNamesReverse() {
@@ -1909,7 +1939,10 @@ export default {
                 console.log(this.project.envs[e])
 
                 const c2 = {
-                  connection: { ...this.project.envs[e].db[0].connection, database: undefined },
+                  connection: {
+                    ...this.project.envs[e].db[0].connection,
+                    database: undefined
+                  },
                   client: this.project.envs[e].db[0].client
                 }
 
@@ -2063,7 +2096,10 @@ export default {
           const db = this.project.envs[env].db[index]
           Vue.set(db, 'client', this.databaseNames[client])
           if (client !== 'Sqlite') {
-            const { ssl, ...connectionDet } = this.sampleConnectionData[client]
+            const {
+              ssl,
+              ...connectionDet
+            } = this.sampleConnectionData[client]
 
             Vue.set(db, 'connection', {
               ...connectionDet,
@@ -2120,7 +2156,10 @@ export default {
       Vue.set(this.project, 'envs', { ...this.project.envs })
     }
   },
-  fetch({ store, params }) {
+  fetch({
+    store,
+    params
+  }) {
   },
   beforeCreated() {
   },
