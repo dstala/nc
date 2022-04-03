@@ -56,8 +56,9 @@ export default class GalleryView implements GalleryType {
       project_id: view.project_id,
       base_id: view.base_id,
       fk_view_id: view.fk_view_id,
-      fk_cover_image_col_id: columns?.find(c => c.uidt === UITypes.Attachment)
-        ?.id,
+      fk_cover_image_col_id:
+        view?.fk_cover_image_col_id ||
+        columns?.find(c => c.uidt === UITypes.Attachment)?.id,
       next_enabled: view.next_enabled,
       prev_enabled: view.prev_enabled,
       cover_image_idx: view.cover_image_idx,

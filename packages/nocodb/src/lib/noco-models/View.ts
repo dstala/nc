@@ -199,16 +199,10 @@ export default class View implements ViewType {
       },
     ncMeta = Noco.ncMeta
   ) {
-    const order =
-      (+(
-        await ncMeta
-          .knex(MetaTable.VIEWS)
-          .max('order', { as: 'order' })
-          .where({
-            fk_model_id: view.fk_model_id
-          })
-          .first()
-      )?.order || 0) + 1;
+    // get order value
+    const order = await ncMeta.metaGetNextOrder(MetaTable.VIEWS, {
+      fk_model_id: view.fk_model_id
+    });
 
     const insertObj = {
       id: view.id,
@@ -223,14 +217,17 @@ export default class View implements ViewType {
       created_at: view.created_at,
       updated_at: view.updated_at
     };
+
+    // get project and base id if missing
     if (!(view.project_id && view.base_id)) {
       const model = await Model.getByIdOrName({ id: view.fk_model_id }, ncMeta);
       insertObj.project_id = model.project_id;
       insertObj.base_id = model.base_id;
     }
 
-    const copyFormView =
+    const copyFromView =
       view.copy_from_id && (await View.get(view.copy_from_id, ncMeta));
+    await copyFromView?.getView();
 
     const { id: view_id } = await ncMeta.metaInsert2(
       null,
@@ -245,6 +242,7 @@ export default class View implements ViewType {
       `${CacheScope.VIEW}:${view_id}`
     );
 
+    // insert view metadata based on view type
     switch (view.type) {
       case ViewTypes.GRID:
         await GridView.insert(
@@ -258,6 +256,7 @@ export default class View implements ViewType {
       case ViewTypes.GALLERY:
         await GalleryView.insert(
           {
+            ...(copyFromView?.view || {}),
             ...view,
             fk_view_id: view_id
           },
@@ -268,34 +267,23 @@ export default class View implements ViewType {
         await FormView.insert(
           {
             heading: view.title,
+            ...(copyFromView?.view || {}),
             ...view,
             fk_view_id: view_id
           },
           ncMeta
         );
         break;
-      // case ViewTypes.KANBAN:
-      //   await KanbanView.insert({
-      //     ...view,
-      //     fk_view_id: id
-      //   });
-      //   break;
-      // case ViewTypes.FORM:
-      //   await FormView.insert({
-      //     ...view,
-      //     fk_view_id: id
-      //   });
-      //   break;
     }
 
     let columns: any[] = await (
       await Model.getByIdOrName({ id: view.fk_model_id }, ncMeta)
     ).getColumns(ncMeta);
 
-    if (copyFormView) {
-      const sorts = await copyFormView.getSorts(ncMeta);
-      const filters = await copyFormView.getFilters(ncMeta);
-      columns = await copyFormView.getColumns(ncMeta);
+    if (copyFromView) {
+      const sorts = await copyFromView.getSorts(ncMeta);
+      const filters = await copyFromView.getFilters(ncMeta);
+      columns = await copyFromView.getColumns(ncMeta);
 
       for (const sort of sorts) {
         await Sort.insert(
@@ -323,15 +311,18 @@ export default class View implements ViewType {
       let order = 1;
       for (const vCol of columns) {
         let show = 'show' in vCol ? vCol.show : true;
-        const col = await Column.get(
-          { colId: vCol.fk_column_id || vCol.id },
-          ncMeta
-        );
+
+        // if columns is list of virtual columns then get the parent column
+        const col = vCol.fk_column_id
+          ? await Column.get({ colId: vCol.fk_column_id }, ncMeta)
+          : vCol;
+
         if (isSystemColumn(col)) show = false;
         await View.insertColumn(
           {
             order: order++,
             ...col,
+            ...vCol,
             view_id,
             fk_column_id: vCol.fk_column_id || vCol.id,
             show,
@@ -393,17 +384,9 @@ export default class View implements ViewType {
       show;
       fk_column_id;
       id?: string;
-    },
+    } & Partial<FormViewColumn>,
     ncMeta = Noco.ncMeta
   ) {
-    const insertObj = {
-      view_id: param.view_id,
-      order: param.order,
-      show: param.show,
-      fk_column_id: param.fk_column_id,
-      id: param.id
-    };
-
     const view = await this.get(param.view_id, ncMeta);
 
     let col;
@@ -412,7 +395,7 @@ export default class View implements ViewType {
         {
           col = await GridViewColumn.insert(
             {
-              ...insertObj,
+              ...param,
               fk_view_id: view.id
             },
             ncMeta
@@ -423,7 +406,7 @@ export default class View implements ViewType {
         {
           col = await GalleryViewColumn.insert(
             {
-              ...insertObj,
+              ...param,
               fk_view_id: view.id
             },
             ncMeta
@@ -434,7 +417,7 @@ export default class View implements ViewType {
         {
           col = await FormViewColumn.insert(
             {
-              ...insertObj,
+              ...param,
               fk_view_id: view.id
             },
             ncMeta

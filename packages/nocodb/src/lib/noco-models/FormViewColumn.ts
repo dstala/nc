@@ -54,7 +54,11 @@ export default class FormViewColumn implements FormColumnType {
       }),
       show: column.show,
       project_id: column.project_id,
-      base_id: column.base_id
+      base_id: column.base_id,
+      label: column.label,
+      help: column.help,
+      description: column.description,
+      required: column.required
     };
 
     if (!(column.project_id && column.base_id)) {
