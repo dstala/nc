@@ -202,10 +202,15 @@ export async function invokeWebhook(
     console.log('Hook handler ::::' + model.table_name + ':: Hook ::', hook);
     console.log('Hook handler ::::' + model.table_name + ':: Data ::', data);
 
-    if (
-      !(await validateCondition(testFilters || (await hook.getFilters()), data))
-    ) {
-      return;
+    if (hook.condition) {
+      if (
+        !(await validateCondition(
+          testFilters || (await hook.getFilters()),
+          data
+        ))
+      ) {
+        return;
+      }
     }
 
     switch (notification?.type) {
