@@ -9,6 +9,7 @@ import Noco from '../noco/Noco';
 import Model from './Model';
 import NocoCache from '../noco-cache/NocoCache';
 import Filter from './Filter';
+import HookFilter from './HookFilter';
 
 export default class Hook implements HookType {
   id?: string;
@@ -213,6 +214,24 @@ export default class Hook implements HookType {
   }
 
   static async delete(hookId: any, ncMeta = Noco.ncMeta) {
+    // Delete Hook Filters
+    const filterList = await ncMeta.metaList2(
+      null,
+      null,
+      MetaTable.FILTER_EXP,
+      {
+        condition: { fk_hook_id: hookId }
+      }
+    );
+    for (const filter of filterList) {
+      await NocoCache.deepDel(
+        CacheScope.FILTER_EXP,
+        `${CacheScope.FILTER_EXP}:${filter.id}`,
+        CacheDelDirection.CHILD_TO_PARENT
+      );
+      await HookFilter.delete(filter.id);
+    }
+    // Delete Hook
     await NocoCache.deepDel(
       CacheScope.HOOK,
       `${CacheScope.HOOK}:${hookId}`,
