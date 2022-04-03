@@ -1148,7 +1148,7 @@ export default {
           //   return
           // }
           // return if there is no change
-          if (oldRow[column.title] === rowObj[column.title] && ((lastSave || null) === rowObj[column.title])) {
+          if (oldRow[column.title] === rowObj[column.title] && ((lastSave || rowObj[column.title]) === rowObj[column.title])) {
             return
           }
           if (saved) { this.$set(this.data[row], 'lastSave', oldRow[column.title]) }
@@ -1161,8 +1161,9 @@ export default {
 
           // eslint-disable-next-line promise/param-names
           const newData = (await this.$api.data.update(this.meta.id, id, {
-            [column.title]: rowObj[column.title],
-            _cellSaved: saved
+            [column.title]: rowObj[column.title]
+          }, {
+            query: { ignoreWebhook: !saved }
           }))// { [column.title]: oldRow[column.title] })
 
           // audit

@@ -1675,13 +1675,25 @@ class BaseModelSqlv2 {
   }
 
   public async beforeUpdate(data: any, _trx: any, req): Promise<void> {
-    if (req.body?._cellSaved) {
+    const ignoreWebhook = req.query?.ignoreWebhook;
+    if (ignoreWebhook) {
+      if (ignoreWebhook != 'true' && ignoreWebhook != 'false') {
+        throw new Error('ignoreWebhook value can be either true or false');
+      }
+    }
+    if (ignoreWebhook === undefined || ignoreWebhook === 'false') {
       await this.handleHooks('Before.update', data, req);
     }
   }
 
   public async afterUpdate(data: any, _trx: any, req): Promise<void> {
-    if (req.body?._cellSaved) {
+    const ignoreWebhook = req.query?.ignoreWebhook;
+    if (ignoreWebhook) {
+      if (ignoreWebhook != 'true' && ignoreWebhook != 'false') {
+        throw new Error('ignoreWebhook value can be either true or false');
+      }
+    }
+    if (ignoreWebhook === undefined || ignoreWebhook === 'false') {
       await this.handleHooks('After.update', data, req);
     }
   }
