@@ -1965,7 +1965,7 @@ export default {
   height: 30px;
   /*width: 100%;*/
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .nc-project-title:not(.shared){
