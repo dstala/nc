@@ -3,7 +3,7 @@
     <v-menu offset-y>
       <template #activator="{on}">
         <v-btn
-          v-show="isDashboard &&(_isUIAllowed('previewAs') || previewAs)"
+          v-show="isDashboard && _isUIAllowed('previewAs')"
           small
           light
           color="#fff3"
