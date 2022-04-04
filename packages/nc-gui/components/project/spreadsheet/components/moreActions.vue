@@ -288,6 +288,8 @@ export default {
                 } else if (input == 'true' || input == 'yes' || input == 'y') {
                   input = '1'
                 }
+              } else if (v.uidt === UITypes.Number) {
+                if (input == "") input = null
               }
               res[col.destCn] = input
             }
