@@ -293,7 +293,7 @@
                           indeterminate
                         />
                         <template v-else>
-                          <v-icon
+                          <!-- <v-icon
                             x-small
                             class="mr-2"
                             :color="
@@ -307,9 +307,9 @@
                             "
                           >
                             mdi-moon-full
-                          </v-icon>
+                          </v-icon> -->
                           <!-- Accessible via GraphQL APIs / Accessible via REST APIs -->
-                          <x-icon
+                          <!-- <x-icon
                             small
                             :tooltip="
                               props.item.projectType === 'graphql'
@@ -328,7 +328,7 @@
                                 ? 'mdi-graphql'
                                 : 'mdi-code-json'
                             }}
-                          </x-icon>
+                          </x-icon> -->
                         </template>
                         <v-tooltip bottom>
                           <template #activator="{on}">
