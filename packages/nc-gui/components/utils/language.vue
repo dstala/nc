@@ -78,10 +78,20 @@ export default {
       },
       set(val) {
         this.$store.commit('windows/MutLanguage', val)
+        this.applyDirection()
       }
     }
   },
+  mounted() {
+    this.applyDirection()
+  },
   methods: {
+    applyDirection() {
+      document.body.style.direction = this.isRtlLang() ? 'rtl' : 'ltr'
+    },
+    isRtlLang() {
+      return ['fa'].includes(this.language)
+    },
     changeLan(lan) {
       this.language = lan
       const count = 200
