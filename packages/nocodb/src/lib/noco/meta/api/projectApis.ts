@@ -251,7 +251,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
 
       for (const column of columns) {
         await Column.insert({
-          uidt: getColumnUiType(base, column),
+          uidt: column.uidt || getColumnUiType(base, column),
           fk_model_id: models2[table.tn].id,
           ...column,
           title: getColumnNameAlias(column.cn, base),
