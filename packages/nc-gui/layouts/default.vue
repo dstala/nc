@@ -131,16 +131,15 @@
           </v-tooltip>-->
         </template>
 
-        <preview-as v-if="isDashboard" class="mx-1"/>
+        <preview-as v-if="isDashboard && _isUIAllowed('previewAs') " class="mx-1" />
 
         <v-menu
           v-if="isAuthenticated"
           offset-y
-
         >
           <template #activator="{ on }">
             <v-icon v-ge="['Profile','']" text class="font-weight-bold nc-menu-account icon" v-on="on">
-<!--              <v-icon></v-icon>-->
+              <!--              <v-icon></v-icon>-->
               mdi-dots-vertical
             </v-icon>
           </template>
