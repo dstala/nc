@@ -128,7 +128,7 @@ export interface TableInfoType {
   fk_project_id?: string;
   fk_base_id?: string;
   title: string;
-  table_name: string;
+  table_nameme: string;
   type?: string;
   enabled?: string;
   parent_id?: string;
@@ -2783,16 +2783,13 @@ export class Api<
      * @tags Meta
      * @name ProjectAuditList
      * @request GET:project/{projectId}/audits
-     * @response `200` `{ audits?: { list: (AuditType)[], pageInfo: PaginatedType } }` OK
+     * @response `200` `{ list: (AuditType)[], pageInfo: PaginatedType }` OK
      */
     projectAuditList: (
       { projectId, ...query }: ProjectAuditListParamsType,
       params: RequestParams = {}
     ) =>
-      this.request<
-        { audits?: { list: AuditType[]; pageInfo: PaginatedType } },
-        any
-      >({
+      this.request<{ list: AuditType[]; pageInfo: PaginatedType }, any>({
         path: `project/${projectId}/audits`,
         method: 'GET',
         query: query,
@@ -3516,7 +3513,7 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description CSV or Excel export
      *
      * @tags Data
      * @name CsvExport

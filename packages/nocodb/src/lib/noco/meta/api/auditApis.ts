@@ -57,15 +57,15 @@ export async function auditList(
   req: Request<ProjectAuditListParamsType>,
   res: Response
 ) {
-  res.json({
-    audits: new PagedResponseImpl(
-      await Audit.projectAuditList(req.params.projectId),
+  res.json(
+    new PagedResponseImpl(
+      await Audit.projectAuditList(req.params.projectId, req.query),
       {
         count: await Audit.projectAuditCount(req.params.projectId),
         ...req.query
       }
     )
-  });
+  );
 }
 
 export async function commentsCount(

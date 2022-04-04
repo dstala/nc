@@ -3251,7 +3251,7 @@
       "get": {
         "summary": "",
         "operationId": "csv-export",
-        "description": "",
+        "description": "CSV or Excel export",
         "tags": [
           "Data"
         ],
@@ -3272,7 +3272,8 @@
               }
             }
           }
-        }
+        },
+        "parameters": []
       }
     },
     "/public/data/{uuid}/list": {
@@ -4379,27 +4380,22 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "audits": {
-                      "type": "object",
-                      "properties": {
-                        "list": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 1,
-                          "items": {
-                            "$ref": "#/components/schemas/Audit"
-                          }
-                        },
-                        "pageInfo": {
-                          "$ref": "#/components/schemas/Paginated"
-                        }
-                      },
-                      "required": [
-                        "list",
-                        "pageInfo"
-                      ]
+                    "list": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/components/schemas/Audit"
+                      }
+                    },
+                    "pageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
                     }
-                  }
+                  },
+                  "required": [
+                    "list",
+                    "pageInfo"
+                  ]
                 },
                 "examples": {
                   "example-1": {
@@ -6001,7 +5997,7 @@
           "title": {
             "type": "string"
           },
-          "table_name": {
+          "table_nameme": {
             "type": "string"
           },
           "type": {
@@ -6049,7 +6045,7 @@
         },
         "required": [
           "title",
-          "table_name"
+          "table_nameme"
         ]
       },
       "TableReq": {
