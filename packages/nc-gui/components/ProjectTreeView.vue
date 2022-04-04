@@ -11,7 +11,7 @@
       v-model="navigation.shown"
       permanent
       mini-variant-width="50"
-      class="pl-2 nc-nav-drawer"
+      class=" nc-nav-drawer"
       style="min-width: 100%; height: calc(100% - 30px)"
     >
       <div class="h-100 d-flex flex-column">

@@ -64,7 +64,7 @@
                 v-if="_isUIAllowed('add-user')"
                 small
                 btn-class="primary--text nc-menu-share white"
-                @click="click"
+                @click="shareModal = true"
               >
                 <v-icon small class="mr-1">
                   mdi-account-supervisor-outline
@@ -72,6 +72,8 @@
                 <!-- Share -->
                 {{ $t('activity.share') }}
               </x-btn>
+
+              <share-or-invite-modal v-model="shareModal" />
             </div>
             <span
               v-shortkey="[ 'ctrl','shift', 'd']"
@@ -318,9 +320,11 @@ import BetterUX from '~/components/utils/betterUX'
 import SettingsModal from '~/components/settings/settingsModal'
 import PreviewAs from '~/components/previewAs'
 import GithubStarBtn from '~/components/githubStarBtn'
+import ShareOrInviteModal from '~/components/auth/shareOrInviteModal'
 
 export default {
   components: {
+    ShareOrInviteModal,
     GithubStarBtn,
     PreviewAs,
     SettingsModal,
@@ -376,7 +380,8 @@ export default {
     snackbar: false,
     timeout: 10000,
     text: 'contact@senseprofit.com',
-    rolesList: null
+    rolesList: null,
+    shareModal: false
 
   }),
   computed: {

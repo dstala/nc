@@ -762,7 +762,6 @@ export default {
         this.$toast.error(e.response.data.msg).goAway(3000)
       }
 
-      this.userEditDialog = false
       await this.loadUsers()
     }
   }
