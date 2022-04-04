@@ -20,7 +20,7 @@
               class="pa-1 brand-icon nc-noco-brand-icon"
               v-on="on"
             >
-              <v-img :src="logo" max-height="30px" max-width="30px" />
+              <v-img :src="logo" max-height="35px" max-width="35px" />
             </v-btn>
           </template>
           <!-- Home -->
@@ -31,11 +31,16 @@
             $store.state.project.projectInfo && $store.state.project.projectInfo.version
           }})</span>
         </v-tooltip>
-        <template>
-          <span v-if="isDashboard" class="title text-capitalize"> {{ $store.getters['project/GtrProjectName'] }}</span>
-          <span v-else class="title"> {{ brandName }}</span>
-        </template>
       </v-toolbar-title>
+
+      <gh-btns-star
+        icon="mark-github"
+        slug="nocodb/nocodb"
+        show-count
+        :class="{'dark' : isDark}"
+      >
+        {{ ghStarText }}
+      </gh-btns-star>
 
       <v-toolbar-items class="ml-0" />
       <!-- loading -->
@@ -887,7 +892,7 @@ a {
 }
 
 /deep/ .nc-user-menu .v-list-item--dense, /deep/ .nc-user-menu .v-list--dense .v-list-item {
-  min-height: 30px
+  min-height: 35px
 }
 
 </style>

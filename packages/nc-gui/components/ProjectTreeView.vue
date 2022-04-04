@@ -5,15 +5,9 @@
       class="primary nc-project-title theme--dark"
     >
       <!--      <div>{{ $store.getters['project/GtrProjectName'] }}</div>-->
-
-      <gh-btns-star
-        icon="mark-github"
-        slug="nocodb/nocodb"
-        show-count
-        :class="{'dark' : isDark}"
-      >
-        {{ ghStarText }}
-      </gh-btns-star>
+      <template>
+        <span class="title text-capitalize white--text"> {{ $store.getters['project/GtrProjectName'] }}</span>
+      </template>      
     </div>
     <v-navigation-drawer
       ref="drawer"
@@ -1953,7 +1947,8 @@ export default {
   height: 30px;
   /*width: 100%;*/
   display: flex;
-  justify-content: center;
+  justify-content: start;
+  padding-left: 30px;
 }
 
 .nc-project-title > div {
