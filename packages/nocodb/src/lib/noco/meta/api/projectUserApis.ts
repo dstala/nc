@@ -200,15 +200,13 @@ async function projectUserDelete(req, res): Promise<any> {
   }
 
   if (!req.session?.passport?.user?.roles?.owner) {
-    // const deleteUser = await this.users
-    //   .where('id', req.params.id)
-    //   .andWhere('roles', 'like', '%super%')
-    //   .first();
-    // if (deleteUser) {
     const user = await User.get(req.params.userId);
     if (user.roles?.split(',').includes('super'))
       NcError.forbidden('Insufficient privilege to delete a super admin user.');
-    // }
+
+    const projectUser = await ProjectUser.get(project_id, req.params.userId);
+    if (projectUser?.roles?.split(',').includes('super'))
+      NcError.forbidden('Insufficient privilege to delete a owner user.');
   }
 
   // await this.users.where('id', req.params.id).del();
