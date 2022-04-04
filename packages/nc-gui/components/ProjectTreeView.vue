@@ -5,7 +5,8 @@
       class="primary nc-project-title theme--dark"
       :class="{shared:sharedBase}"
     >
-      <h3 v-if="sharedBase" class="title white--text text-capitalize">
+      <img src="favicon-32.png" height="18" class="ml-2">
+      <h3 v-if="sharedBase" class="nc-project-title white--text text-capitalize">
         {{ $store.getters['project/GtrProjectName'] }}
       </h3>
       <github-star-btn v-else />
@@ -1968,6 +1969,10 @@ export default {
   justify-content: start;
 }
 
+.nc-project-title.shared {
+  align-items: center;
+}
+
 .nc-project-title:not(.shared){
   padding-left: 30px;
 }
@@ -1975,6 +1980,7 @@ export default {
   padding: 0 10px;
   overflow: hidden;
   text-overflow: ellipsis;
+  align-items: center;
 }
 
 .nc-project-title > div {
