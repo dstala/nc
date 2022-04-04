@@ -136,7 +136,7 @@
           </v-tooltip>-->
         </template>
 
-        <preview-as v-if="isDashboard && _isUIAllowed('previewAs') " class="mx-1" />
+        <preview-as v-if="isDashboard" class="mx-1" />
 
         <v-menu
           v-if="isAuthenticated"

@@ -1,8 +1,14 @@
 <template>
-  <div>
+  <div v-if="previewAs || _isUIAllowed('previewAs')">
     <v-menu offset-y>
       <template #activator="{on}">
-        <v-btn small light color="#fff3" class="white--text" v-on="on">
+        <v-btn
+          small
+          light
+          color="#fff3"
+          class="white--text"
+          v-on="on"
+        >
           <v-icon small class="mr-1">
             mdi-play-circle
           </v-icon>
@@ -67,6 +73,7 @@
       </div>
     </v-menu>
   </div>
+  <span v-else />
 </template>
 
 <script>
