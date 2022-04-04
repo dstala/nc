@@ -1,8 +1,9 @@
 <template>
-  <div v-if="previewAs || _isUIAllowed('previewAs')">
+  <div>
     <v-menu offset-y>
       <template #activator="{on}">
         <v-btn
+          v-show="isDashboard &&(_isUIAllowed('previewAs') || previewAs)"
           small
           light
           color="#fff3"
@@ -62,18 +63,42 @@
       :close-on-click="false"
       :close-on-content-click="false"
     >
-      <div class="floating-reset-btn white py-1 px-3 caption x-active white--text font-weight-bold">
+      <div class="floating-reset-btn white py-1 pr-3 caption primary lighten-2 white--text font-weight-bold d-flex align-center" style="overflow-y: hidden">
         <v-icon style="cursor: move" color="white" @mousedown="mouseDown">
           mdi-drag
         </v-icon>
 
-        <div class="d-inline pointer" @click="setPreviewUser(null)">
-          Reset preview
+        <v-divider vertical class="mr-2" />
+
+        <div class="d-inline pointer d-flex align-center">
+          <span>Preview as :</span>
+          <v-radio-group
+            :value="previewAs"
+            dense
+            row
+            class="mt-0 pt-0"
+            hide-details
+            @change="setPreviewUser($event)"
+          >
+            <v-radio
+              v-for="(role) in rolesList"
+              :key="role.title"
+              :value="role.title"
+              color="white"
+              dark
+              class="ml-1"
+            >
+              <template #label>
+                <span class="white--text caption text-capitalize">{{ role.title }}</span>
+              </template>
+            </v-radio>
+          </v-radio-group>
+          <v-divider vertical class="mr-2" />
+          <span class="pointer" @click="setPreviewUser(null)"> <v-icon small color="white">mdi-exit-to-app</v-icon> Exit</span>
         </div>
       </div>
     </v-menu>
   </div>
-  <span v-else />
 </template>
 
 <script>
@@ -103,6 +128,11 @@ export default {
     }
   },
   mounted() {
+    this.position = {
+      y: window.innerHeight - 100,
+      x: window.innerWidth / 2 - 250
+    }
+
     window.addEventListener('mouseup', this.mouseUp, false)
   },
   beforeDestroy() {

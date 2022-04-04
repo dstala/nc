@@ -29,12 +29,12 @@
           class="
           flex-shrink-1
           text-left
-          elevation-1
+          elevation-0
           rounded-sm
           community-card
           item
         "
-          :class="{ active: showCommunity }"
+          :class="{ active: true }"
           dense
         >
           <v-list-item dense href="https://discord.gg/5RgZmkW" target="_blank">
@@ -48,7 +48,6 @@
               }}</span>
             </v-list-item-title>
           </v-list-item>
-          <v-divider />
           <v-list-item dense href="https://twitter.com/NocoDB" target="_blank">
             <!-- Follow NocoDB -->
             <v-list-item-title>
@@ -60,7 +59,6 @@
               }}</span>
             </v-list-item-title>
           </v-list-item>
-          <v-divider />
           <v-list-item dense href="https://www.reddit.com/r/NocoDB/" target="_blank">
             <!-- Get your questions answered -->
             <v-list-item-title>
@@ -72,7 +70,6 @@
               }}</span>
             </v-list-item-title>
           </v-list-item>
-          <v-divider />
           <v-list-item
             dense
             target="_blank"
@@ -91,11 +88,11 @@
         </v-list>
       </div>
 
-      <sponsor-mini
-        :class="{ active: !showCommunity }"
-        class="item"
-        :nav="true"
-      />
+      <!--      <sponsor-mini-->
+      <!--        :class="{ active: !showCommunity }"-->
+      <!--        class="item elevation-0"-->
+      <!--        :nav="true"-->
+      <!--      />-->
     </template>
   </div>
 </template>
@@ -107,7 +104,7 @@ import colors from '~/mixins/colors'
 
 export default {
   name: 'Extras',
-  components: { ShareIcons, SponsorMini },
+  components: { ShareIcons },
   mixins: [colors],
   data: () => ({
     showCommunity: true

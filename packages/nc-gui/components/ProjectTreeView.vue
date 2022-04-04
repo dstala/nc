@@ -4,10 +4,7 @@
     <div
       class="primary nc-project-title theme--dark"
     >
-      <!--      <div>{{ $store.getters['project/GtrProjectName'] }}</div>-->
-      <template>
-        <span class="title text-capitalize white--text"> {{ $store.getters['project/GtrProjectName'] }}</span>
-      </template>      
+      <github-star-btn />
     </div>
     <v-navigation-drawer
       ref="drawer"
@@ -20,18 +17,6 @@
       <div class="h-100 d-flex flex-column">
         <div class="flex-grow-1" style="overflow-y: auto; min-height: 200px">
           <v-skeleton-loader v-if="!projects || !projects.length" class="mt-2 ml-2" type="button" />
-          <!--      <v-btn
-                  v-else
-                  icon
-                  text
-                  @click.stop="toggleMini"
-                >
-                  &lt;!&ndash;        <v-icon v-if="mini">mdi-chevron-right-circle</v-icon>&ndash;&gt;
-                  &lt;!&ndash;        <v-icon v-else>mdi-pin-outline</v-icon>&ndash;&gt;
-                  <v-icon class="grey&#45;&#45;text">mdi-arrow-expand-horizontal</v-icon>
-                  &lt;!&ndash;        <v-icon v-else>mdi-arrow-expand-horizontal</v-icon>&ndash;&gt;
-
-                </v-btn>-->
           <v-text-field
             v-else
             v-model="search"
@@ -650,6 +635,24 @@
               </v-list-item>
             </v-list>-->
         </div>
+
+        <template v-if="_isUIAllowed('settings')">
+          <v-divider />
+
+          <div class="py-3 pl-5 pr-3 d-flex align-center">
+            <settings-modal>
+              <template #default="{click}">
+                <div class="caption pointer" @click="click">
+                  <v-icon color="brown" small class="mr-1">
+                    mdi-cog
+                  </v-icon> Team & Settings
+                </div>
+              </template>
+            </settings-modal>
+          </div>
+        </template>
+        <v-divider />
+        <extras class="pl-1 " />
       </div>
     </v-navigation-drawer>
 
@@ -747,9 +750,17 @@ import {validateTableName} from "~/helpers";
 import ExcelImport from "~/components/import/excelImport";
 
 import draggable from 'vuedraggable'
+import GithubStarBtn from '~/components/githubStarBtn'
+import SettingsModal from '~/components/settings/settingsModal'
+import Language from '~/components/utils/language'
+import Extras from '~/components/project/spreadsheet/components/extras'
 
 export default {
   components: {
+    Extras,
+    Language,
+    SettingsModal,
+    GithubStarBtn,
     draggable,
     ExcelImport,
     SponsorMini,

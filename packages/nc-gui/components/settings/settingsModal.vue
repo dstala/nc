@@ -2,10 +2,10 @@
   <div>
     <slot :click="() => settingsModal = true">
       <v-icon class="mx-2" @click="settingsModal=true">
-        mdi-cog
+        mdi-cog-outline
       </v-icon>
     </slot>
-    <v-dialog v-model="settingsModal" width="90%">
+    <v-dialog v-model="settingsModal" width="90%" overlay-opacity=".9">
       <v-card
         v-if="settingsModal"
         width="100%"

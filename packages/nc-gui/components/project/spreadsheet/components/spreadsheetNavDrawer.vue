@@ -318,7 +318,8 @@
             mdi-close-circle-outline
           </v-icon>
 
-          <extras />
+          <!--          <extras />-->
+          <sponsor-mini nav />
         </div>
         <!--<div class="text-center">
           <v-hover >
@@ -527,10 +528,11 @@ import CreateViewDialog from '@/components/project/spreadsheet/dialog/createView
 import Extras from '~/components/project/spreadsheet/components/extras'
 import viewIcons from '~/helpers/viewIcons'
 import { copyTextToClipboard } from '~/helpers/xutils'
+import SponsorMini from '~/components/sponsorMini'
 
 export default {
   name: 'SpreadsheetNavDrawer',
-  components: { Extras, CreateViewDialog, draggable },
+  components: { SponsorMini, Extras, CreateViewDialog, draggable },
   props: {
     extraViewParams: Object,
     showAdvanceOptions: Boolean,

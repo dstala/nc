@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-menu bottom offset-y>
+    <v-menu top offset-y>
       <template #activator="{on}">
         <v-icon size="20" class="ml-2 nc-menu-translate" v-on="on">
           mdi-translate

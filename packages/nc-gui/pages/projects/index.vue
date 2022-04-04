@@ -293,21 +293,13 @@
                           indeterminate
                         />
                         <template v-else>
-                          <!-- <v-icon
+                          <v-icon
                             x-small
                             class="mr-2"
-                            :color="
-                              !props.item.allowed ? 'blue' :(
-                                props.item.status === 'started'
-                                  ? 'green'
-                                  : props.item.status === 'stopped'
-                                    ? 'orange'
-                                    : 'orange'
-                              )
-                            "
+                            color="green"
                           >
                             mdi-moon-full
-                          </v-icon> -->
+                          </v-icon>
                           <!-- Accessible via GraphQL APIs / Accessible via REST APIs -->
                           <!-- <x-icon
                             small
@@ -330,20 +322,14 @@
                             }}
                           </x-icon> -->
                         </template>
-                        <v-tooltip bottom>
-                          <template #activator="{on}">
-                            <div
-                              class="d-inline-block title font-weight-regular"
-                              style="min-width:0; max-width:390px; white-space: nowrap;text-overflow: ellipsis; overflow: hidden"
-                              v-on="on"
-                            >
-                              {{
-                                props.item.title
-                              }}
-                            </div>
-                          </template>
-                          <span class="caption">{{ props.item.title }}</span>
-                        </v-tooltip>
+                        <div
+                          class="d-inline-block title font-weight-regular"
+                          style="min-width:0; max-width:390px; white-space: nowrap;text-overflow: ellipsis; overflow: hidden"
+                        >
+                          {{
+                            props.item.title
+                          }}
+                        </div>
                       </div>
                     </td>
                     <td style="width:150px;min-width:150px;max-width:150px">
@@ -352,10 +338,12 @@
                           $t('activity.deleteProject')
                         "
                         class="pointer mr-2"
+                        icon.class="delete-icon"
+                        small
                         color="red grey"
                         @click.stop="deleteProject(props.item)"
                       >
-                        mdi-delete-circle-outline
+                        mdi-delete-outline
                       </x-icon>
 
                       <div
@@ -1296,6 +1284,14 @@ tr:hover .action-icons {
 .nc-container {
   position: relative;
 }
+/deep/ .project-row .delete-icon{
+opacity:0;
+  transition: .2s opacity;
+}
+/deep/ .project-row:hover .delete-icon{
+opacity:1;
+}
+
 </style>
 
 <!--

@@ -11,57 +11,55 @@
       height="48"
       @contextmenu="showAirtabLikeLink++"
     >
-      <v-toolbar-title>
-        <v-tooltip bottom>
-          <template #activator="{ on }">
-            <v-btn
-              to="/projects"
-              icon
-              class="pa-1 brand-icon nc-noco-brand-icon"
-              v-on="on"
-            >
-              <v-img :src="logo" max-height="35px" max-width="35px" />
-            </v-btn>
-          </template>
-          <!-- Home -->
-          {{ $t('general.home') }}
-          <span
-            class="caption ml-1 font-weight-light"
-          >(v{{
-            $store.state.project.projectInfo && $store.state.project.projectInfo.version
-          }})</span>
-        </v-tooltip>
-      </v-toolbar-title>
+      <div class="d-flex align-center pt-1" style="flex: 1">
+        <v-toolbar-title>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                to="/projects"
+                icon
+                class="pa-1 pr-0 brand-icon nc-noco-brand-icon"
+                v-on="on"
+              >
+                <v-img :src="logo" max-height="32px" max-width="32px" />
+              </v-btn>
+            </template>
+            <!-- Home -->
+            {{ $t('general.home') }}
+            <span
+              class="caption  font-weight-light pointer"
+            >(v{{
+              $store.state.project.projectInfo && $store.state.project.projectInfo.version
+            }})</span>
+          </v-tooltip>
 
-      <gh-btns-star
-        icon="mark-github"
-        slug="nocodb/nocodb"
-        show-count
-        :class="{'dark' : isDark}"
-      >
-        {{ ghStarText }}
-      </gh-btns-star>
+          <span class="body-1 ml-n2" @click="$router.push('/projects')"> {{ brandName }}</span>
+        </v-toolbar-title>
 
-      <v-toolbar-items class="ml-0" />
-      <!-- loading -->
-      <span v-show="$nuxt.$loading.show" class="caption grey--text ml-3">{{ $t('general.loading') }} <v-icon small color="grey">mdi-spin mdi-loading</v-icon></span>
+        <!--        <v-toolbar-items  />-->
+        <!-- loading -->
+        <span v-show="$nuxt.$loading.show" class="caption grey--text ml-3">{{ $t('general.loading') }} <v-icon small color="grey">mdi-spin mdi-loading</v-icon></span>
 
-      <span
-        v-shortkey="[ 'ctrl','shift', 'd']"
-        @shortkey="openDiscord"
-      />
+        <span
+          v-shortkey="[ 'ctrl','shift', 'd']"
+          @shortkey="openDiscord"
+        />
+      </div>
 
-      <v-spacer />
+      <div v-if="isDashboard" class="text-capitalize text-center title" style="flex: 1">
+        {{ $store.getters['project/GtrProjectName'] }}
+      </div>
 
-      <v-spacer />
+      <div style="flex: 1" class="d-flex justify-end">
+        <v-toolbar-items class="hidden-sm-and-down nc-topright-menu">
+          <release-info />
 
-      <v-toolbar-items class="hidden-sm-and-down nc-topright-menu">
-        <release-info />
-
-        <language class="mr-3" />
-        <template v-if="isDashboard">
-          <div>
-            <settings-modal v-slot="{click}">
+          <language class="mr-3" />
+          <template v-if="isDashboard">
+            <!--            <div v-if="_isUIAllowed('settings')">-->
+            <!--              <settings-modal />-->
+            <!--            </div>-->
+            <div>
               <x-btn
                 v-if="_isUIAllowed('add-user')"
                 small
@@ -74,196 +72,165 @@
                 <!-- Share -->
                 {{ $t('activity.share') }}
               </x-btn>
-            </settings-modal>
-          </div>
+            </div>
+            <span
+              v-shortkey="[ 'ctrl','shift', 'd']"
+              @shortkey="$router.push('/')"
+            />
+            <x-btn
+              v-if="!$store.state.windows.nc"
+              text
+              btn.class="caption font-weight-bold px-2 text-capitalize"
+              tooltip="Enable/Disable Models"
+              @click="cronTabAdd()"
+            >
+              <v-icon size="20">
+                mdi-timetable
+              </v-icon> &nbsp;
+              Crons
+            </x-btn>
+          </template>
+          <template v-else>
+            <span
+              v-shortkey="[ 'ctrl','shift', 'c']"
+              @shortkey="settingsTabAdd"
+            />
 
-          <span
-            v-shortkey="[ 'ctrl','shift', 'd']"
-            @shortkey="$router.push('/')"
-          />
+            <span
+              v-shortkey="[ 'ctrl','shift', 'b']"
+              @shortkey="changeTheme"
+            />
+          </template>
 
-          <x-btn
-            v-if="!$store.state.windows.nc"
-            text
-            btn.class="caption font-weight-bold px-2 text-capitalize"
-            tooltip="Enable/Disable Models"
-            @click="cronTabAdd()"
+          <preview-as class="mx-1" />
+
+          <v-menu
+            v-if="isAuthenticated"
+            offset-y
           >
-            <v-icon size="20">
-              mdi-timetable
-            </v-icon> &nbsp;
-            Crons
-          </x-btn>
-
-          <span
-            v-shortkey="[ 'ctrl','shift', 'c']"
-            @shortkey="settingsDialog = true"
-          />
-
-          <span
-            v-shortkey="[ 'ctrl','shift', 'o']"
-            @shortkey="toggleOutputWindow"
-          />
-
-          <span
-            v-shortkey="[ 'ctrl','shift', 'l']"
-            @shortkey="toggleLogWindow"
-          />
-        </template>
-        <template v-else>
-          <span
-            v-shortkey="[ 'ctrl','shift', 'c']"
-            @shortkey="settingsTabAdd"
-          />
-
-          <span
-            v-shortkey="[ 'ctrl','shift', 'b']"
-            @shortkey="changeTheme"
-          />
-
-          <!--          <v-tooltip bottom>
             <template #activator="{ on }">
-              <v-icon size="23" :style="$vuetify.theme.dark ? {}:{color:'lightgrey'}" @click="changeTheme" v-on="on">
-                mdi-bat
+              <v-icon v-ge="['Profile','']" text class="font-weight-bold nc-menu-account icon" v-on="on">
+                <!--              <v-icon></v-icon>-->
+                mdi-dots-vertical
               </v-icon>
             </template>
-            <h3 class="pa-3">
-              &lt;!&ndash; "dark": "It does come in Black (^⇧B)",
-              "light": "Does it come in Black ? (^⇧B)" &ndash;&gt;
-              {{ $vuetify.theme.dark ? $t('tooltip.theme.dark') : $t('tooltip.theme.light') }}
-              <i />
-            </h3>
-          </v-tooltip>-->
-        </template>
+            <v-list dense class="nc-user-menu">
+              <template>
+                <v-list-item v-t="['toolbar:user:email']" v-ge="['Settings','']" dense to="/user/settings">
+                  <v-list-item-title>
+                    <v-icon small>
+                      mdi-at
+                    </v-icon>&nbsp; <span class="font-weight-bold caption">{{ userEmail }}</span>
+                  </v-list-item-title>
+                </v-list-item>
 
-        <preview-as v-if="isDashboard" class="mx-1" />
+                <v-divider />
 
-        <v-menu
-          v-if="isAuthenticated"
-          offset-y
-        >
-          <template #activator="{ on }">
-            <v-icon v-ge="['Profile','']" text class="font-weight-bold nc-menu-account icon" v-on="on">
-              <!--              <v-icon></v-icon>-->
-              mdi-dots-vertical
-            </v-icon>
-          </template>
-          <v-list dense class="nc-user-menu">
-            <template>
-              <v-list-item v-t="['toolbar:user:email']" v-ge="['Settings','']" dense to="/user/settings">
-                <v-list-item-title>
-                  <v-icon small>
-                    mdi-at
-                  </v-icon>&nbsp; <span class="font-weight-bold caption">{{ userEmail }}</span>
-                </v-list-item-title>
-              </v-list-item>
+                <!-- Copy Auth Token -->
+                <!-- "Auth token copied to clipboard" -->
+                <v-list-item
+                  v-if="isDashboard"
+                  v-t="['toolbar:user:copy-auth-token']"
+                  v-clipboard="$store.state.users.token"
+                  dense
+                  @click.stop="$toast.success($t('msg.toast.authToken')).goAway(3000)"
+                >
+                  <v-list-item-title>
+                    <v-icon key="terminal-dash" small>
+                      mdi-content-copy
+                    </v-icon>&nbsp;
+                    <span class="font-weight-regular caption">{{ $t('activity.account.authToken') }}</span>
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item
+                  v-if="swaggerOrGraphiqlUrl"
+                  v-t="['toolbar:user:swagger']"
+                  dense
+                  @click.stop="openUrl(`${$axios.defaults.baseURL}${swaggerOrGraphiqlUrl}`)"
+                >
+                  <v-list-item-title>
+                    <v-icon key="terminal-dash" small>
+                      {{ isGql ? 'mdi-graphql' : 'mdi-code-json' }}
+                    </v-icon>&nbsp;
+                    <span class="font-weight-regular caption">
+                      {{ isGql ? 'GraphQL APIs' : 'Swagger APIs Doc' }}</span>
+                  </v-list-item-title>
+                </v-list-item>
+                <v-divider />
+                <v-list-item
+                  v-if="isDashboard"
+                  v-t="['toolbar:user:copy-proj-info']"
+                  v-ge="['Sign Out','']"
+                  dense
+                  @click="copyProjectInfo"
+                >
+                  <v-list-item-title>
+                    <v-icon small>
+                      mdi-content-copy
+                    </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('activity.account.projInfo') }}</span>
+                  </v-list-item-title>
+                </v-list-item>
+                <v-divider v-if="isDashboard" />
+                <v-list-item
+                  v-if="isDashboard"
+                  v-t="['toolbar:user:themes']"
+                  dense
+                  @click.stop="settingsTabAdd"
+                >
+                  <v-list-item-title>
+                    <v-icon key="terminal-dash" small>
+                      mdi-palette
+                    </v-icon>&nbsp;
+                    <span class="font-weight-regular caption">{{ $t('activity.account.themes') }}</span>
+                  </v-list-item-title>
+                </v-list-item>
 
-              <v-divider />
+                <v-divider v-if="isDashboard" />
 
-              <!-- Copy Auth Token -->
-              <!-- "Auth token copied to clipboard" -->
-              <v-list-item
-                v-if="isDashboard"
-                v-t="['toolbar:user:copy-auth-token']"
-                v-clipboard="$store.state.users.token"
-                dense
-                @click.stop="$toast.success($t('msg.toast.authToken')).goAway(3000)"
-              >
-                <v-list-item-title>
-                  <v-icon key="terminal-dash" small>
-                    mdi-content-copy
-                  </v-icon>&nbsp;
-                  <span class="font-weight-regular caption">{{ $t('activity.account.authToken') }}</span>
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item
-                v-if="swaggerOrGraphiqlUrl"
-                v-t="['toolbar:user:swagger']"
-                dense
-                @click.stop="openUrl(`${$axios.defaults.baseURL}${swaggerOrGraphiqlUrl}`)"
-              >
-                <v-list-item-title>
-                  <v-icon key="terminal-dash" small>
-                    {{ isGql ? 'mdi-graphql' : 'mdi-code-json' }}
-                  </v-icon>&nbsp;
-                  <span class="font-weight-regular caption">
-                    {{ isGql ? 'GraphQL APIs' : 'Swagger APIs Doc' }}</span>
-                </v-list-item-title>
-              </v-list-item>
-              <v-divider />
-              <v-list-item
-                v-if="isDashboard"
-                v-t="['toolbar:user:copy-proj-info']"
-                v-ge="['Sign Out','']"
-                dense
-                @click="copyProjectInfo"
-              >
-                <v-list-item-title>
-                  <v-icon small>
-                    mdi-content-copy
-                  </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('activity.account.projInfo') }}</span>
-                </v-list-item-title>
-              </v-list-item>
-              <v-divider v-if="isDashboard" />
-              <v-list-item
-                v-if="isDashboard"
-                v-t="['toolbar:user:themes']"
-                dense
-                @click.stop="settingsTabAdd"
-              >
-                <v-list-item-title>
-                  <v-icon key="terminal-dash" small>
-                    mdi-palette
-                  </v-icon>&nbsp;
-                  <span class="font-weight-regular caption">{{ $t('activity.account.themes') }}</span>
-                </v-list-item-title>
-              </v-list-item>
-
-              <v-divider v-if="isDashboard" />
-
-              <v-list-item
-                v-t="['toolbar:user:sign-out']"
-                v-ge="['Sign Out','']"
-                dense
-                @click="MtdSignOut"
-              >
-                <v-list-item-title>
-                  <v-icon small>
-                    mdi-logout
-                  </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('general.signOut') }}</span>
-                </v-list-item-title>
-              </v-list-item>
+                <v-list-item
+                  v-t="['toolbar:user:sign-out']"
+                  v-ge="['Sign Out','']"
+                  dense
+                  @click="MtdSignOut"
+                >
+                  <v-list-item-title>
+                    <v-icon small>
+                      mdi-logout
+                    </v-icon>&nbsp; <span class="font-weight-regular caption">{{ $t('general.signOut') }}</span>
+                  </v-list-item-title>
+                </v-list-item>
+              </template>
+            </v-list>
+          </v-menu>
+          <v-menu v-else offset-y open-on-hover>
+            <template #activator="{ on }">
+              <v-btn v-ge="['Profile','']" text class=" font-weight-bold nc-menu-account" v-on="on">
+                <!--              Menu-->
+                <v-icon>mdi-account</v-icon>
+                <v-icon>arrow_drop_down</v-icon>
+              </v-btn>
             </template>
-          </v-list>
-        </v-menu>
-        <v-menu v-else offset-y open-on-hover>
-          <template #activator="{ on }">
-            <v-btn v-ge="['Profile','']" text class=" font-weight-bold nc-menu-account" v-on="on">
-              <!--              Menu-->
-              <v-icon>mdi-account</v-icon>
-              <v-icon>arrow_drop_down</v-icon>
-            </v-btn>
-          </template>
-          <v-list dense>
-            <v-list-item v-if="!user && !isThisMobile" dense to="/user/authentication/signup">
-              <v-list-item-title>
-                <v-icon small>
-                  mdi-account-plus-outline
-                </v-icon> &nbsp; <span
-                  class="font-weight-regular caption"
-                >{{ $t('general.signUp') }}</span>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="!user && !isThisMobile" dense to="/user/authentication/signin">
-              <v-list-item-title>
-                <v-icon small>
-                  mdi-login
-                </v-icon> &nbsp; <span class="font-weight-regular caption">{{ $t('general.signIn') }}</span>
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-toolbar-items>
+            <v-list dense>
+              <v-list-item v-if="!user && !isThisMobile" dense to="/user/authentication/signup">
+                <v-list-item-title>
+                  <v-icon small>
+                    mdi-account-plus-outline
+                  </v-icon> &nbsp; <span
+                    class="font-weight-regular caption"
+                  >{{ $t('general.signUp') }}</span>
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item v-if="!user && !isThisMobile" dense to="/user/authentication/signin">
+                <v-list-item-title>
+                  <v-icon small>
+                    mdi-login
+                  </v-icon> &nbsp; <span class="font-weight-regular caption">{{ $t('general.signIn') }}</span>
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-toolbar-items>
+      </div>
     </v-app-bar>
 
     <v-main class="pb-0 mb-0">
@@ -350,9 +317,11 @@ import TemplatesModal from '~/components/templates/templatesModal'
 import BetterUX from '~/components/utils/betterUX'
 import SettingsModal from '~/components/settings/settingsModal'
 import PreviewAs from '~/components/previewAs'
+import GithubStarBtn from '~/components/githubStarBtn'
 
 export default {
   components: {
+    GithubStarBtn,
     PreviewAs,
     SettingsModal,
     BetterUX,
@@ -830,22 +799,6 @@ export default {
 }
 </script>
 <style scoped>
-/deep/ .gh-button-container{
-  background: #fff2;
-  border-radius: 4px;
-}
-/deep/ .gh-button-container:not(.dark) > a {
-  background: transparent !important;
-  color: #cdcdcd !important;
-}
-/deep/ .gh-button-container > a:first-child{
-  border-left-color: transparent;
-  border-top-color: transparent;
-  border-bottom-color: transparent;
-}
-/deep/ .gh-button-container > a:last-child{
-  border-color: transparent;
-}
 a {
   text-decoration: none;
 }
