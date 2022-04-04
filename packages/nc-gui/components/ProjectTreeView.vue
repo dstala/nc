@@ -3,8 +3,12 @@
     <!--    :expand-on-hover="mini"-->
     <div
       class="primary nc-project-title theme--dark"
+      :class="{shared:sharedBase}"
     >
-      <github-star-btn />
+      <h3 v-if="sharedBase" class="title white--text text-capitalize">
+        {{ $store.getters['project/GtrProjectName'] }}
+      </h3>
+      <github-star-btn v-else />
     </div>
     <v-navigation-drawer
       ref="drawer"
@@ -768,6 +772,9 @@ export default {
     DlgTableCreate,
     textDlgSubmitCancel,
     dlgLabelSubmitCancel,
+  },
+  props:{
+    sharedBase:Boolean
   },
   data: () => ({
     treeViewStatus: {},
@@ -1959,7 +1966,15 @@ export default {
   /*width: 100%;*/
   display: flex;
   justify-content: start;
+}
+
+.nc-project-title:not(.shared){
   padding-left: 30px;
+}
+.nc-project-title.shared > h3{
+  padding: 0 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nc-project-title > div {
