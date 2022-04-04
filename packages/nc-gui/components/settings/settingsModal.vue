@@ -6,7 +6,11 @@
       </v-icon>
     </slot>
     <v-dialog v-model="settingsModal" width="90%">
-      <v-card width="100%" min-height="350px">
+      <v-card
+        v-if="settingsModal"
+        width="100%"
+        min-height="350px"
+      >
         <div class="d-flex">
           <v-navigation-drawer
             left
