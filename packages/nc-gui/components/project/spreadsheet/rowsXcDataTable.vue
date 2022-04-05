@@ -1020,7 +1020,7 @@ export default {
         //     title: this.nodes.title,
         //     columns
         //   }])
-        await this.$api.meta.tableCreate(
+        await this.$api.dbTable.create(
           this.$store.state.project.projectId,
           this.$store.state.project.project.bases[0].id,
           {
