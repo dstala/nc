@@ -670,6 +670,7 @@ export default class View implements ViewType {
     }
     // set meta
     await ncMeta.metaUpdate(null, null, MetaTable.VIEWS, updateObj, viewId);
+    return this.get(viewId);
   }
 
   // @ts-ignore

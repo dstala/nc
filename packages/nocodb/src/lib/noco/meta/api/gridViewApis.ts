@@ -20,7 +20,7 @@ export async function gridViewCreate(req: Request<any, any>, res) {
     fk_model_id: req.params.tableId,
     type: ViewTypes.GRID
   });
-  Tele.emit('evt', { evt_type: 'view:created', type: 'grid' });
+  Tele.emit('evt', { evt_type: 'vtable:created', show_as: 'grid' });
   res.json(view);
 }
 

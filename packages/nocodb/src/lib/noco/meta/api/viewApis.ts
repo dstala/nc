@@ -58,7 +58,7 @@ export async function viewCreate(req: Request<any, any>, res, next) {}
 // @ts-ignore
 export async function viewUpdate(req, res) {
   const result = await View.update(req.params.viewId, req.body);
-  Tele.emit('evt', { evt_type: 'vtable:updated' });
+  Tele.emit('evt', { evt_type: 'vtable:updated', show_as: result.type });
   res.json(result);
 }
 

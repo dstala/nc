@@ -1396,7 +1396,45 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Column"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Column"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "uidt": {
+                        "type": "string",
+                        "enum": [
+                          "LinkToAnotherRecord"
+                        ]
+                      },
+                      "_cn": {
+                        "type": "string"
+                      },
+                      "parentId": {
+                        "type": "string"
+                      },
+                      "childId": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "hm",
+                          "bt",
+                          "mm"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "_cn",
+                      "parentId",
+                      "childId",
+                      "type"
+                    ]
+                  }
+                ]
               }
             }
           }

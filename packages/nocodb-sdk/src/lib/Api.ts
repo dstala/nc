@@ -609,6 +609,16 @@ export interface TableReorderPayloadType {
   order?: string;
 }
 
+export type ColumnCreatePayloadType =
+  | ColumnType
+  | {
+      uidt?: 'LinkToAnotherRecord';
+      _cn: string;
+      parentId: string;
+      childId: string;
+      type: 'hm' | 'bt' | 'mm';
+    };
+
 export interface ViewUpdatePayloadType {
   order?: string;
   title?: string;
@@ -1663,7 +1673,7 @@ export class Api<
      */
     columnCreate: (
       tableId: string,
-      data: ColumnType,
+      data: ColumnCreatePayloadType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({

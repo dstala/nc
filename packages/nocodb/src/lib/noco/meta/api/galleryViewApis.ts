@@ -30,7 +30,7 @@ export async function galleyViewList(
 
 // @ts-ignore
 export async function galleryViewCreate(req: Request<any, any>, res) {
-  Tele.emit('evt', { evt_type: 'view:created', type: 'gallery' });
+  Tele.emit('evt', { evt_type: 'vtable:created', show_as: 'gallery' });
   const view = await View.insert({
     ...req.body,
     // todo: sanitize

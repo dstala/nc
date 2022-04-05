@@ -20,7 +20,7 @@ export async function formViewGet(req: Request, res: Response<FormType>) {
 }
 
 export async function formViewCreate(req: Request<any, any>, res) {
-  Tele.emit('evt', { evt_type: 'view:created', type: 'form' });
+  Tele.emit('evt', { evt_type: 'vtable:created', show_as: 'form' });
   const view = await View.insert({
     ...req.body,
     // todo: sanitize
