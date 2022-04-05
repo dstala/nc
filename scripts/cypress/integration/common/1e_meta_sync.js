@@ -165,6 +165,7 @@ export const genTest = (apiType, dbType) => {
                 `${tblDisplayPrefix}table1`,
                 "New column(newCol), Column removed(col1)"
             );
+            mainPage.closeMetaTab();
 
             cy.openTableTab("Table1", 9);
             cy.deleteTable("Table1", dbType);

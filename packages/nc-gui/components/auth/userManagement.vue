@@ -40,6 +40,7 @@
       <!-- tooltip="Add new role" -->
       <x-btn
         v-if="_isUIAllowed('newUser')"
+        class="nc-new-user"
         v-ge="['roles','add new']"
         outlined
         :tooltip="$t('tooltip.addRole')"

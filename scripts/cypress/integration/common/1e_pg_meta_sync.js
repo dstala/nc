@@ -171,6 +171,7 @@ export const genTest = (apiType, dbType) => {
                 `${tblDisplayPrefix}table1`,
                 "New column(newcol), Column removed(col1)"
             );
+            mainPage.closeMetaTab();
 
             cy.openTableTab("Table1", 9);
             // kludge- delete table triggered post sql backend operations doesnt carry any trigger toast

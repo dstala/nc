@@ -7,7 +7,7 @@
           small
           light
           color="#fff3"
-          class="white--text"
+          class="white--text nc-btn-preview"
           v-on="on"
         >
           <v-icon small class="mr-1">
@@ -63,7 +63,7 @@
       :close-on-click="false"
       :close-on-content-click="false"
     >
-      <div class="floating-reset-btn white py-1 pr-3 caption primary lighten-2 white--text font-weight-bold d-flex align-center" style="overflow-y: hidden">
+      <div class="floating-reset-btn white py-1 pr-3 caption primary lighten-2 white--text font-weight-bold d-flex align-center nc-floating-preview-btn" style="overflow-y: hidden">
         <v-icon style="cursor: move" color="white" @mousedown="mouseDown">
           mdi-drag
         </v-icon>
@@ -86,7 +86,7 @@
               :value="role.title"
               color="white"
               dark
-              class="ml-1"
+              :class="`ml-1 nc-floating-preview-${role.title}`"
             >
               <template #label>
                 <span class="white--text caption text-capitalize">{{ role.title }}</span>

@@ -24,6 +24,7 @@ export const genTest = (apiType, dbType) => {
     describe("Static user creations (different roles)", () => {
         before(() => {
             mainPage.tabReset();
+            cy.get(".mdi-close").click();
             mainPage.navigationDraw(mainPage.TEAM_N_AUTH).click();
         });
 
@@ -58,6 +59,8 @@ export const genTest = (apiType, dbType) => {
         // Access contrl list- configuration
         //
         it(`Access control list- configuration`, () => {
+            mainPage.closeMetaTab();
+
             // open Project metadata tab
             //
             mainPage.navigationDraw(mainPage.PROJ_METADATA).click();
@@ -82,6 +85,8 @@ export const genTest = (apiType, dbType) => {
             disableTableAccess("customerlist", "editor");
             disableTableAccess("customerlist", "commenter");
             disableTableAccess("customerlist", "viewer");
+
+            mainPage.closeMetaTab();
         });
     });
 

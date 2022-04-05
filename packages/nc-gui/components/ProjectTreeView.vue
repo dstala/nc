@@ -671,7 +671,7 @@
           <div class="py-3 pl-5 pr-3 d-flex align-center">
             <settings-modal>
               <template #default="{click}">
-                <div class="caption pointer" @click="click" v-t="['project-settings']">
+                <div class="caption pointer nc-team-settings" @click="click" v-t="['project-settings']">
                   <v-icon color="brown" small class="mr-1">
                     mdi-cog
                   </v-icon>

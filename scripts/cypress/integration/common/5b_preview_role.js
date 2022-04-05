@@ -31,10 +31,16 @@ export const genTest = (apiType, dbType, roleType) => {
         before(() => {
             loginPage.loginAndOpenProject(apiType, dbType);
             cy.openTableTab("City", 25);
+            cy.get(".nc-btn-preview").click();
+            cy.getActiveMenu()
+                .find(".nc-preview-editor")
+                .should("exist")
+                .click();
         });
 
         after(() => {
-            cy.get(".nc-preview-reset").click({ force: true });
+            // cy.get(".nc-preview-reset").click({ force: true });
+            cy.get(".mdi-exit-to-app").click();
             // cy.wait(20000)
 
             // wait for page rendering to complete
@@ -75,7 +81,7 @@ export const genTest = (apiType, dbType, roleType) => {
 
         const genTestSub = (roleType) => {
             it(`Role preview: ${roleType}: Enable preview`, () => {
-                cy.get(`.nc-preview-${roleType}`).click();
+                cy.get(`.nc-floating-preview-${roleType}`).click();
             });
 
             it(`Role preview: ${roleType}: Advance settings`, () => {

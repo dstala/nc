@@ -61,7 +61,7 @@ export const genTest = (apiType, dbType) => {
 
         it("Delete Project", () => {
             //cy.visit('./#/projects')
-            cy.get(`.mdi-delete-circle-outline`, {
+            cy.get(`.mdi-delete-outline`, {
                 timeout: 10000,
             })
                 .should("exist")

@@ -59,6 +59,8 @@ export class _mainPage {
     }
 
     navigationDraw(item) {
+        // open settings tab
+        cy.get(".nc-team-settings").should("exist").click();
         // if (item == this.ROLE_VIEW)
         //     return cy.get('.nc-nav-drawer').find('.v-list').last()
         // else
@@ -66,21 +68,21 @@ export class _mainPage {
 
         switch (item) {
             case this.AUDIT:
-                return cy.get(".nc-settings-audit");
+                return cy.get(".nc-settings-audit:visible").should("exist");
             case this.APPSTORE:
-                return cy.get(".nc-settings-appstore");
+                return cy.get(".nc-settings-appstore:visible").should("exist");
             case this.TEAM_N_AUTH:
-                return cy.get(".nc-settings-teamauth");
+                return cy.get(".nc-settings-teamauth:visible").should("exist");
             case this.PROJ_METADATA:
-                return cy.get(".nc-settings-projmeta");
+                return cy.get(".nc-settings-projmeta:visible").should("exist");
             case this.ROLE_VIEW_EDITOR:
-                return cy.get(".nc-preview-editor");
+                return cy.get(".nc-preview-editor:visible").should("exist");
             case this.ROLE_VIEW_COMMENTER:
-                return cy.get(".nc-preview-commenter");
+                return cy.get(".nc-preview-commenter:visible").should("exist");
             case this.ROLE_VIEW_VIEWER:
-                return cy.get(".nc-preview-viewer");
+                return cy.get(".nc-preview-viewer:visible").should("exist");
             case this.ROLE_VIEW_RESET:
-                return cy.get(".nc-preview-reset");
+                return cy.get(".nc-preview-reset:visible").should("exist");
         }
     }
 
@@ -225,6 +227,8 @@ export class _mainPage {
         cy.toastWait(
             "Successfully installed and email notification will use SMTP configuration"
         );
+
+        this.closeMetaTab();
     };
 
     resetSMTP = () => {
@@ -236,6 +240,8 @@ export class _mainPage {
             .click({ force: true });
         cy.getActiveModal().find("button").contains("Submit").click();
         cy.toastWait("Plugin uninstalled successfully");
+
+        this.closeMetaTab();
     };
 
     shareView = () => {
@@ -313,9 +319,9 @@ export class _mainPage {
 
     filterField = (field, operation, value) => {
         cy.get(".nc-filter-menu-btn").click();
-        cy.wait(5000);
+        cy.wait(2000);
         cy.contains("Add Filter").click();
-        cy.wait(5000);
+        cy.wait(2000);
         cy.snipActiveMenu("Menu_FilterField");
 
         cy.get(".nc-filter-field-select").should("exist").last().click();
@@ -463,9 +469,11 @@ export class _mainPage {
 
     closeMetaTab() {
         // user href link to find meta mgmt tab
-        cy.get('[href="#disableOrEnableModel||||Meta Management"]')
-            .find("button.mdi-close")
-            .click({ force: true });
+        // cy.get('[href="#disableOrEnableModel||||Meta Management"]')
+        //     .find("button.mdi-close")
+        //     .click({ force: true });
+        cy.get("body").click("bottomRight");
+
         // refresh
         cy.refreshTableTab();
     }

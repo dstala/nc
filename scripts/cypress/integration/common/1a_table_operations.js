@@ -52,6 +52,10 @@ export const genTest = (apiType, dbType) => {
             getAuditCell(1, 0).contains("TABLE").should("exist");
             getAuditCell(1, 1).contains("CREATED").should("exist");
             getAuditCell(1, 3).contains("user@nocodb.com").should("exist");
+
+            // click on home icon to close modal
+            // cy.get(".nc-noco-brand-icon").click({ force: true });
+            cy.get("body").click("bottomRight");
         });
 
         it("Table Rename operation", () => {
