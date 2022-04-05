@@ -524,7 +524,7 @@ async function getMetaDiff(
 
 export async function metaDiff(req, res) {
   const project = await Project.getWithInfo(req.params.projectId);
-  const base = project.bases.find(b => b.id === req.params.baseId);
+  const base = project.bases[0];
 
   // @ts-ignore
   const sqlClient = NcConnectionMgrv2.getSqlClient(base);
@@ -535,7 +535,7 @@ export async function metaDiff(req, res) {
 
 export async function metaDiffSync(req, res) {
   const project = await Project.getWithInfo(req.params.projectId);
-  const base = project.bases.find(b => b.id === req.params.baseId);
+  const base = project.bases[0];
   const virtualColumnInsert: Array<() => Promise<void>> = [];
 
   // @ts-ignore
@@ -826,6 +826,6 @@ export async function extractAndGenerateManyToManyRelations(
 }
 
 const router = Router();
-router.get('/projects/:projectId/:baseId/metaDiff', ncMetaAclMw(metaDiff));
-router.post('/projects/:projectId/:baseId/metaDiff', ncMetaAclMw(metaDiffSync));
+router.get('/projects/:projectId/metaDiff', ncMetaAclMw(metaDiff));
+router.post('/projects/:projectId/metaDiff', ncMetaAclMw(metaDiffSync));
 export default router;
