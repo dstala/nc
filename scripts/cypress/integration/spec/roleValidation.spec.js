@@ -7,6 +7,8 @@ import { roles } from "../../support/page_objects/projectConstants";
 //  3. Preview mode menu
 //
 export function _advSettings(roleType, previewMode) {
+    cy.log(roleType, previewMode);
+
     let validationString =
         true == roles[roleType].validations.advSettings ? "exist" : "not.exist";
 
@@ -59,7 +61,7 @@ export function _advSettings(roleType, previewMode) {
     //         .should(validationString);
     // }
 
-    mainPage.closeMetaTab();
+    cy.get("body").click("bottomRight");
 }
 
 export function _editSchema(roleType, previewMode) {
