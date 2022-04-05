@@ -195,7 +195,7 @@ export default {
         //   columns
         // }])
 
-        await this.$api.dbTable.delete(this.meta.id, column.id)
+        await this.$api.dbTableColumn.delete(this.meta.id, column.id)
 
         this.$emit('colDelete')
         this.$emit('saved')
