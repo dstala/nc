@@ -43,7 +43,7 @@
               <v-icon class="mr-1" small :color="textColors[0]">
                 mdi-discord
               </v-icon>
-              <span class="caption" :title="$t('labels.community.joinDiscord')">{{
+              <span class="caption" :title="$t('labels.community.joinDiscord')" v-t="['community:discord']">{{
                 $t('labels.community.joinDiscord')
               }}</span>
             </v-list-item-title>
@@ -54,7 +54,7 @@
               <v-icon class="mr-1" small :color="textColors[1]">
                 mdi-twitter
               </v-icon>
-              <span class="caption" title="$t('labels.community.followNocodb')"> {{
+              <span class="caption" title="$t('labels.community.followNocodb')" v-t="['community:twitter']"> {{
                 $t('labels.community.followNocodb')
               }}</span>
             </v-list-item-title>
@@ -65,7 +65,7 @@
               <v-icon class="mr-1" small color="#ff4600">
                 mdi-reddit
               </v-icon>
-              <span class="caption" :title="$t('labels.community.joinReddit')">{{
+              <span class="caption" :title="$t('labels.community.joinReddit')" v-t="['community:reddit']">{{
                 $t('labels.community.joinReddit')
               }}</span>
             </v-list-item-title>
@@ -80,7 +80,7 @@
               <v-icon class="mr-1" small :color="textColors[3]">
                 mdi-calendar-month
               </v-icon>
-              <span class="caption" :title="$t('labels.community.bookDemo')">{{
+              <span class="caption" :title="$t('labels.community.bookDemo')" v-t="['community:book-demo']">{{
                 $t('labels.community.bookDemo')
               }}</span>
             </v-list-item-title>

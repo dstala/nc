@@ -68,6 +68,7 @@
                 <!--                </vue-recaptcha>-->
 
                 <v-btn
+                  v-t="['login:sign-up']"
                   v-ge="['Sign Up ','']"
                   color="primary"
                   class="btn--large"

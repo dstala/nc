@@ -27,7 +27,7 @@
         color="primary"
         small
         :disabled="loading"
-        @click="newTokenDialog = true"
+        @click="showNewTokenDlg"
       >
         <v-icon small left>
           mdi-plus

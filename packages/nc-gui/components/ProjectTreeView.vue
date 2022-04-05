@@ -209,7 +209,7 @@
                           v-for="child in item.children || []"
                           v-show="!search || child.name.toLowerCase().includes(search.toLowerCase())"
                           :key="child.key"
-                          v-t="['project:open']"
+                          v-t="['table:open']"
                           color="x-active"
                           active-class="font-weight-bold"
                           :selectable="true"
@@ -671,7 +671,7 @@
           <div class="py-3 pl-5 pr-3 d-flex align-center">
             <settings-modal>
               <template #default="{click}">
-                <div class="caption pointer" @click="click">
+                <div class="caption pointer" @click="click" v-t="['project-settings']">
                   <v-icon color="brown" small class="mr-1">
                     mdi-cog
                   </v-icon>
@@ -1332,6 +1332,7 @@ export default {
           this.dialogGetSequenceName.dialogShow = true
           break
       }
+      this.$tele.emit('table:create:trigger:mdi-plus-circle')
     },
 
     async handleCTXMenuClick(actionStr) {

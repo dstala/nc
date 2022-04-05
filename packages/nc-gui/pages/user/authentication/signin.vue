@@ -79,6 +79,7 @@
                 <!--                </v-btn>-->
 
                 <v-btn
+                  v-t="['login:sign-in']"
                   v-ge="['Sign In', '']"
                   color="primary"
                   large

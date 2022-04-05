@@ -22,14 +22,13 @@
 
               <v-spacer />
               <x-btn
-                v-t="['proj-meta:metadata:reload']"
                 btn.class="nc-btn-metasync-reload"
                 outlined
                 :tooltip="$t('tooltip.reloadList')"
                 small
                 color="primary"
                 icon="refresh"
-                @click="loadXcDiff()"
+                @click="clickReload"
               >
                 <!-- Reload -->
                 {{ $t('general.reload') }}
@@ -301,6 +300,10 @@ export default {
       //   env: this.$store.getters['project/GtrEnv']
       // }, 'xcMetaDiff'])
     },
+    clickReload() {
+      this.loadXcDiff()
+      this.$tele.emit('proj-meta:metadata:reload')
+    },    
     /* async addTableMeta(tables) {
       try {
         await this.$store.dispatch('sqlMgr/ActSqlOp', [{

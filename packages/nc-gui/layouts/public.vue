@@ -17,7 +17,6 @@
               to="/projects"
               icon class="pa-1 brand-icon nc-noco-brand-icon"
               v-on="on"
-              v-t="['toolbar:home']"
             >
               <v-img :src="require('~/assets/img/icons/512x512-trans.png')" max-height="30px" max-width="30px" />
               <!-- <v-icon color="primary">alpha-x-circle</v-icon

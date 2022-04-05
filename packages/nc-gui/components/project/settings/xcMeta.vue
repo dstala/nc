@@ -182,10 +182,9 @@ export default {
           }
           this.dialogShow = false
           this.loading = null
+          this.$tele.emit('proj-meta:export-zip:submit')
         }
       }
-
-      this.$tele.emit('proj-meta:export-zip:submit')
     },
     async resetMeta() {
       this.dialogShow = true

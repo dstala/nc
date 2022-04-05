@@ -16,6 +16,7 @@
           <v-tooltip bottom>
             <template #activator="{ on }">
               <v-btn
+                v-t="['toolbar:home']"
                 to="/projects"
                 icon
                 class="pa-1 pr-0 brand-icon nc-noco-brand-icon"
