@@ -69,7 +69,7 @@
               </div>
             </template>
             <v-list dense>
-              <v-list-item dense @click="createSharedBase('viewer')">
+              <v-list-item dense @click="createSharedBase('viewer')" v-if="!base.uuid">
                 <v-list-item-title>
                   <v-icon small class="mr-1">
                     mdi-link-variant
@@ -80,14 +80,14 @@
                   </span>
                 </v-list-item-title>
               </v-list-item>
-              <v-list-item dense @click="disableSharedBase">
+              <v-list-item dense @click="disableSharedBase" v-if="base.uuid">
                 <v-list-item-title>
                   <v-icon small class="mr-1">
                     mdi-link-variant-off
                   </v-icon>
                   <span class="caption">
                     <!-- Disable shared base -->
-                    {{ $t('activity.shareBase.link') }}
+                    {{ $t('activity.shareBase.disable') }}
                   </span>
                 </v-list-item-title>
               </v-list-item>
