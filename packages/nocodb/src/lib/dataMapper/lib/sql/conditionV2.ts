@@ -179,7 +179,7 @@ const parseConditionV2 = async (
         })
       ).builder;
       return parseConditionV2(
-        new Filter({ ...filter, value: knex.raw(filter.value) } as any),
+        new Filter({ ...filter, value: knex.raw('?', [filter.value]) } as any),
         knex,
         aliasCount,
         alias,
@@ -196,7 +196,7 @@ const parseConditionV2 = async (
         )
       ).builder;
       return parseConditionV2(
-        new Filter({ ...filter, value: knex.raw(filter.value) } as any),
+        new Filter({ ...filter, value: knex.raw('?', [filter.value]) } as any),
         knex,
         aliasCount,
         alias,
