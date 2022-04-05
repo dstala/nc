@@ -2,26 +2,23 @@ export enum ViewTypes {
   FORM = 1,
   GALLERY = 2,
   GRID = 3,
-  KANBAN = 4
+  KANBAN = 4,
 }
 
 export enum RelationTypes {
   HAS_MANY = 'hm',
   BELONGS_TO = 'bt',
-  MANY_TO_MANY = 'mm'
+  MANY_TO_MANY = 'mm',
 }
-
 
 export enum ExportTypes {
-  CSV = 'csv'
+  CSV = 'csv',
 }
-
 
 export enum ErrorMessages {
   INVALID_SHARED_VIEW_PASSWORD = 'INVALID_SHARED_VIEW_PASSWORD',
   NOT_IMPLEMENTED = 'NOT_IMPLEMENTED',
 }
-
 
 export enum AuditOperationTypes {
   COMMENT = 'COMMENT',
@@ -35,7 +32,7 @@ export enum AuditOperationTypes {
   META = 'META',
   WEBHOOKS = 'WEBHOOKS',
   AUTHENTICATION = 'AUTHENTICATION',
-  TABLE_COLUMN='TABLE_COLUMN',
+  TABLE_COLUMN = 'TABLE_COLUMN',
 }
 
 export enum AuditOperationSubTypes {
@@ -61,11 +58,11 @@ export enum AuditOperationSubTypes {
 }
 
 export enum PluginCategory {
-  STORAGE='Storage',
-  EMAIL='Email'
+  STORAGE = 'Storage',
+  EMAIL = 'Email',
 }
 
 export enum ModelTypes {
-  TABLE='table',
-  VIEW='view'
+  TABLE = 'table',
+  VIEW = 'view',
 }

@@ -5,7 +5,6 @@ import { Tele } from 'nc-help';
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
-  ListParams5Type,
   ModelTypes,
   TableListType,
   TableReqType,
@@ -46,10 +45,7 @@ export async function tableReorder(req: Request, res: Response) {
   res.json(Model.updateOrder(req.params.tableId, req.body.order));
 }
 
-export async function tableList(
-  req: Request<any, any, any, ListParams5Type>,
-  res: Response<TableListType>
-) {
+export async function tableList(req: Request, res: Response<TableListType>) {
   const viewList = await xcVisibilityMetaGet(req.params.projectId);
 
   // todo: optimise

@@ -591,7 +591,7 @@ export interface UploadPayloadType {
   json?: string;
 }
 
-export interface ListParams2Type {
+export interface ListParams8Type {
   page?: number;
   pageSize?: number;
   sort?: string;
@@ -624,7 +624,7 @@ export interface UpdateInputType {
   lock_type?: 'collaborative' | 'locked' | 'personal';
 }
 
-export type CreatePayload7Type = any;
+export type CreatePayload3Type = any;
 
 export interface ShowAllColumnParamsType {
   ignoreIds?: any[];
@@ -636,13 +636,11 @@ export interface HideAllColumnParamsType {
   viewId: string;
 }
 
-export type UpdatePayload8Type = any;
+export type UpdatePayload3Type = any;
 
-export type UpdatePayload2Type = any;
+export type CreatePayload1Type = any;
 
-export type CreatePayload9Type = any;
-
-export interface ListParams9Type {
+export interface ListParams1Type {
   fields?: any[];
   sort?: any[];
   where?: string;
@@ -651,11 +649,9 @@ export interface ListParams9Type {
   tableAlias: string;
 }
 
-export interface CreatePayload3Type {
-  description?: string;
-}
+export type CreatePayload4Type = any;
 
-export interface ListParams7Type {
+export interface ListParams9Type {
   fields?: any[];
   sort?: any[];
   where?: string;
@@ -668,7 +664,7 @@ export interface ListParams7Type {
   viewName: string;
 }
 
-export type CreatePayload6Type = any;
+export type CreatePayload2Type = any;
 
 export interface DataListPayloadType {
   password?: string;
@@ -726,7 +722,9 @@ export interface SharedViewMetaGetPayloadType {
   password?: string;
 }
 
-export type UpdatePayload5Type = any;
+export type UpdatePayload9Type = any;
+
+export type UpdatePayload7Type = any;
 
 export interface CommentListParamsType {
   row_id: string;
@@ -772,6 +770,10 @@ export interface TestBodyType {
 }
 
 export type TestConnectionPayloadType = any;
+
+export interface CreatePayload10Type {
+  description?: string;
+}
 
 export type BulkDeletePayloadType = any[];
 
@@ -2153,7 +2155,7 @@ export class Api<
      * @response `200` `TableListType`
      */
     list: (
-      { projectId, ...query }: ListParams2Type,
+      { projectId, ...query }: ListParams8Type,
       params: RequestParams = {}
     ) =>
       this.request<TableListType, any>({
@@ -2378,7 +2380,7 @@ export class Api<
      */
     create: (
       viewId: string,
-      data: CreatePayload7Type,
+      data: CreatePayload3Type,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -2416,7 +2418,7 @@ export class Api<
     update: (
       viewId: string,
       columnId: string,
-      data: UpdatePayload8Type,
+      data: UpdatePayload3Type,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -2454,7 +2456,7 @@ export class Api<
      */
     update: (
       viewId: string,
-      data: UpdatePayload2Type,
+      data: UpdatePayload3Type,
       params: RequestParams = {}
     ) =>
       this.request<SharedViewType, any>({
@@ -2823,7 +2825,7 @@ export class Api<
      */
     create: (
       tableId: string,
-      data: CreatePayload9Type,
+      data: CreatePayload1Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -2974,7 +2976,7 @@ export class Api<
     update: (
       tableId: string,
       rowId: string,
-      data: UpdatePayload2Type,
+      data: UpdatePayload9Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3011,7 +3013,7 @@ export class Api<
      * @response `200` `any` OK
      */
     list: (
-      { orgs, projectName, tableAlias, ...query }: ListParams9Type,
+      { orgs, projectName, tableAlias, ...query }: ListParams1Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3034,7 +3036,7 @@ export class Api<
       orgs: string,
       projectName: string,
       tableAlias: string,
-      data: CreatePayload3Type,
+      data: CreatePayload4Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3081,7 +3083,7 @@ export class Api<
       projectName: string,
       tableAlias: string,
       rowId: string,
-      data: UpdatePayload5Type,
+      data: UpdatePayload7Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3237,7 +3239,7 @@ export class Api<
      * @response `200` `any` OK
      */
     list: (
-      { orgs, projectName, tableAlias, viewName, ...query }: ListParams7Type,
+      { orgs, projectName, tableAlias, viewName, ...query }: ListParams9Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3261,7 +3263,7 @@ export class Api<
       projectName: string,
       tableAlias: string,
       viewName: string,
-      data: CreatePayload6Type,
+      data: CreatePayload2Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3310,7 +3312,7 @@ export class Api<
       tableAlias: string,
       viewName: string,
       rowId: string,
-      data: UpdatePayload5Type,
+      data: UpdatePayload3Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3718,7 +3720,7 @@ export class Api<
      */
     create: (
       projectId: string,
-      data: CreatePayload3Type,
+      data: CreatePayload10Type,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
