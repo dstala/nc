@@ -9,7 +9,7 @@
             dense
             hide-details
             class="my-2 mx-auto search-field"
-            :placeholder="`Search '${db.database}' models`"
+            placeholder="Search models"
             style="max-width:300px"
             outlined
           >
@@ -19,7 +19,6 @@
               </v-icon>
             </template>
           </v-text-field>
-
           <v-spacer />
           <x-btn
             outlined

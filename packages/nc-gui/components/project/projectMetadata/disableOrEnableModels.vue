@@ -28,50 +28,9 @@
             :db="db"
             :db-id="db.id"
           />
-          <!--          <v-tabs color="x-active" height="28">
-            <v-tab class="text-capitalize caption">
-              Tables
-            </v-tab>
-            <v-tab-item>
-              <disable-or-enable-tables
-                :nodes="nodes"
-                :db="db"
-                :db-alias="db.id"
-              />
-            </v-tab-item>
-            &lt;!&ndash; enable extra &ndash;&gt;
-            <v-tab class="text-capitalize caption">
-              Views
-            </v-tab>
-            <v-tab-item>
-              <disable-or-enable-views
-                :nodes="nodes"
-                :db="db"
-                :db-alias="db.id"
-              />
-            </v-tab-item>
-            &lt;!&ndash; <v-tab class="text-capitalize caption">Functions</v-tab>
-             <v-tab-item>
-               <disable-or-enable-functions :nodes="nodes" :db="db"
-                                            :db-alias="db.id"></disable-or-enable-functions>
-             </v-tab-item>
-             <v-tab class="text-capitalize caption">Procedures</v-tab>
-             <v-tab-item>
-               <disable-or-enable-procedures :nodes="nodes" :db="db"
-                                             :db-alias="db.id"></disable-or-enable-procedures>
-             </v-tab-item>&ndash;&gt;
-
-            <v-tab class="text-capitalize caption">
-              Relations
-            </v-tab>
-            <v-tab-item>
-              <disable-or-enable-relations :nodes="nodes" :db-alias="db.id" />
-            </v-tab-item>
-          </v-tabs>-->
         </v-tab-item>
         <template v-if="uiacl">
           <v-tab :key="db.id + 'acl'" :href="'#' + db.id + 'acl'" class="text-capitalize caption nc-ui-acl-tab">
-            <!--          {{ db.connection.database | extractDbName }}-->
             <!--UI Access Control-->
             {{ $t('title.uiACL') }}
           </v-tab>
@@ -88,34 +47,6 @@
                   :db-alias="db.id"
                 />
               </v-tab-item>
-            <!-- enable extra -->
-            <!--  <v-tab class="text-capitalize caption">Views</v-tab>
-              <v-tab-item>
-                <toggle-view-ui-acl :nodes="nodes" :db="db"
-                                    :db-alias="db.id"></toggle-view-ui-acl>
-              </v-tab-item>
-              <v-tab class="text-capitalize caption">Functions</v-tab>
-              <v-tab-item>
-                <toggle-function-ui-acl :nodes="nodes" :db="db"
-                                        :db-alias="db.id"></toggle-function-ui-acl>
-              </v-tab-item>
-
-              <v-tab class="text-capitalize caption">Procedures</v-tab>
-              <v-tab-item>
-                <toggle-procedure-ui-acl :nodes="nodes" :db="db"
-                                         :db-alias="db.id"></toggle-procedure-ui-acl>
-
-              </v-tab-item>-->
-            <!--            <v-tab class="text-capitalize caption">
-              Relations
-            </v-tab>
-            <v-tab-item>
-              <toggle-relations-ui-acl
-                :nodes="nodes"
-                :db="db"
-                :db-alias="db.id"
-              />
-            </v-tab-item>-->
             </v-tabs>
           </v-tab-item>
         </template>
@@ -127,22 +58,16 @@
 <script>
 import { mapGetters } from 'vuex'
 import XcMeta from '../settings/xcMeta'
-// import DisableOrEnableRelations from './sync/disableOrEnableRelations'
 import { isMetaTable } from '@/helpers/xutils'
 import metaDiffSync from '~/components/project/projectMetadata/sync/metaDiffSync'
 import ToggleTableUiAcl from '@/components/project/projectMetadata/uiAcl/toggleTableUIAcl'
-// import ToggleRelationsUiAcl from '@/components/project/projectMetadata/uiAcl/toggleRelationsUIAcl'
-// import DisableOrEnableViews from '~/components/project/projectMetadata/sync/disableOrEnableViews'
 
 export default {
   name: 'DisableOrEnableModels',
   components: {
-    // DisableOrEnableViews,
-    // ToggleRelationsUiAcl,
     ToggleTableUiAcl,
     metaDiffSync,
     XcMeta
-    // DisableOrEnableRelations
   },
   props: ['nodes'],
   data: () => ({
