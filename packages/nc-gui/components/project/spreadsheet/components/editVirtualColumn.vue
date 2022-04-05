@@ -91,7 +91,7 @@ export default {
       this.newColumn = rest
 
       if (rest.uidt === UITypes.Formula) {
-        this.newColumn.formula_raw = substituteColumnIdWithAliasInFormula(colOptions.formula, this.meta.columns)
+        this.newColumn.formula_raw = substituteColumnIdWithAliasInFormula(colOptions.formula, this.meta.columns, colOptions.formula_raw)
       }
     }
   },
@@ -102,7 +102,7 @@ export default {
     this.newColumn = rest
 
     if (rest.uidt === UITypes.Formula) {
-      this.newColumn.formula_raw = substituteColumnIdWithAliasInFormula(colOptions.formula, this.meta.columns)
+      this.newColumn.formula_raw = substituteColumnIdWithAliasInFormula(colOptions.formula, this.meta.columns, colOptions.formula_raw)
     }
   },
   methods: {

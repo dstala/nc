@@ -612,8 +612,8 @@ export interface TableReorderPayloadType {
 export type ColumnCreatePayloadType =
   | ColumnType
   | {
-      uidt?: 'LinkToAnotherRecord';
-      _cn: string;
+      uidt: 'LinkToAnotherRecord';
+      title: string;
       parentId: string;
       childId: string;
       type: 'hm' | 'bt' | 'mm';
@@ -1493,29 +1493,6 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name TableCreate
-     * @request POST:/projects/{projectId}/{baseId}/tables
-     * @response `200` `TableType` OK
-     */
-    tableCreate: (
-      projectId: string,
-      baseId: string,
-      data: TableReqType,
-      params: RequestParams = {}
-    ) =>
-      this.request<TableType, any>({
-        path: `/projects/${projectId}/${baseId}/tables`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
      * @name TableList
      * @request GET:/projects/{projectId}/{baseId}/tables
      * @response `200` `TableListType`
@@ -2308,100 +2285,6 @@ export class Api<
      * No description
      *
      * @tags Meta
-     * @name WebhookGet
-     * @request GET:/tables/{tableId}/webhooks/{webhookId}
-     * @response `200` `void` OK
-     */
-    webhookGet: (
-      tableId: string,
-      webhookId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/webhooks/${webhookId}`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name WebhookUpdate
-     * @request PUT:/tables/{tableId}/webhooks/{webhookId}
-     * @response `200` `void` OK
-     */
-    webhookUpdate: (
-      tableId: string,
-      webhookId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/webhooks/${webhookId}`,
-        method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name WebhookDelete
-     * @request DELETE:/tables/{tableId}/webhooks/{webhookId}
-     * @response `200` `void` OK
-     */
-    webhookDelete: (
-      tableId: string,
-      webhookId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/webhooks/${webhookId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name WebhookList
-     * @request GET:/tables/{tableId}/webhooks
-     * @response `200` `(WebhookType)[]` OK
-     */
-    webhookList: (tableId: string, params: RequestParams = {}) =>
-      this.request<WebhookType[], any>({
-        path: `/tables/${tableId}/webhooks`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name WebhookCreate
-     * @request POST:/tables/{tableId}/webhooks
-     * @response `200` `void` OK
-     */
-    webhookCreate: (
-      tableId: string,
-      data: WebhookType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/webhooks`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
      * @name GridCreate
      * @request POST:/tables/{tableId}/grids
      * @response `200` `GridType` OK
@@ -3162,35 +3045,6 @@ export class Api<
         ...params,
       }),
   };
-  projects = {
-    /**
-     * @description USer registration apis
-     *
-     * @name ProjectUpdate
-     * @request PUT:/projects/{projectId}
-     * @response `200` `void` OK
-     */
-    projectUpdate: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}`,
-        method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name ProjectReorder
-     * @request POST:/projects/{projectId}/reorder
-     * @response `200` `void` OK
-     */
-    projectReorder: (projectId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/reorder`,
-        method: 'POST',
-        ...params,
-      }),
-  };
   public = {
     /**
      * @description Read project details
@@ -3356,7 +3210,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags
+     * @tags Public
      * @name SharedViewMetaGet
      * @request POST:/public/meta/{uuid}
      * @response `200` `object` OK
@@ -3375,22 +3229,27 @@ export class Api<
         ...params,
       }),
   };
-  tables = {
+  dbTable = {
     /**
      * No description
      *
-     * @name WebhookReorder
-     * @request POST:/tables/{tableId}/webhooks/{webhookId}/reorder
-     * @response `200` `void` OK
+     * @tags Db table
+     * @name TableCreate
+     * @request POST:/projects/{projectId}/{baseId}/tables
+     * @response `200` `TableType` OK
      */
-    webhookReorder: (
-      tableId: string,
-      webhookId: string,
+    tableCreate: (
+      projectId: string,
+      baseId: string,
+      data: TableReqType,
       params: RequestParams = {}
     ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/webhooks/${webhookId}/reorder`,
+      this.request<TableType, any>({
+        path: `/projects/${projectId}/${baseId}/tables`,
         method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
   };
@@ -3615,6 +3474,7 @@ export class Api<
     /**
      * No description
      *
+     * @tags Data
      * @name NestedDelete
      * @request DELETE:/data/{tableId}/{rowId}/{relationType}/{colId}/{referenceTableRowId}
      * @response `200` `void` OK
@@ -3895,11 +3755,11 @@ export class Api<
         format: 'json',
         ...params,
       }),
-  };
-  bulkData = {
+
     /**
      * No description
      *
+     * @tags Data
      * @name BulkUpdateAll
      * @request PATCH:/bulkData/{orgs}/{projectName}/{tableAlias}/all
      * @response `200` `any` OK
@@ -3922,6 +3782,7 @@ export class Api<
     /**
      * No description
      *
+     * @tags Data
      * @name BulkDeleteAll
      * @request DELETE:/bulkData/{orgs}/{projectName}/{tableAlias}/all
      * @response `200` `any` OK

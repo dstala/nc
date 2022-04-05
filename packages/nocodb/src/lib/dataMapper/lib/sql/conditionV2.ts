@@ -187,13 +187,9 @@ const parseConditionV2 = async (
       );
     } else if (column.uidt === UITypes.Formula && !customWhereClause) {
       const model = await column.getModel();
+      const formula = await column.getColOptions<FormulaColumn>();
       const builder = (
-        await formulaQueryBuilderv2(
-          (await column.getColOptions<FormulaColumn>()).formula,
-          null,
-          knex,
-          model
-        )
+        await formulaQueryBuilderv2(formula.formula, null, knex, model)
       ).builder;
       return parseConditionV2(
         new Filter({ ...filter, value: knex.raw('?', [filter.value]) } as any),

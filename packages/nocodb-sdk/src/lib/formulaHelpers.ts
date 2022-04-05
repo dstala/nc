@@ -1,35 +1,37 @@
-import jsep from 'jsep'
+import jsep from 'jsep';
 
-
-import {ColumnType} from "./Api";
-export  function substituteColumnIdWithAliasInFormula(
+import { ColumnType } from './Api';
+export function substituteColumnIdWithAliasInFormula(
   formula,
-  columns: ColumnType[]
+  columns: ColumnType[],
+  rawFormula?
 ) {
-  const substituteId =  (pt: any) => {
+  const substituteId = (pt: any, ptRaw?: any) => {
     if (pt.type === 'CallExpression') {
-      // eslint-disable-next-line functional/no-loop-statement
+      let i = 0;
       for (const arg of pt.arguments || []) {
-         substituteId(arg);
+        substituteId(arg, ptRaw?.arguments?.[i++]);
       }
     } else if (pt.type === 'Literal') {
       return;
     } else if (pt.type === 'Identifier') {
       const colNameOrId = pt.name;
       const column = columns.find(
-        c =>
-          c.id === colNameOrId || c.column_name === colNameOrId || c.title === colNameOrId
+        (c) =>
+          c.id === colNameOrId ||
+          c.column_name === colNameOrId ||
+          c.title === colNameOrId
       );
-      // eslint-disable-next-line functional/immutable-data
-      pt.name = column.title;
+      pt.name = column?.title || ptRaw?.name || pt?.name;
     } else if (pt.type === 'BinaryExpression') {
-       substituteId(pt.left);
-       substituteId(pt.right);
+      substituteId(pt.left, ptRaw?.left);
+      substituteId(pt.right, ptRaw?.right);
     }
   };
 
   const parsedFormula = jsep(formula);
-  substituteId(parsedFormula);
+  const parsedRawFormula = rawFormula && jsep(rawFormula);
+  substituteId(parsedFormula, parsedRawFormula);
   return jsepTreeToFormula(parsedFormula);
 }
 
@@ -85,7 +87,7 @@ export function jsepTreeToFormula(node) {
   }
 
   if (node.type === 'Compound') {
-    return node.body.map(e => jsepTreeToFormula(e)).join(' ');
+    return node.body.map((e) => jsepTreeToFormula(e)).join(' ');
   }
 
   if (node.type === 'ConditionalExpression') {
