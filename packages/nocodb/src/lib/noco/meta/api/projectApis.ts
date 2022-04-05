@@ -199,6 +199,7 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
 
       const columns: Array<Omit<Column, 'column_name' | 'title'> & {
         cn: string;
+        system?: boolean;
       }> = (await sqlClient.columnList({ tn: table.tn }))?.data?.list;
 
       const hasMany =
@@ -225,7 +226,10 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
         ...belongsTo.map(bt => {
           // find and mark foreign key column
           const fkColumn = columns.find(c => c.cn === bt.cn);
-          if (fkColumn) fkColumn.uidt = UITypes.ForeignKey;
+          if (fkColumn) {
+            fkColumn.uidt = UITypes.ForeignKey;
+            fkColumn.system = true;
+          }
 
           return {
             uidt: UITypes.LinkToAnotherRecord,

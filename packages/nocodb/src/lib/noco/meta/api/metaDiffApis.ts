@@ -663,6 +663,12 @@ export async function metaDiffSync(req, res) {
                 .getColumns()
                 .then(cols => cols.find(c => c.column_name === change.cn));
 
+              await Column.update(childCol.id, {
+                ...childCol,
+                uidt: UITypes.ForeignKey,
+                system: true
+              });
+
               if (change.relationType === RelationTypes.BELONGS_TO) {
                 const title = getUniqueColumnAliasName(
                   childModel.columns,
