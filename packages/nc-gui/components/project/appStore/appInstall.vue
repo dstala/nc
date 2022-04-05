@@ -158,7 +158,7 @@ export default {
         //   id: this.pluginId,
         //   title: this.plugin.title
         // }])
-        await this.$api.meta.pluginUpdate(this.id, {
+        await this.$api.plugin.update(this.id, {
           input: JSON.stringify(this.settings),
           active: 1
         })
@@ -180,7 +180,7 @@ export default {
         //   category: this.plugin.category,
         //   title: this.plugin.title
         // }])
-        const res = (await this.$api.meta.pluginTest({
+        const res = (await this.$api.plugin.test({
           input: this.settings,
           id: this.pluginId,
           category: this.plugin.category,
@@ -214,7 +214,7 @@ export default {
         // this.plugin = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginRead', {
         //   title: this.title
         // }])
-        this.plugin = (await this.$api.meta.pluginRead(this.id))
+        this.plugin = (await this.$api.plugin.read(this.id))
         this.formDetails = JSON.parse(this.plugin.input_schema)
         this.pluginId = this.plugin.id
         this.settings = JSON.parse(this.plugin.input) || (this.formDetails.array ? [{}] : {})

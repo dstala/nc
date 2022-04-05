@@ -230,7 +230,7 @@ export default {
         //   title: this.resetPluginRef.title,
         //   uninstall: true
         // }])
-        await this.$api.meta.pluginUpdate(this.resetPluginRef.id, {
+        await this.$api.plugin.update(this.resetPluginRef.id, {
           input: null,
           active: 0
         })
@@ -260,7 +260,7 @@ export default {
     async loadPluginList() {
       try {
         // const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
-        const plugins = (await this.$api.meta.pluginList()).list
+        const plugins = (await this.$api.plugin.list()).list
         // plugins.push(...plugins.splice(0, 3))
         this.apps = plugins.map((p) => {
           p.tags = p.tags ? p.tags.split(',') : []

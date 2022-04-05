@@ -561,21 +561,20 @@ export type ProjectUserAddPayloadType = any;
 
 export type ProjectUserUpdatePayloadType = any;
 
-export interface ProjectModelVisibilityListParamsType {
+export interface ModelVisibilityListParamsType {
   includeM2M?: boolean;
   projectId: string;
-  baseId: string;
 }
 
-export type ProjectModelVisibilitySetPayloadType = any;
+export type ModelVisibilitySetPayloadType = any;
 
-export interface ProjectListParamsType {
+export interface ListParamsType {
   page?: number;
   pageSize?: number;
   sort?: string;
 }
 
-export type ProjectCreatePayloadType = ProjectType & { external?: boolean };
+export type CreatePayloadType = ProjectType & { external?: boolean };
 
 export interface SharedBaseCreatePayloadType {
   roles?: string;
@@ -592,24 +591,23 @@ export interface UploadPayloadType {
   json?: string;
 }
 
-export interface TableListParamsType {
+export interface ListParams2Type {
   page?: number;
   pageSize?: number;
   sort?: string;
   includeM2M?: boolean;
   projectId: string;
-  baseId: string;
 }
 
-export interface TableUpdatePayloadType {
+export interface UpdatePayloadType {
   title?: string;
 }
 
-export interface TableReorderPayloadType {
+export interface ReorderPayloadType {
   order?: string;
 }
 
-export type ColumnCreatePayloadType =
+export type CreateInputType =
   | ColumnType
   | {
       uidt: 'LinkToAnotherRecord';
@@ -619,34 +617,32 @@ export type ColumnCreatePayloadType =
       type: 'hm' | 'bt' | 'mm';
     };
 
-export interface ViewUpdatePayloadType {
+export interface UpdateInputType {
   order?: string;
   title?: string;
   show_system_fields?: boolean;
   lock_type?: 'collaborative' | 'locked' | 'personal';
 }
 
-export type ViewColumnCreatePayloadType = any;
+export type CreatePayload7Type = any;
 
-export interface ViewShowAllColumnParamsType {
+export interface ShowAllColumnParamsType {
   ignoreIds?: any[];
   viewId: string;
 }
 
-export interface ViewHideAllColumnParamsType {
+export interface HideAllColumnParamsType {
   ignoreIds?: any[];
   viewId: string;
 }
 
-export type ViewColumnUpdatePayloadType = any;
+export type UpdatePayload8Type = any;
 
-export interface SharedViewUpdatePayloadType {
-  password?: string;
-}
+export type UpdatePayload2Type = any;
 
-export type CreatePayloadType = any;
+export type CreatePayload9Type = any;
 
-export interface ModelListParamsType {
+export interface ListParams9Type {
   fields?: any[];
   sort?: any[];
   where?: string;
@@ -655,9 +651,11 @@ export interface ModelListParamsType {
   tableAlias: string;
 }
 
-export type ModelCreatePayloadType = any;
+export interface CreatePayload3Type {
+  description?: string;
+}
 
-export interface ViewListParamsType {
+export interface ListParams7Type {
   fields?: any[];
   sort?: any[];
   where?: string;
@@ -670,7 +668,7 @@ export interface ViewListParamsType {
   viewName: string;
 }
 
-export type ViewCreatePayloadType = any;
+export type CreatePayload6Type = any;
 
 export interface DataListPayloadType {
   password?: string;
@@ -728,11 +726,7 @@ export interface SharedViewMetaGetPayloadType {
   password?: string;
 }
 
-export type UpdatePayloadType = any;
-
-export type ViewUpdateBodyType = any;
-
-export type ModelUpdatePayloadType = any;
+export type UpdatePayload5Type = any;
 
 export interface CommentListParamsType {
   row_id: string;
@@ -751,7 +745,7 @@ export interface CommentCountParamsType {
   fk_model_id: string;
 }
 
-export interface ProjectAuditListParamsType {
+export interface AuditListParamsType {
   offset?: string;
   limit?: string;
   projectId: string;
@@ -765,12 +759,12 @@ export interface AuditRowUpdatePayloadType {
   prev_value?: string;
 }
 
-export interface HookTestPayloadType {
+export interface TestPayloadType {
   payload?: { data?: any; user?: any };
   hook?: HookType;
 }
 
-export interface PluginTestPayloadType {
+export interface TestBodyType {
   id?: string;
   title?: string;
   input?: any;
@@ -778,10 +772,6 @@ export interface PluginTestPayloadType {
 }
 
 export type TestConnectionPayloadType = any;
-
-export interface ApiTokenCreatePayloadType {
-  description?: string;
-}
 
 export type BulkDeletePayloadType = any[];
 
@@ -978,7 +968,7 @@ export class Api<
     /**
      * @description App user registration
      *
-     * @tags AUTH
+     * @tags Auth
      * @name Signup
      * @summary Signup
      * @request POST:/auth/user/signup
@@ -1002,7 +992,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name Signin
      * @summary Signin
      * @request POST:/auth/user/signin
@@ -1021,7 +1011,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name Me
      * @summary User Info
      * @request GET:/auth/user/me
@@ -1038,7 +1028,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name PasswordForgot
      * @summary Password Forgot
      * @request POST:/auth/password/forgot
@@ -1059,7 +1049,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name PasswordChange
      * @summary Password Change
      * @request POST:/auth/password/change
@@ -1080,7 +1070,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name PasswordResetTokenValidate
      * @summary Password Reset
      * @request POST:/auth/token/validate/{token}
@@ -1096,7 +1086,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name EmailValidate
      * @summary Password Reset
      * @request POST:/auth/email/validate/{token}
@@ -1112,7 +1102,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name PasswordReset
      * @summary Password Reset
      * @request POST:/auth/password/reset/{token}
@@ -1134,7 +1124,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name TokenVerify
      * @summary Password Verify
      * @request POST:/auth/token/verify
@@ -1152,7 +1142,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name TokenRefresh
      * @summary Password Refresh
      * @request POST:/auth/token/refresh
@@ -1168,7 +1158,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags AUTH
+     * @tags Auth
      * @name ProjectUserList
      * @summary Password Refresh
      * @request GET:/projects/{projectId}/users
@@ -1188,7 +1178,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags auth
+     * @tags Auth
      * @name ProjectUserAdd
      * @request POST:/projects/{projectId}/users
      * @response `200` `any` OK
@@ -1210,7 +1200,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags auth
+     * @tags Auth
      * @name ProjectUserUpdate
      * @request PUT:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
@@ -1233,7 +1223,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags auth
+     * @tags Auth
      * @name ProjectUserRemove
      * @request DELETE:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
@@ -1250,18 +1240,18 @@ export class Api<
         ...params,
       }),
   };
-  meta = {
+  project = {
     /**
      * No description
      *
-     * @tags meta
-     * @name ProjectMetaGet
+     * @tags Project
+     * @name MetaGet
      * @summary User Info
      * @request GET:/projects/{projectId}/info
      * @response `200` `UserType` OK
      * @response `0` `{ Node?: string, Arch?: string, Platform?: string, Docker?: boolean, Database?: string, ProjectOnRootDB?: string, RootDB?: string, PackageVersion?: string }`
      */
-    projectMetaGet: (projectId: string, params: RequestParams = {}) =>
+    metaGet: (projectId: string, params: RequestParams = {}) =>
       this.request<
         UserType,
         {
@@ -1284,18 +1274,17 @@ export class Api<
     /**
      * No description
      *
-     * @tags meta
-     * @name ProjectModelVisibilityList
-     * @summary Password Refresh
-     * @request GET:/projects/{projectId}/{baseId}/modelVisibility
+     * @tags Project
+     * @name ModelVisibilityList
+     * @request GET:/projects/{projectId}/modelVisibility
      * @response `200` `(any)[]` OK
      */
-    projectModelVisibilityList: (
-      { projectId, baseId, ...query }: ProjectModelVisibilityListParamsType,
+    modelVisibilityList: (
+      { projectId, ...query }: ModelVisibilityListParamsType,
       params: RequestParams = {}
     ) =>
       this.request<any[], any>({
-        path: `/projects/${projectId}/${baseId}/modelVisibility`,
+        path: `/projects/${projectId}/modelVisibility`,
         method: 'GET',
         query: query,
         format: 'json',
@@ -1305,19 +1294,18 @@ export class Api<
     /**
      * No description
      *
-     * @tags meta
-     * @name ProjectModelVisibilitySet
-     * @request POST:/projects/{projectId}/{baseId}/modelVisibility
+     * @tags Project
+     * @name ModelVisibilitySet
+     * @request POST:/projects/{projectId}/modelVisibility
      * @response `200` `any` OK
      */
-    projectModelVisibilitySet: (
+    modelVisibilitySet: (
       projectId: string,
-      baseId: string,
-      data: ProjectModelVisibilitySetPayloadType,
+      data: ModelVisibilitySetPayloadType,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/${baseId}/modelVisibility`,
+        path: `/projects/${projectId}/modelVisibility`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -1328,12 +1316,12 @@ export class Api<
     /**
      * @description Read project details
      *
-     * @tags Meta
-     * @name ProjectList
+     * @tags Project
+     * @name List
      * @request GET:/projects/
      * @response `201` `ProjectListType`
      */
-    projectList: (query: ProjectListParamsType, params: RequestParams = {}) =>
+    list: (query: ListParamsType, params: RequestParams = {}) =>
       this.request<ProjectListType, any>({
         path: `/projects/`,
         method: 'GET',
@@ -1344,15 +1332,12 @@ export class Api<
     /**
      * No description
      *
-     * @tags Meta
-     * @name ProjectCreate
+     * @tags Project
+     * @name Create
      * @request POST:/projects/
      * @response `200` `ProjectType` OK
      */
-    projectCreate: (
-      data: ProjectCreatePayloadType,
-      params: RequestParams = {}
-    ) =>
+    create: (data: CreatePayloadType, params: RequestParams = {}) =>
       this.request<ProjectType, any>({
         path: `/projects/`,
         method: 'POST',
@@ -1365,12 +1350,12 @@ export class Api<
     /**
      * @description Read project details
      *
-     * @tags Meta
-     * @name ProjectRead
+     * @tags Project
+     * @name Read
      * @request GET:/projects/{projectId}
      * @response `200` `object` OK
      */
-    projectRead: (projectId: string, params: RequestParams = {}) =>
+    read: (projectId: string, params: RequestParams = {}) =>
       this.request<object, any>({
         path: `/projects/${projectId}`,
         method: 'GET',
@@ -1381,12 +1366,12 @@ export class Api<
     /**
      * No description
      *
-     * @tags meta
-     * @name ProjectsDelete
+     * @tags Project
+     * @name Delete
      * @request DELETE:/projects/{projectId}
      * @response `200` `void` OK
      */
-    projectsDelete: (projectId: string, params: RequestParams = {}) =>
+    delete: (projectId: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/projects/${projectId}`,
         method: 'DELETE',
@@ -1396,7 +1381,7 @@ export class Api<
     /**
      * @description Read project details
      *
-     * @tags Meta
+     * @tags Project
      * @name SharedBaseGet
      * @request GET:/projects/{projectId}/sharedBase
      * @response `200` `{ uuid?: string, url?: string }` OK
@@ -1412,7 +1397,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags meta
+     * @tags Project
      * @name SharedBaseDisable
      * @request DELETE:/projects/{projectId}/sharedBase
      * @response `200` `void` OK
@@ -1427,7 +1412,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags meta
+     * @tags Project
      * @name SharedBaseCreate
      * @request POST:/projects/{projectId}/sharedBase
      * @response `200` `{ url?: string, uuid?: string }` OK
@@ -1449,7 +1434,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags meta
+     * @tags Project
      * @name SharedBaseUpdate
      * @request PUT:/projects/{projectId}/sharedBase
      * @response `200` `void` OK
@@ -1470,59 +1455,14 @@ export class Api<
     /**
      * No description
      *
-     * @tags Meta
-     * @name Upload
-     * @summary Attachment
-     * @request POST:/projects/{projectId}/views/{viewId}/upload
-     */
-    upload: (
-      projectId: string,
-      viewId: string,
-      data: UploadPayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/projects/${projectId}/views/${viewId}/upload`,
-        method: 'POST',
-        body: data,
-        type: ContentType.FormData,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableList
-     * @request GET:/projects/{projectId}/{baseId}/tables
-     * @response `200` `TableListType`
-     */
-    tableList: (
-      { projectId, baseId, ...query }: TableListParamsType,
-      params: RequestParams = {}
-    ) =>
-      this.request<TableListType, any>({
-        path: `/projects/${projectId}/${baseId}/tables`,
-        method: 'GET',
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
+     * @tags Project
      * @name MetaDiffSync
-     * @request POST:/projects/{projectId}/{baseId}/metaDiff
+     * @request POST:/projects/{projectId}/metaDiff
      * @response `200` `any` OK
      */
-    metaDiffSync: (
-      projectId: string,
-      baseId: string,
-      params: RequestParams = {}
-    ) =>
+    metaDiffSync: (projectId: string, params: RequestParams = {}) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/${baseId}/metaDiff`,
+        path: `/projects/${projectId}/metaDiff`,
         method: 'POST',
         format: 'json',
         ...params,
@@ -1531,18 +1471,14 @@ export class Api<
     /**
      * No description
      *
-     * @tags Meta
+     * @tags Project
      * @name MetaDiffGet
-     * @request GET:/projects/{projectId}/{baseId}/metaDiff
+     * @request GET:/projects/{projectId}/metaDiff
      * @response `200` `any` OK
      */
-    metaDiffGet: (
-      projectId: string,
-      baseId: string,
-      params: RequestParams = {}
-    ) =>
+    metaDiffGet: (projectId: string, params: RequestParams = {}) =>
       this.request<any, any>({
-        path: `/projects/${projectId}/${baseId}/metaDiff`,
+        path: `/projects/${projectId}/metaDiff`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -1551,1135 +1487,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Meta
-     * @name TableRead
-     * @request GET:/tables/{tableId}
-     * @response `200` `TableInfoType` OK
-     */
-    tableRead: (tableId: string, params: RequestParams = {}) =>
-      this.request<TableInfoType, any>({
-        path: `/tables/${tableId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableUpdate
-     * @request PUT:/tables/{tableId}
-     * @response `200` `any` OK
-     */
-    tableUpdate: (
-      tableId: string,
-      data: TableUpdatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/tables/${tableId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name TableDelete
-     * @request DELETE:/tables/{tableId}
-     * @response `200` `void` OK
-     */
-    tableDelete: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name TableReorder
-     * @request POST:/tables/{tableId}/reorder
-     * @response `200` `void` OK
-     */
-    tableReorder: (
-      tableId: string,
-      data: TableReorderPayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/reorder`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Read project details
-     *
-     * @tags Meta
-     * @name ColumnList
-     * @summary Column List
-     * @request GET:/tables/{tableId}/columns
-     * @response `200` `ColumnListType`
-     * @response `201` `ColumnType` Created
-     */
-    columnList: (tableId: string, params: RequestParams = {}) =>
-      this.request<ColumnListType, any>({
-        path: `/tables/${tableId}/columns`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ColumnCreate
-     * @summary Column create
-     * @request POST:/tables/{tableId}/columns
-     * @response `200` `void` OK
-     */
-    columnCreate: (
-      tableId: string,
-      data: ColumnCreatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/columns`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Read project details
-     *
-     * @tags Meta
-     * @name ColumnRead
-     * @summary Column Read
-     * @request GET:/tables/{tableId}/columns/{columnId}
-     * @response `200` `ColumnType` OK
-     */
-    columnRead: (
-      tableId: string,
-      columnId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<ColumnType, any>({
-        path: `/tables/${tableId}/columns/${columnId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ColumnUpdate
-     * @summary Column Update
-     * @request PUT:/tables/{tableId}/columns/{columnId}
-     * @response `200` `ColumnType` OK
-     */
-    columnUpdate: (
-      tableId: string,
-      columnId: string,
-      data: ColumnType,
-      params: RequestParams = {}
-    ) =>
-      this.request<ColumnType, any>({
-        path: `/tables/${tableId}/columns/${columnId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ColumnDelete
-     * @request DELETE:/tables/{tableId}/columns/{columnId}
-     * @response `200` `void` OK
-     */
-    columnDelete: (
-      tableId: string,
-      columnId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/columns/${columnId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name TablePrimaryColumnSet
-     * @request POST:/tables/{tableId}/columns/{columnId}/primary
-     * @response `200` `void` OK
-     */
-    tablePrimaryColumnSet: (
-      tableId: string,
-      columnId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/columns/${columnId}/primary`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewUpdate
-     * @request PUT:/views/{viewId}
-     * @response `200` `void` OK
-     */
-    viewUpdate: (
-      viewId: string,
-      data: ViewUpdatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name ViewDelete
-     * @request DELETE:/views/{viewId}
-     * @response `200` `void` OK
-     */
-    viewDelete: (viewId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewColumnList
-     * @request GET:/views/{viewId}/columns
-     * @response `200` `void`
-     */
-    viewColumnList: (viewId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/columns`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewColumnCreate
-     * @request POST:/views/{viewId}/columns
-     * @response `200` `void` OK
-     */
-    viewColumnCreate: (
-      viewId: string,
-      data: ViewColumnCreatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/columns`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewShowAllColumn
-     * @request POST:/views/{viewId}/showAll
-     * @response `200` `void` OK
-     */
-    viewShowAllColumn: (
-      { viewId, ...query }: ViewShowAllColumnParamsType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/showAll`,
-        method: 'POST',
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewHideAllColumn
-     * @request POST:/views/{viewId}/hideAll
-     * @response `200` `void` OK
-     */
-    viewHideAllColumn: (
-      { viewId, ...query }: ViewHideAllColumnParamsType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/hideAll`,
-        method: 'POST',
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewColumnRead
-     * @request GET:/views/{viewId}/columns/{columnId}
-     * @response `200` `any` OK
-     */
-    viewColumnRead: (
-      viewId: string,
-      columnId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/views/${viewId}/columns/${columnId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewColumnUpdate
-     * @request PUT:/views/{viewId}/columns/{columnId}
-     * @response `200` `void` OK
-     */
-    viewColumnUpdate: (
-      viewId: string,
-      columnId: string,
-      data: ViewColumnUpdatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/columns/${columnId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ShareViewCreate
-     * @request POST:/views/{viewId}/share
-     * @response `200` `{ uuid?: string }` OK
-     */
-    shareViewCreate: (viewId: string, params: RequestParams = {}) =>
-      this.request<{ uuid?: string }, any>({
-        path: `/views/${viewId}/share`,
-        method: 'POST',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name SharedViewUpdate
-     * @request PUT:/views/{viewId}/share
-     * @response `200` `SharedViewType` OK
-     */
-    sharedViewUpdate: (
-      viewId: string,
-      data: SharedViewUpdatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<SharedViewType, any>({
-        path: `/views/${viewId}/share`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name SharedViewDelete
-     * @request DELETE:/views/{viewId}/share
-     * @response `200` `void` OK
-     */
-    sharedViewDelete: (viewId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/share`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name SharedViewList
-     * @request GET:/tables/{viewId}/share
-     * @response `200` `(any)[]` OK
-     */
-    sharedViewList: (viewId: string, params: RequestParams = {}) =>
-      this.request<any[], any>({
-        path: `/tables/${viewId}/share`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortList
-     * @request GET:/views/{viewId}/sorts
-     * @response `200` `SortListType`
-     * @response `0` `{ uuid?: string, url?: string }`
-     */
-    sortList: (viewId: string, params: RequestParams = {}) =>
-      this.request<SortListType, { uuid?: string; url?: string }>({
-        path: `/views/${viewId}/sorts`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortCreate
-     * @request POST:/views/{viewId}/sorts
-     * @response `200` `void` OK
-     */
-    sortCreate: (viewId: string, data: SortType, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortGet
-     * @request GET:/views/{viewId}/sorts/{sortId}
-     * @response `200` `SortType` OK
-     */
-    sortGet: (viewId: string, sortId: string, params: RequestParams = {}) =>
-      this.request<SortType, any>({
-        path: `/views/${viewId}/sorts/${sortId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortUpdate
-     * @request PUT:/views/{viewId}/sorts/{sortId}
-     * @response `200` `void` OK
-     */
-    sortUpdate: (
-      viewId: string,
-      sortId: string,
-      data: SortType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts/${sortId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name SortDelete
-     * @request DELETE:/views/{viewId}/sorts/{sortId}
-     * @response `200` `void` OK
-     */
-    sortDelete: (viewId: string, sortId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/sorts/${sortId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FilterRead
-     * @request GET:/views/{viewId}/filters
-     * @response `200` `FilterListType`
-     */
-    filterRead: (viewId: string, params: RequestParams = {}) =>
-      this.request<FilterListType, any>({
-        path: `/views/${viewId}/filters`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FilterCreate
-     * @request POST:/views/{viewId}/filters
-     * @response `200` `void` OK
-     */
-    filterCreate: (
-      viewId: string,
-      data: FilterType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/filters`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FilterGet
-     * @request GET:/views/{viewId}/filters/{filterId}
-     * @response `200` `FilterType` OK
-     */
-    filterGet: (viewId: string, filterId: string, params: RequestParams = {}) =>
-      this.request<FilterType, any>({
-        path: `/views/${viewId}/filters/${filterId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FilterUpdate
-     * @request PUT:/views/{viewId}/filters/{filterId}
-     * @response `200` `void` OK
-     */
-    filterUpdate: (
-      viewId: string,
-      filterId: string,
-      data: FilterType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/filters/${filterId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FilterDelete
-     * @request DELETE:/views/{viewId}/filters/{filterId}
-     * @response `200` `void` OK
-     */
-    filterDelete: (
-      viewId: string,
-      filterId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/views/${viewId}/filters/${filterId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FilterChildrenRead
-     * @request GET:/views/{viewId}/filters/{filterParentId}/children
-     * @response `200` `FilterType` OK
-     */
-    filterChildrenRead: (
-      viewId: string,
-      filterParentId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<FilterType, any>({
-        path: `/views/${viewId}/filters/${filterParentId}/children`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookFilterRead
-     * @request GET:/hooks/{hookId}/filters
-     * @response `200` `FilterListType`
-     */
-    hookFilterRead: (hookId: string, params: RequestParams = {}) =>
-      this.request<FilterListType, any>({
-        path: `/hooks/${hookId}/filters`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookFilterCreate
-     * @request POST:/hooks/{hookId}/filters
-     * @response `200` `void` OK
-     */
-    hookFilterCreate: (
-      hookId: string,
-      data: FilterType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/hooks/${hookId}/filters`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookFilterGet
-     * @request GET:/hooks/{viewId}/filters/{filterId}
-     * @response `200` `FilterType` OK
-     */
-    hookFilterGet: (
-      viewId: string,
-      filterId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<FilterType, any>({
-        path: `/hooks/${viewId}/filters/${filterId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookFilterUpdate
-     * @request PUT:/hooks/{viewId}/filters/{filterId}
-     * @response `200` `void` OK
-     */
-    hookFilterUpdate: (
-      viewId: string,
-      filterId: string,
-      data: FilterType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/hooks/${viewId}/filters/${filterId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookFilterDelete
-     * @request DELETE:/hooks/{viewId}/filters/{filterId}
-     * @response `200` `void` OK
-     */
-    hookFilterDelete: (
-      viewId: string,
-      filterId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/hooks/${viewId}/filters/${filterId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookFilterChildrenRead
-     * @request GET:/hooks/{viewId}/filters/{filterParentId}/children
-     * @response `200` `FilterType` OK
-     */
-    hookFilterChildrenRead: (
-      viewId: string,
-      filterParentId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<FilterType, any>({
-        path: `/hooks/${viewId}/filters/${filterParentId}/children`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GridCreate
-     * @request POST:/tables/{tableId}/grids
-     * @response `200` `GridType` OK
-     */
-    gridCreate: (tableId: string, data: GridType, params: RequestParams = {}) =>
-      this.request<GridType, any>({
-        path: `/tables/${tableId}/grids`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GridUpdate
-     * @request PUT:/tables/{tableId}/grids/{gridId}
-     * @response `200` `void` OK
-     */
-    gridUpdate: (tableId: string, gridId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/grids/${gridId}`,
-        method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GridDelete
-     * @request DELETE:/tables/{tableId}/grids/{gridId}
-     * @response `200` `void` OK
-     */
-    gridDelete: (tableId: string, gridId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/grids/${gridId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GridRead
-     * @request GET:/tables/{tableId}/grids/{gridId}
-     * @response `200` `void` OK
-     */
-    gridRead: (tableId: string, gridId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/grids/${gridId}`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FormCreate
-     * @request POST:/tables/{tableId}/forms
-     * @response `200` `FormType` OK
-     */
-    formCreate: (tableId: string, data: FormType, params: RequestParams = {}) =>
-      this.request<FormType, any>({
-        path: `/tables/${tableId}/forms`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FormUpdate
-     * @request PUT:/forms/{formId}
-     * @response `200` `void` OK
-     */
-    formUpdate: (formId: string, data: FormType, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/forms/${formId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FormRead
-     * @request GET:/forms/{formId}
-     * @response `200` `FormType` OK
-     */
-    formRead: (formId: string, params: RequestParams = {}) =>
-      this.request<FormType, any>({
-        path: `/forms/${formId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name FormColumnUpdate
-     * @request PUT:/formColumns/{columnId}
-     * @response `200` `any` OK
-     */
-    formColumnUpdate: (
-      columnId: string,
-      data: FormColumnType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/formColumns/${columnId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GridColumnsList
-     * @request GET:/grid/{gidId}/gridColumns
-     * @response `200` `(GridColumnType)[]` OK
-     */
-    gridColumnsList: (gidId: string, params: RequestParams = {}) =>
-      this.request<GridColumnType[], any>({
-        path: `/grid/${gidId}/gridColumns`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GridColumnUpdate
-     * @request PUT:/gridColumns/{columnId}
-     * @response `200` `any` OK
-     * @response `0` `any`
-     */
-    gridColumnUpdate: (
-      columnId: string,
-      data: GridColumnType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/gridColumns/${columnId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GalleryCreate
-     * @request POST:/tables/{tableId}/galleries
-     * @response `200` `object` OK
-     */
-    galleryCreate: (
-      tableId: string,
-      data: GalleryType,
-      params: RequestParams = {}
-    ) =>
-      this.request<object, any>({
-        path: `/tables/${tableId}/galleries`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GalleryUpdate
-     * @request PUT:/galleries/{galleryId}
-     * @response `200` `void` OK
-     */
-    galleryUpdate: (
-      galleryId: string,
-      data: GalleryType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/galleries/${galleryId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GalleryDelete
-     * @request DELETE:/galleries/{galleryId}
-     * @response `200` `void` OK
-     */
-    galleryDelete: (galleryId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/galleries/${galleryId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name GalleryRead
-     * @request GET:/galleries/{galleryId}
-     * @response `200` `GalleryType` OK
-     */
-    galleryRead: (galleryId: string, params: RequestParams = {}) =>
-      this.request<GalleryType, any>({
-        path: `/galleries/${galleryId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name KanbanCreate
-     * @request POST:/tables/{tableId}/kanbans
-     * @response `200` `void` OK
-     */
-    kanbanCreate: (tableId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/kanbans`,
-        method: 'POST',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name KanbanUpdate
-     * @request PUT:/tables/{tableId}/kanbans/{kanbanId}
-     * @response `200` `void` OK
-     */
-    kanbanUpdate: (
-      tableId: string,
-      kanbanId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/kanbans/${kanbanId}`,
-        method: 'PUT',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name KanbanDelete
-     * @request DELETE:/tables/{tableId}/kanbans/{kanbanId}
-     * @response `200` `void` OK
-     */
-    kanbanDelete: (
-      tableId: string,
-      kanbanId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/kanbans/${kanbanId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name KanbanRead
-     * @request GET:/tables/{tableId}/kanbans/{kanbanId}
-     * @response `200` `void` OK
-     */
-    kanbanRead: (
-      tableId: string,
-      kanbanId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/tables/${tableId}/kanbans/${kanbanId}`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ViewsList
-     * @request GET:/tables/{tableId}/views
-     * @response `200` `ViewListType`
-     */
-    viewsList: (tableId: string, params: RequestParams = {}) =>
-      this.request<ViewListType, any>({
-        path: `/tables/${tableId}/views`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name CommentList
-     * @request GET:/audits/comments
-     * @response `201` `any` Created
-     * @response `0` `any`
-     */
-    commentList: (query: CommentListParamsType, params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `/audits/comments`,
-        method: 'GET',
-        query: query,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name CommentRow
-     * @request POST:/audits/comments
-     * @response `200` `void` OK
-     */
-    commentRow: (data: CommentRowPayloadType, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/audits/comments`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name CommentCount
-     * @request GET:/audits/comments/count
-     * @response `201` `any` Created
-     * @response `0` `any`
-     */
-    commentCount: (query: CommentCountParamsType, params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `/audits/comments/count`,
-        method: 'GET',
-        query: query,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name ProjectAuditList
+     * @tags Project
+     * @name AuditList
      * @request GET:project/{projectId}/audits
      * @response `200` `{ list: (AuditType)[], pageInfo: PaginatedType }` OK
      */
-    projectAuditList: (
-      { projectId, ...query }: ProjectAuditListParamsType,
+    auditList: (
+      { projectId, ...query }: AuditListParamsType,
       params: RequestParams = {}
     ) =>
       this.request<{ list: AuditType[]; pageInfo: PaginatedType }, any>({
@@ -2689,367 +1503,12 @@ export class Api<
         format: 'json',
         ...params,
       }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name AuditRowUpdate
-     * @request POST:/audits/rowUpdate
-     * @response `200` `void` OK
-     */
-    auditRowUpdate: (
-      data: AuditRowUpdatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/audits/rowUpdate`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookList
-     * @request GET:/tables/{tableId}/hooks
-     * @response `200` `{ list: (HookType)[], pageInfo: PaginatedType }` OK
-     * @response `0` `any`
-     */
-    hookList: (tableId: string, params: RequestParams = {}) =>
-      this.request<{ list: HookType[]; pageInfo: PaginatedType }, any>({
-        path: `/tables/${tableId}/hooks`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HookCreate
-     * @request POST:/tables/{tableId}/hooks
-     * @response `200` `AuditType` OK
-     */
-    hookCreate: (
-      tableId: string,
-      data: AuditType,
-      params: RequestParams = {}
-    ) =>
-      this.request<AuditType, any>({
-        path: `/tables/${tableId}/hooks`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name HookTest
-     * @request POST:/tables/{tableId}/hooks/test
-     * @response `200` `any` OK
-     */
-    hookTest: (
-      tableId: string,
-      data: HookTestPayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/tables/${tableId}/hooks/test`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name HookUpdate
-     * @request PUT:/hooks/{hookId}
-     * @response `200` `HookType` OK
-     */
-    hookUpdate: (hookId: string, data: HookType, params: RequestParams = {}) =>
-      this.request<HookType, any>({
-        path: `/hooks/${hookId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name HookDelete
-     * @request DELETE:/hooks/{hookId}
-     * @response `200` `void` OK
-     */
-    hookDelete: (hookId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/hooks/${hookId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name PluginList
-     * @request GET:/plugins
-     * @response `200` `{ list?: (PluginType)[], pageInfo?: PaginatedType }` OK
-     * @response `0` `any`
-     */
-    pluginList: (params: RequestParams = {}) =>
-      this.request<{ list?: PluginType[]; pageInfo?: PaginatedType }, any>({
-        path: `/plugins`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * @description Check plugin is active or not
-     *
-     * @tags Meta
-     * @name PluginStatus
-     * @request GET:/plugins/{pluginTitle}/status
-     * @response `200` `boolean` OK
-     */
-    pluginStatus: (pluginTitle: string, params: RequestParams = {}) =>
-      this.request<boolean, any>({
-        path: `/plugins/${pluginTitle}/status`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name HooksSamplePayloadGet
-     * @request GET:/tables/{tableId}/hooks/samplePayload/{operation}
-     * @response `200` `{ plugins?: { list: (PluginType)[], pageInfo: PaginatedType } }` OK
-     * @response `0` `any`
-     */
-    hooksSamplePayloadGet: (
-      tableId: string,
-      operation: 'update' | 'delete' | 'insert',
-      params: RequestParams = {}
-    ) =>
-      this.request<
-        { plugins?: { list: PluginType[]; pageInfo: PaginatedType } },
-        any
-      >({
-        path: `/tables/${tableId}/hooks/samplePayload/${operation}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Meta
-     * @name PluginTest
-     * @request POST:/plugins/test
-     * @response `200` `any` OK
-     * @response `400` `void` Bad Request
-     * @response `401` `void` Unauthorized
-     * @response `0` `any`
-     */
-    pluginTest: (data: PluginTestPayloadType, params: RequestParams = {}) =>
-      this.request<any, void>({
-        path: `/plugins/test`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name PluginUpdate
-     * @request PUT:/plugins/{pluginId}
-     * @response `200` `PluginType` OK
-     */
-    pluginUpdate: (
-      pluginId: string,
-      data: PluginType,
-      params: RequestParams = {}
-    ) =>
-      this.request<PluginType, any>({
-        path: `/plugins/${pluginId}`,
-        method: 'PUT',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name PluginRead
-     * @request GET:/plugins/{pluginId}
-     * @response `200` `PluginType` OK
-     */
-    pluginRead: (pluginId: string, params: RequestParams = {}) =>
-      this.request<PluginType, any>({
-        path: `/plugins/${pluginId}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name TestConnection
-     * @request POST:/testConnection
-     * @response `200` `{ code?: number, message?: string }` OK
-     */
-    testConnection: (
-      data: TestConnectionPayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<{ code?: number; message?: string }, any>({
-        path: `/testConnection`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name AppInfo
-     * @request GET:/appInfo
-     * @response `200` `any` OK
-     */
-    appInfo: (params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `/appInfo`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * @description Get All K/V pairs in NocoCache
-     *
-     * @tags Meta
-     * @name CacheGet
-     * @summary Your GET endpoint
-     * @request GET:/cache
-     */
-    cacheGet: (params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `/cache`,
-        method: 'GET',
-        ...params,
-      }),
-
-    /**
-     * @description Delete All K/V pairs in NocoCache
-     *
-     * @tags Meta
-     * @name CacheDelete
-     * @request DELETE:/cache
-     * @response `200` `void` OK
-     */
-    cacheDelete: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/cache`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name ApiTokenList
-     * @summary Your GET endpoint
-     * @request GET:/projects/{projectId}/apiTokens
-     * @response `200` `(ApiTokenType)[]` OK
-     */
-    apiTokenList: (projectId: string, params: RequestParams = {}) =>
-      this.request<ApiTokenType[], any>({
-        path: `/projects/${projectId}/apiTokens`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name ApiTokenCreate
-     * @request POST:/projects/{projectId}/apiTokens
-     * @response `200` `void` OK
-     * @response `201` `ApiTokenType` Created
-     */
-    apiTokenCreate: (
-      projectId: string,
-      data: ApiTokenCreatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/apiTokens`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags meta
-     * @name ApiTokenDelete
-     * @request DELETE:/projects/{projectId}/apiTokens/{token}
-     * @response `200` `void` OK
-     */
-    apiTokenDelete: (
-      projectId: string,
-      token: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/projects/${projectId}/apiTokens/${token}`,
-        method: 'DELETE',
-        ...params,
-      }),
   };
   public = {
     /**
      * @description Read project details
      *
-     * @tags public
+     * @tags Public
      * @name SharedBaseGet
      * @request GET:/public/sharedBase/{sharedBaseUuid}
      * @response `200` `{ project_id?: string }` OK
@@ -3164,7 +1623,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags public
+     * @tags Public
      * @name CsvExport
      * @request POST:/public/data/{uuid}/export/{type}
      * @response `200` `any` OK
@@ -3229,26 +1688,1110 @@ export class Api<
         ...params,
       }),
   };
+  dbView = {
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name Upload
+     * @summary Attachment
+     * @request POST:/projects/{projectId}/views/{viewId}/upload
+     */
+    upload: (
+      projectId: string,
+      viewId: string,
+      data: UploadPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/projects/${projectId}/views/${viewId}/upload`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name Update
+     * @request PUT:/views/{viewId}
+     * @response `200` `void` OK
+     */
+    update: (
+      viewId: string,
+      data: UpdateInputType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name Delete
+     * @request DELETE:/views/{viewId}
+     * @response `200` `void` OK
+     */
+    delete: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name ShowAllColumn
+     * @request POST:/views/{viewId}/showAll
+     * @response `200` `void` OK
+     */
+    showAllColumn: (
+      { viewId, ...query }: ShowAllColumnParamsType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/showAll`,
+        method: 'POST',
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name HideAllColumn
+     * @request POST:/views/{viewId}/hideAll
+     * @response `200` `void` OK
+     */
+    hideAllColumn: (
+      { viewId, ...query }: HideAllColumnParamsType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/hideAll`,
+        method: 'POST',
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GridCreate
+     * @request POST:/tables/{tableId}/grids
+     * @response `200` `GridType` OK
+     */
+    gridCreate: (tableId: string, data: GridType, params: RequestParams = {}) =>
+      this.request<GridType, any>({
+        path: `/tables/${tableId}/grids`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GridUpdate
+     * @request PUT:/tables/{tableId}/grids/{gridId}
+     * @response `200` `void` OK
+     */
+    gridUpdate: (tableId: string, gridId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/grids/${gridId}`,
+        method: 'PUT',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GridDelete
+     * @request DELETE:/tables/{tableId}/grids/{gridId}
+     * @response `200` `void` OK
+     */
+    gridDelete: (tableId: string, gridId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/grids/${gridId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GridRead
+     * @request GET:/tables/{tableId}/grids/{gridId}
+     * @response `200` `void` OK
+     */
+    gridRead: (tableId: string, gridId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/grids/${gridId}`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name FormCreate
+     * @request POST:/tables/{tableId}/forms
+     * @response `200` `FormType` OK
+     */
+    formCreate: (tableId: string, data: FormType, params: RequestParams = {}) =>
+      this.request<FormType, any>({
+        path: `/tables/${tableId}/forms`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name FormUpdate
+     * @request PUT:/forms/{formId}
+     * @response `200` `void` OK
+     */
+    formUpdate: (formId: string, data: FormType, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/forms/${formId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name FormRead
+     * @request GET:/forms/{formId}
+     * @response `200` `FormType` OK
+     */
+    formRead: (formId: string, params: RequestParams = {}) =>
+      this.request<FormType, any>({
+        path: `/forms/${formId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name FormColumnUpdate
+     * @request PUT:/formColumns/{columnId}
+     * @response `200` `any` OK
+     */
+    formColumnUpdate: (
+      columnId: string,
+      data: FormColumnType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/formColumns/${columnId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GridColumnsList
+     * @request GET:/grid/{gidId}/gridColumns
+     * @response `200` `(GridColumnType)[]` OK
+     */
+    gridColumnsList: (gidId: string, params: RequestParams = {}) =>
+      this.request<GridColumnType[], any>({
+        path: `/grid/${gidId}/gridColumns`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GridColumnUpdate
+     * @request PUT:/gridColumns/{columnId}
+     * @response `200` `any` OK
+     * @response `0` `any`
+     */
+    gridColumnUpdate: (
+      columnId: string,
+      data: GridColumnType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/gridColumns/${columnId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GalleryCreate
+     * @request POST:/tables/{tableId}/galleries
+     * @response `200` `object` OK
+     */
+    galleryCreate: (
+      tableId: string,
+      data: GalleryType,
+      params: RequestParams = {}
+    ) =>
+      this.request<object, any>({
+        path: `/tables/${tableId}/galleries`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GalleryUpdate
+     * @request PUT:/galleries/{galleryId}
+     * @response `200` `void` OK
+     */
+    galleryUpdate: (
+      galleryId: string,
+      data: GalleryType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/galleries/${galleryId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GalleryDelete
+     * @request DELETE:/galleries/{galleryId}
+     * @response `200` `void` OK
+     */
+    galleryDelete: (galleryId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/galleries/${galleryId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name GalleryRead
+     * @request GET:/galleries/{galleryId}
+     * @response `200` `GalleryType` OK
+     */
+    galleryRead: (galleryId: string, params: RequestParams = {}) =>
+      this.request<GalleryType, any>({
+        path: `/galleries/${galleryId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name KanbanCreate
+     * @request POST:/tables/{tableId}/kanbans
+     * @response `200` `void` OK
+     */
+    kanbanCreate: (tableId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/kanbans`,
+        method: 'POST',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name KanbanUpdate
+     * @request PUT:/tables/{tableId}/kanbans/{kanbanId}
+     * @response `200` `void` OK
+     */
+    kanbanUpdate: (
+      tableId: string,
+      kanbanId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/kanbans/${kanbanId}`,
+        method: 'PUT',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name KanbanDelete
+     * @request DELETE:/tables/{tableId}/kanbans/{kanbanId}
+     * @response `200` `void` OK
+     */
+    kanbanDelete: (
+      tableId: string,
+      kanbanId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/kanbans/${kanbanId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name KanbanRead
+     * @request GET:/tables/{tableId}/kanbans/{kanbanId}
+     * @response `200` `void` OK
+     */
+    kanbanRead: (
+      tableId: string,
+      kanbanId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/kanbans/${kanbanId}`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View
+     * @name List
+     * @request GET:/tables/{tableId}/views
+     * @response `200` `ViewListType`
+     */
+    list: (tableId: string, params: RequestParams = {}) =>
+      this.request<ViewListType, any>({
+        path: `/tables/${tableId}/views`,
+        method: 'GET',
+        ...params,
+      }),
+  };
   dbTable = {
     /**
      * No description
      *
-     * @tags Db table
-     * @name TableCreate
-     * @request POST:/projects/{projectId}/{baseId}/tables
+     * @tags DB Table
+     * @name Create
+     * @request POST:/projects/{projectId}/tables
      * @response `200` `TableType` OK
      */
-    tableCreate: (
+    create: (
       projectId: string,
-      baseId: string,
       data: TableReqType,
       params: RequestParams = {}
     ) =>
       this.request<TableType, any>({
-        path: `/projects/${projectId}/${baseId}/tables`,
+        path: `/projects/${projectId}/tables`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table
+     * @name List
+     * @request GET:/projects/{projectId}/tables
+     * @response `200` `TableListType`
+     */
+    list: (
+      { projectId, ...query }: ListParams2Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<TableListType, any>({
+        path: `/projects/${projectId}/tables`,
+        method: 'GET',
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table
+     * @name Read
+     * @request GET:/tables/{tableId}
+     * @response `200` `TableInfoType` OK
+     */
+    read: (tableId: string, params: RequestParams = {}) =>
+      this.request<TableInfoType, any>({
+        path: `/tables/${tableId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table
+     * @name Update
+     * @request PUT:/tables/{tableId}
+     * @response `200` `any` OK
+     */
+    update: (
+      tableId: string,
+      data: UpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/tables/${tableId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table
+     * @name Delete
+     * @request DELETE:/tables/{tableId}
+     * @response `200` `void` OK
+     */
+    delete: (tableId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table
+     * @name Reorder
+     * @request POST:/tables/{tableId}/reorder
+     * @response `200` `void` OK
+     */
+    reorder: (
+      tableId: string,
+      data: ReorderPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/reorder`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  dbTableColumn = {
+    /**
+     * @description Read project details
+     *
+     * @tags DB Table column
+     * @name List
+     * @summary Column List
+     * @request GET:/tables/{tableId}/columns
+     * @response `200` `ColumnListType`
+     * @response `201` `ColumnType` Created
+     */
+    list: (tableId: string, params: RequestParams = {}) =>
+      this.request<ColumnListType, any>({
+        path: `/tables/${tableId}/columns`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table column
+     * @name Create
+     * @summary Column create
+     * @request POST:/tables/{tableId}/columns
+     * @response `200` `void` OK
+     */
+    create: (
+      tableId: string,
+      data: CreateInputType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/columns`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Read project details
+     *
+     * @tags DB Table column
+     * @name Read
+     * @summary Column Read
+     * @request GET:/tables/{tableId}/columns/{columnId}
+     * @response `200` `ColumnType` OK
+     */
+    read: (tableId: string, columnId: string, params: RequestParams = {}) =>
+      this.request<ColumnType, any>({
+        path: `/tables/${tableId}/columns/${columnId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table column
+     * @name Update
+     * @summary Column Update
+     * @request PUT:/tables/{tableId}/columns/{columnId}
+     * @response `200` `ColumnType` OK
+     */
+    update: (
+      tableId: string,
+      columnId: string,
+      data: ColumnType,
+      params: RequestParams = {}
+    ) =>
+      this.request<ColumnType, any>({
+        path: `/tables/${tableId}/columns/${columnId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table column
+     * @name Delete
+     * @request DELETE:/tables/{tableId}/columns/{columnId}
+     * @response `200` `void` OK
+     */
+    delete: (tableId: string, columnId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/columns/${columnId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table column
+     * @name PrimaryColumnSet
+     * @request POST:/tables/{tableId}/columns/{columnId}/primary
+     * @response `200` `void` OK
+     */
+    primaryColumnSet: (
+      tableId: string,
+      columnId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/tables/${tableId}/columns/${columnId}/primary`,
+        method: 'POST',
+        ...params,
+      }),
+  };
+  dbViewColumn = {
+    /**
+     * No description
+     *
+     * @tags DB View column
+     * @name List
+     * @request GET:/views/{viewId}/columns
+     * @response `200` `void`
+     */
+    list: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/columns`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View column
+     * @name Create
+     * @request POST:/views/{viewId}/columns
+     * @response `200` `void` OK
+     */
+    create: (
+      viewId: string,
+      data: CreatePayload7Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/columns`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View column
+     * @name Read
+     * @request GET:/views/{viewId}/columns/{columnId}
+     * @response `200` `any` OK
+     */
+    read: (viewId: string, columnId: string, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/views/${viewId}/columns/${columnId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View column
+     * @name Update
+     * @request PUT:/views/{viewId}/columns/{columnId}
+     * @response `200` `void` OK
+     */
+    update: (
+      viewId: string,
+      columnId: string,
+      data: UpdatePayload8Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/columns/${columnId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  dbViewShare = {
+    /**
+     * No description
+     *
+     * @tags DB View share
+     * @name Create
+     * @request POST:/views/{viewId}/share
+     * @response `200` `{ uuid?: string }` OK
+     */
+    create: (viewId: string, params: RequestParams = {}) =>
+      this.request<{ uuid?: string }, any>({
+        path: `/views/${viewId}/share`,
+        method: 'POST',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View share
+     * @name Update
+     * @request PUT:/views/{viewId}/share
+     * @response `200` `SharedViewType` OK
+     */
+    update: (
+      viewId: string,
+      data: UpdatePayload2Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<SharedViewType, any>({
+        path: `/views/${viewId}/share`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View share
+     * @name Delete
+     * @request DELETE:/views/{viewId}/share
+     * @response `200` `void` OK
+     */
+    delete: (viewId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/share`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View share
+     * @name List
+     * @request GET:/tables/{viewId}/share
+     * @response `200` `(any)[]` OK
+     */
+    list: (viewId: string, params: RequestParams = {}) =>
+      this.request<any[], any>({
+        path: `/tables/${viewId}/share`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+  };
+  dbTableSort = {
+    /**
+     * No description
+     *
+     * @tags DB Table sort
+     * @name List
+     * @request GET:/views/{viewId}/sorts
+     * @response `200` `SortListType`
+     * @response `0` `{ uuid?: string, url?: string }`
+     */
+    list: (viewId: string, params: RequestParams = {}) =>
+      this.request<SortListType, { uuid?: string; url?: string }>({
+        path: `/views/${viewId}/sorts`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table sort
+     * @name Create
+     * @request POST:/views/{viewId}/sorts
+     * @response `200` `void` OK
+     */
+    create: (viewId: string, data: SortType, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/sorts`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table sort
+     * @name Get
+     * @request GET:/views/{viewId}/sorts/{sortId}
+     * @response `200` `SortType` OK
+     */
+    get: (viewId: string, sortId: string, params: RequestParams = {}) =>
+      this.request<SortType, any>({
+        path: `/views/${viewId}/sorts/${sortId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table sort
+     * @name Update
+     * @request PUT:/views/{viewId}/sorts/{sortId}
+     * @response `200` `void` OK
+     */
+    update: (
+      viewId: string,
+      sortId: string,
+      data: SortType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/sorts/${sortId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table sort
+     * @name Delete
+     * @request DELETE:/views/{viewId}/sorts/{sortId}
+     * @response `200` `void` OK
+     */
+    delete: (viewId: string, sortId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/sorts/${sortId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+  };
+  dbTableFilter = {
+    /**
+     * No description
+     *
+     * @tags DB Table filter
+     * @name Read
+     * @request GET:/views/{viewId}/filters
+     * @response `200` `FilterListType`
+     */
+    read: (viewId: string, params: RequestParams = {}) =>
+      this.request<FilterListType, any>({
+        path: `/views/${viewId}/filters`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table filter
+     * @name Create
+     * @request POST:/views/{viewId}/filters
+     * @response `200` `void` OK
+     */
+    create: (viewId: string, data: FilterType, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/filters`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table filter
+     * @name Get
+     * @request GET:/views/{viewId}/filters/{filterId}
+     * @response `200` `FilterType` OK
+     */
+    get: (viewId: string, filterId: string, params: RequestParams = {}) =>
+      this.request<FilterType, any>({
+        path: `/views/${viewId}/filters/${filterId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table filter
+     * @name Update
+     * @request PUT:/views/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
+     */
+    update: (
+      viewId: string,
+      filterId: string,
+      data: FilterType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/filters/${filterId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table filter
+     * @name Delete
+     * @request DELETE:/views/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
+     */
+    delete: (viewId: string, filterId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/views/${viewId}/filters/${filterId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table filter
+     * @name ChildrenRead
+     * @request GET:/views/{viewId}/filters/{filterParentId}/children
+     * @response `200` `FilterType` OK
+     */
+    childrenRead: (
+      viewId: string,
+      filterParentId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<FilterType, any>({
+        path: `/views/${viewId}/filters/${filterParentId}/children`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+  };
+  dbTableWebhookFilter = {
+    /**
+     * No description
+     *
+     * @tags DB Table webhook filter
+     * @name Read
+     * @request GET:/hooks/{hookId}/filters
+     * @response `200` `FilterListType`
+     */
+    read: (hookId: string, params: RequestParams = {}) =>
+      this.request<FilterListType, any>({
+        path: `/hooks/${hookId}/filters`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook filter
+     * @name Create
+     * @request POST:/hooks/{hookId}/filters
+     * @response `200` `void` OK
+     */
+    create: (hookId: string, data: FilterType, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/hooks/${hookId}/filters`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook filter
+     * @name Get
+     * @request GET:/hooks/{viewId}/filters/{filterId}
+     * @response `200` `FilterType` OK
+     */
+    get: (viewId: string, filterId: string, params: RequestParams = {}) =>
+      this.request<FilterType, any>({
+        path: `/hooks/${viewId}/filters/${filterId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook filter
+     * @name Update
+     * @request PUT:/hooks/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
+     */
+    update: (
+      viewId: string,
+      filterId: string,
+      data: FilterType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/hooks/${viewId}/filters/${filterId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook filter
+     * @name Delete
+     * @request DELETE:/hooks/{viewId}/filters/{filterId}
+     * @response `200` `void` OK
+     */
+    delete: (viewId: string, filterId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/hooks/${viewId}/filters/${filterId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook filter
+     * @name ChildrenRead
+     * @request GET:/hooks/{viewId}/filters/{filterParentId}/children
+     * @response `200` `FilterType` OK
+     */
+    childrenRead: (
+      viewId: string,
+      filterParentId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<FilterType, any>({
+        path: `/hooks/${viewId}/filters/${filterParentId}/children`,
+        method: 'GET',
         format: 'json',
         ...params,
       }),
@@ -3280,100 +2823,11 @@ export class Api<
      */
     create: (
       tableId: string,
-      data: CreatePayloadType,
+      data: CreatePayload9Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
         path: `/data/${tableId}`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Data
-     * @name ModelList
-     * @request GET:/data/{orgs}/{projectName}/{tableAlias}
-     * @response `200` `any` OK
-     */
-    modelList: (
-      { orgs, projectName, tableAlias, ...query }: ModelListParamsType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/data/${orgs}/${projectName}/${tableAlias}`,
-        method: 'GET',
-        query: query,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Data
-     * @name ModelCreate
-     * @request POST:/data/{orgs}/{projectName}/{tableAlias}
-     * @response `200` `any` OK
-     */
-    modelCreate: (
-      orgs: string,
-      projectName: string,
-      tableAlias: string,
-      data: ModelCreatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/data/${orgs}/${projectName}/${tableAlias}`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Data
-     * @name ViewList
-     * @request GET:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}
-     * @response `200` `any` OK
-     */
-    viewList: (
-      { orgs, projectName, tableAlias, viewName, ...query }: ViewListParamsType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}`,
-        method: 'GET',
-        query: query,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Data
-     * @name ViewCreate
-     * @request POST:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}
-     * @response `200` `any` OK
-     */
-    viewCreate: (
-      orgs: string,
-      projectName: string,
-      tableAlias: string,
-      viewName: string,
-      data: ViewCreatePayloadType,
-      params: RequestParams = {}
-    ) =>
-      this.request<any, any>({
-        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -3520,7 +2974,7 @@ export class Api<
     update: (
       tableId: string,
       rowId: string,
-      data: UpdatePayloadType,
+      data: UpdatePayload2Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3546,26 +3000,24 @@ export class Api<
         method: 'DELETE',
         ...params,
       }),
-
+  };
+  dbTableRow = {
     /**
      * No description
      *
-     * @tags Data
-     * @name ViewRead
-     * @request GET:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
-     * @response `201` `any` Created
+     * @tags DB Table row
+     * @name List
+     * @request GET:/data/{orgs}/{projectName}/{tableAlias}
+     * @response `200` `any` OK
      */
-    viewRead: (
-      orgs: string,
-      projectName: string,
-      tableAlias: string,
-      viewName: string,
-      rowId: string,
+    list: (
+      { orgs, projectName, tableAlias, ...query }: ListParams9Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
+        path: `/data/${orgs}/${projectName}/${tableAlias}`,
         method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),
@@ -3573,23 +3025,21 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
-     * @name ViewUpdate
-     * @request PUT:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
+     * @tags DB Table row
+     * @name Create
+     * @request POST:/data/{orgs}/{projectName}/{tableAlias}
      * @response `200` `any` OK
      */
-    viewUpdate: (
+    create: (
       orgs: string,
       projectName: string,
       tableAlias: string,
-      viewName: string,
-      rowId: string,
-      data: ViewUpdateBodyType,
+      data: CreatePayload3Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
-        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
-        method: 'PUT',
+        path: `/data/${orgs}/${projectName}/${tableAlias}`,
+        method: 'POST',
         body: data,
         type: ContentType.Json,
         format: 'json',
@@ -3599,34 +3049,12 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
-     * @name ViewDelete
-     * @request DELETE:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
-     * @response `200` `void` OK
-     */
-    viewDelete: (
-      orgs: string,
-      projectName: string,
-      tableAlias: string,
-      viewName: string,
-      rowId: string,
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
-        method: 'DELETE',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Data
-     * @name ModelRead
+     * @tags DB Table row
+     * @name Read
      * @request GET:/data/{orgs}/{projectName}/{tableAlias}/{rowId}
      * @response `201` `any` Created
      */
-    modelRead: (
+    read: (
       orgs: string,
       projectName: string,
       tableAlias: string,
@@ -3643,17 +3071,17 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
-     * @name ModelUpdate
+     * @tags DB Table row
+     * @name Update
      * @request PUT:/data/{orgs}/{projectName}/{tableAlias}/{rowId}
      * @response `200` `any` OK
      */
-    modelUpdate: (
+    update: (
       orgs: string,
       projectName: string,
       tableAlias: string,
       rowId: string,
-      data: ModelUpdatePayloadType,
+      data: UpdatePayload5Type,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3668,7 +3096,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
+     * @tags DB Table row
      * @name ModelDelete
      * @request DELETE:/data/{orgs}/{projectName}/{tableAlias}/{rowId}
      * @response `200` `void` OK
@@ -3689,7 +3117,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
+     * @tags DB Table row
      * @name BulkDelete
      * @request DELETE:/bulkData/{orgs}/{projectName}/{tableAlias}/
      * @response `200` `void` OK
@@ -3712,7 +3140,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
+     * @tags DB Table row
      * @name BulkInsert
      * @request POST:/bulkData/{orgs}/{projectName}/{tableAlias}/
      * @response `200` `void` OK
@@ -3735,7 +3163,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
+     * @tags DB Table row
      * @name BulkUpdate
      * @request PATCH:/bulkData/{orgs}/{projectName}/{tableAlias}/
      * @response `200` `any` OK
@@ -3759,7 +3187,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
+     * @tags DB Table row
      * @name BulkUpdateAll
      * @request PATCH:/bulkData/{orgs}/{projectName}/{tableAlias}/all
      * @response `200` `any` OK
@@ -3782,7 +3210,7 @@ export class Api<
     /**
      * No description
      *
-     * @tags Data
+     * @tags DB Table row
      * @name BulkDeleteAll
      * @request DELETE:/bulkData/{orgs}/{projectName}/{tableAlias}/all
      * @response `200` `any` OK
@@ -3796,6 +3224,523 @@ export class Api<
         method: 'DELETE',
         query: query,
         format: 'json',
+        ...params,
+      }),
+  };
+  dbViewRow = {
+    /**
+     * No description
+     *
+     * @tags DB View row
+     * @name List
+     * @request GET:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}
+     * @response `200` `any` OK
+     */
+    list: (
+      { orgs, projectName, tableAlias, viewName, ...query }: ListParams7Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View row
+     * @name Create
+     * @request POST:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}
+     * @response `200` `any` OK
+     */
+    create: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      data: CreatePayload6Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View row
+     * @name Read
+     * @request GET:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
+     * @response `201` `any` Created
+     */
+    read: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      rowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View row
+     * @name Update
+     * @request PUT:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
+     * @response `200` `any` OK
+     */
+    update: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      rowId: string,
+      data: UpdatePayload5Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB View row
+     * @name Delete
+     * @request DELETE:/data/{orgs}/{projectName}/{tableAlias}/views/{viewName}/{rowId}
+     * @response `200` `void` OK
+     */
+    delete: (
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      rowId: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/data/${orgs}/${projectName}/${tableAlias}/views/${viewName}/${rowId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+  };
+  utils = {
+    /**
+     * No description
+     *
+     * @tags Utils
+     * @name CommentList
+     * @request GET:/audits/comments
+     * @response `201` `any` Created
+     * @response `0` `any`
+     */
+    commentList: (query: CommentListParamsType, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/audits/comments`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Utils
+     * @name CommentRow
+     * @request POST:/audits/comments
+     * @response `200` `void` OK
+     */
+    commentRow: (data: CommentRowPayloadType, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/audits/comments`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Utils
+     * @name CommentCount
+     * @request GET:/audits/comments/count
+     * @response `201` `any` Created
+     * @response `0` `any`
+     */
+    commentCount: (query: CommentCountParamsType, params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/audits/comments/count`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Utils
+     * @name AuditRowUpdate
+     * @request POST:/audits/rowUpdate
+     * @response `200` `void` OK
+     */
+    auditRowUpdate: (
+      data: AuditRowUpdatePayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/audits/rowUpdate`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Utils
+     * @name TestConnection
+     * @request POST:/testConnection
+     * @response `200` `{ code?: number, message?: string }` OK
+     */
+    testConnection: (
+      data: TestConnectionPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<{ code?: number; message?: string }, any>({
+        path: `/testConnection`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Utils
+     * @name AppInfo
+     * @request GET:/appInfo
+     * @response `200` `any` OK
+     */
+    appInfo: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/appInfo`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Get All K/V pairs in NocoCache
+     *
+     * @tags Utils
+     * @name CacheGet
+     * @summary Your GET endpoint
+     * @request GET:/cache
+     */
+    cacheGet: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/cache`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * @description Delete All K/V pairs in NocoCache
+     *
+     * @tags Utils
+     * @name CacheDelete
+     * @request DELETE:/cache
+     * @response `200` `void` OK
+     */
+    cacheDelete: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/cache`,
+        method: 'DELETE',
+        ...params,
+      }),
+  };
+  dbTableWebhook = {
+    /**
+     * No description
+     *
+     * @tags DB Table webhook
+     * @name List
+     * @request GET:/tables/{tableId}/hooks
+     * @response `200` `{ list: (HookType)[], pageInfo: PaginatedType }` OK
+     * @response `0` `any`
+     */
+    list: (tableId: string, params: RequestParams = {}) =>
+      this.request<{ list: HookType[]; pageInfo: PaginatedType }, any>({
+        path: `/tables/${tableId}/hooks`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook
+     * @name Create
+     * @request POST:/tables/{tableId}/hooks
+     * @response `200` `AuditType` OK
+     */
+    create: (tableId: string, data: AuditType, params: RequestParams = {}) =>
+      this.request<AuditType, any>({
+        path: `/tables/${tableId}/hooks`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook
+     * @name Test
+     * @request POST:/tables/{tableId}/hooks/test
+     * @response `200` `any` OK
+     */
+    test: (
+      tableId: string,
+      data: TestPayloadType,
+      params: RequestParams = {}
+    ) =>
+      this.request<any, any>({
+        path: `/tables/${tableId}/hooks/test`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook
+     * @name Update
+     * @request PUT:/hooks/{hookId}
+     * @response `200` `HookType` OK
+     */
+    update: (hookId: string, data: HookType, params: RequestParams = {}) =>
+      this.request<HookType, any>({
+        path: `/hooks/${hookId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook
+     * @name Delete
+     * @request DELETE:/hooks/{hookId}
+     * @response `200` `void` OK
+     */
+    delete: (hookId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/hooks/${hookId}`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags DB Table webhook
+     * @name SamplePayloadGet
+     * @request GET:/tables/{tableId}/hooks/samplePayload/{operation}
+     * @response `200` `{ plugins?: { list: (PluginType)[], pageInfo: PaginatedType } }` OK
+     * @response `0` `any`
+     */
+    samplePayloadGet: (
+      tableId: string,
+      operation: 'update' | 'delete' | 'insert',
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        { plugins?: { list: PluginType[]; pageInfo: PaginatedType } },
+        any
+      >({
+        path: `/tables/${tableId}/hooks/samplePayload/${operation}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+  };
+  plugin = {
+    /**
+     * No description
+     *
+     * @tags Plugin
+     * @name List
+     * @request GET:/plugins
+     * @response `200` `{ list?: (PluginType)[], pageInfo?: PaginatedType }` OK
+     * @response `0` `any`
+     */
+    list: (params: RequestParams = {}) =>
+      this.request<{ list?: PluginType[]; pageInfo?: PaginatedType }, any>({
+        path: `/plugins`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Check plugin is active or not
+     *
+     * @tags Plugin
+     * @name Status
+     * @request GET:/plugins/{pluginTitle}/status
+     * @response `200` `boolean` OK
+     */
+    status: (pluginTitle: string, params: RequestParams = {}) =>
+      this.request<boolean, any>({
+        path: `/plugins/${pluginTitle}/status`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Plugin
+     * @name Test
+     * @request POST:/plugins/test
+     * @response `200` `any` OK
+     * @response `400` `void` Bad Request
+     * @response `401` `void` Unauthorized
+     * @response `0` `any`
+     */
+    test: (data: TestBodyType, params: RequestParams = {}) =>
+      this.request<any, void>({
+        path: `/plugins/test`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Plugin
+     * @name Update
+     * @request PUT:/plugins/{pluginId}
+     * @response `200` `PluginType` OK
+     */
+    update: (pluginId: string, data: PluginType, params: RequestParams = {}) =>
+      this.request<PluginType, any>({
+        path: `/plugins/${pluginId}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Plugin
+     * @name Read
+     * @request GET:/plugins/{pluginId}
+     * @response `200` `PluginType` OK
+     */
+    read: (pluginId: string, params: RequestParams = {}) =>
+      this.request<PluginType, any>({
+        path: `/plugins/${pluginId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+  };
+  apiToken = {
+    /**
+     * No description
+     *
+     * @tags Api token
+     * @name List
+     * @summary Your GET endpoint
+     * @request GET:/projects/{projectId}/apiTokens
+     * @response `200` `(ApiTokenType)[]` OK
+     */
+    list: (projectId: string, params: RequestParams = {}) =>
+      this.request<ApiTokenType[], any>({
+        path: `/projects/${projectId}/apiTokens`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api token
+     * @name Create
+     * @request POST:/projects/{projectId}/apiTokens
+     * @response `200` `void` OK
+     * @response `201` `ApiTokenType` Created
+     */
+    create: (
+      projectId: string,
+      data: CreatePayload3Type,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/apiTokens`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api token
+     * @name Delete
+     * @request DELETE:/projects/{projectId}/apiTokens/{token}
+     * @response `200` `void` OK
+     */
+    delete: (projectId: string, token: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/projects/${projectId}/apiTokens/${token}`,
+        method: 'DELETE',
         ...params,
       }),
   };

@@ -293,7 +293,7 @@ export default {
   },
   methods: {
     async loadXcDiff() {
-      this.diff = (await this.$api.meta.metaDiffGet(this.$store.state.project.projectId, this.db.id))
+      this.diff = (await this.$api.project.metaDiffGet(this.$store.state.project.projectId, this.db.id))
 
       // this.diff = await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   dbAlias: this.db.meta.dbAlias,
@@ -303,7 +303,7 @@ export default {
     clickReload() {
       this.loadXcDiff()
       this.$tele.emit('proj-meta:metadata:reload')
-    },    
+    },
     /* async addTableMeta(tables) {
       try {
         await this.$store.dispatch('sqlMgr/ActSqlOp', [{
@@ -349,7 +349,7 @@ export default {
 */
     async syncMetaDiff() {
       try {
-        await this.$api.meta.metaDiffSync(this.$store.state.project.projectId, this.db.id)
+        await this.$api.project.metaDiffSync(this.$store.state.project.projectId, this.db.id)
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   dbAlias: this.db.meta.dbAlias,
         //   env: this.$store.getters['project/GtrEnv']

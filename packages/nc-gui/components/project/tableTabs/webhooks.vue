@@ -542,7 +542,7 @@ export default {
     async loadPluginList() {
       try {
         // const plugins = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'xcPluginList'])
-        const plugins = (await this.$api.meta.pluginList()).list
+        const plugins = (await this.$api.plugin.list()).list
         // plugins.push(...plugins.splice(0, 3))
         this.apps = plugins.reduce((o, p) => {
           p.tags = p.tags ? p.tags.split(',') : []
@@ -658,7 +658,7 @@ export default {
         // ])
         let res
         if (this.hook.id) {
-          res = await this.$api.meta.hookUpdate(this.hook.id, {
+          res = await this.$api.dbTableWebhook.update(this.hook.id, {
             ...this.hook,
             notification: {
               ...this.hook.notification,
@@ -666,7 +666,7 @@ export default {
             }
           })
         } else {
-          res = await this.$api.meta.hookCreate(this.meta.id, {
+          res = await this.$api.dbTableWebhook.create(this.meta.id, {
             ...this.hook,
             notification: {
               ...this.hook.notification,
@@ -715,7 +715,7 @@ export default {
       //   tn: this.nodes.table_name
       // }])
 
-      const hooks = await this.$api.meta.hookList(this.meta.id)
+      const hooks = await this.$api.dbTableWebhook.list(this.meta.id)
 
       this.hooks = hooks.list.map((h) => {
         h.notification = h.notification && JSON.parse(h.notification)
@@ -749,7 +749,7 @@ export default {
           //   title: item.title,
           //   tn: this.nodes.table_name
           // }])
-          await this.$api.meta.hookDelete(item.id)
+          await this.$api.dbTableWebhook.delete(item.id)
           this.hooks.splice(i, 1)
         } else {
           this.hooks.splice(i, 1)

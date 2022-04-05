@@ -118,7 +118,7 @@ export default {
   },
   methods: {
     async loadTablesList() {
-      const result = (await this.$api.meta.tableList({
+      const result = (await this.$api.dbTable.list({
         projectId: this.$store.state.project.projectId,
         baseId: this.$store.state.project.project.bases[0].id
       }))
@@ -151,7 +151,7 @@ export default {
           rollup_function: this.rollup.fn
         }
 
-        const col = await this.$api.meta.columnCreate(this.meta.id, rollupCol)
+        const col = await this.$api.dbTable.create(this.meta.id, rollupCol)
 
         console.log(col)
 

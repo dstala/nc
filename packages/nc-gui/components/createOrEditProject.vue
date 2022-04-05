@@ -1705,7 +1705,7 @@ export default {
       const con = projectJson.envs._noco.db[0]
       const inflection = (con.meta && con.meta.inflection) || {}
       try {
-        const result = (await this.$api.meta.projectCreate({
+        const result = (await this.$api.project.create({
           title: projectJson.title,
           bases: [{
             type: con.client,
@@ -2052,7 +2052,7 @@ export default {
             //   c1
             // ])
 
-            const result = (await this.$api.meta.testConnection(c1))
+            const result = (await this.$api.utils.testConnection(c1))
 
             console.log('test connection result', result)
             if (result.code === 0) {

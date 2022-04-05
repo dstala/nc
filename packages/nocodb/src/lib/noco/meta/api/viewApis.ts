@@ -26,8 +26,7 @@ export async function viewList(
   const viewList = await xcVisibilityMetaGet(
     // req.params.projectId,
     // req.params.baseId,
-    null,
-    null,
+    model.project_id,
     [model]
   );
 

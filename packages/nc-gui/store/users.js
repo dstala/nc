@@ -474,7 +474,7 @@ export const actions = {
     // console.log('in action signout');
   },
   async ActGetAuthType({ commit }) {
-    const { type, firstUser } = (await this.$api.meta.appInfo())// (await this.$axios.get('/auth/type'))
+    const { type, firstUser } = (await this.$api.utils.appInfo())// (await this.$axios.get('/auth/type'))
     commit('MutAuthType', type)
     return { type, firstUser }
   },

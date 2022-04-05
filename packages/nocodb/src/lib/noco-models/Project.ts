@@ -1,6 +1,6 @@
 import Base from '../noco-models/Base';
 import Noco from '../noco/Noco';
-import { ProjectListParamsType, ProjectType } from 'nocodb-sdk';
+import { ListParamsType, ProjectType } from 'nocodb-sdk';
 import {
   CacheDelDirection,
   CacheGetType,
@@ -78,7 +78,7 @@ export default class Project implements ProjectType {
 
   static async list(
     // @ts-ignore
-    param: ProjectListParamsType,
+    param: ListParamsType,
     ncMeta = Noco.ncMeta
   ): Promise<Project[]> {
     // todo: pagination

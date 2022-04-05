@@ -345,7 +345,7 @@ export default {
         //   prependName: [this.column.column_name]
         // }, file])
 
-          const data = await this.$api.meta.upload(this.$store.state.project.projectId, this.viewId, {
+          const data = await this.$api.dbView.upload(this.$store.state.project.projectId, this.viewId, {
             files: file,
             json: '{}'
           })

@@ -137,7 +137,7 @@ export default {
   },
   methods: {
     async loadTablesList() {
-      const result = (await this.$api.meta.tableList({
+      const result = (await this.$api.dbTable.list({
         projectId: this.$store.state.project.projectId,
         baseId: this.$store.state.project.project.bases[0].id
       }))
@@ -200,7 +200,7 @@ export default {
           uidt: UITypes.Lookup
         }
 
-        await this.$api.meta.columnCreate(this.meta.id, lookupCol)
+        await this.$api.dbTable.create(this.meta.id, lookupCol)
 
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,

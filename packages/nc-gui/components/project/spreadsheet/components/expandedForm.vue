@@ -412,7 +412,7 @@ export default {
       //   comments: this.commentsOnly
       // }])
 
-      const data = (await this.$api.meta.commentList({
+      const data = (await this.$api.utils.commentList({
         row_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c.title]).join('___'),
         fk_model_id: this.meta.id,
         comments_only: this.commentsOnly
@@ -465,7 +465,7 @@ export default {
           await this.$api.data.update(this.viewId || this.meta.id, id, updatedObj)
           for (const key of Object.keys(updatedObj)) {
             // audit
-            this.$api.meta.auditRowUpdate({
+            this.$api.utils.auditRowUpdate({
               fk_model_id: this.meta.id,
               column_name: key,
               row_id: id,
@@ -516,7 +516,7 @@ export default {
         //   }
         // ])
 
-        await this.$api.meta.commentRow({
+        await this.$api.utils.commentRow({
           fk_model_id: this.meta.id,
           row_id: this.meta.columns.filter(c => c.pk).map(c => this.localState[c.title]).join('___'),
           description: this.comment

@@ -135,7 +135,7 @@ export default {
           //   projectType: this.projectType
           // }])
 
-          const result = (await this.$api.meta.projectCreate({
+          const result = (await this.$api.project.create({
             title: this.name
           }))
 

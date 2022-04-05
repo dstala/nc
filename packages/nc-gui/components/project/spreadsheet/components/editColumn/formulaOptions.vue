@@ -134,7 +134,7 @@ export default {
           formula_raw: this.formula.value
         }
 
-        const col = await this.$api.meta.columnCreate(this.meta.id, formulaCol)
+        const col = await this.$api.dbTableColumn.create(this.meta.id, formulaCol)
 
         console.log(col)
 

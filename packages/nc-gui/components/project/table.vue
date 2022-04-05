@@ -582,7 +582,7 @@ export default {
         // 'tableDelete',
         // { tn: this.nodes.table_name, columns }])
         try {
-          await this.$api.meta.tableDelete(this.deleteId)
+          await this.$api.dbTable.delete(this.deleteId)
 
           this.removeTableTab({
             env: this.nodes.env,

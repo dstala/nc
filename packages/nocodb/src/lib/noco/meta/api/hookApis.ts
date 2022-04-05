@@ -1,7 +1,7 @@
 import catchError from '../helpers/catchError';
 import { Request, Response, Router } from 'express';
 import Hook from '../../../noco-models/Hook';
-import { HookListType, HookTestPayloadType, HookType } from 'nocodb-sdk';
+import { HookListType, HookType, TestPayloadType } from 'nocodb-sdk';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import { invokeWebhook } from '../helpers/webhookHelpers';
 import Model from '../../../noco-models/Model';
@@ -48,7 +48,7 @@ export async function hookUpdate(
 }
 
 export async function hookTest(
-  req: Request<any, any, HookTestPayloadType>,
+  req: Request<any, any, TestPayloadType>,
   res: Response
 ) {
   const model = await Model.getByIdOrName({ id: req.params.tableId });

@@ -4,8 +4,8 @@ import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import {
+  ListParamsType,
   SortListType,
-  TableListParamsType,
   TableReqType,
   TableType
 } from 'nocodb-sdk';
@@ -22,7 +22,7 @@ export async function sortGet(req: Request, res: Response<TableType>) {}
 
 // @ts-ignore
 export async function sortList(
-  req: Request<any, any, any, TableListParamsType>,
+  req: Request<any, any, any, ListParamsType>,
   res: Response<SortListType>
 ) {
   const sortList = await Sort.list({ viewId: req.params.viewId });

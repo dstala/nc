@@ -671,7 +671,7 @@
           <div class="py-3 pl-5 pr-3 d-flex align-center">
             <settings-modal>
               <template #default="{click}">
-                <div class="caption pointer nc-team-settings" @click="click" v-t="['project-settings']">
+                <div v-t="['project-settings']" class="caption pointer nc-team-settings" @click="click">
                   <v-icon color="brown" small class="mr-1">
                     mdi-cog
                   </v-icon>
@@ -961,7 +961,7 @@ export default {
       //   tn: children[event.moved.newIndex].table_name,
       //   order: children[event.moved.newIndex].order,
       // }])
-      await this.$api.meta.tableReorder(children[event.moved.newIndex].id, {
+      await this.$api.dbTable.reorder(children[event.moved.newIndex].id, {
         order: children[event.moved.newIndex].order
       })
 
@@ -1495,7 +1495,7 @@ export default {
     async mtdDialogRenameTableSubmit(title, cookie) {
       let item = cookie
       try {
-        await this.$api.meta.tableUpdate(item.id, {
+        await this.$api.dbTable.update(item.id, {
           title
         })
       } catch (e) {

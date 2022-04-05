@@ -683,7 +683,7 @@ export default {
       //   order: this.viewsList[event.moved.newIndex].view_order
       // }])
       //
-      await this.$api.meta.viewUpdate(this.viewsList[event.moved.newIndex].id, {
+      await this.$api.dbView.update(this.viewsList[event.moved.newIndex].id, {
         title: this.viewsList[event.moved.newIndex].title,
         order: this.viewsList[event.moved.newIndex].order
       })
@@ -759,7 +759,7 @@ export default {
     },
     async saveShareLinkPassword() {
       try {
-        await this.$api.meta.sharedViewUpdate(this.shareLink.id, {
+        await this.$api.dbViewShare.update(this.shareLink.id, {
           password: this.shareLink.password
         })
 
@@ -792,7 +792,7 @@ export default {
 
       // this.viewsList = []
 
-      const views = (await this.$api.meta.viewsList(this.meta.id)).list
+      const views = (await this.$api.dbView.list(this.meta.id)).list
       this.$emit('update:views', views)
     },
     // async onViewChange() {
@@ -848,7 +848,7 @@ export default {
         //   alias: view.alias,
         //   parent_model_title: this.meta.table_name
         // })
-        await this.$api.meta.viewUpdate(view.id, {
+        await this.$api.dbView.update(view.id, {
           title: view.title,
           order: view.order
         })
@@ -875,7 +875,7 @@ export default {
         //   view_name: view.alias || view.title,
         //   parent_model_title: this.table
         // })
-        await this.$api.meta.viewDelete(view.id)
+        await this.$api.dbView.delete(view.id)
         this.$toast.success('View deleted successfully').goAway(3000)
         await this.loadViews()
       } catch (e) {
@@ -908,7 +908,7 @@ export default {
       //     password: this.sharedViewPassword
       //   }
       // ])
-      const shared = (await this.$api.meta.shareViewCreate(this.selectedViewId))
+      const shared = (await this.$api.dbViewShare.create(this.selectedViewId))
 
       // todo: url
       this.shareLink = shared

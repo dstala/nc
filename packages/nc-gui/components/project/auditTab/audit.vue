@@ -107,7 +107,7 @@ export default {
       // }])
       const {
         list, pageInfo
-      } = (await this.$api.meta.projectAuditList({
+      } = (await this.$api.project.auditList({
         projectId: this.$store.state.project.projectId,
         limit: this.limit,
         offset: this.limit * (this.page - 1)

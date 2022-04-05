@@ -148,7 +148,7 @@ export default {
       //   model_name: this.modelName
       // }])
 
-      const viewList = (await this.$api.meta.sharedViewList(this.meta.id))
+      const viewList = (await this.$api.dbViewShare.list(this.meta.id))
 
       const index = viewList.findIndex((v) => {
         return this.selectedView && this.selectedView.id === v.id
@@ -167,7 +167,7 @@ export default {
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: this.nodes.dbAlias }, 'deleteSharedViewLink', {
         //   id
         // }])
-        await this.$api.meta.sharedViewDelete(id)
+        await this.$api.dbViewShare.delete(id)
         this.$toast.success('Deleted shared view successfully').goAway(3000)
         await this.loadSharedViewsList()
       } catch (e) {

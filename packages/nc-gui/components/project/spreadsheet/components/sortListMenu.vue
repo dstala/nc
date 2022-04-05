@@ -138,7 +138,7 @@ export default {
         let sortList = []
 
         if (this.viewId) {
-          const data = await this.$api.meta.sortList(this.viewId)
+          const data = await this.$api.dbTableSort.list(this.viewId)
           sortList = data.sorts.list
         }
 
@@ -148,9 +148,9 @@ export default {
     async saveOrUpdate(sort, i) {
       if (!this.shared && this._isUIAllowed('sortSync')) {
         if (sort.id) {
-          await this.$api.meta.sortUpdate(this.viewId, sort.id, sort)
+          await this.$api.dbTableSort.update(this.viewId, sort.id, sort)
         } else {
-          this.$set(this.sortList, i, (await this.$api.meta.sortCreate(this.viewId, sort)))
+          this.$set(this.sortList, i, (await this.$api.dbTableSort.create(this.viewId, sort)))
         }
       } else {
         this.$emit('input', this.sortList)
@@ -161,7 +161,7 @@ export default {
     },
     async deleteSort(sort, i) {
       if (!this.shared && sort.id && this._isUIAllowed('sortSync')) {
-        await this.$api.meta.sortDelete(this.viewId, sort.id)
+        await this.$api.dbTableSort.delete(this.viewId, sort.id)
         await this.loadSortList()
       } else {
         this.sortList.splice(i, 1)

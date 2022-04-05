@@ -61,7 +61,7 @@ export const actions = {
       value: true
     })
 
-    const model = await this.$api.meta.tableRead(modelId)
+    const model = await this.$api.dbTable.read(modelId)
     // const model = await dispatch('sqlMgr/ActSqlOp', [{ env, dbAlias, project_id }, 'tableXcModelGet', { tableName }], { root: true })
     // const meta = JSON.parse(model.meta)
     commit('MutMeta', {

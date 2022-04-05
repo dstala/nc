@@ -313,7 +313,7 @@ export default {
       let fields = []
       let order = 1
       if (this.viewId) {
-        const data = await this.$api.meta.viewColumnList(this.viewId)
+        const data = await this.$api.dbViewColumn.list(this.viewId)
         const fieldById = data.reduce((o, f) => ({
           ...o,
           [f.fk_column_id]: f
@@ -340,9 +340,9 @@ export default {
     async saveOrUpdate(field, i) {
       if (!this.isPublic && this._isUIAllowed('fieldsSync')) {
         if (field.id) {
-          await this.$api.meta.viewColumnUpdate(this.viewId, field.id, field)
+          await this.$api.dbViewColumn.update(this.viewId, field.id, field)
         } else {
-          this.fields[i] = (await this.$api.meta.viewColumnCreate(this.viewId, field))
+          this.fields[i] = (await this.$api.dbViewColumn.create(this.viewId, field))
         }
       }
       this.$emit('updated')
@@ -356,7 +356,7 @@ export default {
     },
     async showAll() {
       if (!this.isPublic) {
-        await this.$api.meta.viewShowAllColumn({ viewId: this.viewId })
+        await this.$api.dbView.showAllColumn({ viewId: this.viewId })
       }
       for (const f of this.fields) {
         f.show = true
@@ -370,7 +370,7 @@ export default {
     },
     async hideAll() {
       if (!this.isPublic) {
-        await this.$api.meta.viewHideAllColumn({ viewId: this.viewId })
+        await this.$api.dbView.hideAllColumn({ viewId: this.viewId })
       }
       for (const f of this.fields) {
         f.show = false

@@ -69,7 +69,7 @@
               </div>
             </template>
             <v-list dense>
-              <v-list-item dense @click="createSharedBase('viewer')" v-if="!base.uuid">
+              <v-list-item v-if="!base.uuid" dense @click="createSharedBase('viewer')">
                 <v-list-item-title>
                   <v-icon small class="mr-1">
                     mdi-link-variant
@@ -80,7 +80,7 @@
                   </span>
                 </v-list-item-title>
               </v-list-item>
-              <v-list-item dense @click="disableSharedBase" v-if="base.uuid">
+              <v-list-item v-if="base.uuid" dense @click="disableSharedBase">
                 <v-list-item-title>
                   <v-icon small class="mr-1">
                     mdi-link-variant-off
@@ -172,7 +172,7 @@ export default {
       try {
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [
         //   { dbAlias: 'db' }, 'getSharedBaseLink'])
-        const sharedBase = (await this.$api.meta.sharedBaseGet(this.$store.state.project.projectId))
+        const sharedBase = (await this.$api.project.sharedBaseGet(this.$store.state.project.projectId))
 
         this.base = sharedBase || {}
       } catch (e) {
@@ -182,7 +182,7 @@ export default {
     async createSharedBase(roles = 'viewer') {
       try {
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink', { roles }])
-        const sharedBase = (await this.$api.meta.sharedBaseUpdate(this.$store.state.project.projectId, { roles }))
+        const sharedBase = (await this.$api.project.sharedBaseUpdate(this.$store.state.project.projectId, { roles }))
 
         this.base = sharedBase || {}
       } catch (e) {
@@ -193,7 +193,7 @@ export default {
     },
     async disableSharedBase() {
       try {
-        await this.$api.meta.sharedBaseDisable(this.$store.state.project.projectId)
+        await this.$api.project.sharedBaseDisable(this.$store.state.project.projectId)
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
         this.base = {}
       } catch (e) {
@@ -204,7 +204,7 @@ export default {
     },
     async recreate() {
       try {
-        const sharedBase = (await this.$api.meta.sharedBaseCreate(this.$store.state.project.projectId, { roles: this.base.roles || 'viewer' }))
+        const sharedBase = (await this.$api.project.sharedBaseCreate(this.$store.state.project.projectId, { roles: this.base.roles || 'viewer' }))
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'disableSharedBaseLink'])
         // const sharedBase = await this.$store.dispatch('sqlMgr/ActSqlOp', [{ dbAlias: 'db' }, 'createSharedBaseLink'])
         this.base = sharedBase || {}

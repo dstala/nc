@@ -195,7 +195,7 @@ export default {
         //   columns
         // }])
 
-        await this.$api.meta.columnDelete(this.meta.id, column.id)
+        await this.$api.dbTable.delete(this.meta.id, column.id)
 
         this.$emit('colDelete')
         this.$emit('saved')
@@ -225,7 +225,7 @@ export default {
         //   meta
         // }])
 
-        await this.$api.meta.tablePrimaryColumnSet(this.meta.id, this.column.id)
+        await this.$api.dbTableColumn.primaryColumnSet(this.meta.id, this.column.id)
         this.$toast.success('Successfully updated as primary column').goAway(3000)
       } catch (e) {
         console.log(e)

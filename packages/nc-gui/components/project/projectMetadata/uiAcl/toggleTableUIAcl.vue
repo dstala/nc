@@ -148,7 +148,7 @@ export default {
   },
   methods: {
     async loadTableList() {
-      this.tables = (await this.$api.meta.projectModelVisibilityList({
+      this.tables = (await this.$api.project.modelVisibilityList({
         projectId: this.db.project_id,
         baseId: this.db.id,
         includeM2M: this.$store.state.windows.includeM2M || ''
@@ -169,7 +169,7 @@ export default {
         //   disableList: this.tables.filter(t => t.edited)
         // }])
 
-        await this.$api.meta.projectModelVisibilitySet(this.db.project_id, this.db.id, this.tables.filter(t => t.edited))
+        await this.$api.project.modelVisibilitySet(this.db.project_id, this.db.id, this.tables.filter(t => t.edited))
 
         this.$toast.success('Updated UI ACL for tables successfully').goAway(3000)
       } catch (e) {

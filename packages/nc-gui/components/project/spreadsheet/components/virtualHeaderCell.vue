@@ -343,7 +343,7 @@ export default {
     // },
     async deleteColumn() {
       try {
-        await this.$api.meta.columnDelete(this.meta.id, this.column.id)
+        await this.$api.dbTable.delete(this.meta.id, this.column.id)
         this.$emit('saved')
         this.columnDeleteDialog = false
       } catch (e) {

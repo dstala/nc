@@ -1362,7 +1362,7 @@ export default {
         const {
           list,
           pageInfo
-        } = (await this.$api.data.viewList(
+        } = (await this.$api.dbViewRow.list(
           {
             orgs: 'noco',
             projectName: this.$store.state.project.project.title,
@@ -1575,7 +1575,7 @@ export default {
     },
     async exportCache() {
       try {
-        const data = (await this.$api.meta.cacheGet())
+        const data = (await this.$api.utils.cacheGet())
         if (!data.length) {
           this.$toast.info('Cache is empty').goAway(3000)
           return
@@ -1590,7 +1590,7 @@ export default {
     },
     async deleteCache() {
       try {
-        await this.$api.meta.cacheDelete()
+        await this.$api.utils.cacheDelete()
         this.$toast.info('Deleted Cache').goAway(3000)
       } catch (e) {
         console.log(e)
@@ -1608,7 +1608,7 @@ export default {
       },
       set(type) {
         this.selectedView.lock_type = type
-        this.$api.meta.viewUpdate(this.selectedViewId, {
+        this.$api.dbView.update(this.selectedViewId, {
           lock_type: type
         })
       }
@@ -1620,7 +1620,7 @@ export default {
       set(v) {
         if (this.selectedView) {
           this.selectedView.show_system_fields = v
-          this.$api.meta.viewUpdate(this.selectedViewId, {
+          this.$api.dbView.update(this.selectedViewId, {
             show_system_fields: v
           }).then(() => {
             if (v) {

@@ -663,14 +663,14 @@ export default {
       } = field
 
       if (id) {
-        await this.$api.meta.viewColumnUpdate(this.viewId, field.id, {
+        await this.$api.dbViewColumn.update(this.viewId, field.id, {
           fk_view_id,
           fk_column_id,
           order,
           show
         })
       } else {
-        field.id = (await this.$api.meta.viewColumnCreate(this.viewId, {
+        field.id = (await this.$api.dbViewColumn.create(this.viewId, {
           fk_view_id,
           fk_column_id,
           order,
@@ -681,17 +681,17 @@ export default {
     },
     async updateColMeta(col, i) {
       if (col.id) {
-        await this.$api.meta.formColumnUpdate(col.id, col)
+        await this.$api.dbView.formColumnUpdate(col.id, col)
       }
     },
     async updateView() {
-      await this.$api.meta.formUpdate(this.viewId, this.view)
+      await this.$api.dbView.formUpdate(this.viewId, this.view)
     },
     async loadView() {
       const {
         columns,
         ...view
-      } = (await this.$api.meta.formRead(this.viewId))
+      } = (await this.$api.dbView.formRead(this.viewId))
       this.view = view
       this.formColumns = columns
       let order = 1
@@ -748,7 +748,7 @@ export default {
           this.$set(col, 'show', true)
         }
       }
-      await this.$api.meta.viewShowAllColumn({
+      await this.$api.dbView.showAllColumn({
         viewId: this.viewId,
         ignoreIds: this.systemFieldsIds
       })
@@ -762,7 +762,7 @@ export default {
         }
         this.$set(col, 'show', false)
       }
-      await this.$api.meta.viewHideAllColumn({
+      await this.$api.dbView.hideAllColumn({
         viewId: this.viewId,
         ignoreIds: this.fields.filter(this.isDbRequired).map(f => f.fk_column_id)
       })
@@ -800,7 +800,7 @@ export default {
     },
     async checkSMTPStatus() {
       if (this.emailMe) {
-        const emailPluginActive = (await this.$api.meta.pluginStatus('SMTP'))
+        const emailPluginActive = (await this.$api.plugin.status('SMTP'))
         if (!emailPluginActive) {
           this.emailMe = false
           this.$toast.info('Please activate SMTP plugin in App store for enabling email notification').goAway(5000)

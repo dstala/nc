@@ -1,13 +1,13 @@
 import { Request, Response, Router } from 'express';
 import Audit from '../../../noco-models/Audit';
 import {
+  AuditListParamsType,
   AuditOperationSubTypes,
   AuditOperationTypes,
   AuditRowUpdatePayloadType,
   CommentCountParamsType,
   CommentListParamsType,
-  CommentRowPayloadType,
-  ProjectAuditListParamsType
+  CommentRowPayloadType
 } from 'nocodb-sdk';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
@@ -54,7 +54,7 @@ export async function commentList(
   res.json(await Audit.commentsList(req.query));
 }
 export async function auditList(
-  req: Request<ProjectAuditListParamsType>,
+  req: Request<AuditListParamsType>,
   res: Response
 ) {
   res.json(

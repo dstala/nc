@@ -32,13 +32,13 @@ export default {
   methods: {
     async   loadSampleData() {
       this.sampleData = {
-        data: (await this.$api.meta.hooksSamplePayloadGet(this.modelId, this.hook.operation)),
+        data: (await this.$api.dbTableWebhook.samplePayloadGet(this.modelId, this.hook.operation)),
         user: this.$store.state.users.user
       }
     },
     async testWebhook() {
       try {
-        const res = await this.$api.meta.hookTest(this.modelId, {
+        const res = await this.$api.dbTableWebhook.test(this.modelId, {
           hook: this.hook,
           payload: this.sampleData
         })

@@ -5,7 +5,7 @@ import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import {
   GalleryType,
-  TableListParamsType,
+  ListParamsType,
   TableListType,
   ViewTypes
 } from 'nocodb-sdk';
@@ -24,7 +24,7 @@ export async function galleryViewGet(req: Request, res: Response<GalleryType>) {
 
 // @ts-ignore
 export async function galleyViewList(
-  _req: Request<any, any, any, TableListParamsType>,
+  _req: Request<any, any, any, ListParamsType>,
   _res: Response<TableListType>
 ) {}
 

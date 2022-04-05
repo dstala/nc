@@ -595,7 +595,7 @@ export default {
         this.newColumn.title = this.newColumn.column_name
 
         if (this.editColumn) {
-          const col = await this.$api.meta.columnUpdate(this.meta.id, this.column.id, this.newColumn)
+          const col = await this.$api.dbTableColumn.update(this.meta.id, this.column.id, this.newColumn)
           console.log(col)
           //   tn: this.nodes.table_name,
           //   title: this.meta.title,
@@ -605,13 +605,7 @@ export default {
 
           // columns[this.columnIndex] = this.newColumn
         } else {
-          const col = await this.$api.meta.columnCreate(this.meta.id, this.newColumn)
-          // const col = await this.$api.meta.columnCreate(this.meta.id, {
-          //  column_name:this
-          //     .newColumn.column_name,
-          //   _cn: this.newColumn.column_name,
-          //   uidt: this.newColumn.uidt
-          // })
+          const col = await this.$api.dbTableColumn.create(this.meta.id, this.newColumn)
           console.log(col)
         }
 

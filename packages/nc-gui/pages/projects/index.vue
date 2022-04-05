@@ -1019,7 +1019,7 @@ export default {
             //   'projectDelete'
             // ])
 
-            await this.$api.meta.projectsDelete(projectId)
+            await this.$api.project.delete(projectId)
             this.$toast
               .success(`Project '${project.title}' deleted successfully`)
               .goAway(3000)
@@ -1080,7 +1080,7 @@ export default {
         //   'projectList'
         // ])
 
-        this.projects = (await this.$api.meta.projectList({})).list
+        this.projects = (await this.$api.project.list({})).list
 
         // todo: multiplex
         const user = this.$store.state.users.user

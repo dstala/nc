@@ -377,30 +377,30 @@ export default {
       for (const [i, filter] of Object.entries(this.filters)) {
         if (filter.status === 'delete') {
           if (this.hookId || hookId) {
-            await this.$api.meta.hookFilterDelete(this.hookId || hookId, filter.id)
+            await this.$api.dbTableFilter.delete(this.hookId || hookId, filter.id)
           } else {
-            await this.$api.meta.filterDelete(this.viewId, filter.id)
+            await this.$api.dbTableFilter.delete(this.viewId, filter.id)
           }
         } else if (filter.status === 'update') {
           if (filter.id) {
             if (this.hookId || hookId) {
-              await this.$api.meta.hookFilterUpdate(this.hookId || hookId, filter.id, {
+              await this.$api.dbTableFilter.update(this.hookId || hookId, filter.id, {
                 ...filter,
                 fk_parent_id: this.parentId
               })
             } else {
-              await this.$api.meta.filterUpdate(this.viewId, filter.id, {
+              await this.$api.dbTableFilter.update(this.viewId, filter.id, {
                 ...filter,
                 fk_parent_id: this.parentId
               })
             }
           } else if (this.hookId || hookId) {
-            this.$set(this.filters, i, (await this.$api.meta.hookFilterCreate(this.hookId || hookId, {
+            this.$set(this.filters, i, (await this.$api.dbTableFilter.create(this.hookId || hookId, {
               ...filter,
               fk_parent_id: this.parentId
             })))
           } else {
-            this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
+            this.$set(this.filters, i, (await this.$api.dbTableFilter.create(this.viewId, {
               ...filter,
               fk_parent_id: this.parentId
             })))
@@ -419,13 +419,13 @@ export default {
       let filters = []
       if (this.viewId && this._isUIAllowed('filterSync')) {
         filters = this.parentId
-          ? (await this.$api.meta.filterChildrenRead(this.viewId, this.parentId))
-          : (await this.$api.meta.filterRead(this.viewId))
+          ? (await this.$api.dbTableFilter.childrenRead(this.viewId, this.parentId))
+          : (await this.$api.dbTableFilter.read(this.viewId))
       }
       if (this.hookId && this._isUIAllowed('filterSync')) {
         filters = this.parentId
-          ? (await this.$api.meta.hookFilterChildrenRead(this.hookId, this.parentId))
-          : (await this.$api.meta.hookFilterRead(this.hookId))
+          ? (await this.$api.dbTableWebhookFilter.childrenRead(this.hookId, this.parentId))
+          : (await this.$api.dbTableWebhookFilter.read(this.hookId))
       }
 
       this.filters = filters
@@ -462,14 +462,14 @@ export default {
       } else if (!this.autoApply) {
         filter.status = 'update'
       } else if (filter.id) {
-        await this.$api.meta.filterUpdate(this.viewId, filter.id, {
+        await this.$api.dbTableFilter.update(this.viewId, filter.id, {
           ...filter,
           fk_parent_id: this.parentId
         })
 
         this.$emit('updated')
       } else {
-        this.$set(this.filters, i, (await this.$api.meta.filterCreate(this.viewId, {
+        this.$set(this.filters, i, (await this.$api.dbTableFilter.create(this.viewId, {
           ...filter,
           fk_parent_id: this.parentId
         })))
@@ -486,7 +486,7 @@ export default {
         if (!this.autoApply) {
           this.$set(filter, 'status', 'delete')
         } else {
-          await this.$api.meta.filterDelete(this.viewId, filter.id)
+          await this.$api.dbTableFilter.delete(this.viewId, filter.id)
           await this.loadFilter()
           this.$emit('updated')
         }

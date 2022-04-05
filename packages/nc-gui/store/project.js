@@ -320,7 +320,7 @@ export const actions = {
         commit('MutProjectId', null)
         return
       }
-      data = (await this.$api.meta.projectRead(projectId))
+      data = (await this.$api.project.read(projectId))
       commit("project", data);
       commit("meta/MutClear", null, {root: true});
       commit("tabs/MutClearTabState", null, {root: true});
@@ -358,7 +358,7 @@ export const actions = {
       //   "xcTableAndViewList", {includeM2M: rootState.windows.includeM2M}
       // ], {root: true});
 
-      const tables = (await this.$api.meta.tableList({
+      const tables = (await this.$api.dbTable.list({
         projectId: state.projectId,
         baseId: state.project.bases[0].id,
         includeM2M: rootState.windows.includeM2M || ''
@@ -649,7 +649,7 @@ export const actions = {
 
 
   async ActLoadProjectInfo({commit}) {
-    const projectInfo = (await this.$api.meta.appInfo())
+    const projectInfo = (await this.$api.utils.appInfo())
     //   (await this.$axios({
     //   url: '/auth/type',
     //   baseURL: `${this.$axios.defaults.baseURL}/dashboard`,

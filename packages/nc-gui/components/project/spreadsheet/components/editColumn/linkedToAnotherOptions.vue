@@ -185,7 +185,7 @@ export default {
     async loadTablesList() {
       this.isRefTablesLoading = true
 
-      const result = (await this.$api.meta.tableList({
+      const result = (await this.$api.dbTable.list({
         projectId: this.$store.state.project.projectId,
         baseId: this.$store.state.project.project.bases[0].id
       })).list.filter(t => t.type === ModelTypes.TABLE)
@@ -194,7 +194,7 @@ export default {
       this.isRefTablesLoading = false
     },
     async saveRelation() {
-      await this.$api.meta.columnCreate(this.meta.id, {
+      await this.$api.dbTable.create(this.meta.id, {
         ...this.relation,
         parentId: this.meta.id,
         uidt: UITypes.LinkToAnotherRecord,

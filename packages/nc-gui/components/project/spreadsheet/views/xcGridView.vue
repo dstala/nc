@@ -428,7 +428,7 @@ export default {
       if (!this.viewId) {
         return
       }
-      const colsData = (await this.$api.meta.gridColumnsList(this.viewId))
+      const colsData = (await this.$api.dbView.gridColumnsList(this.viewId))
       this.gridViewCols = colsData.reduce((o, col) => ({
         ...o,
         [col.fk_column_id]: col
@@ -497,7 +497,7 @@ export default {
       // }])
       //
 
-      this.aggCount = (await this.$api.meta.commentCount({
+      this.aggCount = (await this.$api.utils.commentCount({
         ids: this.data.map(({ row: r }) => {
           return this.meta.columns.filter(c => c.pk).map(c => r[c.title]).join('___')
         }),
@@ -712,7 +712,7 @@ export default {
       }
       this.$set(this.gridViewCols[colId], 'width', size)
       if (this._isUIAllowed('gridColUpdate')) {
-        await this.$api.meta.gridColumnUpdate(gridColId, {
+        await this.$api.dbView.gridColumnUpdate(gridColId, {
           width: size
         })
       }

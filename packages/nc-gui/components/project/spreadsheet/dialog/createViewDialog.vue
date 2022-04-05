@@ -122,19 +122,19 @@ export default {
         let data
         switch (this.show_as) {
           case ViewTypes.GRID:
-            data = (await this.$api.meta.gridCreate(this.meta.id, {
+            data = (await this.$api.dbView.gridCreate(this.meta.id, {
               title: this.view_name,
               copy_from_id: this.selectedViewId
             }))
             break
           case ViewTypes.GALLERY:
-            data = (await this.$api.meta.galleryCreate(this.meta.id, {
+            data = (await this.$api.dbView.galleryCreate(this.meta.id, {
               title: this.view_name,
               copy_from_id: this.selectedViewId
             }))
             break
           case ViewTypes.FORM:
-            data = (await this.$api.meta.formCreate(this.meta.id, {
+            data = (await this.$api.dbView.formCreate(this.meta.id, {
               title: this.view_name,
               copy_from_id: this.selectedViewId
             }))

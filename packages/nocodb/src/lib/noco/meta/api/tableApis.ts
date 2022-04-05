@@ -5,12 +5,12 @@ import { Tele } from 'nc-help';
 import {
   AuditOperationSubTypes,
   AuditOperationTypes,
+  ListParams5Type,
   ModelTypes,
-  TableListParamsType,
   TableListType,
   TableReqType,
   TableType,
-  TableUpdatePayloadType
+  UpdatePayloadType
 } from 'nocodb-sdk';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
@@ -28,13 +28,7 @@ export async function tableGet(req: Request, res: Response<TableType>) {
   });
 
   // todo: optimise
-  const viewList = <View[]>await xcVisibilityMetaGet(
-    // req.params.projectId,
-    // req.params.baseId,
-    null,
-    null,
-    [table]
-  );
+  const viewList = <View[]>await xcVisibilityMetaGet(table.project_id, [table]);
 
   //await View.list(req.params.tableId)
   table.views = viewList.filter((table: any) => {
@@ -53,25 +47,10 @@ export async function tableReorder(req: Request, res: Response) {
 }
 
 export async function tableList(
-  req: Request<any, any, any, TableListParamsType>,
+  req: Request<any, any, any, ListParams5Type>,
   res: Response<TableListType>
 ) {
-  // const tablesList = await xcVisibilityMetaGet(
-  //   req.params.projectId,
-  //   req.params.baseId
-  // );
-  //
-  // const filteredTableList = tablesList.filter((table: any) => {
-  //   return Object.keys((req as any).session?.passport?.user?.roles).some(
-  //     role =>
-  //       (req as any)?.session?.passport?.user?.roles[role] &&
-  //       !table.disabled[role]
-  //   );
-  // });
-  const viewList = await xcVisibilityMetaGet(
-    req.params.projectId,
-    req.params.baseId
-  );
+  const viewList = await xcVisibilityMetaGet(req.params.projectId);
 
   // todo: optimise
   const tableViewMapping = viewList.reduce((o, view: any) => {
@@ -107,7 +86,7 @@ export async function tableList(
 
 export async function tableCreate(req: Request<any, any, TableReqType>, res) {
   const project = await Project.getWithInfo(req.params.projectId);
-  const base = project.bases.find(b => b.id === req.params.baseId);
+  const base = project.bases[0];
 
   if (!req.body.table_name) {
     NcError.badRequest(
@@ -187,7 +166,7 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
 }
 
 export async function tableUpdate(
-  req: Request<any, any, TableUpdatePayloadType>,
+  req: Request<any, any, UpdatePayloadType>,
   res
 ) {
   const model = await Model.get(req.params.tableId);
@@ -252,8 +231,8 @@ export async function tableDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableList));
-router.post('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableCreate));
+router.get('/projects/:projectId/tables', ncMetaAclMw(tableList));
+router.post('/projects/:projectId/tables', ncMetaAclMw(tableCreate));
 router.get('/tables/:tableId', ncMetaAclMw(tableGet));
 router.put('/tables/:tableId', ncMetaAclMw(tableUpdate));
 router.delete('/tables/:tableId', ncMetaAclMw(tableDelete));
