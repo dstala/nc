@@ -1167,7 +1167,7 @@ export default {
           }))// { [column.title]: oldRow[column.title] })
 
           // audit
-          this.$api.meta.auditRowUpdate({
+          this.$api.utils.auditRowUpdate({
             fk_model_id: this.meta.id,
             column_name: column.title,
             row_id: id,
