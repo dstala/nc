@@ -148,6 +148,8 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
     client: base?.getConnectionConfig()?.client,
     timeTaken: 0
   };
+
+  const t = process.hrtime();
   const sqlClient = NcConnectionMgrv2.getSqlClient(base);
   let order = 1;
   const models2: { [tableName: string]: Model } = {};
@@ -371,6 +373,11 @@ async function populateMeta(base: Base, project: Project): Promise<any> {
   });
 
   await NcHelp.executeOperations(viewMetasInsert, base.type);
+
+  const t1 = process.hrtime(t);
+  const t2 = t1[0] + t1[1] / 1000000000;
+
+  (info as any).timeTaken = t2.toFixed(1);
 
   return info;
 }
