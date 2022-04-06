@@ -59,14 +59,13 @@ export default async function formulaQueryBuilderv2(
     switch (col.uidt) {
       case UITypes.Formula:
         {
-          aliasToColumn[col.id] = null;
           const formulOption = await col.getColOptions<FormulaColumn>();
           const { builder } = await formulaQueryBuilderv2(
             formulOption.formula,
             alias,
             knex,
             model,
-            aliasToColumn
+            { ...aliasToColumn, [col.id]: null }
           );
           aliasToColumn[col.id] = builder;
         }
