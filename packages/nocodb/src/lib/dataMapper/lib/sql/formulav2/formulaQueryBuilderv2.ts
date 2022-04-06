@@ -232,7 +232,7 @@ export default async function formulaQueryBuilderv2(
                         )
                         .wrap('(', ')');
                   } else {
-                    selectQb.select(builder);
+                    selectQb.select(knex.raw(builder).wrap('(', ')'));
                   }
                 }
                 break;
@@ -391,17 +391,13 @@ export default async function formulaQueryBuilderv2(
         }
         break;
       case UITypes.Rollup:
-        aliasToColumn[col.id] = knex
-          .raw(
-            (
-              await genRollupSelectv2({
-                knex,
-                columnOptions: (await col.getColOptions()) as RollupColumn
-              })
-            ).builder
-          )
-          .wrap('(', ')');
-
+        {
+          const qb = await genRollupSelectv2({
+            knex,
+            columnOptions: (await col.getColOptions()) as RollupColumn
+          });
+          aliasToColumn[col.id] = knex.raw(qb.builder).wrap('(', ')');
+        }
         break;
       case UITypes.LinkToAnotherRecord:
         {
