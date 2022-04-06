@@ -967,43 +967,6 @@ export default {
       }
     },
     async syncData() {
-      if (this.relation) {
-        return
-      }
-      try {
-        // const queryParams = {x
-        //   filters: this.filters,
-        //   sortList: this.sortList,
-        //   showFields: this.showFields,
-        //   fieldsOrder: this.fieldsOrder,
-        //   viewStatus: this.viewStatus,
-        //   columnsWidth: this.columnsWidth,
-        //   showSystemFields: this.showSystemFields,
-        //   extraViewParams: this.extraViewParams
-        // }
-        //
-        // if (this.isGallery) {
-        //   queryParams.coverImageField = this.coverImageField
-        // }
-        //
-        // if (this.isKanban) {
-        //   queryParams.groupingField = this.groupingField
-        // }
-        //
-        // this.$set(this.selectedView, 'query_params', JSON.stringify(queryParams))
-        //
-        // if (!this._isUIAllowed('xcVirtualTableUpdate')) {
-        //   return
-        // }
-        // await this.sqlOp({ dbAlias: this.nodes.dbAlias }, 'xcVirtualTableUpdate', {
-        //   id: this.selectedViewId,
-        //   query_params: queryParams,
-        //   tn: this.meta.table_name,
-        //   view_name: this.$route.query.view
-        // })
-      } catch (e) {
-        // this.$toast.error(e.message).goAway(3000);
-      }
     },
     showAdditionalFeatOverlay(feat) {
       this.showAddFeatOverlay = true
@@ -1342,7 +1305,7 @@ export default {
       this.loadTableDataDeb(this)
     },
     async loadTableDataFn() {
-      if (this.isForm) {
+      if (this.isForm || !this.selectedView || !this.selectedView.title) {
         return
       }
       this.loadingData = true
@@ -1361,13 +1324,14 @@ export default {
         //       ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
         //     }
         //   })).data.data
+
         const {
           list,
           pageInfo
         } = (await this.$api.dbViewRow.list(
           {
             orgs: 'noco',
-            projectName: this.$store.state.project.project.title,
+            projectName: this.$store.getters['project/GtrProjectName'],
             tableAlias: this.meta.title,
             viewName: this.selectedView.title
           },
