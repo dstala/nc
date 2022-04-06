@@ -200,7 +200,7 @@ export default {
           uidt: UITypes.Lookup
         }
 
-        await this.$api.dbTable.create(this.meta.id, lookupCol)
+        await this.$api.dbTableColumn.create(this.meta.id, lookupCol)
 
         // await this.$store.dispatch('sqlMgr/ActSqlOp', [{
         //   env: this.nodes.env,
