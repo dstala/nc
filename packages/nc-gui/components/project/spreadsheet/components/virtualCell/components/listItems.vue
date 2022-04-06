@@ -142,27 +142,16 @@ export default {
     async loadData() {
       if (this.isPublic) {
         this.data = (await this.$api.public.dataRelationList(
-          { uuid: this.$route.params.id, relationColumnId: this.column.id },
+          this.$route.params.id,
+          this.column.id,
           { password: this.password }, {
             query: {
               limit: this.size,
               offset: this.size * (this.page - 1),
               ...this.queryParams
-              // where
             }
           }))
-        // this.data = await this.$store.dispatch('sqlMgr/ActSqlOp', [null, 'sharedViewNestedDataGet', {
-        //   password: this.password,
-        //   limit: this.size,
-        //   tn: this.table_name,
-        //   view_id: this.$route.params.id,
-        //   offset: this.size * (this.page - 1),
-        //   query: this.query
-        // }])
       } else {
-        // if (!this.api) {
-        //   return
-        // }
         const where = `(${this.primaryCol},like,%${this.query}%)`
 
         // eslint-disable-next-line no-lonely-if
@@ -180,18 +169,6 @@ export default {
               }
             }))
         } else {
-          // let where = this.queryParams.where || ''
-          // if (this.query) {
-          // }
-
-          // if (this.mm) {
-          //   this.data = await this.api.paginatedM2mNotChildrenList({
-          //     limit: this.size,
-          //     offset: this.size * (this.page - 1),
-          //     ...this.queryParams,
-          //     where
-          //   }, this.mm.vtn, this.parentId)
-          // } else {
           this.data = (await this.$api.data.list(
             this.meta.id, {
               query: {
@@ -202,14 +179,6 @@ export default {
               }
             }))
         }
-
-        //   await this.api.paginatedList({
-        //   limit: this.size,
-        //   offset: this.size * (this.page - 1),
-        //   ...this.queryParams,
-        //   where
-        // })
-        // }
       }
     }
   }
