@@ -988,7 +988,7 @@ export default {
         //   }])
         await this.$api.dbTable.create(
           this.$store.state.project.projectId,
-          this.$store.state.project.bases[0].id,
+          this.$store.state.project.project.bases[0].id,
           {
             table_name: this.nodes.table_name,
             title: this.nodes.title,

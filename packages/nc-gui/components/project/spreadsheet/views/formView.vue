@@ -748,7 +748,7 @@ export default {
           this.$set(col, 'show', true)
         }
       }
-      await this.$api.dbView.showAllColumn(this.viewId,{
+      await this.$api.dbView.showAllColumn(this.viewId, {
         ignoreIds: this.systemFieldsIds
       })
       // this.columns = [...this.allColumnsLoc]
@@ -761,7 +761,7 @@ export default {
         }
         this.$set(col, 'show', false)
       }
-      await this.$api.dbView.hideAllColumn(this.viewId,{
+      await this.$api.dbView.hideAllColumn(this.viewId, {
         ignoreIds: this.fields.filter(this.isDbRequired).map(f => f.fk_column_id)
       })
       this.$tele.emit('form-view:remove-all')
