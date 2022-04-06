@@ -227,8 +227,8 @@ export async function tableDelete(req: Request, res: Response, next) {
 }
 
 const router = Router({ mergeParams: true });
-router.get('/projects/:projectId/tables', ncMetaAclMw(tableList));
-router.post('/projects/:projectId/tables', ncMetaAclMw(tableCreate));
+router.get('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableList));
+router.post('/projects/:projectId/:baseId/tables', ncMetaAclMw(tableCreate));
 router.get('/tables/:tableId', ncMetaAclMw(tableGet));
 router.put('/tables/:tableId', ncMetaAclMw(tableUpdate));
 router.delete('/tables/:tableId', ncMetaAclMw(tableDelete));
