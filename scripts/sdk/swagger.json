@@ -424,15 +424,6 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {
                   "type": "object",
                   "properties": {
                     "Node": {
@@ -1552,10 +1543,9 @@
         "summary": "",
         "operationId": "db-view-column-list",
         "responses": {
-          "200": {}
         },
         "tags": [
-          "DB View column"
+          "DB View Column"
         ]
       },
       "post": {
@@ -1567,7 +1557,7 @@
           }
         },
         "tags": [
-          "DB View column"
+          "DB View Column"
         ],
         "requestBody": {
           "content": {
@@ -1679,7 +1669,7 @@
           }
         },
         "tags": [
-          "DB View column"
+          "DB View Column"
         ]
       },
       "put": {
@@ -1691,7 +1681,7 @@
           }
         },
         "tags": [
-          "DB View column"
+          "DB View Column"
         ],
         "requestBody": {
           "content": {
@@ -1734,7 +1724,7 @@
           }
         },
         "tags": [
-          "DB View share"
+          "DB View Share"
         ]
       },
       "put": {
@@ -1768,7 +1758,7 @@
           "description": ""
         },
         "tags": [
-          "DB View share"
+          "DB View Share"
         ]
       },
       "delete": {
@@ -1781,7 +1771,7 @@
         },
         "description": "",
         "tags": [
-          "DB View share"
+          "DB View Share"
         ]
       }
     },
@@ -1814,7 +1804,7 @@
         },
         "description": "",
         "tags": [
-          "DB View share"
+          "DB View Share"
         ]
       }
     },
@@ -1834,9 +1824,7 @@
         "operationId": "db-table-sort-list",
         "responses": {
           "200": {
-            "$ref": "#/components/responses/SortList"
-          },
-          "": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1855,7 +1843,7 @@
           }
         },
         "tags": [
-          "DB Table sort"
+          "DB Table Sort"
         ]
       },
       "post": {
@@ -1867,7 +1855,7 @@
           }
         },
         "tags": [
-          "DB Table sort"
+          "DB Table Sort"
         ],
         "requestBody": {
           "content": {
@@ -1915,7 +1903,7 @@
           }
         },
         "tags": [
-          "DB Table sort"
+          "DB Table Sort"
         ]
       },
       "put": {
@@ -1927,7 +1915,7 @@
           }
         },
         "tags": [
-          "DB Table sort"
+          "DB Table Sort"
         ],
         "requestBody": {
           "content": {
@@ -1948,7 +1936,7 @@
           }
         },
         "tags": [
-          "DB Table sort"
+          "DB Table Sort"
         ]
       }
     },
@@ -1972,7 +1960,7 @@
           }
         },
         "tags": [
-          "DB Table filter"
+          "DB Table Filter"
         ]
       },
       "post": {
@@ -1984,7 +1972,7 @@
           }
         },
         "tags": [
-          "DB Table filter"
+          "DB Table Filter"
         ],
         "requestBody": {
           "content": {
@@ -2032,7 +2020,7 @@
           }
         },
         "tags": [
-          "DB Table filter"
+          "DB Table Filter"
         ]
       },
       "put": {
@@ -2044,7 +2032,7 @@
           }
         },
         "tags": [
-          "DB Table filter"
+          "DB Table Filter"
         ],
         "requestBody": {
           "content": {
@@ -2065,7 +2053,7 @@
           }
         },
         "tags": [
-          "DB Table filter"
+          "DB Table Filter"
         ]
       }
     },
@@ -2104,7 +2092,7 @@
           }
         },
         "tags": [
-          "DB Table filter"
+          "DB Table Filter"
         ]
       }
     },
@@ -2128,7 +2116,7 @@
           }
         },
         "tags": [
-          "DB Table webhook filter"
+          "DB Table Webhook Filter"
         ]
       },
       "post": {
@@ -2140,7 +2128,7 @@
           }
         },
         "tags": [
-          "DB Table webhook filter"
+          "DB Table Webhook Filter"
         ],
         "requestBody": {
           "content": {
@@ -2188,7 +2176,7 @@
           }
         },
         "tags": [
-          "DB Table webhook filter"
+          "DB Table Webhook Filter"
         ]
       },
       "put": {
@@ -2200,7 +2188,7 @@
           }
         },
         "tags": [
-          "DB Table webhook filter"
+          "DB Table Webhook Filter"
         ],
         "requestBody": {
           "content": {
@@ -2221,7 +2209,7 @@
           }
         },
         "tags": [
-          "DB Table webhook filter"
+          "DB Table Webhook Filter"
         ]
       }
     },
@@ -2260,7 +2248,7 @@
           }
         },
         "tags": [
-          "DB Table webhook filter"
+          "DB Table Webhook Filter"
         ]
       }
     },
@@ -2544,15 +2532,6 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": ""
-                }
-              }
-            }
-          },
-          "": {
             "content": {
               "application/json": {
                 "schema": {}
@@ -2870,7 +2849,7 @@
         "operationId": "db-table-row-list",
         "description": "",
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ],
         "parameters": [
           {
@@ -2920,7 +2899,7 @@
           }
         },
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ],
         "requestBody": {
           "content": {
@@ -2971,7 +2950,7 @@
         "operationId": "db-view-row-list",
         "description": "",
         "tags": [
-          "DB View row"
+          "DB View Row"
         ],
         "parameters": [
           {
@@ -3027,7 +3006,7 @@
           }
         },
         "tags": [
-          "DB View row"
+          "DB View Row"
         ],
         "requestBody": {
           "content": {
@@ -3211,13 +3190,6 @@
                 "schema": {}
               }
             }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
           }
         },
         "tags": [
@@ -3286,13 +3258,6 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "": {
             "content": {
               "application/json": {
                 "schema": {}
@@ -3615,13 +3580,6 @@
                 "schema": {}
               }
             }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
           }
         },
         "description": "",
@@ -3671,13 +3629,6 @@
         "responses": {
           "201": {
             "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "": {
             "content": {
               "application/json": {
                 "schema": {}
@@ -3740,13 +3691,6 @@
         "responses": {
           "201": {
             "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "": {
             "content": {
               "application/json": {
                 "schema": {}
@@ -3906,7 +3850,7 @@
         },
         "description": "",
         "tags": [
-          "DB View row"
+          "DB View Row"
         ]
       },
       "put": {
@@ -3923,7 +3867,7 @@
           }
         },
         "tags": [
-          "DB View row"
+          "DB View Row"
         ],
         "requestBody": {
           "content": {
@@ -3942,7 +3886,7 @@
           }
         },
         "tags": [
-          "DB View row"
+          "DB View Row"
         ],
         "description": ""
       }
@@ -3997,7 +3941,7 @@
         },
         "description": "",
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ]
       },
       "put": {
@@ -4014,7 +3958,7 @@
           }
         },
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ],
         "requestBody": {
           "content": {
@@ -4033,7 +3977,7 @@
           }
         },
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ],
         "description": ""
       }
@@ -4046,13 +3990,6 @@
         "responses": {
           "201": {
             "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "": {
             "content": {
               "application/json": {
                 "schema": {}
@@ -4141,13 +4078,6 @@
                 "schema": {}
               }
             }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
           }
         },
         "description": "",
@@ -4212,38 +4142,6 @@
                     "list",
                     "pageInfo"
                   ]
-                },
-                "examples": {
-                  "example-1": {
-                    "value": {
-                      "audits": {
-                        "list": [
-                          {
-                            "id": "string",
-                            "user": "string",
-                            "ip": "string",
-                            "base_id": "string",
-                            "project_id": "string",
-                            "fk_model_id": "string",
-                            "row_id": "string",
-                            "op_type": "string",
-                            "op_sub_type": "string",
-                            "status": "string",
-                            "description": "string",
-                            "details": "string"
-                          }
-                        ],
-                        "pageInfo": {
-                          "pageSize": 0,
-                          "totalRows": 0,
-                          "sort": "string",
-                          "isFirstPage": true,
-                          "isLastPage": true,
-                          "page": 0
-                        }
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -4353,19 +4251,12 @@
                 }
               }
             }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
           }
         },
         "description": "",
         "parameters": [],
         "tags": [
-          "DB Table webhook"
+          "DB Table Webhook"
         ]
       },
       "post": {
@@ -4394,7 +4285,7 @@
           }
         },
         "tags": [
-          "DB Table webhook"
+          "DB Table Webhook"
         ]
       }
     },
@@ -4423,7 +4314,7 @@
           }
         },
         "tags": [
-          "DB Table webhook"
+          "DB Table Webhook"
         ],
         "requestBody": {
           "content": {
@@ -4475,7 +4366,7 @@
           }
         },
         "tags": [
-          "DB Table webhook"
+          "DB Table Webhook"
         ],
         "requestBody": {
           "content": {
@@ -4496,7 +4387,7 @@
           }
         },
         "tags": [
-          "DB Table webhook"
+          "DB Table Webhook"
         ]
       }
     },
@@ -4526,13 +4417,6 @@
                     }
                   }
                 }
-              }
-            }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           }
@@ -4636,19 +4520,12 @@
                 }
               }
             }
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
           }
         },
         "description": "",
         "parameters": [],
         "tags": [
-          "DB Table webhook"
+          "DB Table Webhook"
         ]
       }
     },
@@ -4671,13 +4548,6 @@
           },
           "401": {
             "description": "Unauthorized"
-          },
-          "": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
           }
         },
         "description": "",
@@ -4989,7 +4859,7 @@
           }
         },
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ],
         "description": "",
         "requestBody": {
@@ -5012,7 +4882,7 @@
           }
         },
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ],
         "requestBody": {
           "content": {
@@ -5052,7 +4922,7 @@
           }
         },
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ]
       }
     },
@@ -5116,7 +4986,7 @@
           }
         ],
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ]
       },
       "delete": {
@@ -5143,7 +5013,7 @@
           }
         ],
         "tags": [
-          "DB Table row"
+          "DB Table Row"
         ]
       }
     }
