@@ -1,7 +1,7 @@
 import catchError from '../helpers/catchError';
 import { Request, Response, Router } from 'express';
 import Hook from '../../../noco-models/Hook';
-import { HookListType, HookType, TestPayloadType } from 'nocodb-sdk';
+import { HookListType, HookType } from 'nocodb-sdk';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import { invokeWebhook } from '../helpers/webhookHelpers';
 import Model from '../../../noco-models/Model';
@@ -44,13 +44,11 @@ export async function hookUpdate(
   res: Response<HookType>
 ) {
   Tele.emit('evt', { evt_type: 'webhooks:updated' });
+
   res.json(await Hook.update(req.params.hookId, req.body));
 }
 
-export async function hookTest(
-  req: Request<any, any, TestPayloadType>,
-  res: Response
-) {
+export async function hookTest(req: Request<any, any>, res: Response) {
   const model = await Model.getByIdOrName({ id: req.params.tableId });
 
   const {

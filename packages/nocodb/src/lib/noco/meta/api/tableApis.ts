@@ -8,8 +8,7 @@ import {
   ModelTypes,
   TableListType,
   TableReqType,
-  TableType,
-  UpdatePayloadType
+  TableType
 } from 'nocodb-sdk';
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 import Project from '../../../noco-models/Project';
@@ -161,10 +160,7 @@ export async function tableCreate(req: Request<any, any, TableReqType>, res) {
   );
 }
 
-export async function tableUpdate(
-  req: Request<any, any, UpdatePayloadType>,
-  res
-) {
+export async function tableUpdate(req: Request<any, any>, res) {
   const model = await Model.get(req.params.tableId);
 
   if (

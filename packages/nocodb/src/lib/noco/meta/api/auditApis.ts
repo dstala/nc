@@ -1,22 +1,11 @@
 import { Request, Response, Router } from 'express';
 import Audit from '../../../noco-models/Audit';
-import {
-  AuditListParamsType,
-  AuditOperationSubTypes,
-  AuditOperationTypes,
-  AuditRowUpdatePayloadType,
-  CommentCountParamsType,
-  CommentListParamsType,
-  CommentRowPayloadType
-} from 'nocodb-sdk';
+import { AuditOperationSubTypes, AuditOperationTypes } from 'nocodb-sdk';
 import Model from '../../../noco-models/Model';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import ncMetaAclMw from '../helpers/ncMetaAclMw';
 
-export async function commentRow(
-  req: Request<any, any, CommentRowPayloadType>,
-  res
-) {
+export async function commentRow(req: Request<any, any>, res) {
   res.json(
     await Audit.insert({
       ...req.body,
@@ -26,10 +15,7 @@ export async function commentRow(
   );
 }
 
-export async function auditRowUpdate(
-  req: Request<any, any, AuditRowUpdatePayloadType>,
-  res
-) {
+export async function auditRowUpdate(req: Request<any, any>, res) {
   const model = await Model.getByIdOrName({ id: req.body.fk_model_id });
   res.json(
     await Audit.insert({
@@ -47,16 +33,10 @@ export async function auditRowUpdate(
   );
 }
 
-export async function commentList(
-  req: Request<any, any, any, CommentListParamsType>,
-  res
-) {
+export async function commentList(req: Request<any, any, any>, res) {
   res.json(await Audit.commentsList(req.query));
 }
-export async function auditList(
-  req: Request<AuditListParamsType>,
-  res: Response
-) {
+export async function auditList(req: Request, res: Response) {
   res.json(
     new PagedResponseImpl(
       await Audit.projectAuditList(req.params.projectId, req.query),
@@ -68,10 +48,7 @@ export async function auditList(
   );
 }
 
-export async function commentsCount(
-  req: Request<any, any, any, CommentCountParamsType>,
-  res
-) {
+export async function commentsCount(req: Request<any, any, any>, res) {
   res.json(
     await Audit.commentsCount({
       fk_model_id: req.query.fk_model_id as string,

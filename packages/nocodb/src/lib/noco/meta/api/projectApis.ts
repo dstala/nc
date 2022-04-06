@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
 import Project from '../../../noco-models/Project';
-import {
-  CreatePayloadType,
-  ListParamsType,
-  ModelTypes,
-  ProjectListType
-} from 'nocodb-sdk';
+import { ModelTypes, ProjectListType } from 'nocodb-sdk';
 
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import syncMigration from '../helpers/syncMigration';
@@ -34,7 +29,7 @@ const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz_', 4);
 // // Project CRUD
 
 export async function projectGet(
-  req: Request<any, any, any, ListParamsType>,
+  req: Request<any, any, any>,
   res: Response<Project>
 ) {
   console.log(req.query.page);
@@ -49,7 +44,7 @@ export async function projectGet(
 }
 
 export async function projectList(
-  req: Request<any, any, any, ListParamsType>,
+  req: Request<any, any, any>,
   res: Response<ProjectListType>,
   next
 ) {
@@ -71,7 +66,7 @@ export async function projectList(
 }
 
 export async function projectDelete(
-  req: Request<any, any, any, ListParamsType>,
+  req: Request<any, any, any>,
   res: Response<ProjectListType>
 ) {
   const result = await Project.softDelete(req.params.projectId);
@@ -82,7 +77,7 @@ export async function projectDelete(
 //
 //
 
-async function projectCreate(req: Request<any, any, CreatePayloadType>, res) {
+async function projectCreate(req: Request<any, any>, res) {
   const projectBody = req.body;
   if (!projectBody.external) {
     const ranId = nanoid();

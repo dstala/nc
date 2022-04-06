@@ -30,7 +30,7 @@ import SESPluginConfig from '../../../../plugins/ses';
 import Noco from '../../Noco';
 import Local from '../../plugins/adapters/storage/Local';
 import { MetaTable } from '../../../utils/globals';
-import { PluginCategory, TestBodyType } from 'nocodb-sdk';
+import { PluginCategory } from 'nocodb-sdk';
 
 const defaultPlugins = [
   SlackPluginConfig,
@@ -178,7 +178,7 @@ class NcPluginMgrv2 {
     // }, {});
   }
 
-  public static async test(args: TestBodyType): Promise<boolean> {
+  public static async test(args): Promise<boolean> {
     args.input =
       typeof args?.input === 'string' ? JSON.parse(args?.input) : args?.input;
     switch (args.category) {

@@ -254,10 +254,10 @@ export type TestConnectionPayloadType = any;
 export type BulkDeletePayloadType = any[];
 
 export type BulkInsertPayloadType = any[];
-
-export type BulkUpdatePayloadType = object[];
-
-export type BulkUpdateAllPayloadType = object;
+//
+// export type BulkUpdatePayloadType = object[];
+//
+// export type BulkUpdateAllPayloadType = object;
 
 export interface BulkUpdateAllParamsType {
   where?: string;

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { PagedResponseImpl } from '../helpers/PagedResponse';
 import Plugin from '../../../noco-models/Plugin';
-import { PluginType, TestBodyType } from 'nocodb-sdk';
+import { PluginType } from 'nocodb-sdk';
 import NcPluginMgrv2 from '../helpers/NcPluginMgrv2';
 import ncMetaAclMw from '../helpers/ncMetaAclMw';
 import { Tele } from 'nc-help';
@@ -10,10 +10,7 @@ export async function pluginList(_req: Request, res: Response) {
   res.json(new PagedResponseImpl(await Plugin.list()));
 }
 
-export async function pluginTest(
-  req: Request<any, any, TestBodyType>,
-  res: Response
-) {
+export async function pluginTest(req: Request<any, any>, res: Response) {
   Tele.emit('evt', { evt_type: 'plugin:tested' });
   res.json(await NcPluginMgrv2.test(req.body));
 }

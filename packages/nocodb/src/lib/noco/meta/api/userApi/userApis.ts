@@ -1,9 +1,5 @@
 import { Request, Response } from 'express';
-import {
-  PasswordChangePayloadType,
-  PasswordForgotPayloadType,
-  TableType
-} from 'nocodb-sdk';
+import { TableType } from 'nocodb-sdk';
 import catchError, { NcError } from '../../helpers/catchError';
 const { isEmail } = require('validator');
 import * as ejs from 'ejs';
@@ -231,10 +227,7 @@ async function me(req, res): Promise<any> {
   res.json(req?.session?.passport?.user ?? {});
 }
 
-async function passwordChange(
-  req: Request<any, any, PasswordChangePayloadType>,
-  res
-): Promise<any> {
+async function passwordChange(req: Request<any, any>, res): Promise<any> {
   if (!(req as any).isAuthenticated()) {
     NcError.forbidden('Not allowed');
   }
@@ -270,10 +263,7 @@ async function passwordChange(
   res.json({ msg: 'Password updated successfully' });
 }
 
-async function passwordForgot(
-  req: Request<any, any, PasswordForgotPayloadType>,
-  res
-): Promise<any> {
+async function passwordForgot(req: Request<any, any>, res): Promise<any> {
   const _email = req.body.email;
   if (!_email) {
     NcError.badRequest('Please enter your email address.');

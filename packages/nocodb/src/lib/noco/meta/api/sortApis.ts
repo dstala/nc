@@ -3,12 +3,7 @@ import { Request, Response, Router } from 'express';
 import Model from '../../../noco-models/Model';
 // @ts-ignore
 import { PagedResponseImpl } from '../helpers/PagedResponse';
-import {
-  ListParamsType,
-  SortListType,
-  TableReqType,
-  TableType
-} from 'nocodb-sdk';
+import { SortListType, TableReqType, TableType } from 'nocodb-sdk';
 // @ts-ignore
 import ProjectMgrv2 from '../../../sqlMgr/v2/ProjectMgrv2';
 // @ts-ignore
@@ -22,7 +17,7 @@ export async function sortGet(req: Request, res: Response<TableType>) {}
 
 // @ts-ignore
 export async function sortList(
-  req: Request<any, any, any, ListParamsType>,
+  req: Request<any, any, any>,
   res: Response<SortListType>
 ) {
   const sortList = await Sort.list({ viewId: req.params.viewId });

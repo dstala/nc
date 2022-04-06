@@ -1,8 +1,4 @@
-import {
-  AuditOperationTypes,
-  AuditType,
-  CommentListParamsType
-} from 'nocodb-sdk';
+import { AuditOperationTypes, AuditType } from 'nocodb-sdk';
 import { MetaTable } from '../utils/globals';
 import Noco from '../noco/Noco';
 import Model from './Model';
@@ -83,7 +79,7 @@ export default class Audit implements AuditType {
 
     return audits?.map(a => new Audit(a));
   }
-  public static async commentsList(args: CommentListParamsType) {
+  public static async commentsList(args) {
     const query = Noco.ncMeta
       .knex(MetaTable.AUDIT)
       .where('row_id', args.row_id)
