@@ -533,272 +533,6 @@ export interface HookLogType {
   updated_at?: string;
 }
 
-export interface SigninPayloadType {
-  email: string;
-  password: string;
-}
-
-export interface PasswordForgotPayloadType {
-  email?: string;
-}
-
-export interface PasswordChangePayloadType {
-  currentPassword?: string;
-  newPassword?: string;
-  verifyPassword?: string;
-}
-
-export interface PasswordResetPayloadType {
-  new_password?: string;
-}
-
-export interface TokenVerifyPayloadType {
-  token?: string;
-  email?: string;
-}
-
-export type ProjectUserAddPayloadType = any;
-
-export type ProjectUserUpdatePayloadType = any;
-
-export interface ModelVisibilityListParamsType {
-  includeM2M?: boolean;
-  projectId: string;
-}
-
-export type ModelVisibilitySetPayloadType = any;
-
-export interface ListParamsType {
-  page?: number;
-  pageSize?: number;
-  sort?: string;
-}
-
-export type CreatePayloadType = ProjectType & { external?: boolean };
-
-export interface SharedBaseCreatePayloadType {
-  roles?: string;
-  password?: string;
-}
-
-export interface SharedBaseUpdatePayloadType {
-  roles?: string;
-  password?: string;
-}
-
-export interface UploadPayloadType {
-  files?: any;
-  json?: string;
-}
-
-export interface ListParams7Type {
-  page?: number;
-  pageSize?: number;
-  sort?: string;
-  includeM2M?: boolean;
-  projectId: string;
-}
-
-export interface UpdatePayloadType {
-  title?: string;
-}
-
-export interface ReorderPayloadType {
-  order?: string;
-}
-
-export type CreateInputType =
-  | ColumnType
-  | {
-      uidt: 'LinkToAnotherRecord';
-      title: string;
-      parentId: string;
-      childId: string;
-      type: 'hm' | 'bt' | 'mm';
-    };
-
-export interface UpdateInputType {
-  order?: string;
-  title?: string;
-  show_system_fields?: boolean;
-  lock_type?: 'collaborative' | 'locked' | 'personal';
-}
-
-export type CreatePayload8Type = any;
-
-export interface ShowAllColumnParamsType {
-  ignoreIds?: any[];
-  viewId: string;
-}
-
-export interface HideAllColumnParamsType {
-  ignoreIds?: any[];
-  viewId: string;
-}
-
-export type UpdatePayload4Type = any;
-
-export interface UpdatePayload7Type {
-  password?: string;
-}
-
-export type CreatePayload3Type = any;
-
-export interface ListParams4Type {
-  fields?: any[];
-  sort?: any[];
-  where?: string;
-  orgs: string;
-  projectName: string;
-  tableAlias: string;
-}
-
-export interface CreatePayload9Type {
-  description?: string;
-}
-
-export interface ListParams10Type {
-  fields?: any[];
-  sort?: any[];
-  where?: string;
-
-  /** Query params for nested data */
-  nested?: any;
-  orgs: string;
-  projectName: string;
-  tableAlias: string;
-  viewName: string;
-}
-
-export type CreatePayload5Type = any;
-
-export interface DataListPayloadType {
-  password?: string;
-  sorts?: SortType[];
-  filters?: FilterType[];
-}
-
-export interface DataListParamsType {
-  limit?: string;
-  offset?: string;
-  uuid: string;
-}
-
-export interface DataNestedListParamsType {
-  limit?: string;
-  offset?: string;
-  uuid: string;
-  rowId: string;
-  relationType: 'mm' | 'hm';
-  columnId: string;
-}
-
-export interface DataNestedExcludedListParamsType {
-  limit?: string;
-  offset?: string;
-  uuid: string;
-  rowId: string;
-  relationType: 'mm' | 'hm';
-  columnId: string;
-}
-
-export interface DataCreatePayloadType {
-  data?: any;
-  password?: string;
-}
-
-export interface CsvExportBodyType {
-  password?: string;
-  filters?: FilterType[];
-  sorts?: SortType[];
-}
-
-export interface DataRelationListPayloadType {
-  password?: string;
-}
-
-export interface DataRelationListParamsType {
-  limit?: string;
-  offset?: string;
-  uuid: string;
-  relationColumnId: string;
-}
-
-export interface SharedViewMetaGetPayloadType {
-  password?: string;
-}
-
-export type UpdatePayload10Type = any;
-
-export type UpdatePayload9Type = any;
-
-export interface CommentListParamsType {
-  row_id: string;
-  fk_model_id: string;
-  comments_only?: boolean;
-}
-
-export interface CommentRowPayloadType {
-  row_id: string;
-  fk_model_id: string;
-  comment: string;
-}
-
-export interface CommentCountParamsType {
-  ids: any[];
-  fk_model_id: string;
-}
-
-export interface AuditListParamsType {
-  offset?: string;
-  limit?: string;
-  projectId: string;
-}
-
-export interface AuditRowUpdatePayloadType {
-  fk_model_id?: string;
-  column_name?: string;
-  row_id?: string;
-  value?: string;
-  prev_value?: string;
-}
-
-export interface TestPayloadType {
-  payload?: { data?: any; user?: any };
-  hook?: HookType;
-}
-
-export interface TestBodyType {
-  id?: string;
-  title?: string;
-  input?: any;
-  category?: string;
-}
-
-export type TestConnectionPayloadType = any;
-
-export type BulkDeletePayloadType = any[];
-
-export type BulkInsertPayloadType = any[];
-
-export type BulkUpdatePayloadType = object[];
-
-export type BulkUpdateAllPayloadType = object;
-
-export interface BulkUpdateAllParamsType {
-  where?: string;
-  orgs: string;
-  projectName: string;
-  tableAlias: string;
-}
-
-export interface BulkDeleteAllParamsType {
-  where?: string;
-  orgs: string;
-  projectName: string;
-  tableAlias: string;
-}
-
 import axios, { AxiosInstance, AxiosRequestConfig, ResponseType } from 'axios';
 
 export type QueryParamsType = Record<string | number, any>;
@@ -982,7 +716,7 @@ export class Api<
      * @response `403` `void` Forbidden
      */
     signup: (
-      data: { email?: boolean; password?: string },
+      data: { email?: string; password?: string },
       params: RequestParams = {}
     ) =>
       this.request<{ token?: string }, void>({
@@ -1002,7 +736,10 @@ export class Api<
      * @request POST:/auth/user/signin
      * @response `200` `{ token?: string }` OK
      */
-    signin: (data: SigninPayloadType, params: RequestParams = {}) =>
+    signin: (
+      data: { email: string; password: string },
+      params: RequestParams = {}
+    ) =>
       this.request<{ token?: string }, any>({
         path: `/auth/user/signin`,
         method: 'POST',
@@ -1038,10 +775,7 @@ export class Api<
      * @request POST:/auth/password/forgot
      * @response `200` `void` OK
      */
-    passwordForgot: (
-      data: PasswordForgotPayloadType,
-      params: RequestParams = {}
-    ) =>
+    passwordForgot: (data: { email?: string }, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/auth/password/forgot`,
         method: 'POST',
@@ -1060,7 +794,11 @@ export class Api<
      * @response `200` `void` OK
      */
     passwordChange: (
-      data: PasswordChangePayloadType,
+      data: {
+        currentPassword?: string;
+        newPassword?: string;
+        verifyPassword?: string;
+      },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1114,7 +852,7 @@ export class Api<
      */
     passwordReset: (
       token: string,
-      data: PasswordResetPayloadType,
+      data: { new_password?: string },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1134,7 +872,10 @@ export class Api<
      * @request POST:/auth/token/verify
      * @response `200` `void` OK
      */
-    tokenVerify: (data: TokenVerifyPayloadType, params: RequestParams = {}) =>
+    tokenVerify: (
+      data: { token?: string; email?: string },
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/auth/token/verify`,
         method: 'POST',
@@ -1189,7 +930,7 @@ export class Api<
      */
     projectUserAdd: (
       projectId: string,
-      data: ProjectUserAddPayloadType,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1212,7 +953,7 @@ export class Api<
     projectUserUpdate: (
       projectId: string,
       userId: string,
-      data: ProjectUserUpdatePayloadType,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1284,7 +1025,8 @@ export class Api<
      * @response `200` `(any)[]` OK
      */
     modelVisibilityList: (
-      { projectId, ...query }: ModelVisibilityListParamsType,
+      projectId: string,
+      query?: { includeM2M?: boolean },
       params: RequestParams = {}
     ) =>
       this.request<any[], any>({
@@ -1305,7 +1047,7 @@ export class Api<
      */
     modelVisibilitySet: (
       projectId: string,
-      data: ModelVisibilitySetPayloadType,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1325,7 +1067,10 @@ export class Api<
      * @request GET:/projects/
      * @response `201` `ProjectListType`
      */
-    list: (query: ListParamsType, params: RequestParams = {}) =>
+    list: (
+      query?: { page?: number; pageSize?: number; sort?: string },
+      params: RequestParams = {}
+    ) =>
       this.request<ProjectListType, any>({
         path: `/projects/`,
         method: 'GET',
@@ -1341,7 +1086,10 @@ export class Api<
      * @request POST:/projects/
      * @response `200` `ProjectType` OK
      */
-    create: (data: CreatePayloadType, params: RequestParams = {}) =>
+    create: (
+      data: ProjectType & { external?: boolean },
+      params: RequestParams = {}
+    ) =>
       this.request<ProjectType, any>({
         path: `/projects/`,
         method: 'POST',
@@ -1423,7 +1171,7 @@ export class Api<
      */
     sharedBaseCreate: (
       projectId: string,
-      data: SharedBaseCreatePayloadType,
+      data: { roles?: string; password?: string },
       params: RequestParams = {}
     ) =>
       this.request<{ url?: string; uuid?: string }, any>({
@@ -1445,7 +1193,7 @@ export class Api<
      */
     sharedBaseUpdate: (
       projectId: string,
-      data: SharedBaseUpdatePayloadType,
+      data: { roles?: string; password?: string },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1497,7 +1245,8 @@ export class Api<
      * @response `200` `{ list: (AuditType)[], pageInfo: PaginatedType }` OK
      */
     auditList: (
-      { projectId, ...query }: AuditListParamsType,
+      projectId: string,
+      query?: { offset?: string; limit?: string },
       params: RequestParams = {}
     ) =>
       this.request<{ list: AuditType[]; pageInfo: PaginatedType }, any>({
@@ -1534,8 +1283,9 @@ export class Api<
      * @response `200` `any` OK
      */
     dataList: (
-      { uuid, ...query }: DataListParamsType,
-      data: DataListPayloadType,
+      uuid: string,
+      data: { password?: string; sorts?: SortType[]; filters?: FilterType[] },
+      query?: { limit?: string; offset?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1558,13 +1308,11 @@ export class Api<
      * @response `0` `any`
      */
     dataNestedList: (
-      {
-        uuid,
-        rowId,
-        relationType,
-        columnId,
-        ...query
-      }: DataNestedListParamsType,
+      uuid: string,
+      rowId: string,
+      relationType: 'mm' | 'hm',
+      columnId: string,
+      query?: { limit?: string; offset?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1585,13 +1333,11 @@ export class Api<
      * @response `0` `any`
      */
     dataNestedExcludedList: (
-      {
-        uuid,
-        rowId,
-        relationType,
-        columnId,
-        ...query
-      }: DataNestedExcludedListParamsType,
+      uuid: string,
+      rowId: string,
+      relationType: 'mm' | 'hm',
+      columnId: string,
+      query?: { limit?: string; offset?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1612,7 +1358,7 @@ export class Api<
      */
     dataCreate: (
       uuid: string,
-      data: DataCreatePayloadType,
+      data: { data?: any; password?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1635,7 +1381,7 @@ export class Api<
     csvExport: (
       uuid: string,
       type: 'csv' | 'excel',
-      data: CsvExportBodyType,
+      data: { password?: string; filters?: FilterType[]; sorts?: SortType[] },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1656,8 +1402,10 @@ export class Api<
      * @response `200` `any` OK
      */
     dataRelationList: (
-      { uuid, relationColumnId, ...query }: DataRelationListParamsType,
-      data: DataRelationListPayloadType,
+      uuid: string,
+      relationColumnId: string,
+      data: { password?: string },
+      query?: { limit?: string; offset?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1680,7 +1428,7 @@ export class Api<
      */
     sharedViewMetaGet: (
       uuid: string,
-      data: SharedViewMetaGetPayloadType,
+      data: { password?: string },
       params: RequestParams = {}
     ) =>
       this.request<object, any>({
@@ -1704,7 +1452,7 @@ export class Api<
     upload: (
       projectId: string,
       viewId: string,
-      data: UploadPayloadType,
+      data: { files?: any; json?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -1725,7 +1473,12 @@ export class Api<
      */
     update: (
       viewId: string,
-      data: UpdateInputType,
+      data: {
+        order?: string;
+        title?: string;
+        show_system_fields?: boolean;
+        lock_type?: 'collaborative' | 'locked' | 'personal';
+      },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1760,7 +1513,8 @@ export class Api<
      * @response `200` `void` OK
      */
     showAllColumn: (
-      { viewId, ...query }: ShowAllColumnParamsType,
+      viewId: string,
+      query?: { ignoreIds?: any[] },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -1779,7 +1533,8 @@ export class Api<
      * @response `200` `void` OK
      */
     hideAllColumn: (
-      { viewId, ...query }: HideAllColumnParamsType,
+      viewId: string,
+      query?: { ignoreIds?: any[] },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -2157,7 +1912,13 @@ export class Api<
      * @response `200` `TableListType`
      */
     list: (
-      { projectId, ...query }: ListParams7Type,
+      projectId: string,
+      query?: {
+        page?: number;
+        pageSize?: number;
+        sort?: string;
+        includeM2M?: boolean;
+      },
       params: RequestParams = {}
     ) =>
       this.request<TableListType, any>({
@@ -2193,7 +1954,7 @@ export class Api<
      */
     update: (
       tableId: string,
-      data: UpdatePayloadType,
+      data: { title?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -2230,7 +1991,7 @@ export class Api<
      */
     reorder: (
       tableId: string,
-      data: ReorderPayloadType,
+      data: { order?: string },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -2270,7 +2031,15 @@ export class Api<
      */
     create: (
       tableId: string,
-      data: CreateInputType,
+      data:
+        | ColumnType
+        | {
+            uidt: 'LinkToAnotherRecord';
+            title: string;
+            parentId: string;
+            childId: string;
+            type: 'hm' | 'bt' | 'mm';
+          },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -2380,11 +2149,7 @@ export class Api<
      * @request POST:/views/{viewId}/columns
      * @response `200` `void` OK
      */
-    create: (
-      viewId: string,
-      data: CreatePayload8Type,
-      params: RequestParams = {}
-    ) =>
+    create: (viewId: string, data: any, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/views/${viewId}/columns`,
         method: 'POST',
@@ -2420,7 +2185,7 @@ export class Api<
     update: (
       viewId: string,
       columnId: string,
-      data: UpdatePayload4Type,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -2458,7 +2223,7 @@ export class Api<
      */
     update: (
       viewId: string,
-      data: UpdatePayload7Type,
+      data: { password?: string },
       params: RequestParams = {}
     ) =>
       this.request<SharedViewType, any>({
@@ -2825,11 +2590,7 @@ export class Api<
      * @request POST:/data/{tableId}
      * @response `200` `any` OK
      */
-    create: (
-      tableId: string,
-      data: CreatePayload3Type,
-      params: RequestParams = {}
-    ) =>
+    create: (tableId: string, data: any, params: RequestParams = {}) =>
       this.request<any, any>({
         path: `/data/${tableId}`,
         method: 'POST',
@@ -2978,7 +2739,7 @@ export class Api<
     update: (
       tableId: string,
       rowId: string,
-      data: UpdatePayload10Type,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3015,7 +2776,10 @@ export class Api<
      * @response `200` `any` OK
      */
     list: (
-      { orgs, projectName, tableAlias, ...query }: ListParams4Type,
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      query?: { fields?: any[]; sort?: any[]; where?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3038,7 +2802,7 @@ export class Api<
       orgs: string,
       projectName: string,
       tableAlias: string,
-      data: CreatePayload9Type,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3085,7 +2849,7 @@ export class Api<
       projectName: string,
       tableAlias: string,
       rowId: string,
-      data: UpdatePayload9Type,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3130,7 +2894,7 @@ export class Api<
       orgs: string,
       projectName: string,
       tableAlias: string,
-      data: BulkDeletePayloadType,
+      data: any[],
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -3153,7 +2917,7 @@ export class Api<
       orgs: string,
       projectName: string,
       tableAlias: string,
-      data: BulkInsertPayloadType,
+      data: any[],
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -3176,7 +2940,7 @@ export class Api<
       orgs: string,
       projectName: string,
       tableAlias: string,
-      data: BulkUpdatePayloadType,
+      data: object[],
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3197,8 +2961,11 @@ export class Api<
      * @response `200` `any` OK
      */
     bulkUpdateAll: (
-      { orgs, projectName, tableAlias, ...query }: BulkUpdateAllParamsType,
-      data: BulkUpdateAllPayloadType,
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      data: object,
+      query?: { where?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3220,7 +2987,10 @@ export class Api<
      * @response `200` `any` OK
      */
     bulkDeleteAll: (
-      { orgs, projectName, tableAlias, ...query }: BulkDeleteAllParamsType,
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      query?: { where?: string },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3241,7 +3011,11 @@ export class Api<
      * @response `200` `any` OK
      */
     list: (
-      { orgs, projectName, tableAlias, viewName, ...query }: ListParams10Type,
+      orgs: string,
+      projectName: string,
+      tableAlias: string,
+      viewName: string,
+      query?: { fields?: any[]; sort?: any[]; where?: string; nested?: any },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3265,7 +3039,7 @@ export class Api<
       projectName: string,
       tableAlias: string,
       viewName: string,
-      data: CreatePayload5Type,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3314,7 +3088,7 @@ export class Api<
       tableAlias: string,
       viewName: string,
       rowId: string,
-      data: UpdatePayload9Type,
+      data: any,
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3358,7 +3132,10 @@ export class Api<
      * @response `201` `any` Created
      * @response `0` `any`
      */
-    commentList: (query: CommentListParamsType, params: RequestParams = {}) =>
+    commentList: (
+      query: { row_id: string; fk_model_id: string; comments_only?: boolean },
+      params: RequestParams = {}
+    ) =>
       this.request<any, any>({
         path: `/audits/comments`,
         method: 'GET',
@@ -3375,7 +3152,10 @@ export class Api<
      * @request POST:/audits/comments
      * @response `200` `void` OK
      */
-    commentRow: (data: CommentRowPayloadType, params: RequestParams = {}) =>
+    commentRow: (
+      data: { row_id: string; fk_model_id: string; comment: string },
+      params: RequestParams = {}
+    ) =>
       this.request<void, any>({
         path: `/audits/comments`,
         method: 'POST',
@@ -3393,7 +3173,10 @@ export class Api<
      * @response `201` `any` Created
      * @response `0` `any`
      */
-    commentCount: (query: CommentCountParamsType, params: RequestParams = {}) =>
+    commentCount: (
+      query: { ids: any[]; fk_model_id: string },
+      params: RequestParams = {}
+    ) =>
       this.request<any, any>({
         path: `/audits/comments/count`,
         method: 'GET',
@@ -3411,7 +3194,13 @@ export class Api<
      * @response `200` `void` OK
      */
     auditRowUpdate: (
-      data: AuditRowUpdatePayloadType,
+      data: {
+        fk_model_id?: string;
+        column_name?: string;
+        row_id?: string;
+        value?: string;
+        prev_value?: string;
+      },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -3430,10 +3219,7 @@ export class Api<
      * @request POST:/testConnection
      * @response `200` `{ code?: number, message?: string }` OK
      */
-    testConnection: (
-      data: TestConnectionPayloadType,
-      params: RequestParams = {}
-    ) =>
+    testConnection: (data: any, params: RequestParams = {}) =>
       this.request<{ code?: number; message?: string }, any>({
         path: `/testConnection`,
         method: 'POST',
@@ -3535,7 +3321,7 @@ export class Api<
      */
     test: (
       tableId: string,
-      data: TestPayloadType,
+      data: { payload?: { data?: any; user?: any }; hook?: HookType },
       params: RequestParams = {}
     ) =>
       this.request<any, any>({
@@ -3649,7 +3435,10 @@ export class Api<
      * @response `401` `void` Unauthorized
      * @response `0` `any`
      */
-    test: (data: TestBodyType, params: RequestParams = {}) =>
+    test: (
+      data: { id?: string; title?: string; input?: any; category?: string },
+      params: RequestParams = {}
+    ) =>
       this.request<any, void>({
         path: `/plugins/test`,
         method: 'POST',
@@ -3722,7 +3511,7 @@ export class Api<
      */
     create: (
       projectId: string,
-      data: CreatePayload9Type,
+      data: { description?: string },
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
