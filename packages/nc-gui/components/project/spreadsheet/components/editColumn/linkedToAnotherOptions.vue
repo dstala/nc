@@ -192,7 +192,7 @@ export default {
       this.isRefTablesLoading = false
     },
     async saveRelation() {
-      await this.$api.dbTable.create(this.meta.id, {
+      await this.$api.dbTableColumn.create(this.meta.id, {
         ...this.relation,
         parentId: this.meta.id,
         uidt: UITypes.LinkToAnotherRecord,

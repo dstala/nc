@@ -1,3 +1,5 @@
+import { ColumnReqType, ColumnType } from './Api';
+
 enum UITypes {
   ID = 'ID',
   LinkToAnotherRecord = 'LinkToAnotherRecord',
@@ -36,13 +38,19 @@ enum UITypes {
   Button = 'Button',
 }
 
-export function isVirtualCol(col: UITypes | { readonly uidt: UITypes }) {
+export function isVirtualCol(
+  col:
+    | UITypes
+    | { readonly uidt: UITypes | string }
+    | ColumnReqType
+    | ColumnType
+) {
   return [
     UITypes.LinkToAnotherRecord,
     UITypes.Formula,
     UITypes.Rollup,
     UITypes.Lookup,
-  ].includes(typeof col === 'object' ? col?.uidt : col);
+  ].includes(<UITypes>(typeof col === 'object' ? col?.uidt : col));
 }
 
 export default UITypes;

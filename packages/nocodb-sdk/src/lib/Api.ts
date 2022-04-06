@@ -533,6 +533,87 @@ export interface HookLogType {
   updated_at?: string;
 }
 
+export type ColumnReqType =
+  | {
+      uidt?:
+        | 'ID'
+        | 'SingleLineText'
+        | 'LongText'
+        | 'Attachment'
+        | 'Checkbox'
+        | 'MultiSelect'
+        | 'SingleSelect'
+        | 'Collaborator'
+        | 'Date'
+        | 'Year'
+        | 'Time'
+        | 'PhoneNumber'
+        | 'Email'
+        | 'URL'
+        | 'Number'
+        | 'Decimal'
+        | 'Currency'
+        | 'Percent'
+        | 'Duration'
+        | 'Rating'
+        | 'Count'
+        | 'DateTime'
+        | 'CreateTime'
+        | 'LastModifiedTime'
+        | 'AutoNumber'
+        | 'Geometry'
+        | 'JSON'
+        | 'SpecificDBType'
+        | 'Barcode'
+        | 'Button';
+      id?: string;
+      base_id?: string;
+      fk_model_id?: string;
+      title?: string;
+      dt?: string;
+      np?: string;
+      ns?: string;
+      clen?: string | number;
+      cop?: string;
+      pk?: boolean;
+      pv?: boolean;
+      rqd?: boolean;
+      column_name?: string;
+      un?: boolean;
+      ct?: string;
+      ai?: boolean;
+      unique?: boolean;
+      cdf?: string;
+      cc?: string;
+      csn?: string;
+      dtx?: string;
+      dtxp?: string;
+      dtxs?: string;
+      au?: boolean;
+      ''?: string;
+    }
+  | {
+      uidt: 'LinkToAnotherRecord';
+      title: string;
+      parentId: string;
+      childId: string;
+      type: 'hm' | 'bt' | 'mm';
+    }
+  | {
+      uidt?: 'Rollup';
+      title?: string;
+      fk_relation_column_id?: string;
+      fk_rollup_column_id?: string;
+      rollup_function?: string;
+    }
+  | {
+      uidt?: 'Lookup';
+      title?: string;
+      fk_relation_column_id?: string;
+      fk_lookup_column_id?: string;
+    }
+  | { uidt?: string; formula_raw?: string; formula?: string; title?: string };
+
 import axios, { AxiosInstance, AxiosRequestConfig, ResponseType } from 'axios';
 
 export type QueryParamsType = Record<string | number, any>;
@@ -704,7 +785,7 @@ export class Api<
 > extends HttpClient<SecurityDataType> {
   auth = {
     /**
-     * @description App user registration
+     * @description Create a new user with provided email and password and first user is marked as super admin.
      *
      * @tags Auth
      * @name Signup
@@ -728,7 +809,7 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Authenticate existing user with their email and password. Successful login will return a JWT access-token.
      *
      * @tags Auth
      * @name Signin
@@ -750,7 +831,7 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Returns authenticated user info
      *
      * @tags Auth
      * @name Me
@@ -767,7 +848,7 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Emails user with a reset url.
      *
      * @tags Auth
      * @name PasswordForgot
@@ -785,7 +866,7 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Change password of authenticated user with a new one.
      *
      * @tags Auth
      * @name PasswordChange
@@ -810,11 +891,11 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Validtae password reset url token.
      *
      * @tags Auth
      * @name PasswordResetTokenValidate
-     * @summary Password Reset
+     * @summary Reset Token Verify
      * @request POST:/auth/token/validate/{token}
      * @response `200` `void` OK
      */
@@ -826,11 +907,11 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Api for verifying email where token need to be passed which is shared to user email.
      *
      * @tags Auth
      * @name EmailValidate
-     * @summary Password Reset
+     * @summary Verify Email
      * @request POST:/auth/email/validate/{token}
      * @response `200` `void` OK
      */
@@ -842,7 +923,7 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Update user password to new by using reset token.
      *
      * @tags Auth
      * @name PasswordReset
@@ -889,7 +970,7 @@ export class Api<
      *
      * @tags Auth
      * @name TokenRefresh
-     * @summary Password Refresh
+     * @summary Refresh Token
      * @request POST:/auth/token/refresh
      * @response `200` `void` OK
      */
@@ -905,7 +986,7 @@ export class Api<
      *
      * @tags Auth
      * @name ProjectUserList
-     * @summary Password Refresh
+     * @summary Project Users
      * @request GET:/projects/{projectId}/users
      * @response `200` `{ users?: { list: (UserType)[], pageInfo: PaginatedType } }` OK
      */
@@ -925,6 +1006,7 @@ export class Api<
      *
      * @tags Auth
      * @name ProjectUserAdd
+     * @summary Project User Add
      * @request POST:/projects/{projectId}/users
      * @response `200` `any` OK
      */
@@ -947,6 +1029,7 @@ export class Api<
      *
      * @tags Auth
      * @name ProjectUserUpdate
+     * @summary Project User Update
      * @request PUT:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
      */
@@ -970,6 +1053,7 @@ export class Api<
      *
      * @tags Auth
      * @name ProjectUserRemove
+     * @summary Project User Remove
      * @request DELETE:/projects/{projectId}/users/{userId}
      * @response `200` `any` OK
      */
@@ -991,7 +1075,7 @@ export class Api<
      *
      * @tags Project
      * @name MetaGet
-     * @summary User Info
+     * @summary Project Info
      * @request GET:/projects/{projectId}/info
      * @response `200` `UserType` OK
      * @response `0` `{ Node?: string, Arch?: string, Platform?: string, Docker?: boolean, Database?: string, ProjectOnRootDB?: string, RootDB?: string, PackageVersion?: string }`
@@ -1021,6 +1105,7 @@ export class Api<
      *
      * @tags Project
      * @name ModelVisibilityList
+     * @summary UI ACL
      * @request GET:/projects/{projectId}/modelVisibility
      * @response `200` `(any)[]` OK
      */
@@ -2033,15 +2118,7 @@ export class Api<
      */
     create: (
       tableId: string,
-      data:
-        | ColumnType
-        | {
-            uidt: 'LinkToAnotherRecord';
-            title: string;
-            parentId: string;
-            childId: string;
-            type: 'hm' | 'bt' | 'mm';
-          },
+      data: ColumnReqType,
       params: RequestParams = {}
     ) =>
       this.request<void, any>({
@@ -2081,7 +2158,7 @@ export class Api<
     update: (
       tableId: string,
       columnId: string,
-      data: ColumnType,
+      data: ColumnReqType,
       params: RequestParams = {}
     ) =>
       this.request<ColumnType, any>({

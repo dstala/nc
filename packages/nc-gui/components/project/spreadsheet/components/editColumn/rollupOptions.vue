@@ -148,7 +148,7 @@ export default {
           rollup_function: this.rollup.fn
         }
 
-        const col = await this.$api.dbTable.create(this.meta.id, rollupCol)
+        const col = await this.$api.dbTableColumn.create(this.meta.id, rollupCol)
 
         console.log(col)
 
