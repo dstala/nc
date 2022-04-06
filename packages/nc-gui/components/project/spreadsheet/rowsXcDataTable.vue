@@ -869,9 +869,6 @@ export default {
         val: p
       })
     },
-    data(v) {
-      this.count = v.length
-    },
     selectedViewId(id) {
       if (this.tabsState[this.tabId] && this.tabsState[this.tabId].page) {
         this.page = this.tabsState[this.tabId].page || 1
