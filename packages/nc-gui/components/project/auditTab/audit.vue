@@ -107,11 +107,11 @@ export default {
       // }])
       const {
         list, pageInfo
-      } = (await this.$api.project.auditList({
-        projectId: this.$store.state.project.projectId,
-        limit: this.limit,
-        offset: this.limit * (this.page - 1)
-      }))
+      } = (await this.$api.project.auditList(
+        this.$store.state.project.projectId, {
+          limit: this.limit,
+          offset: this.limit * (this.page - 1)
+        }))
 
       this.audits = list
       this.count = pageInfo.totalRows

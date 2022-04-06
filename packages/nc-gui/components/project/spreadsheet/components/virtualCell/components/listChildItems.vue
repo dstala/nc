@@ -195,15 +195,15 @@ export default {
         // }])
 
         if (this.column && this.column.colOptions && this.rowId) {
-          this.data = (await this.$api.public.dataNestedList({
-            uuid: this.$route.params.id,
-            relationType: this.column.colOptions.type,
-            rowId: this.rowId,
-            limit: this.size,
-            offset: this.size * (this.page - 1),
+          this.data = (await this.$api.public.dataNestedList(
+            this.$route.params.id,
+            this.rowId,
+            this.column.colOptions.type,
+            this.column.fk_column_id || this.column.id, {
+              limit: this.size,
+              offset: this.size * (this.page - 1)
             // query: this.query,
-            columnId: this.column.fk_column_id || this.column.id
-          }, {}))
+            }, {}))
         }
 
         return

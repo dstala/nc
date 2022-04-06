@@ -356,7 +356,7 @@ export default {
     },
     async showAll() {
       if (!this.isPublic) {
-        await this.$api.dbView.showAllColumn({ viewId: this.viewId })
+        await this.$api.dbView.showAllColumn(this.viewId)
       }
       for (const f of this.fields) {
         f.show = true

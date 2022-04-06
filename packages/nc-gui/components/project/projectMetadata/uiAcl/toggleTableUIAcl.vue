@@ -148,10 +148,10 @@ export default {
   },
   methods: {
     async loadTableList() {
-      this.tables = (await this.$api.project.modelVisibilityList({
-        projectId: this.db.project_id,
-        includeM2M: this.$store.state.windows.includeM2M || ''
-      }))
+      this.tables = (await this.$api.project.modelVisibilityList(
+        this.db.project_id, {
+          includeM2M: this.$store.state.windows.includeM2M || ''
+        }))
       // this.tables = (await this.$store.dispatch('sqlMgr/ActSqlOp', [{
       //   dbAlias: this.db.meta.dbAlias,
       //   env: this.$store.getters['project/GtrEnv']

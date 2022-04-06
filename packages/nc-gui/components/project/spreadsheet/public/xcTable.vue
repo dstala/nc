@@ -548,10 +548,7 @@ export default {
             list,
             pageInfo: { totalRows: count }
           }
-        } = (await this.$api.public.dataList({
-          ...this.queryParams,
-          uuid: this.$route.params.id
-        }, {
+        } = (await this.$api.public.dataList(this.$route.params.id, {
           password: this.password,
           sorts: this.sorts && this.sorts.map(({
             fk_column_id,
@@ -561,7 +558,7 @@ export default {
             fk_column_id
           })),
           filters: this.filters
-        }
+        }, this.queryParams
         ))
 
         // this.client = client
