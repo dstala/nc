@@ -988,6 +988,7 @@ export default {
         //   }])
         await this.$api.dbTable.create(
           this.$store.state.project.projectId,
+          this.$store.state.project.bases[0].id,
           {
             table_name: this.nodes.table_name,
             title: this.nodes.title,
@@ -1328,22 +1329,15 @@ export default {
         const {
           list,
           pageInfo
-        } = (await this.$api.dbViewRow.list(
+        } = (await this.$api.dbViewRow.list('noco', this.$store.getters['project/GtrProjectName'], this.meta.title, this.selectedView.title,
           {
-            orgs: 'noco',
-            projectName: this.$store.getters['project/GtrProjectName'],
-            tableAlias: this.meta.title,
-            viewName: this.selectedView.title
-          },
-          {
-            query: {
-              ...this.queryParams,
-              ...(this._isUIAllowed('sortSync') ? {} : { sortArrJson: JSON.stringify(this.sortList) }),
-              ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
-              // sort: ['-FirstName'],
-              // where: '(FirstName,like,%ro)~or((FirstName,like,%a)~and(FirstName,like,%e%))'
-            }
-          }))
+            ...this.queryParams,
+            ...(this._isUIAllowed('sortSync') ? {} : { sortArrJson: JSON.stringify(this.sortList) }),
+            ...(this._isUIAllowed('filterSync') ? {} : { filterArrJson: JSON.stringify(this.filters) })
+            // sort: ['-FirstName'],
+            // where: '(FirstName,like,%ro)~or((FirstName,like,%a)~and(FirstName,like,%e%))'
+          }
+        ))
 
         this.count = pageInfo.totalRows// count
         this.data = list.map(row => ({

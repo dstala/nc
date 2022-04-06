@@ -956,13 +956,21 @@
         }
       ]
     },
-    "/projects/{projectId}/tables": {
+    "/projects/{projectId}/{baseId}/tables": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
           "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "baseId",
           "in": "path",
           "required": true
         }

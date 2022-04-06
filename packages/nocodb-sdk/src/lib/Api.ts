@@ -1886,16 +1886,17 @@ export class Api<
      *
      * @tags DB Table
      * @name Create
-     * @request POST:/projects/{projectId}/tables
+     * @request POST:/projects/{projectId}/{baseId}/tables
      * @response `200` `TableType` OK
      */
     create: (
       projectId: string,
+      baseId: string,
       data: TableReqType,
       params: RequestParams = {}
     ) =>
       this.request<TableType, any>({
-        path: `/projects/${projectId}/tables`,
+        path: `/projects/${projectId}/${baseId}/tables`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -1908,11 +1909,12 @@ export class Api<
      *
      * @tags DB Table
      * @name List
-     * @request GET:/projects/{projectId}/tables
+     * @request GET:/projects/{projectId}/{baseId}/tables
      * @response `200` `TableListType`
      */
     list: (
       projectId: string,
+      baseId: string,
       query?: {
         page?: number;
         pageSize?: number;
@@ -1922,7 +1924,7 @@ export class Api<
       params: RequestParams = {}
     ) =>
       this.request<TableListType, any>({
-        path: `/projects/${projectId}/tables`,
+        path: `/projects/${projectId}/${baseId}/tables`,
         method: 'GET',
         query: query,
         ...params,

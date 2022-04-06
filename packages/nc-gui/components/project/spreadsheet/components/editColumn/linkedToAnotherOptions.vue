@@ -185,10 +185,8 @@ export default {
     async loadTablesList() {
       this.isRefTablesLoading = true
 
-      const result = (await this.$api.dbTable.list({
-        projectId: this.$store.state.project.projectId,
-        baseId: this.$store.state.project.project.bases[0].id
-      })).list.filter(t => t.type === ModelTypes.TABLE)
+      const result = (await this.$api.dbTable.list(this.$store.state.project.projectId, this.$store.state.project.project.bases[0].id))
+        .list.filter(t => t.type === ModelTypes.TABLE)
 
       this.refTables = result // .data.list.map(({ table_name, title }) => ({ table_name, title }))
       this.isRefTablesLoading = false

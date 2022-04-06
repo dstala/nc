@@ -118,10 +118,7 @@ export default {
   },
   methods: {
     async loadTablesList() {
-      const result = (await this.$api.dbTable.list({
-        projectId: this.$store.state.project.projectId,
-        baseId: this.$store.state.project.project.bases[0].id
-      }))
+      const result = (await this.$api.dbTable.list(this.$store.state.project.projectId, this.$store.state.project.project.bases[0].id))
 
       this.tables = result.list
     },
