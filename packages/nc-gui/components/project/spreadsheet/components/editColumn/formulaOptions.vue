@@ -90,7 +90,7 @@ export default {
           text: fn,
           type: 'function'
         })),
-        ...this.meta.columns.map(c => ({
+        ...this.meta.columns.filter(c => !this.column || this.column.id !== c.id).map(c => ({
           text: c.title,
           type: 'column',
           c
@@ -201,7 +201,7 @@ export default {
         }
         pt.arguments.map(arg => this.validateAgainstMeta(arg, arr))
       } else if (pt.type === 'Identifier') {
-        if (this.meta.columns.every(c => c.title !== pt.name)) {
+        if (this.meta.columns.filter(c => !this.column || this.column.id !== c.id).every(c => c.title !== pt.name)) {
           arr.push(`Column with name '${pt.name}' is not available`)
         }
       } else if (pt.type === 'BinaryExpression') {
